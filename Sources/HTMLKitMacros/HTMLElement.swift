@@ -164,7 +164,7 @@ struct HTMLElement : ExpressionMacro {
         }
         let attributes_string:String = attributes.isEmpty ? "" : " " + attributes.joined(separator: " ")
         let extra_attributes_string:String = extra_attributes.isEmpty ? "" : " " + extra_attributes.joined(separator: " ")
-        var string:String = "\"<" + type.rawValue + attributes_string + extra_attributes_string + ">"
+        var string:String = (type == .html ? "\"<!DOCTYPE html>" : "\"") + "<" + type.rawValue + attributes_string + extra_attributes_string + ">"
         if !items.isEmpty {
             string += "\""
         }
