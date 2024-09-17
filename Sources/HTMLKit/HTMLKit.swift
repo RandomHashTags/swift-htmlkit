@@ -11,9 +11,6 @@ import HTMLKitMacros
 
 // MARK: Elements
 @freestanding(expression)
-public macro HTMLElement(elementType: HTMLElementType, innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
-
-@freestanding(expression)
 public macro html(xmlns: String? = nil, innerHTML: [String]) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: A

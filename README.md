@@ -12,7 +12,7 @@ Write HTML using Swift Macros.
   - create `div` element: `#div()`
   - create `div` element with "dark" and "mode" classes: `#div(attributes: [.class(["dark", "mode"])])`
 ### Example
-This html is compiled by following code
+This html is compiled by the following code
 ```html
 <!DOCTYPE html><html><body><div class="dark mode" title="Hover over message" draggable="false" inputmode="email" hidden="hidden">Unconstrained text<div></div><a><div><abbr></abbr></div></a><div></div><button disabled></button><video autoplay preload="auto" src="ezclap" width="5"></video></div></body></html>
 ```
