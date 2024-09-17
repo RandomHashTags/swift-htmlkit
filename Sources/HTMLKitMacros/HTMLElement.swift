@@ -21,14 +21,14 @@ extension HTMLElement {
     static func parse_element(node: some FreestandingMacroExpansionSyntax, context: some MacroExpansionContext) -> String {
         let macroName:String = node.macroName.text
         let type:HTMLElementType = HTMLElementType(rawValue: macroName) ?? HTMLElementType.a
-        let data:ElementData = parse_arguments(arguments: node.arguments)
+        let data:ElementData = parse_arguments(elementType: type, arguments: node.arguments)
         var string:String = (type == .html ? "<!DOCTYPE html>" : "") + "<" + type.rawValue + data.attributes + ">" + data.innerHTML
         if !type.isVoid {
             string += "</" + type.rawValue + ">"
         }
         return "\"" + string + "\""
     }
-    static func parse_arguments(arguments: LabeledExprListSyntax) -> ElementData {
+    static func parse_arguments(elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
         var attributes:[String] = []
         var innerHTML:[String] = []
         for element in arguments.children(viewMode: .all) {
@@ -42,7 +42,7 @@ extension HTMLElement {
                             innerHTML = parse_inner_html(child: child)
                             break
                         default: // extra attribute
-                            if let string:String = parse_extra_attribute(child: child) {
+                        if let string:String = parse_extra_attribute(elementType: elementType, child: child) {
                                 attributes.append(string)
                             }
                             break
@@ -54,7 +54,7 @@ extension HTMLElement {
     }
     static func parse_element_macro(expression: MacroExpansionExprSyntax) -> String {
         guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
-        let data:ElementData = parse_arguments(arguments: expression.arguments)
+        let data:ElementData = parse_arguments(elementType: elementType, arguments: expression.arguments)
         return "<" + elementType.rawValue + data.attributes + ">" + data.innerHTML + (elementType.isVoid ? "" : "</" + elementType.rawValue + ">")
     }
     static func parse_inner_html(child: LabeledExprSyntax) -> [String] {
@@ -170,7 +170,7 @@ private extension HTMLElement {
         return function.arguments.first!.expression.as(ArrayExprSyntax.self)!.elements.map({ $0.expression.as(StringLiteralExprSyntax.self)!.string })
     }
 
-    static func parse_extra_attribute(child: LabeledExprSyntax) -> String? {
+    static func parse_extra_attribute(elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
         let key:String = child.label!.text
         func yup(_ value: String) -> String {
             return key + "=\\\"" + value + "\\\""
@@ -183,7 +183,13 @@ private extension HTMLElement {
             return yup(string)
         }
         if let member:String = expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
-            return yup("\\(HTMLElementAttribute." + key[key.startIndex].uppercased() + key[key.index(after: key.startIndex)...] + "." + member + ")")
+            let inner:String
+            if elementType == .input && key == "type" {
+                inner = "InputMode"
+            } else {
+                inner = key[key.startIndex].uppercased() + key[key.index(after: key.startIndex)...]
+            }
+            return yup("\\(HTMLElementAttribute." + inner + "." + member + ")")
         }
         if let _:NilLiteralExprSyntax = expression.as(NilLiteralExprSyntax.self) {
             return nil

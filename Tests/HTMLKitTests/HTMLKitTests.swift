@@ -14,9 +14,13 @@ final class HTMLKitTests : XCTestCase {
 }
 
 extension HTMLKitTests {
-    func test_macro_html() {
+    func test_element_html() {
         XCTAssertEqual(#html(innerHTML: []), "<!DOCTYPE html><html></html>")
         XCTAssertEqual(#html(xmlns: "test", innerHTML: []), "<!DOCTYPE html><html xmlns=\"test\"></html>")
+    }
+    func test_element_input() {
+        let string:String = #input(type: .text)
+        XCTAssertEqual(string, "<input type=\"text\">")
     }
 }
 
@@ -28,6 +32,10 @@ extension HTMLKitTests {
             #div()
         ])
         XCTAssertEqual(string, "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
+    }
+    func test_void() {
+        let string:String = #area(innerHTML: [#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
+        XCTAssertEqual(string, "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
     }
 }
 
