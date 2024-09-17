@@ -21,7 +21,18 @@ extension HTMLKitTests {
 }
 
 extension HTMLKitTests {
-    func test_example1() {
+    func test_recursive() {
+        let string:String = #div(innerHTML: [
+            #div(),
+            #div(innerHTML: [#div(), #div(), #div()]),
+            #div()
+        ])
+        XCTAssertEqual(string, "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
+    }
+}
+
+extension HTMLKitTests {
+    func testExample1() {
         let test:String = #html(innerHTML: [
             #body(innerHTML: [
                 #div(

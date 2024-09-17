@@ -13,238 +13,72 @@ import SwiftDiagnostics
 
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        let arguments:LabeledExprListSyntax = node.arguments
-        let macroName:String = node.macroName.text
-        var type:HTMLElementType = HTMLElementType(rawValue: macroName) ?? HTMLElementType.a
-        var attributes:[String] = [], extra_attributes:[String] = []
-        var items:[Item] = []
-        for element in arguments.children(viewMode: .all) {
-            if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
-                if let key:String = child.label?.text {
-                    switch key {
-                        case "elementType":
-                            type = HTMLElementType(rawValue: child.expression.as(MemberAccessExprSyntax.self)!.declName.baseName.text) ?? HTMLElementType.div
-                            break
-                        case "attributes":
-                            attributes = parse_attributes(child: child)
-                            break
-                        case "accept",
-                                "alt",
-                                "as",
-                                "attributionsrc",
-                                "autocomplete",
-                                "autoplay",
-                                "blocking",
-                                "browsingtopics",
-                                "capture",
-                                "charset",
-                                "checked",
-                                "cite",
-                                "cols",
-                                "coords",
-                                "content",
-                                "controls",
-                                "controlslist",
-                                "credentialless",
-                                "crossorigin",
-                                "csp",
-                                "datetime",
-                                "decoding",
-                                "default",
-                                "defer",
-                                "dirname",
-                                "disabled",
-                                "disablepictureinpicture",
-                                "disableremoteplayback",
-                                "download",
-                                "elementtiming",
-                                "fetchpriority",
-                                "for",
-                                "form",
-                                "formaction",
-                                "formenctype",
-                                "formmethod",
-                                "formnovalidate",
-                                "formtarget",
-                                "height",
-                                "high",
-                                "href",
-                                "hreflang",
-                                "httpEquiv",
-                                "imagesizes",
-                                "integrity",
-                                "ismap",
-                                "kind",
-                                "label",
-                                "list",
-                                "loading",
-                                "loop",
-                                "low",
-                                "max",
-                                "maxlength",
-                                "media",
-                                "min",
-                                "minlength",
-                                "multiple",
-                                "muted",
-                                "name",
-                                "nomodule",
-                                "onafterprint",
-                                "onbeforeprint",
-                                "onbeforeunload",
-                                "onblur",
-                                "onerror",
-                                "onfocus",
-                                "onhashchange",
-                                "onlanguagechange",
-                                "onload",
-                                "onmessage",
-                                "onoffline",
-                                "ononline",
-                                "onpopstate",
-                                "onresize",
-                                "onstorange",
-                                "onunload",
-                                "open",
-                                "optimum",
-                                "pattern",
-                                "ping",
-                                "placeholder",
-                                "playsinline",
-                                "popovertarget",
-                                "popovertargetaction",
-                                "poster",
-                                "preload",
-                                "readonly",
-                                "referrerpolicy",
-                                "rel",
-                                "reversed",
-                                "required",
-                                "rows",
-                                "sandbox",
-                                "scope",
-                                "selected",
-                                "shadowrootclonable",
-                                "shadowrootdelegatesfocus",
-                                "shadowrootmode",
-                                "shadowrootserializable",
-                                "shape",
-                                "size",
-                                "sizes",
-                                "src",
-                                "srcdoc",
-                                "srclang",
-                                "srcset",
-                                "start",
-                                "step",
-                                "target",
-                                "template",
-                                "type",
-                                "usemap",
-                                "value",
-                                "width",
-                                "wrap",
-                                "xmlns":
-                            let string:String = parse_extra_attribute(child: child)
-                            if !string.isEmpty {
-                                extra_attributes.append(string)
-                            }
-                            break
-                        case "innerHTML":
-                            let array:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)!.elements
-                            parse_body(node: node, context: context, macroName: macroName, array: array, items: &items)
-                            break
-                        default:
-                            break
-                    }
-                } else if let array:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)?.elements {
-                    parse_body(node: node, context: context, macroName: macroName, array: array, items: &items)
-                }
-            }
-        }
-        let attributes_string:String = attributes.isEmpty ? "" : " " + attributes.joined(separator: " ")
-        let extra_attributes_string:String = extra_attributes.isEmpty ? "" : " " + extra_attributes.joined(separator: " ")
-        var string:String = (type == .html ? "\"<!DOCTYPE html>" : "\"") + "<" + type.rawValue + attributes_string + extra_attributes_string + ">"
-        if !items.isEmpty {
-            string += "\""
-        }
-        for item in items {
-            string += "+" + item.string
-        }
-        if !type.isVoid {
-            string += (items.isEmpty ? "" : " + \"") + "</" + type.rawValue + ">\""
-        }
-        return "\(raw: string)"
-    }
-    private static func parse_body(node: some FreestandingMacroExpansionSyntax, context: some MacroExpansionContext, macroName: String, array: ArrayElementListSyntax, items: inout [Item]) {
-        for element in array {
-            if let test:MacroExpansionExprSyntax = element.expression.as(MacroExpansionExprSyntax.self) {
-                let key:String
-                let recursive:Bool = macroName == test.macroName.text
-                if recursive { // swift macro limitation
-                    key = "#HTMLElement(elementType: ." + test.macroName.text + ","
-                } else {
-                    if test.macroName.text == "HTMLElement" {
-                        items.append(Item(isMacro: true, value: "\(test)"))
-                        break
-                    } else {
-                        key = "#" + test.macroName.text + "("
-                    }
-                }
-                var values:[String] = []
-                for child in test.arguments.children(viewMode: .all) {
-                    let label:LabeledExprSyntax = child.as(LabeledExprSyntax.self)!, key:String = label.label!.text + ": ", expression:ExprSyntax = label.expression
-                    var string:String = ""
-                    if let array:ArrayElementListSyntax = expression.as(ArrayExprSyntax.self)?.elements {
-                        var body_items:[Item] = []
-                        parse_body(node: node, context: context, macroName: macroName, array: array, items: &body_items)
-                        string = key + "[" + body_items.map({ $0.string }).joined(separator: ", ") + "]"
-                    } else {
-                        string = key + "\(expression)"
-                    }
-                    if !string.isEmpty {
-                        values.append(string)
-                    }
-                }
-                if recursive && values.isEmpty {
-                    values.append("innerHTML: []")
-                }
-                items.append(Item(isMacro: true, value: key + values.joined(separator: ",") + ")"))
-            } else if let text:String = element.expression.as(StringLiteralExprSyntax.self)?.string {
-                items.append(Item(isMacro: false, value: text))
-            } else {
-                var string:String = "\(element)"
-                while string[string.startIndex].isWhitespace {
-                    string.removeFirst()
-                }
-                while string[string.index(before: string.endIndex)].isWhitespace || string[string.index(before: string.endIndex)] == "," {
-                    string.removeLast()
-                }
-                var jugs:[Character] = [], offset:Int = 1
-                while string[string.index(string.startIndex, offsetBy: offset)] != "(" {
-                    jugs.append(string[string.index(string.startIndex, offsetBy: offset)])
-                    offset += 1
-                }
-                if string[string.index(string.startIndex, offsetBy: offset + 1)] == "." {
-                    let ez:String = String(jugs)
-                    string.insert(contentsOf: "HTMLElementAttribute." + ez[ez.startIndex].uppercased() + ez[ez.index(after: ez.startIndex)...], at: string.index(string.startIndex, offsetBy: offset+1)) 
-                }
-                if !string.starts(with: "HTMLElementAttribute") {
-                    string.insert(contentsOf: "HTMLElementAttribute", at: string.startIndex)
-                }
-                items.append(Item(isMacro: true, value: string))
-            }
-        }
+        return "\(raw: parse_element(node: node, context: context))"
     }
 }
 
 extension HTMLElement {
-    struct Item {
-        let string:String
-
-        init(isMacro: Bool, value: String) {
-            string = isMacro ? value : "\"" + value + "\""
+    static func parse_element(node: some FreestandingMacroExpansionSyntax, context: some MacroExpansionContext) -> String {
+        let macroName:String = node.macroName.text
+        let type:HTMLElementType = HTMLElementType(rawValue: macroName) ?? HTMLElementType.a
+        let data:ElementData = parse_arguments(arguments: node.arguments)
+        var string:String = (type == .html ? "<!DOCTYPE html>" : "") + "<" + type.rawValue + data.attributes + ">" + data.innerHTML
+        if !type.isVoid {
+            string += "</" + type.rawValue + ">"
         }
+        return "\"" + string + "\""
+    }
+    static func parse_arguments(arguments: LabeledExprListSyntax) -> ElementData {
+        var attributes:[String] = []
+        var innerHTML:[String] = []
+        for element in arguments.children(viewMode: .all) {
+            if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
+                if let key:String = child.label?.text {
+                    switch key {
+                        case "attributes":
+                            attributes = parse_attributes(child: child)
+                            break
+                        case "innerHTML":
+                            innerHTML = parse_inner_html(child: child)
+                            break
+                        default: // extra attribute
+                            if let string:String = parse_extra_attribute(child: child) {
+                                attributes.append(string)
+                            }
+                            break
+                    }
+                }
+            }
+        }
+        return ElementData(attributes: attributes, innerHTML: innerHTML)
+    }
+    static func parse_element_macro(expression: MacroExpansionExprSyntax) -> String {
+        guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
+        let data:ElementData = parse_arguments(arguments: expression.arguments)
+        return "<" + elementType.rawValue + data.attributes + ">" + data.innerHTML + (elementType.isVoid ? "" : "</" + elementType.rawValue + ">")
+    }
+    static func parse_inner_html(child: LabeledExprSyntax) -> [String] {
+        var innerHTML:[String] = []
+        if let array:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)?.elements {
+            for yoink in array {
+                if let macro:MacroExpansionExprSyntax = yoink.expression.as(MacroExpansionExprSyntax.self) {
+                    innerHTML.append(parse_element_macro(expression: macro))
+                } else if let string:String = yoink.expression.as(StringLiteralExprSyntax.self)?.string {
+                    innerHTML.append(string)
+                }
+            }
+        }
+        return innerHTML
+    }
+}
+
+struct ElementData {
+    let attributes:String
+    let innerHTML:String
+
+    init(attributes: [String], innerHTML: [String]) {
+        self.attributes = attributes.isEmpty ? "" : " " + attributes.joined(separator: " ")
+        self.innerHTML = innerHTML.joined()
     }
 }
 
@@ -332,14 +166,14 @@ private extension HTMLElement {
         return function.arguments.first!.expression.as(ArrayExprSyntax.self)!.elements.map({ $0.expression.as(StringLiteralExprSyntax.self)!.string })
     }
 
-    static func parse_extra_attribute(child: LabeledExprSyntax) -> String {
+    static func parse_extra_attribute(child: LabeledExprSyntax) -> String? {
         let key:String = child.label!.text
         func yup(_ value: String) -> String {
             return key + "=\\\"" + value + "\\\""
         }
         let expression:ExprSyntax = child.expression
         if let boolean:String = expression.as(BooleanLiteralExprSyntax.self)?.literal.text {
-            return boolean.elementsEqual("true") ? key : ""
+            return boolean.elementsEqual("true") ? key : nil
         }
         if let string:String = expression.as(StringLiteralExprSyntax.self)?.string {
             return yup(string)
@@ -348,7 +182,7 @@ private extension HTMLElement {
             return yup("\\(HTMLElementAttribute." + key[key.startIndex].uppercased() + key[key.index(after: key.startIndex)...] + "." + member + ")")
         }
         if let _:NilLiteralExprSyntax = expression.as(NilLiteralExprSyntax.self) {
-            return ""
+            return nil
         }
         if let integer:String = expression.as(IntegerLiteralExprSyntax.self)?.literal.text {
             return yup(integer)
@@ -356,7 +190,7 @@ private extension HTMLElement {
         if let float:String = expression.as(FloatLiteralExprSyntax.self)?.literal.text {
             return yup(float)
         }
-        return ""
+        return nil
     }
 }
 
