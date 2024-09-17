@@ -11,7 +11,7 @@ import HTMLKitMacros
 
 // MARK: Elements
 @freestanding(expression)
-public macro html(xmlns: String? = nil, innerHTML: [String]) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro html(xmlns: String? = nil, _ innerHTML: [String]) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: A
 @freestanding(expression)
@@ -26,14 +26,14 @@ public macro a(
     rel: String? = nil,
     target: HTMLElementAttribute.Target? = nil,
     type: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro abbr(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro abbr(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro address(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro address(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro area(
@@ -46,14 +46,14 @@ public macro area(
     referrerpolicy: HTMLElementAttribute.ReferrerPolicy? = nil,
     rel: String? = nil,
     target: HTMLElementAttribute.FormTarget? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro article(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro article(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro aside(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro aside(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro audio(
@@ -67,32 +67,32 @@ public macro audio(
     muted: Bool = false,
     preload: HTMLElementAttribute.Preload? = nil,
     src: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: B
 @freestanding(expression)
-public macro b(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro b(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro base(
     attributes: Set<HTMLElementAttribute> = [],
     href: String? = nil,
     target: HTMLElementAttribute.FormTarget? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro bdi(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro bdi(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro bdo(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro bdo(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro blockquote(
     attributes: Set<HTMLElementAttribute> = [],
     cite: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -114,11 +114,11 @@ public macro body(
     onresize: String? = nil,
     onstorage: String? = nil,
     onunload: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro br(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro br(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro button(
@@ -135,7 +135,7 @@ public macro button(
     popovertargetaction: HTMLElementAttribute.PopoverTargetAction? = nil,
     type: HTMLElementAttribute.ButtonType? = nil,
     value: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: C
@@ -144,30 +144,30 @@ public macro canvas(
     attributes: Set<HTMLElementAttribute> = [],
     height: Int? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro caption(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro caption(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro cite(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro cite(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro code(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro code(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro col(
     attributes: Set<HTMLElementAttribute> = [],
     span: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro colgroup(
     attributes: Set<HTMLElementAttribute> = [],
     span: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: D
@@ -175,21 +175,21 @@ public macro colgroup(
 public macro data(
     attributes: Set<HTMLElementAttribute> = [],
     value: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro datalist(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro datalist(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro dd(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro dd(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro del(
     attributes: Set<HTMLElementAttribute> = [],
     cite: String? = nil,
     datetime: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -197,31 +197,31 @@ public macro details(
     attributes: Set<HTMLElementAttribute> = [],
     open: Bool = false,
     name: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro dfn(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro dfn(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro dialog(
     attributes: Set<HTMLElementAttribute> = [],
     open: Bool = false,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro div(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro div(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro dl(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro dl(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro dt(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro dt(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: E
 @freestanding(expression)
-public macro em(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro em(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro embed(
@@ -230,7 +230,7 @@ public macro embed(
     src: String? = nil,
     type: String? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: F
@@ -240,7 +240,7 @@ public macro fencedframe(
     allow: String? = nil,
     height: Int? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -249,17 +249,17 @@ public macro fieldset(
     disabled: Bool = false,
     form: String? = nil,
     name: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro figcaption(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro figcaption(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro figure(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro figure(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro footer(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro footer(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro form(
@@ -269,43 +269,43 @@ public macro form(
     autocomplete: [String] = [],
     name: String? = nil,
     rel: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: H
 @freestanding(expression)
-public macro h1(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro h1(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro h2(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro h2(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro h3(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro h3(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro h4(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro h4(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro h5(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro h5(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro h6(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro h6(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro head(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro head(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro header(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro header(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro hgroup(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro hgroup(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro hr(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro hr(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: I
 @freestanding(expression)
-public macro i(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro i(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro iframe(
@@ -322,7 +322,7 @@ public macro iframe(
     src: String? = nil,
     srcdoc: String? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -343,7 +343,7 @@ public macro img(
     srcset: [String] = [],
     width: Int? = nil,
     usemap: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -382,7 +382,7 @@ public macro input(
     type: HTMLElementAttribute.InputMode? = nil,
     value: String? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -390,29 +390,29 @@ public macro ins(
     attributes: Set<HTMLElementAttribute> = [],
     cite: String? = nil,
     datetime: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: K
 @freestanding(expression)
-public macro kbd(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro kbd(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: L
 @freestanding(expression)
 public macro label(
     attributes: Set<HTMLElementAttribute> = [],
     for: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro legend(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro legend(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro li(
     attributes: Set<HTMLElementAttribute> = [],
     value: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -432,25 +432,25 @@ public macro link(
     rel: [String] = [],
     sizes: [String] = [],
     type: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: M
 @freestanding(expression)
-public macro main(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro main(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro map(
     attributes: Set<HTMLElementAttribute> = [],
     name: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro mark(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro mark(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro menu(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro menu(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro meta(
@@ -459,7 +459,7 @@ public macro meta(
     content: String? = nil,
     httpEquiv: HTMLElementAttribute.HttpEquiv? = nil,
     name: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -472,15 +472,15 @@ public macro meter(
     high: Float? = nil,
     optimum: Float? = nil,
     form: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: N
 @freestanding(expression)
-public macro nav(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro nav(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro noscript(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro noscript(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: O
 @freestanding(expression)
@@ -491,7 +491,7 @@ public macro object(
     name: String? = nil,
     type: String? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -500,7 +500,7 @@ public macro ol(
     reversed: Bool = false,
     start: Int? = nil,
     type: HTMLElementAttribute.NumberingType? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -508,7 +508,7 @@ public macro optgroup(
     attributes: Set<HTMLElementAttribute> = [],
     disabled: Bool = false,
     label: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -518,7 +518,7 @@ public macro option(
     label: String? = nil,
     selected: Bool = false,
     value: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -527,33 +527,33 @@ public macro output(
     for: [String] = [],
     form: String? = nil,
     name: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: P
 @freestanding(expression)
-public macro p(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro p(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro picture(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro picture(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro portal(
     attributes: Set<HTMLElementAttribute> = [],
     referrerpolicy: HTMLElementAttribute.ReferrerPolicy? = nil,
     src: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro pre(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro pre(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro progress(
     attributes: Set<HTMLElementAttribute> = [],
     max: Float? = nil,
     value: Float? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: Q
@@ -561,25 +561,25 @@ public macro progress(
 public macro q(
     attributes: Set<HTMLElementAttribute> = [],
     cite: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: R
 @freestanding(expression)
-public macro rp(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro rp(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro rt(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro rt(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro ruby(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro ruby(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: S
 @freestanding(expression)
-public macro s(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro s(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro samp(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro samp(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro script(
@@ -596,14 +596,14 @@ public macro script(
     referrerpolicy: HTMLElementAttribute.ReferrerPolicy? = nil,
     src: String? = nil,
     type: HTMLElementAttribute.ScriptType? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro search(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro search(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro section(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro section(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro select(
@@ -614,18 +614,18 @@ public macro select(
     name: String? = nil,
     required: Bool = false,
     size: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro slot(
     attributes: Set<HTMLElementAttribute> = [],
     name: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro small(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro small(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro source(
@@ -637,14 +637,14 @@ public macro source(
     media: String? = nil,
     height: Int? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro span(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro span(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro strong(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro strong(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro style(
@@ -652,24 +652,24 @@ public macro style(
     blocking: HTMLElementAttribute.Blocking? = nil,
     media: String? = nil,
     nonce: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro sub(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro sub(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro summary(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro summary(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro sup(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro sup(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: T
 @freestanding(expression)
-public macro table(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro table(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro tbody(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro tbody(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro td(
@@ -677,7 +677,7 @@ public macro td(
     colspan: Int? = nil,
     headers: [String] = [],
     rowspan: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -687,7 +687,7 @@ public macro template(
     shadowrootdelegatesfocus: Bool = false,
     shadowrootmode: HTMLElementAttribute.Template.ShadowRootMode? = nil,
     shadowrootserializable: Bool = false,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
@@ -706,11 +706,11 @@ public macro textarea(
     readonly: Bool = false,
     rows: Int? = nil,
     wrap: HTMLElementAttribute.Wrap? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro tfoot(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro tfoot(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro th(
@@ -720,24 +720,24 @@ public macro th(
     headers: [String] = [],
     rowspan: Int? = nil,
     scope: HTMLElementAttribute.Scope? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro thead(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro thead(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro time(
     attributes: Set<HTMLElementAttribute> = [],
     datetime: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro title(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro title(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro tr(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro tr(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro track(
@@ -747,19 +747,19 @@ public macro track(
     label: String? = nil,
     src: String? = nil,
     srclang: String? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: U
 @freestanding(expression)
-public macro u(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro u(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
-public macro ul(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro ul(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: V
 @freestanding(expression)
-public macro `var`(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro `var`(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro video(
@@ -778,12 +778,12 @@ public macro video(
     preload: HTMLElementAttribute.Preload? = nil,
     src: String? = nil,
     width: Int? = nil,
-    innerHTML: [String] = []
+    _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: W
 @freestanding(expression)
-public macro wbr(attributes: Set<HTMLElementAttribute> = [], innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro wbr(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 
 // MARK: HTMLElementAttribute

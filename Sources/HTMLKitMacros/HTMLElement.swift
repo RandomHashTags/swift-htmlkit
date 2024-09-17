@@ -38,15 +38,14 @@ extension HTMLElement {
                         case "attributes":
                             attributes = parse_attributes(child: child)
                             break
-                        case "innerHTML":
-                            innerHTML = parse_inner_html(child: child)
-                            break
                         default: // extra attribute
-                        if let string:String = parse_extra_attribute(elementType: elementType, child: child) {
+                            if let string:String = parse_extra_attribute(elementType: elementType, child: child) {
                                 attributes.append(string)
                             }
                             break
                     }
+                } else { // inner html
+                    innerHTML = parse_inner_html(child: child)
                 }
             }
         }

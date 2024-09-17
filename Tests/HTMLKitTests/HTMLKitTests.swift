@@ -15,8 +15,8 @@ final class HTMLKitTests : XCTestCase {
 
 extension HTMLKitTests {
     func test_element_html() {
-        XCTAssertEqual(#html(innerHTML: []), "<!DOCTYPE html><html></html>")
-        XCTAssertEqual(#html(xmlns: "test", innerHTML: []), "<!DOCTYPE html><html xmlns=\"test\"></html>")
+        XCTAssertEqual(#html([]), "<!DOCTYPE html><html></html>")
+        XCTAssertEqual(#html(xmlns: "test", []), "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
     func test_element_input() {
         let string:String = #input(type: .text)
@@ -26,15 +26,15 @@ extension HTMLKitTests {
 
 extension HTMLKitTests {
     func test_recursive() {
-        let string:String = #div(innerHTML: [
+        let string:String = #div([
             #div(),
-            #div(innerHTML: [#div(), #div(), #div()]),
+            #div([#div(), #div(), #div()]),
             #div()
         ])
         XCTAssertEqual(string, "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }
     func test_void() {
-        let string:String = #area(innerHTML: [#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
+        let string:String = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
         XCTAssertEqual(string, "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
     }
 }
@@ -49,8 +49,8 @@ extension HTMLKitTests {
 
 extension HTMLKitTests {
     func testExample1() {
-        let test:String = #html(innerHTML: [
-            #body(innerHTML: [
+        let test:String = #html([
+            #body([
                 #div(
                     attributes: [
                         .class(["bing", "bong"]),
@@ -59,10 +59,10 @@ extension HTMLKitTests {
                         .inputMode(.email),
                         .hidden(.hidden)
                     ],
-                    innerHTML: [
+                    [
                         "poggies",
                         #div(),
-                        #a(innerHTML: [#div(innerHTML: [#abbr()]), #address()]),
+                        #a([#div([#abbr()]), #address()]),
                         #div(),
                         #button(disabled: true),
                         #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "ezclap", width: 5),
@@ -71,5 +71,22 @@ extension HTMLKitTests {
             ])
         ])
         XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" title=\"just seeing what blow's\" draggable=\"false\" inputmode=\"email\" hidden=\"hidden\">poggies<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"ezclap\" width=\"5\"></video></div></body></html>")
+    }
+}
+
+extension HTMLKitTests {
+    func testExample2() {
+        var test:TestStruct = TestStruct(name: "one", array: ["1", "2", "3"])
+        XCTAssertEqual(test.html, "<p>one123</p>")
+        
+        test.name = "two"
+        test.array = [4, 5, 6, 7, 8]
+        XCTAssertEqual(test.html, "<p>two45678</p>")
+    }
+    struct TestStruct {
+        var name:String
+        var array:[CustomStringConvertible]
+        
+        var html : String { #p(["\(name)", "\(array.map({ "\($0)" }).joined())"]) }
     }
 }
