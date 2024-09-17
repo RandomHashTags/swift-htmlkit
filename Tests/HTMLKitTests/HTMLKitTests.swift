@@ -32,6 +32,14 @@ extension HTMLKitTests {
 }
 
 extension HTMLKitTests {
+    func test_attribute_data() {
+        let bro:Int = 0
+        let string:String = #div(attributes: [.data(id: "id", "\(bro)")])
+        XCTAssertEqual(string, "<div data-id=\"\(bro)\"></div>")
+    }
+}
+
+extension HTMLKitTests {
     func testExample1() {
         let test:String = #html(innerHTML: [
             #body(innerHTML: [

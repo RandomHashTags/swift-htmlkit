@@ -89,7 +89,7 @@ private extension HTMLElement {
         var attributes:[String] = []
         for attribute in elements {
             let function:FunctionCallExprSyntax = attribute.expression.as(FunctionCallExprSyntax.self)!
-            let functionName:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+            var functionName:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
             var string:String = ""
             switch functionName {
                 case "accesskey",
@@ -125,6 +125,10 @@ private extension HTMLElement {
                     string = parse_attribute_array(function).joined(separator: " ")
                     break
                 case "tabIndex": // TODO: fix
+                    break
+                case "data":
+                    functionName = "data-" + function.arguments.first!.expression.as(StringLiteralExprSyntax.self)!.string
+                    string = function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string
                     break
                 default:
                     break
@@ -340,7 +344,5 @@ public enum HTMLElementType : String, CaseIterable {
 }
 
 extension StringLiteralExprSyntax {
-    var string : String {
-        segments.children(viewMode: .sourceAccurate).first!.as(StringSegmentSyntax.self)!.content.text
-    }
+    var string : String { "\(segments)" }
 }
