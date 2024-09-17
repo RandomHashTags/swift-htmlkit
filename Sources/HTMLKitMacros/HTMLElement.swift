@@ -35,14 +35,14 @@ extension HTMLElement {
             if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
                 if let key:String = child.label?.text {
                     switch key {
-                        case "attributes":
-                            attributes = parse_attributes(child: child)
-                            break
-                        default: // extra attribute
-                            if let string:String = parse_extra_attribute(elementType: elementType, child: child) {
-                                attributes.append(string)
-                            }
-                            break
+                    case "attributes":
+                        attributes = parse_attributes(child: child)
+                        break
+                    default: // extra attribute
+                        if let string:String = parse_extra_attribute(elementType: elementType, child: child) {
+                            attributes.append(string)
+                        }
+                        break
                     }
                 } else { // inner html
                     innerHTML = parse_inner_html(child: child)
@@ -174,6 +174,17 @@ private extension HTMLElement {
         func yup(_ value: String) -> String {
             return key + "=\\\"" + value + "\\\""
         }
+        func member(_ value: String) -> String {
+            let inner:String
+            if elementType == .input && key == "type" {
+                inner = "InputMode"
+            } else if key == "height" || key == "width" {
+                inner = "CSSUnit"
+            } else {
+                inner = key[key.startIndex].uppercased() + key[key.index(after: key.startIndex)...]
+            }
+            return yup("\\(HTMLElementAttribute." + inner + value + ")")
+        }
         let expression:ExprSyntax = child.expression
         if let boolean:String = expression.as(BooleanLiteralExprSyntax.self)?.literal.text {
             return boolean.elementsEqual("true") ? key : nil
@@ -181,14 +192,8 @@ private extension HTMLElement {
         if let string:String = expression.as(StringLiteralExprSyntax.self)?.string {
             return yup(string)
         }
-        if let member:String = expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
-            let inner:String
-            if elementType == .input && key == "type" {
-                inner = "InputMode"
-            } else {
-                inner = key[key.startIndex].uppercased() + key[key.index(after: key.startIndex)...]
-            }
-            return yup("\\(HTMLElementAttribute." + inner + "." + member + ")")
+        if let value:String = expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
+            return member("." + value)
         }
         if let _:NilLiteralExprSyntax = expression.as(NilLiteralExprSyntax.self) {
             return nil
@@ -198,6 +203,9 @@ private extension HTMLElement {
         }
         if let float:String = expression.as(FloatLiteralExprSyntax.self)?.literal.text {
             return yup(float)
+        }
+        if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
+            return member("\(function)")
         }
         return nil
     }

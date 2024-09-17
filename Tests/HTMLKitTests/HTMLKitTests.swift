@@ -18,6 +18,9 @@ extension HTMLKitTests {
         XCTAssertEqual(#html([]), "<!DOCTYPE html><html></html>")
         XCTAssertEqual(#html(xmlns: "test", []), "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
+    func test_element_canvas() {
+        XCTAssertEqual(#canvas(height: .percent(4), width: .em(2.69)), "<canvas height=\"4.0%\" width=\"2.69em\"></canvas>")
+    }
     func test_element_input() {
         let string:String = #input(type: .text)
         XCTAssertEqual(string, "<input type=\"text\">")
@@ -66,11 +69,12 @@ extension HTMLKitTests {
                         #div(),
                         #button(disabled: true),
                         #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "ezclap", width: 5),
+                        #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "ezclap", width: "1cm"),
                     ]
                 )
             ])
         ])
-        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" title=\"just seeing what blow's\" draggable=\"false\" inputmode=\"email\" hidden=\"hidden\">poggies<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"ezclap\" width=\"5\"></video></div></body></html>")
+        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" title=\"just seeing what blow's\" draggable=\"false\" inputmode=\"email\" hidden=\"hidden\">poggies<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"ezclap\" width=\"5\"></video><video autoplay preload=\"auto\" src=\"ezclap\" width=\"1cm\"></video></div></body></html>")
     }
 }
 

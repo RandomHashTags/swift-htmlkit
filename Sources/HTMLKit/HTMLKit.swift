@@ -7,8 +7,6 @@
 
 import HTMLKitMacros
 
-// TODO: fix some `height` & `width` value types (they're CSS pixels, not only integers) | change some to `String` or allow overloads
-
 // MARK: Elements
 @freestanding(expression)
 public macro html(xmlns: String? = nil, _ innerHTML: [String]) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
@@ -142,8 +140,8 @@ public macro button(
 @freestanding(expression)
 public macro canvas(
     attributes: Set<HTMLElementAttribute> = [],
-    height: Int? = nil,
-    width: Int? = nil,
+    height: HTMLElementAttribute.CSSUnit? = nil,
+    width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
@@ -226,10 +224,10 @@ public macro em(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String
 @freestanding(expression)
 public macro embed(
     attributes: Set<HTMLElementAttribute> = [],
-    height: Int? = nil,
+    height: HTMLElementAttribute.CSSUnit? = nil,
     src: String? = nil,
     type: String? = nil,
-    width: Int? = nil,
+    width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
@@ -314,14 +312,14 @@ public macro iframe(
     browsingtopics: Bool = false,
     credentialless: Bool = false,
     csp: String? = nil,
-    height: Int? = nil,
+    height: HTMLElementAttribute.CSSUnit? = nil,
     loading: HTMLElementAttribute.Loading? = nil,
     name: String? = nil,
     referrerpolicy: HTMLElementAttribute.ReferrerPolicy? = nil,
     sandbox: [HTMLElementAttribute.Iframe.Sandbox] = [],
     src: String? = nil,
     srcdoc: String? = nil,
-    width: Int? = nil,
+    width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
@@ -334,14 +332,14 @@ public macro img(
     decoding: HTMLElementAttribute.Decoding? = nil,
     elementtiming: String? = nil,
     fetchpriority: HTMLElementAttribute.FetchPriority? = nil,
-    height: Int? = nil,
+    height: HTMLElementAttribute.CSSUnit? = nil,
     ismap: Bool = false,
     loading: HTMLElementAttribute.Loading? = nil,
     referrerpolicy: HTMLElementAttribute.ReferrerPolicy? = nil,
     sizes: [String] = [],
     src: String? = nil,
     srcset: [String] = [],
-    width: Int? = nil,
+    width: HTMLElementAttribute.CSSUnit? = nil,
     usemap: String? = nil,
     _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
@@ -362,7 +360,7 @@ public macro input(
     formmethod: HTMLElementAttribute.FormMethod? = nil,
     formnovalidate: Bool = false,
     formtarget: HTMLElementAttribute.FormTarget? = nil,
-    height: Int? = nil,
+    height: HTMLElementAttribute.CSSUnit? = nil,
     list: String? = nil,
     max: Int? = nil,
     maxlength: Int? = nil,
@@ -381,7 +379,7 @@ public macro input(
     step: Float? = nil,
     type: HTMLElementAttribute.InputMode? = nil,
     value: String? = nil,
-    width: Int? = nil,
+    width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
@@ -487,10 +485,10 @@ public macro noscript(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [
 public macro object(
     attributes: Set<HTMLElementAttribute> = [],
     form: String? = nil,
-    height: Int? = nil,
+    height: HTMLElementAttribute.CSSUnit? = nil,
     name: String? = nil,
     type: String? = nil,
-    width: Int? = nil,
+    width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
@@ -770,21 +768,20 @@ public macro video(
     crossorigin: HTMLElementAttribute.CrossOrigin? = nil,
     disablepictureinpicture: Bool = false,
     disableremoteplayback: Bool = false,
-    height: Int? = nil,
+    height: HTMLElementAttribute.CSSUnit? = nil,
     loop: Bool = false,
     muted: Bool = false,
     playsinline: Bool = true,
     poster: String? = nil,
     preload: HTMLElementAttribute.Preload? = nil,
     src: String? = nil,
-    width: Int? = nil,
+    width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: [String] = []
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: W
 @freestanding(expression)
 public macro wbr(attributes: Set<HTMLElementAttribute> = [], _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
-
 
 // MARK: HTMLElementAttribute
 public struct HTMLElementAttribute : Hashable {
@@ -793,6 +790,50 @@ public struct HTMLElementAttribute : Hashable {
     init(_ id: String) {
         self.id = id
     }
+}
+
+// MARK: CSSUnit
+public extension HTMLElementAttribute {
+    struct CSSUnit : CustomStringConvertible {
+        let string:String
+        init(_ string: String) {
+            self.string = string
+        }
+        public var description : String { string }
+    }
+}
+public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/cssref/css_units.php
+    // absolute
+    static func centimeters(_ value: Float) -> Self { Self("\(value)cm") }
+    static func millimeters(_ value: Float) -> Self { Self("\(value)mm") }
+    /// 1 inch = 96px = 2.54cm
+    static func inches(_ value: Float) -> Self      { Self("\(value)in") }
+    /// 1 pixel = 1/96th of 1inch
+    static func pixels(_ value: Float) -> Self      { Self("\(value)px") }
+    /// 1 point = 1/72 of 1inch
+    static func points(_ value: Float) -> Self      { Self("\(value)pt") }
+    /// 1 pica = 12 points
+    static func picas(_ value: Float) -> Self       { Self("\(value)pc") }
+    
+    // relative
+    /// Relative to the font-size of the element (2em means 2 times the size of the current font)
+    static func em(_ value: Float) -> Self             { Self("\(value)em") }
+    /// Relative to the x-height of the current font (rarely used)
+    static func ex(_ value: Float) -> Self             { Self("\(value)ex") }
+    /// Relative to the width of the "0" (zero)
+    static func ch(_ value: Float) -> Self             { Self("\(value)ch") }
+    /// Relative to font-size of the root element
+    static func rem(_ value: Float) -> Self            { Self("\(value)rem") }
+    /// Relative to 1% of the width of the viewport
+    static func viewportWidth(_ value: Float) -> Self  { Self("\(value)vw") }
+    /// Relative to 1% of the height of the viewport
+    static func viewportHeight(_ value: Float) -> Self { Self("\(value)vh") }
+    /// Relative to 1% of viewport's smaller dimension
+    static func viewportMin(_ value: Float) -> Self    { Self("\(value)vmin") }
+    /// Relative to 1% of viewport's larger dimension
+    static func viewportMax(_ value: Float) -> Self    { Self("\(value)vmax") }
+    /// Relative to the parent element
+    static func percent(_ value: Float) -> Self        { Self("\(value)%") }
 }
 
 // MARK: Global Attributes
