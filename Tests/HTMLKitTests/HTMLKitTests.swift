@@ -10,6 +10,18 @@ import XCTest
 
 final class HTMLKitTests : XCTestCase {
     func testExample() throws {
+    }
+}
+
+extension HTMLKitTests {
+    func test_macro_html() {
+        XCTAssertEqual(#html(innerHTML: []), "<!DOCTYPE html><html></html>")
+        XCTAssertEqual(#html(xmlns: "test", innerHTML: []), "<!DOCTYPE html><html xmlns=\"test\"></html>")
+    }
+}
+
+extension HTMLKitTests {
+    func test_example1() {
         let test:String = #html(innerHTML: [
             #body(innerHTML: [
                 #div(
@@ -31,6 +43,6 @@ final class HTMLKitTests : XCTestCase {
                 )
             ])
         ])
-        print("test=" + test)
+        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" title=\"just seeing what blow's\" draggable=\"false\" inputmode=\"email\" hidden=\"hidden\">poggies<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"ezclap\" width=\"5\"></video></div></body></html>")
     }
 }
