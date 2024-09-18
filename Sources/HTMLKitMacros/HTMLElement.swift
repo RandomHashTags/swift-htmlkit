@@ -31,10 +31,22 @@ extension HTMLElement {
                 if let key:String = child.label?.text {
                     switch key {
                     case "attributes":
-                        attributes = parse_attributes(child: child)
+                        let elements:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)!.elements
+                        for attribute in elements {
+                            let function:FunctionCallExprSyntax = attribute.expression.as(FunctionCallExprSyntax.self)!
+                            var functionName:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+                            var expression:ExprSyntax = function.arguments.first!.expression
+                            if functionName == "data" {
+                                functionName += "-" + function.arguments.first!.expression.as(StringLiteralExprSyntax.self)!.string
+                                expression = function.arguments.last!.expression
+                            }
+                            if let string:String = parse_attribute(elementType: elementType, key: functionName, expression: expression) {
+                                attributes.append(string)
+                            }
+                        }
                         break
                     default: // extra attribute
-                        if let string:String = parse_extra_attribute(elementType: elementType, child: child) {
+                        if let string:String = parse_attribute(elementType: elementType, child: child) {
                             attributes.append(string)
                         }
                         break
@@ -77,96 +89,13 @@ struct ElementData {
 
 // MARK: Parse Attribute
 private extension HTMLElement {
-    static func parse_attributes(child: LabeledExprSyntax) -> [String] {
-        let elements:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)!.elements
-        var attributes:[String] = []
-        for attribute in elements {
-            let function:FunctionCallExprSyntax = attribute.expression.as(FunctionCallExprSyntax.self)!
-            var functionName:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
-            var string:String = ""
-            switch functionName {
-                case "accesskey",
-                        "contentEditable",
-                        "dir",
-                        "draggable",
-                        "enterKeyHint",
-                        "hidden",
-                        "id",
-                        "inputMode",
-                        "is",
-                        "itemId",
-                        "itemProp",
-                        "itemRef",
-                        //"itemScope",
-                        "itemType",
-                        "lang",
-                        "nonce",
-                        "popover",
-                        "role",
-                        "slot",
-                        "spellcheck",
-                        "style",
-                        "title",
-                        "translate",
-                        "virtualKeyboardPolicy",
-                        "writingSuggestions":
-                    string = parse_attribute_string(functionName, function)
-                    break
-                case "class",
-                        "exportParts",
-                        "part":
-                    string = parse_attribute_array(function).joined(separator: " ")
-                    break
-                case "tabIndex": // TODO: fix
-                    break
-                case "data":
-                    functionName = "data-" + function.arguments.first!.expression.as(StringLiteralExprSyntax.self)!.string
-                    string = function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string
-                    break
-                default:
-                    break
-            }
-            if !string.isEmpty {
-                attributes.append(functionName.lowercased() + "=\\\"" + string + "\\\"")
-            }
-        }
-        return attributes
-    }
-    static func parse_attribute_string(_ key : String, _ function: FunctionCallExprSyntax) -> String {
-        let argument = function.arguments.first!
-        let expression:ExprSyntax = argument.expression
-        if let string:String = expression.as(StringLiteralExprSyntax.self)?.string {
-            return string
-        }
-        if let member = expression.as(MemberAccessExprSyntax.self) {
-            var token:[String] = []
-            var base:ExprSyntax? = member.base
-            while base != nil {
-                if let member:MemberAccessExprSyntax = base!.as(MemberAccessExprSyntax.self) {
-                    token.append(member.declName.baseName.text)
-                    base = member.base
-                } else if let decl:String = base!.as(DeclReferenceExprSyntax.self)?.baseName.text {
-                    token.append(decl)
-                    base = nil
-                } else {
-                    base = nil
-                }
-            }
-            if token.isEmpty {
-                token.append("HTMLElementAttribute." + key[key.startIndex].uppercased() + key[key.index(after: key.startIndex)...])
-            }
-            return "\\(" + token.reversed().joined(separator: ".") + "." + member.declName.baseName.text + ")"
-        }
-        return "?"
-    }
-    static func parse_attribute_array(_ function: FunctionCallExprSyntax) -> [String] {
-        return function.arguments.first!.expression.as(ArrayExprSyntax.self)!.elements.map({ $0.expression.as(StringLiteralExprSyntax.self)!.string })
+    static func parse_attribute(elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
+        return parse_attribute(elementType: elementType, key: child.label!.text, expression: child.expression)
     }
 
-    static func parse_extra_attribute(elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
-        let key:String = child.label!.text
+    static func parse_attribute(elementType: HTMLElementType, key: String, expression: ExprSyntax) -> String? {
         func yup(_ value: String) -> String {
-            return key + "=\\\"" + value + "\\\""
+            return key.lowercased() + "=\\\"" + value + "\\\""
         }
         func member(_ value: String) -> String {
             let inner:String
@@ -179,7 +108,6 @@ private extension HTMLElement {
             }
             return yup("\\(HTMLElementAttribute." + inner + value + ")")
         }
-        let expression:ExprSyntax = child.expression
         if let boolean:String = expression.as(BooleanLiteralExprSyntax.self)?.literal.text {
             return boolean.elementsEqual("true") ? key : nil
         }
@@ -200,6 +128,9 @@ private extension HTMLElement {
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
             return member("\(function)")
+        }
+        if let array:[String] = expression.as(ArrayExprSyntax.self)?.elements.map({ $0.expression.as(StringLiteralExprSyntax.self)!.string }) {
+            return yup(array.joined(separator: " "))
         }
         return nil
     }

@@ -51,7 +51,7 @@ extension HTMLKitTests {
 }
 
 extension HTMLKitTests {
-    func testExample1() {
+    func test_example_1() {
         let test:String = #html([
             #body([
                 #div(
