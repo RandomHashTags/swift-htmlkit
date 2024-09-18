@@ -5,32 +5,27 @@
 //  Created by Evan Anderson on 9/14/24.
 //
 
-import SwiftCompilerPlugin
 import SwiftSyntax
 import SwiftSyntaxMacros
-import SwiftSyntaxBuilder
-import SwiftDiagnostics
 
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        return "\(raw: parse_element(node: node, context: context))"
+        return "\"\(raw: parse_element(node: node, context: context))\""
     }
 }
 
 extension HTMLElement {
     static func parse_element(node: some FreestandingMacroExpansionSyntax, context: some MacroExpansionContext) -> String {
-        let macroName:String = node.macroName.text
-        let type:HTMLElementType = HTMLElementType(rawValue: macroName) ?? HTMLElementType.a
+        let type:HTMLElementType = HTMLElementType(rawValue: node.macroName.text) ?? HTMLElementType.a
         let data:ElementData = parse_arguments(elementType: type, arguments: node.arguments)
         var string:String = (type == .html ? "<!DOCTYPE html>" : "") + "<" + type.rawValue + data.attributes + ">" + data.innerHTML
         if !type.isVoid {
             string += "</" + type.rawValue + ">"
         }
-        return "\"" + string + "\""
+        return string
     }
     static func parse_arguments(elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
-        var attributes:[String] = []
-        var innerHTML:[String] = []
+        var attributes:[String] = [], innerHTML:[String] = []
         for element in arguments.children(viewMode: .all) {
             if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
                 if let key:String = child.label?.text {
@@ -72,8 +67,7 @@ extension HTMLElement {
 }
 
 struct ElementData {
-    let attributes:String
-    let innerHTML:String
+    let attributes:String, innerHTML:String
 
     init(attributes: [String], innerHTML: [String]) {
         self.attributes = attributes.isEmpty ? "" : " " + attributes.joined(separator: " ")
@@ -212,7 +206,7 @@ private extension HTMLElement {
 }
 
 // MARK: HTMLElementType
-public enum HTMLElementType : String, CaseIterable {
+enum HTMLElementType : String {
     case html
     
     case a
@@ -346,7 +340,7 @@ public enum HTMLElementType : String, CaseIterable {
 
     case wbr
 
-    public var isVoid : Bool {
+    var isVoid : Bool {
         switch self {
             case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
                 return true

@@ -5,8 +5,6 @@
 //  Created by Evan Anderson on 9/14/24.
 //
 
-import HTMLKitMacros
-
 // MARK: Elements
 @freestanding(expression)
 public macro html(xmlns: String? = nil, _ innerHTML: [String]) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")

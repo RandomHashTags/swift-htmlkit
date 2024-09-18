@@ -68,13 +68,12 @@ extension HTMLKitTests {
                         #a([#div([#abbr()]), #address()]),
                         #div(),
                         #button(disabled: true),
-                        #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "ezclap", width: 5),
-                        #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "ezclap", width: "1cm"),
+                        #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "ezclap", width: .centimeters(1)),
                     ]
                 )
             ])
         ])
-        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" title=\"just seeing what blow's\" draggable=\"false\" inputmode=\"email\" hidden=\"hidden\">poggies<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"ezclap\" width=\"5\"></video><video autoplay preload=\"auto\" src=\"ezclap\" width=\"1cm\"></video></div></body></html>")
+        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" title=\"just seeing what blow's\" draggable=\"false\" inputmode=\"email\" hidden=\"hidden\">poggies<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"ezclap\" width=\"1.0cm\"></video></div></body></html>")
     }
 }
 
