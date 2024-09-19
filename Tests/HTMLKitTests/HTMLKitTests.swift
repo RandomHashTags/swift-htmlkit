@@ -9,7 +9,18 @@ import XCTest
 @testable import HTMLKit
 
 final class HTMLKitTests : XCTestCase {
-    func testExample() throws {
+    func testExample1() {
+        measureElapsedTime(key: "htmlkit") {
+            let _:String = #html([
+                #body([
+                    #h1(["Swift HTML Benchmarks"])
+                ])
+            ])
+        }
+    }
+    func measureElapsedTime(key: String, _ block: () -> Void) {
+        let duration:ContinuousClock.Duration = ContinuousClock().measure(block)
+        print("measureElapsedTime;" + key + " took=\(duration)")
     }
 }
 
@@ -45,7 +56,7 @@ extension HTMLKitTests {
 extension HTMLKitTests {
     func test_attribute_data() {
         let bro:Int = 0
-        let string:String = #div(attributes: [.data(id: "id", "\(bro)")])
+        let string:String = #div(data: ("id", "\(bro)"))
         XCTAssertEqual(string, "<div data-id=\"\(bro)\"></div>")
     }
 }
@@ -55,25 +66,28 @@ extension HTMLKitTests {
         let test:String = #html([
             #body([
                 #div(
-                    attributes: [
-                        .class(["bing", "bong"]),
-                        .title("just seeing what blow's"),
-                        .draggable(.false),
-                        .inputMode(.email),
-                        .hidden(.hidden)
-                    ],
+                    class: ["bing", "bong"],
+                    draggable: .false,
+                    hidden: .hidden,
+                    inputmode: .email,
+                    title: "just seeing what blow's",
                     [
-                        "poggies",
+                        "Random text",
                         #div(),
-                        #a([#div([#abbr()]), #address()]),
+                        #a([
+                            #div([
+                                #abbr()
+                            ]),
+                            #address()
+                        ]),
                         #div(),
                         #button(disabled: true),
-                        #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "ezclap", width: .centimeters(1)),
+                        #video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1)),
                     ]
                 )
             ])
         ])
-        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" title=\"just seeing what blow's\" draggable=\"false\" inputmode=\"email\" hidden=\"hidden\">poggies<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"ezclap\" width=\"1.0cm\"></video></div></body></html>")
+        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" draggable=\"false\" hidden=\"hidden\" inputmode=\"email\" title=\"just seeing what blow's\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1.0cm\"></video></div></body></html>")
     }
 }
 
