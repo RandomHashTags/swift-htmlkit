@@ -29,12 +29,20 @@ extension HTMLKitTests {
         XCTAssertEqual(#html([]), "<!DOCTYPE html><html></html>")
         XCTAssertEqual(#html(xmlns: "test", []), "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
+    func test_element_button() {
+        XCTAssertEqual(#button(type: .submit), "<button type=\"submit\"></button>")
+    }
     func test_element_canvas() {
         XCTAssertEqual(#canvas(height: .percent(4), width: .em(2.69)), "<canvas height=\"4.0%\" width=\"2.69em\"></canvas>")
     }
     func test_element_input() {
-        let string:String = #input(type: .text)
-        XCTAssertEqual(string, "<input type=\"text\">")
+        XCTAssertEqual(#input(type: .text), "<input type=\"text\">")
+    }
+    func test_element_ol() {
+        XCTAssertEqual(#ol(type: .a), "<ol type=\"a\"></ol>")
+    }
+    func test_element_script() {
+        XCTAssertEqual(#script(type: .classic), "<script type=\"classic\"></script>")
     }
 }
 

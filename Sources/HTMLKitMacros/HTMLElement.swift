@@ -11,7 +11,7 @@ import SwiftSyntaxMacros
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         let type:HTMLElementType = HTMLElementType(rawValue: node.macroName.text)!
-        let data:ElementData = parse_arguments(arguments: node.arguments)
+        let data:ElementData = parse_arguments(elementType: type, arguments: node.arguments)
         var string:String = (type == .html ? "<!DOCTYPE html>" : "") + "<" + type.rawValue + data.attributes + ">" + data.innerHTML
         if !type.isVoid {
             string += "</" + type.rawValue + ">"
@@ -21,7 +21,7 @@ struct HTMLElement : ExpressionMacro {
 }
 
 private extension HTMLElement {
-    static func parse_arguments(arguments: LabeledExprListSyntax) -> ElementData {
+    static func parse_arguments(elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
         for element in arguments.children(viewMode: .all) {
             if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
@@ -30,7 +30,7 @@ private extension HTMLElement {
                         let tuple:TupleExprSyntax = child.expression.as(TupleExprSyntax.self)!
                         key += "-\(tuple.elements.first!.expression.as(StringLiteralExprSyntax.self)!.string)"
                         attributes.append(key + "=\\\"\(tuple.elements.last!.expression.as(StringLiteralExprSyntax.self)!.string)\\\"")
-                    } else if let string:String = parse_attribute(key: key, expression: child.expression) {
+                    } else if let string:String = parse_attribute(elementType: elementType, key: key, expression: child.expression) {
                         attributes.append(string)
                     }
                 } else if let array:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)?.elements { // inner html
@@ -48,7 +48,7 @@ private extension HTMLElement {
     }
     static func parse_element_macro(expression: MacroExpansionExprSyntax) -> String {
         guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
-        let data:ElementData = parse_arguments(arguments: expression.arguments)
+        let data:ElementData = parse_arguments(elementType: elementType, arguments: expression.arguments)
         return "<" + elementType.rawValue + data.attributes + ">" + data.innerHTML + (elementType.isVoid ? "" : "</" + elementType.rawValue + ">")
     }
 
@@ -61,7 +61,7 @@ private extension HTMLElement {
         }
     }
     
-    static func parse_attribute(key: String, expression: ExprSyntax) -> String? {
+    static func parse_attribute(elementType: HTMLElementType, key: String, expression: ExprSyntax) -> String? {
         if let boolean:String = expression.as(BooleanLiteralExprSyntax.self)?.literal.text {
             return boolean.elementsEqual("true") ? key : nil
         }
@@ -79,7 +79,24 @@ private extension HTMLElement {
             return yup(value)
         }
         func member(_ value: String) -> String {
-            return yup("\\(HTMLElementAttribute." + key + value + ")")
+            var enumName:String = key
+            switch elementType.rawValue + key { // better performance than switching key, than switching elementType
+                case "buttontype":
+                    enumName = "buttontype"
+                    break
+                case "inputtype":
+                    enumName = "inputmode"
+                    break
+                case "oltype":
+                    enumName = "numberingtype"
+                    break
+                case "scripttype":
+                    enumName = "scripttype"
+                    break
+                default:
+                    break
+            }
+            return yup("\\(HTMLElementAttribute." + enumName + value + ")")
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
             return member("\(function)")

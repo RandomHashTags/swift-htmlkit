@@ -4,8 +4,8 @@ Write HTML using Swift Macros.
 - Swift Macros are powerful and offer performance benefits
 - Alternative libraries may not fit all situations and may restrict how the html is generated/manipulated, prone to human error, or cost a constant performance overhead (middleware, rendering, result builders, etc)
 - HTML macros enforce safety, can be used anywhere, and compile directly to strings which are easily manipulated
-- The output is already minified at no performance cost
-### Examples
+- The output is minified at no performance cost
+## Examples
 ```swift
 let test:String = #html([
     #body([

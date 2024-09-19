@@ -4575,12 +4575,7 @@ public macro wbr(
     _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: HTMLElementAttribute
-public struct HTMLElementAttribute : Hashable {
-    public let id:String
-
-    init(_ id: String) {
-        self.id = id
-    }
+public enum HTMLElementAttribute {
 }
 
 // MARK: CSSUnit
@@ -4628,7 +4623,6 @@ public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/css
 }
 
 public extension HTMLElementAttribute {
-    typealias type = inputmode
     typealias height = CSSUnit
     typealias width = CSSUnit
 
