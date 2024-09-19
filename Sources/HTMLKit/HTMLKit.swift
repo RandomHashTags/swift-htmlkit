@@ -46,7 +46,7 @@ public macro a(
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
     
-    attributionsrc: [String] = [],
+    attributionsrc: [String]? = nil,
     download: HTMLElementAttribute.download? = nil,
     href: String? = nil,
     hreflang: String? = nil,
@@ -3401,7 +3401,7 @@ public macro script(
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
     
     async: Bool = false,
-    attributionsrc: [String] = [],
+    attributionsrc: [String]? = nil,
     blocking: HTMLElementAttribute.blocking? = nil,
     crossorigin: HTMLElementAttribute.crossorigin? = nil,
     defer: Bool = false,
@@ -4729,23 +4729,6 @@ public extension HTMLElementAttribute {
         case refresh
     }
 
-    enum sandbox : String {
-        case allowDownloads = "allow-downloads"
-        case allowForms = "allow-forms"
-        case allowModals = "allow-modals"
-        case allowOrientationLock = "allow-orientation-lock"
-        case allowPointerLock = "allow-pointer-lock"
-        case allowPopups = "allow-popups"
-        case allowPopupsToEscapeSandbox = "allow-popups-to-escape-sandbox"
-        case allowPresentation = "allow-presentation"
-        case allowSameOrigin = "allow-same-origin"
-        case allowScripts = "allow-scripts"
-        case allowStorageAccessByUserActiviation = "allow-storage-access-by-user-activation"
-        case allowTopNavigation = "allow-top-navigation"
-        case allowTopNavigationByUserActivation = "allow-top-navigation-by-user-activation"
-        case allowTopNavigationToCustomProtocols = "allow-top-navigation-to-custom-protocols"
-    }
-
     enum inputmode {
         case none, text, decimal, numeric, tel, search, email, url
     }
@@ -4919,6 +4902,23 @@ public extension HTMLElementAttribute {
                 case time
             }
         }
+    }
+
+    enum sandbox : String {
+        case allowDownloads = "allow-downloads"
+        case allowForms = "allow-forms"
+        case allowModals = "allow-modals"
+        case allowOrientationLock = "allow-orientation-lock"
+        case allowPointerLock = "allow-pointer-lock"
+        case allowPopups = "allow-popups"
+        case allowPopupsToEscapeSandbox = "allow-popups-to-escape-sandbox"
+        case allowPresentation = "allow-presentation"
+        case allowSameOrigin = "allow-same-origin"
+        case allowScripts = "allow-scripts"
+        case allowStorageAccessByUserActiviation = "allow-storage-access-by-user-activation"
+        case allowTopNavigation = "allow-top-navigation"
+        case allowTopNavigationByUserActivation = "allow-top-navigation-by-user-activation"
+        case allowTopNavigationToCustomProtocols = "allow-top-navigation-to-custom-protocols"
     }
 
     enum scripttype : String {

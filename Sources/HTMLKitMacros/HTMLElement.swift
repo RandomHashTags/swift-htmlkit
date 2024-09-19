@@ -81,11 +81,14 @@ private extension HTMLElement {
         if let float:String = expression.as(FloatLiteralExprSyntax.self)?.literal.text {
             return yup(float)
         }
-        if let value:String = expression.as(ArrayExprSyntax.self)?.elements.map({ $0.expression.as(StringLiteralExprSyntax.self)!.string }).joined(separator: " ") { // TODO: fix: [Int], [HTMLElementAttribute.controlslist], [HTMLElementAttribute.sandbox]
+        // TODO: fix: [Int], [HTMLElementAttribute.controlslist], [HTMLElementAttribute.sandbox]
+        // TODO: fix: attributionsrc attribute has two possible return values (Bool, [String])
+        // TODO: fix: some attributes return a comma separated string instead of space separated
+        if let value:String = expression.as(ArrayExprSyntax.self)?.elements.map({ $0.expression.as(StringLiteralExprSyntax.self)!.string }).joined(separator: " ") {
             return yup(value)
         }
         func member(_ value: String) -> String {
-            var enumName:String = key
+            let enumName:String
             switch elementType.rawValue + key { // better performance than switching key, than switching elementType
                 case "buttontype":
                     enumName = "buttontype"
@@ -100,9 +103,20 @@ private extension HTMLElement {
                     enumName = "scripttype"
                     break
                 default:
+                    enumName = key
                     break
             }
-            return yup("\\(HTMLElementAttribute." + enumName + value + ")")
+            let string:String
+            switch enumName {
+                case "contenteditable", "crossorigin", "download", "formenctype", "hidden", "httpequiv", "numberingtype", "referrerpolicy", "sandbox", "scripttype",
+                        "width", "height":
+                    string = "\\(HTMLElementAttribute." + enumName + value + ")"
+                    break
+                default:
+                    string = String(value[value.index(after: value.startIndex)...])
+                    break
+            }
+            return yup(string)
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
             return member("\(function)")
