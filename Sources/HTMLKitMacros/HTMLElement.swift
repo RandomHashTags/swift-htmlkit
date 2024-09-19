@@ -20,6 +20,12 @@ struct HTMLElement : ExpressionMacro {
     }
 }
 
+/*extension HTMLElement : BodyMacro {
+    static func expansion(of node: AttributeSyntax, providingBodyFor declaration: some DeclSyntaxProtocol & WithOptionalCodeBlockSyntax, in context: some MacroExpansionContext) throws -> [CodeBlockItemSyntax] {
+        return ["test: String? = nil,"]
+    }
+}*/
+
 private extension HTMLElement {
     static func parse_arguments(elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []

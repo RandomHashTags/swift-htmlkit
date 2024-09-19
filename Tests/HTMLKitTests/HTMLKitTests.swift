@@ -8,6 +8,17 @@
 import XCTest
 @testable import HTMLKit
 
+/*
+extension StaticString : Equatable {
+    public static func == (left: Self, right: Self) -> Bool {
+        return left.withUTF8Buffer { lp in
+            right.withUTF8Buffer { rp in
+                return String(decoding: lp, as: UTF8.self) == String(decoding: rp, as: UTF8.self)
+            }
+        }
+    }
+}*/
+
 final class HTMLKitTests : XCTestCase {
     func testExample1() {
         measureElapsedTime(key: "htmlkit") {
