@@ -35,6 +35,7 @@ let package = Package(
         .target(
             name: "HTMLKit",
             dependencies: [
+                "HTMLKitUtilities",
                 "HTMLKitMacros"
             ]
         ),

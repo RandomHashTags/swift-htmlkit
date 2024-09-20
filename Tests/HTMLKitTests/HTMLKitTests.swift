@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable import HTMLKit
+import HTMLKit
 
 /*extension StaticString : Equatable {
     public static func == (left: Self, right: Self) -> Bool {
@@ -42,6 +42,9 @@ extension HTMLKitTests {
     @Test func test_element_area() {
         #expect(#area(coords: [1, 2, 3]) == "<area coords=\"1,2,3\">")
     }
+    @Test func test_element_audio() {
+        #expect(#audio(controlslist: .nodownload) == "<audio controlslist=\"nodownload\"></audio>")
+    }
     @Test func test_element_button() {
         #expect(#button(type: .submit) == "<button type=\"submit\"></button>")
     }
@@ -50,6 +53,9 @@ extension HTMLKitTests {
     }
     @Test func test_element_form() {
         #expect(#form(acceptCharset: ["utf-8"], autocomplete: .on) == "<form accept-charset=\"utf-8\" autocomplete=\"on\"></form>")
+    }
+    @Test func test_element_iframe() {
+        #expect(#iframe(sandbox: [.allowDownloads, .allowForms]) == "<iframe sandbox=\"allow-downloads allow-forms\"></iframe>")
     }
     @Test func test_element_input() {
         #expect(#input(autocomplete: ["email", "password"], type: .text) == "<input autocomplete=\"email password\" type=\"text\">")
@@ -76,6 +82,9 @@ extension HTMLKitTests {
     }
     @Test func test_element_text_area() {
         #expect(#textarea(autocomplete: ["email", "password"], rows: 5) == "<textarea autocomplete=\"email password\" rows=\"5\"></textarea>")
+    }
+    @Test func test_element_video() {
+        #expect(#video(controlslist: [.nodownload, .nofullscreen, .noremoteplayback]) == "<video controlslist=\"nodownload nofullscreen noremoteplayback\"></video>")
     }
 }
 

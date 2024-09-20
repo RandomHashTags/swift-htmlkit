@@ -21,12 +21,6 @@ struct HTMLElement : ExpressionMacro {
     }
 }
 
-/*extension HTMLElement : BodyMacro {
-    static func expansion(of node: AttributeSyntax, providingBodyFor declaration: some DeclSyntaxProtocol & WithOptionalCodeBlockSyntax, in context: some MacroExpansionContext) throws -> [CodeBlockItemSyntax] {
-        return ["test: String? = nil,"]
-    }
-}*/
-
 private extension HTMLElement {
     static func parse_arguments(elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
@@ -87,34 +81,32 @@ private extension HTMLElement {
         if let float:String = expression.as(FloatLiteralExprSyntax.self)?.literal.text {
             return yup(float)
         }
-        // TODO: fix: [HTMLElementAttribute.controlslist], [HTMLElementAttribute.sandbox]
-        if let value:String = expression.as(ArrayExprSyntax.self)?.elements.map({
-            $0.expression.as(StringLiteralExprSyntax.self)?.string
-            ?? $0.expression.as(IntegerLiteralExprSyntax.self)!.literal.text
+        func enumName() -> String {
+            switch elementType.rawValue + key { // better performance than switching key, than switching elementType
+            case "buttontype": return "buttontype"
+            case "inputtype":  return "inputmode"
+            case "oltype":     return "numberingtype"
+            case "scripttype": return "scripttype"
+            default:           return key
+            }
+        }
+        if let value:String = expression.as(ArrayExprSyntax.self)?.elements.compactMap({
+            if let string:String = $0.expression.as(StringLiteralExprSyntax.self)?.string {
+                return string
+            }
+            if let string:String = $0.expression.as(IntegerLiteralExprSyntax.self)?.literal.text {
+                return string
+            }
+            if let string:String = $0.expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
+                return HTMLElementAttribute.htmlValue(enumName: enumName(), for: string)
+            }
+            return nil
         }).joined(separator: get_separator(key: key)) {
             return yup(value)
         }
         func member(_ value: String) -> String {
-            let enumName:String
-            switch elementType.rawValue + key { // better performance than switching key, than switching elementType
-            case "buttontype":
-                enumName = "buttontype"
-                break
-            case "inputtype":
-                enumName = "inputmode"
-                break
-            case "oltype":
-                enumName = "numberingtype"
-                break
-            case "scripttype":
-                enumName = "scripttype"
-                break
-            default:
-                enumName = key
-                break
-            }
             var string:String = String(value[value.index(after: value.startIndex)...])
-            string = HTMLElementAttribute.htmlValue(enumName: enumName, for: string)
+            string = HTMLElementAttribute.htmlValue(enumName: enumName(), for: string)
             return yup(string)
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
