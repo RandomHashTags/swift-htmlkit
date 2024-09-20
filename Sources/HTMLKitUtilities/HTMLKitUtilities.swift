@@ -5,10 +5,6 @@
 //  Created by Evan Anderson on 9/19/24.
 //
 
-// MARK: HTMLElementAttribute
-public enum HTMLElementAttribute {
-}
-
 // MARK: CSSUnit
 public extension HTMLElementAttribute {
     struct CSSUnit {
@@ -48,6 +44,9 @@ public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/css
     static func percent(_ value: Float) -> Self        { Self() }
 }
 
+// MARK: HTMLElement Attributes
+public enum HTMLElementAttribute {
+}
 public extension HTMLElementAttribute {
     typealias height = CSSUnit
     typealias width = CSSUnit
@@ -239,145 +238,88 @@ public extension HTMLElementAttribute {
         }
     }
 
-    enum Role { // TODO: support
-        public enum Value : String {
-            case alert
-            case alertdialog
-            case application
-            case article
+    /// [The first rule](https://www.w3.org/TR/using-aria/#rule1) of ARIA use is "If you can use a native HTML element or attribute with the semantics and behavior you require already built in, instead of re-purposing an element and adding an ARIA role, state or property to make it accessible, then do so."
+    /// 
+    /// - Note: There is a saying "No ARIA is better than bad ARIA." In [WebAim's survey of over one million home pages](https://webaim.org/projects/million/#aria), they found that Home pages with ARIA present averaged 41% more detected errors than those without ARIA. While ARIA is designed to make web pages more accessible, if used incorrectly, it can do more harm than good.
+    /// 
+    /// Like any other web technology, there are varying degrees of support for ARIA. Support is based on the operating system and browser being used, as well as the kind of assistive technology interfacing with it. In addition, the version of the operating system, browser, and assistive technology are contributing factors. Older software versions may not support certain ARIA roles, have only partial support, or misreport its functionality.
+    ///
+    /// It is also important to acknowledge that some people who rely on assistive technology are reluctant to upgrade their software, for fear of losing the ability to interact with their computer and browser. Because of this, it is important to use semantic HTML elements whenever possible, as semantic HTML has far better support for assistive technology.
+    /// 
+    /// It is also important to test your authored ARIA with actual assistive technology. This is because browser emulators and simulators are not really effective for testing full support. Similarly, proxy assistive technology solutions are not sufficient to fully guarantee functionality.
+    ///
+    /// Learn more at https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA .
+    enum role : String {
+        case alert
+        case alertdialog
+        case associationlist
+        case associationlistitemkey
+        case associationlistitemvalue
 
-            case banner
-            case button
+        case banner
+        case blockquote
 
-            case cell
-            case checkbox
-            case columnheader
-            case combobox
-            case command
-            case comment
-            case complementary
-            case composite
-            case contentinfo
+        case caption
+        case code
+        case combobox
+        case comment
+        case complementary
+        case contentinfo
 
-            case definition
-            case dialog
-            case directory
-            //case document(Document)
+        case deletion
+        case dialog
 
-            case feed
-            case figure
-            case form
+        case emphasis
 
-            case generic
-            case grid
-            case gridcell
-            case group
+        case feed
+        case form
 
-            case heading
+        case generic
 
-            case img
-            case input
+        case insertion
 
-            case landmark
-            case link
-            case list
-            case listbox
-            case listitem
-            case log
+        case log
 
-            case main
-            case mark
-            case marquee
-            case math
-            case menu
-            case menubar
-            case menuitem
-            case menuitemcheckbox
-            case menuitemradio
-            case meter
+        case main
+        case mark
+        case marquee
+        case math
+        case menu
+        case menubar
 
-            case navigation
-            case none
-            case note
+        case navigation
+        case none
+        case note
+        
+        case paragraph
+        case presentation
 
-            case option
-            
-            case presentation
-            case progressbar
+        case region
 
-            case radio
-            case radiogroup
-            case range
-            case region
-            case roletype
-            case row
-            case rowgroup
-            case rowheader
+        case scrollbar
+        case search
+        case searchbox
+        case sectionhead
+        case separator
+        case slider
+        case spinbutton
+        case status
+        case strong
+        case `subscript`
+        case superscript
+        case suggestion
+        case `switch`
 
-            case scrollbar
-            case search
-            case searchbox
-            case section
-            case sectionhead
-            case select
-            case separator
-            case slider
-            case spinbutton
-            case status
-            case structure
-            case suggestion
-            case `switch`
-
-            case tab
-            case table
-            case tablist
-            case tabpanel
-            case term
-            case textbox
-            case timer
-            case toolbar
-            case tooltip
-            case tree
-            case treegrid
-            case treeitem
-
-            case widget
-            case window
-
-            /*package var rawValue : RawValue {
-                switch self {
-                    case .document(let bro):
-                        return bro.rawValue
-                    default:
-                        return "\(self)"
-                }
-            }*/
-
-            public enum Document : String {
-                case associationlist
-                case associationlistitemkey
-                case associationlistitemvalue
-                case blockquote
-                case caption
-                case code
-                case deletion
-                case emphasis
-                case figure
-                case heading
-                case img
-                case insertion
-                case list
-                case listitem
-                case mark
-                case meter
-                case paragraph
-                case strong
-                case `subscript`
-                case superscript
-                case term
-                case time
-            }
-        }
+        case tab
+        case tablist
+        case tabpanel
+        case time
+        case timer
+        case toolbar
+        case tooltip
+        case tree
+        case treegrid
+        case treeitem
     }
 
     enum sandbox : String {
