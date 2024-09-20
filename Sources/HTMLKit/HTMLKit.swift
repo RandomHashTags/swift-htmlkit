@@ -137,7 +137,8 @@ public macro address(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro area(
@@ -221,7 +222,8 @@ public macro article(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro aside(
@@ -258,7 +260,8 @@ public macro aside(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro audio(
@@ -344,7 +347,8 @@ public macro b(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro base(
@@ -422,7 +426,8 @@ public macro bdi(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro bdo(
@@ -459,7 +464,8 @@ public macro bdo(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro blockquote(
@@ -591,7 +597,8 @@ public macro br(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro button(
@@ -721,7 +728,8 @@ public macro caption(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro cite(
@@ -758,7 +766,8 @@ public macro cite(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro code(
@@ -795,7 +804,8 @@ public macro code(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro col(
@@ -953,7 +963,8 @@ public macro datalist(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro dd(
@@ -990,7 +1001,8 @@ public macro dd(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro del(
@@ -1109,7 +1121,8 @@ public macro dfn(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro dialog(
@@ -1186,7 +1199,8 @@ public macro div(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro dl(
@@ -1223,7 +1237,8 @@ public macro dl(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro dt(
@@ -1260,7 +1275,8 @@ public macro dt(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: E
 @freestanding(expression)
@@ -1298,7 +1314,8 @@ public macro em(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro embed(
@@ -1463,7 +1480,8 @@ public macro figcaption(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro figure(
@@ -1500,7 +1518,8 @@ public macro figure(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro footer(
@@ -1537,7 +1556,8 @@ public macro footer(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro form(
@@ -1576,8 +1596,7 @@ public macro form(
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
     
     acceptCharset: [String] = [],
-    //autocapitalize: HTMLElementAttribute.autocapitalize? = nil,
-    autocomplete: [String] = [],
+    autocomplete: HTMLElementAttribute.autocomplete? = nil,
     name: String? = nil,
     rel: String? = nil,
     _ innerHTML: [String] = []
@@ -1619,7 +1638,8 @@ public macro h1(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro h2(
@@ -1656,7 +1676,8 @@ public macro h2(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro h3(
@@ -1693,7 +1714,8 @@ public macro h3(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro h4(
@@ -1730,7 +1752,8 @@ public macro h4(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro h5(
@@ -1767,7 +1790,8 @@ public macro h5(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro h6(
@@ -1804,7 +1828,8 @@ public macro h6(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro head(
@@ -1841,7 +1866,8 @@ public macro head(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro header(
@@ -1878,7 +1904,8 @@ public macro header(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro hgroup(
@@ -1915,7 +1942,8 @@ public macro hgroup(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro hr(
@@ -1952,7 +1980,8 @@ public macro hr(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: I
 @freestanding(expression)
@@ -1990,7 +2019,8 @@ public macro i(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro iframe(
@@ -2135,7 +2165,7 @@ public macro input(
     
     accept: [String] = [],
     alt: String? = nil,
-    //autocomplete: [String] = [],
+    autocomplete: [String] = [],
     capture: HTMLElementAttribute.capture? = nil,
     checked: Bool = false,
     dirname: HTMLElementAttribute.dirname? = nil,
@@ -2246,7 +2276,8 @@ public macro kbd(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: L
 @freestanding(expression)
@@ -2324,7 +2355,8 @@ public macro legend(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro li(
@@ -2410,6 +2442,7 @@ public macro link(
     href: String? = nil,
     hreflang: String? = nil,
     imagesizes: [String] = [],
+    imagesrcset: [String] = [],
     integrity: String? = nil,
     media: String? = nil,
     referrerpolicy: HTMLElementAttribute.referrerpolicy? = nil,
@@ -2455,7 +2488,8 @@ public macro main(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro map(
@@ -2532,7 +2566,8 @@ public macro mark(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro menu(
@@ -2569,7 +2604,8 @@ public macro menu(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro meta(
@@ -2696,7 +2732,8 @@ public macro nav(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro noscript(
@@ -2733,7 +2770,8 @@ public macro noscript(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: O
 @freestanding(expression)
@@ -2984,7 +3022,8 @@ public macro p(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro picture(
@@ -3021,7 +3060,8 @@ public macro picture(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro portal(
@@ -3099,7 +3139,8 @@ public macro pre(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro progress(
@@ -3219,7 +3260,8 @@ public macro rp(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro rt(
@@ -3256,7 +3298,8 @@ public macro rt(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro ruby(
@@ -3293,7 +3336,8 @@ public macro ruby(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: S
 @freestanding(expression)
@@ -3331,7 +3375,8 @@ public macro s(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro samp(
@@ -3368,7 +3413,8 @@ public macro samp(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro script(
@@ -3455,7 +3501,8 @@ public macro search(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro section(
@@ -3492,7 +3539,8 @@ public macro section(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro select(
@@ -3614,7 +3662,8 @@ public macro small(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro source(
@@ -3697,7 +3746,8 @@ public macro span(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro strong(
@@ -3734,7 +3784,8 @@ public macro strong(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro style(
@@ -3812,7 +3863,8 @@ public macro sub(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro summary(
@@ -3849,7 +3901,8 @@ public macro summary(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro sup(
@@ -3886,7 +3939,8 @@ public macro sup(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: T
 @freestanding(expression)
@@ -3924,7 +3978,8 @@ public macro table(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro tbody(
@@ -3961,7 +4016,8 @@ public macro tbody(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro td(
@@ -4084,7 +4140,7 @@ public macro textarea(
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
     
-    //autocomplete: HTMLElementAttribute.AutoComplete,
+    autocomplete: [String]? = nil,
     autocorrect: String? = nil,
     cols: Int? = nil,
     dirname: HTMLElementAttribute.dirname? = nil,
@@ -4135,7 +4191,8 @@ public macro tfoot(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro th(
@@ -4216,7 +4273,8 @@ public macro thead(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro time(
@@ -4293,7 +4351,8 @@ public macro title(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro tr(
@@ -4330,7 +4389,8 @@ public macro tr(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro track(
@@ -4412,7 +4472,8 @@ public macro u(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro ul(
@@ -4449,7 +4510,8 @@ public macro ul(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 // MARK: V
 @freestanding(expression)
@@ -4487,7 +4549,8 @@ public macro `var`(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro video(
@@ -4578,4 +4641,5 @@ public macro wbr(
     translate: HTMLElementAttribute.translate? = nil,
     virtualkeyboardpolicy: HTMLElementAttribute.virtualkeyboardpolicy? = nil,
     writingsuggestions: HTMLElementAttribute.writingsuggestions? = nil,
-    _ innerHTML: [String] = []) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+    _ innerHTML: [String] = []
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")

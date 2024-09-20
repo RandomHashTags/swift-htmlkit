@@ -10,11 +10,11 @@ Write HTML using Swift Macros.
 let test:String = #html([
     #body([
         #div(
-            class: ["bing", "bong"],
+            class: ["dark-mode", "row"],
             draggable: .false,
             hidden: .true,
             inputmode: .email,
-            title: "just seeing what blow's",
+            title: "Hey, you're pretty cool",
             [
                 "Random text",
                 #div(),
@@ -26,7 +26,7 @@ let test:String = #html([
                 ]),
                 #div(),
                 #button(disabled: true),
-                #video(autoplay: true, controls: false, height: nil, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1)),
+                #video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1)),
             ]
         )
     ])

@@ -37,8 +37,13 @@ private extension HTMLElement {
                         let tuple:TupleExprSyntax = child.expression.as(TupleExprSyntax.self)!
                         key += "-\(tuple.elements.first!.expression.as(StringLiteralExprSyntax.self)!.string)"
                         attributes.append(key + "=\\\"\(tuple.elements.last!.expression.as(StringLiteralExprSyntax.self)!.string)\\\"")
-                    } else if let string:String = parse_attribute(elementType: elementType, key: key, expression: child.expression) {
-                        attributes.append(string)
+                    } else {
+                        if key == "acceptCharset" {
+                            key = "accept-charset"
+                        }
+                        if let string:String = parse_attribute(elementType: elementType, key: key, expression: child.expression) {
+                            attributes.append(string)
+                        }
                     }
                 } else if let array:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)?.elements { // inner html
                     for yoink in array {
@@ -82,10 +87,11 @@ private extension HTMLElement {
         if let float:String = expression.as(FloatLiteralExprSyntax.self)?.literal.text {
             return yup(float)
         }
-        // TODO: fix: [Int], [HTMLElementAttribute.controlslist], [HTMLElementAttribute.sandbox]
-        // TODO: fix: attributionsrc attribute has two possible return values (Bool, [String])
-        // TODO: fix: some attributes return a comma separated string instead of space separated
-        if let value:String = expression.as(ArrayExprSyntax.self)?.elements.map({ $0.expression.as(StringLiteralExprSyntax.self)!.string }).joined(separator: " ") {
+        // TODO: fix: [HTMLElementAttribute.controlslist], [HTMLElementAttribute.sandbox]
+        if let value:String = expression.as(ArrayExprSyntax.self)?.elements.map({
+            $0.expression.as(StringLiteralExprSyntax.self)?.string
+            ?? $0.expression.as(IntegerLiteralExprSyntax.self)!.literal.text
+        }).joined(separator: get_separator(key: key)) {
             return yup(value)
         }
         func member(_ value: String) -> String {
@@ -108,7 +114,7 @@ private extension HTMLElement {
                 break
             }
             var string:String = String(value[value.index(after: value.startIndex)...])
-            string = HTMLElementAttribute.htmlValue(enumName: enumName, for: string) ?? string
+            string = HTMLElementAttribute.htmlValue(enumName: enumName, for: string)
             return yup(string)
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
@@ -118,6 +124,12 @@ private extension HTMLElement {
             return member("." + value)
         }
         return nil
+    }
+    static func get_separator(key: String) -> String {
+        switch key {
+            case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset": return ","
+            default: return " "
+        }
     }
 }
 
@@ -271,7 +283,7 @@ extension StringLiteralExprSyntax {
 }
 
 extension HTMLElementAttribute {
-    static func htmlValue(enumName: String, for enumCase: String) -> String? { // only need to check the ones where the rawValue is different from the case literal
+    static func htmlValue(enumName: String, for enumCase: String) -> String { // only need to check the ones where the htmlValue is different from the rawValue
         switch enumName {
         case "contenteditable": return contenteditable(rawValue: enumCase)!.htmlValue
         case "crossorigin":     return crossorigin(rawValue: enumCase)!.htmlValue
@@ -284,7 +296,7 @@ extension HTMLElementAttribute {
         case "height", "width":
             let values:[Substring] = enumCase.split(separator: "("), key:String = String(values[0]), value:String = String(values[1])
             return value[value.startIndex..<value.index(before: value.endIndex)] + CSSUnitType(rawValue: key)!.suffix
-        default:                return nil
+        default:                return enumCase
         }
     }
     

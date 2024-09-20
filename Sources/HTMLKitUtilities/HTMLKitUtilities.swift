@@ -62,15 +62,9 @@ public extension HTMLElementAttribute {
         case sentences, words, characters
     }
 
-    /*enum AutoComplete { // TODO: support
-        package enum Value : String {
-            case off, on, tokenList([String])
-
-            var rawValue: RawValue {
-                return ""
-            }
-        }
-    }*/
+    enum autocomplete : String {
+        case off, on
+    }
 
     enum blocking : String {
         case render
