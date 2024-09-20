@@ -7,6 +7,7 @@
 
 import SwiftSyntax
 import SwiftSyntaxMacros
+import SwiftDiagnostics
 import HTMLKitUtilities
 
 struct HTMLElement : ExpressionMacro {
@@ -28,9 +29,14 @@ private extension HTMLElement {
             if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
                 if var key:String = child.label?.text { // attributes
                     if key == "data" {
-                        let tuple:TupleExprSyntax = child.expression.as(TupleExprSyntax.self)!
+                        //context.diagnose(Diagnostic(node: node, message: ErrorDiagnostic(id: "bro", message: child.expression.debugDescription)))
+                        let tuple:TupleExprSyntax = child.expression.as(TupleExprSyntax.self)!, valueExpression:ExprSyntax = tuple.elements.last!.expression
+                        var (value, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: "data", expression: valueExpression)!
+                        if returnType == .interpolation {
+                            value = "\\(" + value + ")"
+                        }
                         key += "-\(tuple.elements.first!.expression.as(StringLiteralExprSyntax.self)!.string)"
-                        attributes.append(key + "=\\\"\(tuple.elements.last!.expression.as(StringLiteralExprSyntax.self)!.string)\\\"")
+                        attributes.append(key + "=\\\"" + value + "\\\"")
                     } else {
                         if key == "acceptCharset" {
                             key = "accept-charset"
@@ -67,38 +73,34 @@ private extension HTMLElement {
         }
     }
     
+    static func enumName(elementType: HTMLElementType, key: String) -> String {
+        switch elementType.rawValue + key {
+        case "buttontype": return "buttontype"
+        case "inputtype":  return "inputmode"
+        case "oltype":     return "numberingtype"
+        case "scripttype": return "scripttype"
+        default:           return key
+        }
+    }
+    
     static func parse_attribute(elementType: HTMLElementType, key: String, expression: ExprSyntax) -> String? {
-        if let boolean:String = expression.as(BooleanLiteralExprSyntax.self)?.literal.text {
-            return boolean.elementsEqual("true") ? key : nil
-        }
         func yup(_ value: String) -> String { key + "=\\\"" + value + "\\\"" }
-        if let string:String = expression.as(StringLiteralExprSyntax.self)?.string {
-            return yup(string)
-        }
-        if let integer:String = expression.as(IntegerLiteralExprSyntax.self)?.literal.text {
-            return yup(integer)
-        }
-        if let float:String = expression.as(FloatLiteralExprSyntax.self)?.literal.text {
-            return yup(float)
-        }
-        func enumName() -> String {
-            switch elementType.rawValue + key { // better performance than switching key, than switching elementType
-            case "buttontype": return "buttontype"
-            case "inputtype":  return "inputmode"
-            case "oltype":     return "numberingtype"
-            case "scripttype": return "scripttype"
-            default:           return key
+        if let (string, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: key, expression: expression) {
+            switch returnType {
+            case .boolean: return string.elementsEqual("true") ? key : nil
+            case .string: return yup(string)
+            case .interpolation: return yup("\\(" + string + ")")
             }
         }
         if let value:String = expression.as(ArrayExprSyntax.self)?.elements.compactMap({
-            if let string:String = $0.expression.as(StringLiteralExprSyntax.self)?.string {
+            if let string:String = $0.expression.stringLiteral?.string {
                 return string
             }
-            if let string:String = $0.expression.as(IntegerLiteralExprSyntax.self)?.literal.text {
+            if let string:String = $0.expression.integerLiteral?.literal.text {
                 return string
             }
             if let string:String = $0.expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
-                return HTMLElementAttribute.htmlValue(enumName: enumName(), for: string)
+                return HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
             }
             return nil
         }).joined(separator: get_separator(key: key)) {
@@ -106,14 +108,11 @@ private extension HTMLElement {
         }
         func member(_ value: String) -> String {
             var string:String = String(value[value.index(after: value.startIndex)...])
-            string = HTMLElementAttribute.htmlValue(enumName: enumName(), for: string)
+            string = HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
             return yup(string)
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
             return member("\(function)")
-        }
-        if let value:String = expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
-            return member("." + value)
         }
         return nil
     }
@@ -123,6 +122,53 @@ private extension HTMLElement {
             default: return " "
         }
     }
+    static func parse_literal_value(elementType: HTMLElementType, key: String, expression: ExprSyntax) -> (value: String, returnType: LiteralReturnType)? {
+        if let boolean:String = expression.booleanLiteral?.literal.text {
+            return (boolean, .boolean)
+        }
+        if let string:String = expression.stringLiteral?.string {
+            return (string, .string)
+        }
+        if let integer:String = expression.integerLiteral?.literal.text {
+            return (integer, .string)
+        }
+        if let float:String = expression.floatLiteral?.literal.text {
+            return (float, .string)
+        }
+        if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
+            switch key {
+            case "height", "width":
+                var value:String = "\(function)"
+                value = String(value[value.index(after: value.startIndex)...])
+                value = HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
+                return (value, .string)
+            default:
+                return ("\(function)", .interpolation)
+            }
+        }
+        if let member:MemberAccessExprSyntax = expression.as(MemberAccessExprSyntax.self) {
+            let decl:String = member.declName.baseName.text
+            if let base:ExprSyntax = member.base {
+                if let integer:String = base.integerLiteral?.literal.text {
+                    switch decl {
+                    case "description":
+                        return (integer, .string)
+                    default:
+                        return (integer, .interpolation)
+                    }
+                } else {
+                    return ("\(member)", .interpolation)
+                }
+            } else {
+                return (HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: decl), .string)
+            }
+        }
+        return nil
+    }
+}
+
+enum LiteralReturnType {
+    case boolean, string, interpolation
 }
 
 // MARK: HTMLElementType
@@ -270,6 +316,12 @@ enum HTMLElementType : String {
     }
 }
 
+extension ExprSyntax {
+    var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
+    var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
+    var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
+    var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
+}
 extension StringLiteralExprSyntax {
     var string : String { "\(segments)" }
 }

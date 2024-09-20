@@ -110,6 +110,33 @@ extension HTMLKitTests {
 }
 
 extension HTMLKitTests {
+    enum Shrek : String {
+        case isLove, isLife
+    }
+    @Test func test_third_party_enum() {
+        #expect(#div(title: Shrek.isLove.rawValue) == "<div title=\"isLove\"></div>")
+        #expect(#div(title: "\(Shrek.isLife)") == "<div title=\"isLife\"></div>")
+    }
+}
+
+extension HTMLKitTests {
+    static let spongebob:String = "Spongebob"
+    static func spongebobCharacter(_ string: String) -> String {
+        switch string {
+        case "patrick": return "Patrick Star"
+        default: return "Plankton"
+        }
+    }
+    
+    @Test func test_third_party_literal() {
+        #expect(#div(title: HTMLKitTests.spongebob) == "<div title=\"Spongebob\"></div>")
+    }
+    @Test func test_third_party_func() {
+        #expect(#div(title: HTMLKitTests.spongebobCharacter("patrick")) == "<div title=\"Patrick Star\"></div>")
+    }
+}
+
+extension HTMLKitTests {
     @Test func test_example_1() {
         let test:String = #html([
             #body([
