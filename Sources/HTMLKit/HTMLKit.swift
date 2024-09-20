@@ -2193,7 +2193,7 @@ public macro input(
     size: String? = nil,
     src: String? = nil,
     step: Float? = nil,
-    type: HTMLElementAttribute.inputmode? = nil,
+    type: HTMLElementAttribute.inputtype? = nil,
     value: String? = nil,
     width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: [String] = []

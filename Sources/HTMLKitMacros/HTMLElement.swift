@@ -76,7 +76,7 @@ private extension HTMLElement {
     static func enumName(elementType: HTMLElementType, key: String) -> String {
         switch elementType.rawValue + key {
         case "buttontype": return "buttontype"
-        case "inputtype":  return "inputmode"
+        case "inputtype":  return "inputtype"
         case "oltype":     return "numberingtype"
         case "scripttype": return "scripttype"
         default:           return key
@@ -334,6 +334,7 @@ extension HTMLElementAttribute {
         case "formenctype":     return formenctype(rawValue: enumCase)!.htmlValue
         case "hidden":          return hidden(rawValue: enumCase)!.htmlValue
         case "httpequiv":       return httpequiv(rawValue: enumCase)!.htmlValue
+        case "inputtype":       return inputtype(rawValue: enumCase)!.htmlValue
         case "numberingtype":   return numberingtype(rawValue: enumCase)!.htmlValue
         case "referrerpolicy":  return referrerpolicy(rawValue: enumCase)!.htmlValue
         case "sandbox":         return sandbox(rawValue: enumCase)!.htmlValue

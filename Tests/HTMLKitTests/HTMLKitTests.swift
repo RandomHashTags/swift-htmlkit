@@ -59,6 +59,8 @@ extension HTMLKitTests {
     }
     @Test func test_element_input() {
         #expect(#input(autocomplete: ["email", "password"], type: .text) == "<input autocomplete=\"email password\" type=\"text\">")
+        #expect(#input(type: .password) == "<input type=\"password\">")
+        #expect(#input(type: .datetimeLocal) == "<input type=\"datetime-local\">")
     }
     @Test func test_element_img() {
         #expect(#img(sizes: ["(max-height: 500px) 1000px", "(min-height: 25rem)"], srcset: ["https://paradigm-app.com", "https://litleagues.com"]) == "<img sizes=\"(max-height: 500px) 1000px,(min-height: 25rem)\" srcset=\"https://paradigm-app.com,https://litleagues.com\">")

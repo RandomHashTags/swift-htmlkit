@@ -188,6 +188,19 @@ public extension HTMLElementAttribute {
     enum inputmode : String {
         case none, text, decimal, numeric, tel, search, email, url
     }
+    
+    enum inputtype : String {
+        case button, checkbox, color, date
+        case datetimeLocal
+        case email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week
+
+        public var htmlValue : String {
+            switch self {
+                case .datetimeLocal: return "datetime-local"
+                default: return rawValue
+            }
+        }
+    }
 
     enum loading : String {
         case eager, lazy
