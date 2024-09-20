@@ -19,9 +19,14 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-syntax.git", from: "600.0.0"),
     ],
     targets: [
+        .target(
+            name: "HTMLKitUtilities",
+            dependencies: []
+        ),
         .macro(
             name: "HTMLKitMacros",
             dependencies: [
+                "HTMLKitUtilities",
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax")

@@ -7,6 +7,7 @@
 
 import SwiftSyntax
 import SwiftSyntaxMacros
+import HTMLKitUtilities
 
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
@@ -90,32 +91,24 @@ private extension HTMLElement {
         func member(_ value: String) -> String {
             let enumName:String
             switch elementType.rawValue + key { // better performance than switching key, than switching elementType
-                case "buttontype":
-                    enumName = "buttontype"
-                    break
-                case "inputtype":
-                    enumName = "inputmode"
-                    break
-                case "oltype":
-                    enumName = "numberingtype"
-                    break
-                case "scripttype":
-                    enumName = "scripttype"
-                    break
-                default:
-                    enumName = key
-                    break
+            case "buttontype":
+                enumName = "buttontype"
+                break
+            case "inputtype":
+                enumName = "inputmode"
+                break
+            case "oltype":
+                enumName = "numberingtype"
+                break
+            case "scripttype":
+                enumName = "scripttype"
+                break
+            default:
+                enumName = key
+                break
             }
-            let string:String
-            switch enumName {
-                case "contenteditable", "crossorigin", "download", "formenctype", "hidden", "httpequiv", "numberingtype", "referrerpolicy", "sandbox", "scripttype",
-                        "width", "height":
-                    string = "\\(HTMLElementAttribute." + enumName + value + ")"
-                    break
-                default:
-                    string = String(value[value.index(after: value.startIndex)...])
-                    break
-            }
+            var string:String = String(value[value.index(after: value.startIndex)...])
+            string = HTMLElementAttribute.htmlValue(enumName: enumName, for: string) ?? string
             return yup(string)
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
@@ -265,14 +258,73 @@ enum HTMLElementType : String {
 
     var isVoid : Bool {
         switch self {
-            case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
-                return true
-            default:
-                return false
+        case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
+            return true
+        default:
+            return false
         }
     }
 }
 
 extension StringLiteralExprSyntax {
     var string : String { "\(segments)" }
+}
+
+extension HTMLElementAttribute {
+    static func htmlValue(enumName: String, for enumCase: String) -> String? { // only need to check the ones where the rawValue is different from the case literal
+        switch enumName {
+        case "contenteditable": return contenteditable(rawValue: enumCase)!.htmlValue
+        case "crossorigin":     return crossorigin(rawValue: enumCase)!.htmlValue
+        case "formenctype":     return formenctype(rawValue: enumCase)!.htmlValue
+        case "hidden":          return hidden(rawValue: enumCase)!.htmlValue
+        case "httpequiv":       return httpequiv(rawValue: enumCase)!.htmlValue
+        case "numberingtype":   return numberingtype(rawValue: enumCase)!.htmlValue
+        case "referrerpolicy":  return referrerpolicy(rawValue: enumCase)!.htmlValue
+        case "sandbox":         return sandbox(rawValue: enumCase)!.htmlValue
+        case "height", "width":
+            let values:[Substring] = enumCase.split(separator: "("), key:String = String(values[0]), value:String = String(values[1])
+            return value[value.startIndex..<value.index(before: value.endIndex)] + CSSUnitType(rawValue: key)!.suffix
+        default:                return nil
+        }
+    }
+    
+    enum CSSUnitType : String {
+        case centimeters
+        case millimeters
+        case inches
+        case pixels
+        case points
+        case picas
+        
+        case em
+        case ex
+        case ch
+        case rem
+        case viewportWidth
+        case viewportHeight
+        case viewportMin
+        case viewportMax
+        case percent
+        
+        var suffix : String {
+            switch self {
+            case .centimeters:    return "cm"
+            case .millimeters:    return "mm"
+            case .inches:         return "in"
+            case .pixels:         return "px"
+            case .points:         return "pt"
+            case .picas:          return "pc"
+                
+            case .em:             return "em"
+            case .ex:             return "ex"
+            case .ch:             return "ch"
+            case .rem:            return "rem"
+            case .viewportWidth:  return "vw"
+            case .viewportHeight: return "vh"
+            case .viewportMin:    return "vmin"
+            case .viewportMax:    return "vmax"
+            case .percent:        return "%"
+            }
+        }
+    }
 }

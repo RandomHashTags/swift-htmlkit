@@ -44,16 +44,24 @@ extension HTMLKitTests {
         XCTAssertEqual(#button(type: .submit), "<button type=\"submit\"></button>")
     }
     func test_element_canvas() {
-        XCTAssertEqual(#canvas(height: .percent(4), width: .em(2.69)), "<canvas height=\"4.0%\" width=\"2.69em\"></canvas>")
+        XCTAssertEqual(#canvas(height: .percent(4), width: .em(2.69)), "<canvas height=\"4%\" width=\"2.69em\"></canvas>")
     }
     func test_element_input() {
         XCTAssertEqual(#input(type: .text), "<input type=\"text\">")
     }
     func test_element_ol() {
+        XCTAssertEqual(#ol(), "<ol></ol>")
         XCTAssertEqual(#ol(type: .a), "<ol type=\"a\"></ol>")
+        XCTAssertEqual(#ol(type: .A), "<ol type=\"A\"></ol>")
+        XCTAssertEqual(#ol(type: .i), "<ol type=\"i\"></ol>")
+        XCTAssertEqual(#ol(type: .I), "<ol type=\"I\"></ol>")
+        XCTAssertEqual(#ol(type: .one), "<ol type=\"1\"></ol>")
     }
     func test_element_script() {
-        XCTAssertEqual(#script(type: .classic), "<script type=\"classic\"></script>")
+        XCTAssertEqual(#script(), "<script></script>")
+        XCTAssertEqual(#script(type: .importmap), "<script type=\"importmap\"></script>")
+        XCTAssertEqual(#script(type: .module), "<script type=\"module\"></script>")
+        XCTAssertEqual(#script(type: .speculationrules), "<script type=\"speculationrules\"></script>")
     }
 }
 
@@ -87,7 +95,7 @@ extension HTMLKitTests {
                 #div(
                     class: ["bing", "bong"],
                     draggable: .false,
-                    hidden: .hidden,
+                    hidden: .true,
                     inputmode: .email,
                     title: "just seeing what blow's",
                     [
@@ -106,7 +114,7 @@ extension HTMLKitTests {
                 )
             ])
         ])
-        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" draggable=\"false\" hidden=\"hidden\" inputmode=\"email\" title=\"just seeing what blow's\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1.0cm\"></video></div></body></html>")
+        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" draggable=\"false\" hidden=\"\" inputmode=\"email\" title=\"just seeing what blow's\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
     }
 }
 
