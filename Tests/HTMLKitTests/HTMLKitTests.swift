@@ -8,8 +8,7 @@
 import XCTest
 @testable import HTMLKit
 
-/*
-extension StaticString : Equatable {
+/*extension StaticString : Equatable {
     public static func == (left: Self, right: Self) -> Bool {
         return left.withUTF8Buffer { lp in
             right.withUTF8Buffer { rp in
@@ -82,9 +81,7 @@ extension HTMLKitTests {
 
 extension HTMLKitTests {
     func test_attribute_data() {
-        let bro:Int = 0
-        let string:String = #div(data: ("id", "\(bro)"))
-        XCTAssertEqual(string, "<div data-id=\"\(bro)\"></div>")
+        XCTAssertEqual(#div(data: ("id", "5")), "<div data-id=\"5\"></div>")
     }
 }
 
@@ -93,11 +90,11 @@ extension HTMLKitTests {
         let test:String = #html([
             #body([
                 #div(
-                    class: ["bing", "bong"],
+                    class: ["dark-mode", "row"],
                     draggable: .false,
                     hidden: .true,
                     inputmode: .email,
-                    title: "just seeing what blow's",
+                    title: "Hey, you're pretty cool",
                     [
                         "Random text",
                         #div(),
@@ -114,7 +111,7 @@ extension HTMLKitTests {
                 )
             ])
         ])
-        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"bing bong\" draggable=\"false\" hidden=\"\" inputmode=\"email\" title=\"just seeing what blow's\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
+        XCTAssertEqual(test, "<!DOCTYPE html><html><body><div class=\"dark-mode row\" draggable=\"false\" hidden=\"\" inputmode=\"email\" title=\"Hey, you're pretty cool\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
     }
 }
 
@@ -130,7 +127,7 @@ extension HTMLKitTests {
     struct TestStruct {
         var name:String
         var array:[CustomStringConvertible]
-        
+
         var html : String { #p(["\(name)", "\(array.map({ "\($0)" }).joined())"]) }
     }
 }

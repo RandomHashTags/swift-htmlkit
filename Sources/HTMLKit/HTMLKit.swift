@@ -7,6 +7,10 @@
 
 import HTMLKitUtilities
 
+/*public extension StaticString {
+    var string : String { withUTF8Buffer { String(decoding: $0, as: UTF8.self) } }
+}*/
+
 // MARK: Elements
 @freestanding(expression)
 public macro html(xmlns: String? = nil, _ innerHTML: [String]) -> String = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")

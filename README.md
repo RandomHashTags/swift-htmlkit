@@ -12,7 +12,7 @@ let test:String = #html([
         #div(
             class: ["bing", "bong"],
             draggable: .false,
-            hidden: .hidden,
+            hidden: .true,
             inputmode: .email,
             title: "just seeing what blow's",
             [
