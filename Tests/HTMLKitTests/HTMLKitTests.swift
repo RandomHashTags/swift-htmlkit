@@ -8,20 +8,10 @@
 import Testing
 import HTMLKit
 
-/*extension StaticString : Equatable {
-    public static func == (left: Self, right: Self) -> Bool {
-        return left.withUTF8Buffer { lp in
-            right.withUTF8Buffer { rp in
-                return String(decoding: lp, as: UTF8.self) == String(decoding: rp, as: UTF8.self)
-            }
-        }
-    }
-}*/
-
 struct HTMLKitTests {
     @Test func measureElapsedTime() {
         measureElapsedTime(key: "htmlkit") {
-            let _:String = #html([
+            let _:StaticString = #html([
                 #body([
                     #h1(["Swift HTML Benchmarks"])
                 ])
@@ -100,7 +90,7 @@ extension HTMLKitTests {
         #expect(string == "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }
     @Test func test_void() {
-        let string:String = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
+        let string:StaticString = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
         #expect(string == "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
     }
     @Test func test_multiline() {
@@ -132,11 +122,11 @@ extension HTMLKitTests {
 
 extension HTMLKitTests {
     static let spongebob:String = "Spongebob"
-    static func spongebobCharacter(_ string: String) -> String {
-        switch string {
-        case "patrick": return "Patrick Star"
-        default: return "Plankton"
+    static func spongebobCharacter(_ string: StaticString) -> StaticString {
+        if string == "patrick" {
+            return "Patrick Star"
         }
+        return "Plankton"
     }
     
     @Test func test_third_party_literal() {
@@ -149,7 +139,7 @@ extension HTMLKitTests {
 
 extension HTMLKitTests {
     @Test func test_example_1() {
-        let test:String = #html([
+        let test:StaticString = #html([
             #body([
                 #div(
                     attributes: [
