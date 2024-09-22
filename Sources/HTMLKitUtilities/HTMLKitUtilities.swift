@@ -51,7 +51,7 @@ public enum HTMLElementAttribute : Hashable {
     case autofocus(Bool = false)
     case `class`([String] = [])
     case contenteditable(Extra.contenteditable? = nil)
-    case data(id: String, value: String? = nil)
+    case data(_ id: String, _ value: String? = nil)
     case dir(Extra.dir? = nil)
     case draggable(Extra.draggable? = nil)
     case enterkeyhint(Extra.enterkeyhint? = nil)
@@ -81,7 +81,7 @@ public enum HTMLElementAttribute : Hashable {
     case writingsuggestions(Extra.writingsuggestions? = nil)
 
     @available(*, deprecated, message: "\nInline event handlers are an outdated way to handle events. General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript.\n\nThis will never be removed and remains deprecated to encourage use of other techniques.\n\nLearn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
-    case event(Extra.event, value: String? = nil)
+    case event(Extra.event, _ value: String? = nil)
 }
 public extension HTMLElementAttribute {
     enum Extra {

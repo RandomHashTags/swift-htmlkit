@@ -110,13 +110,13 @@ extension HTMLKitTests {
         ]) == "<script>bro</script>")*/
     }
     @Test func test_events() {
-        #expect(#div(attributes: [.event(.click, value: "doThing()"), .event(.change, value: "doAnotherThing()")], []) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
+        #expect(#div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()")], []) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
     }
 }
 
 extension HTMLKitTests {
     @Test func test_attribute_data() {
-        #expect(#div(attributes: [.data(id: "id", value: "5")]) == "<div data-id=\"5\"></div>")
+        #expect(#div(attributes: [.data("id", "5")]) == "<div data-id=\"5\"></div>")
     }
 }
 
