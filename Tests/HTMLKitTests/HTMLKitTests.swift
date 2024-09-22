@@ -103,11 +103,20 @@ extension HTMLKitTests {
         let string:String = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
         #expect(string == "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
     }
+    @Test func test_multiline() {
+        /*#expect(#script(["""
+        bro
+        """
+        ]) == "<script>bro</script>")*/
+    }
+    @Test func test_events() {
+        #expect(#div(attributes: [.event(.click, value: "doThing()"), .event(.change, value: "doAnotherThing()")], []) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
+    }
 }
 
 extension HTMLKitTests {
     @Test func test_attribute_data() {
-        #expect(#div(data: ("id", "5")) == "<div data-id=\"5\"></div>")
+        #expect(#div(attributes: [.data(id: "id", value: "5")]) == "<div data-id=\"5\"></div>")
     }
 }
 
@@ -116,8 +125,8 @@ extension HTMLKitTests {
         case isLove, isLife
     }
     @Test func test_third_party_enum() {
-        #expect(#div(title: Shrek.isLove.rawValue) == "<div title=\"isLove\"></div>")
-        #expect(#div(title: "\(Shrek.isLife)") == "<div title=\"isLife\"></div>")
+        #expect(#div(attributes: [.title(Shrek.isLove.rawValue)]) == "<div title=\"isLove\"></div>")
+        #expect(#div(attributes: [.title("\(Shrek.isLife)")]) == "<div title=\"isLife\"></div>")
     }
 }
 
@@ -131,10 +140,10 @@ extension HTMLKitTests {
     }
     
     @Test func test_third_party_literal() {
-        #expect(#div(title: HTMLKitTests.spongebob) == "<div title=\"Spongebob\"></div>")
+        #expect(#div(attributes: [.title(HTMLKitTests.spongebob)]) == "<div title=\"Spongebob\"></div>")
     }
     @Test func test_third_party_func() {
-        #expect(#div(title: HTMLKitTests.spongebobCharacter("patrick")) == "<div title=\"Patrick Star\"></div>")
+        #expect(#div(attributes: [.title(HTMLKitTests.spongebobCharacter("patrick"))]) == "<div title=\"Patrick Star\"></div>")
     }
 }
 
@@ -143,11 +152,13 @@ extension HTMLKitTests {
         let test:String = #html([
             #body([
                 #div(
-                    class: ["dark-mode", "row"],
-                    draggable: .false,
-                    hidden: .true,
-                    inputmode: .email,
-                    title: "Hey, you're pretty cool",
+                    attributes: [
+                        .class(["dark-mode", "row"]),
+                        .draggable(.false),
+                        .hidden(.true),
+                        .inputmode(.email),
+                        .title("Hey, you're pretty cool")
+                    ],
                     [
                         "Random text",
                         #div(),

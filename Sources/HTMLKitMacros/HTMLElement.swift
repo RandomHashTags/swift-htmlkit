@@ -28,15 +28,8 @@ private extension HTMLElement {
         for element in arguments.children(viewMode: .all) {
             if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
                 if var key:String = child.label?.text { // attributes
-                    if key == "data" {
-                        //context.diagnose(Diagnostic(node: node, message: ErrorDiagnostic(id: "bro", message: child.expression.debugDescription)))
-                        let tuple:TupleExprSyntax = child.expression.as(TupleExprSyntax.self)!, valueExpression:ExprSyntax = tuple.elements.last!.expression
-                        var (value, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: "data", expression: valueExpression)!
-                        if returnType == .interpolation {
-                            value = "\\(" + value + ")"
-                        }
-                        key += "-\(tuple.elements.first!.expression.as(StringLiteralExprSyntax.self)!.string)"
-                        attributes.append(key + "=\\\"" + value + "\\\"")
+                    if key == "attributes" {
+                        attributes.append(contentsOf: parse_global_attributes(elementType: elementType, array: child.expression.as(ArrayExprSyntax.self)!))
                     } else {
                         if key == "acceptCharset" {
                             key = "accept-charset"
@@ -57,6 +50,27 @@ private extension HTMLElement {
             }
         }
         return ElementData(attributes: attributes, innerHTML: innerHTML)
+    }
+    static func parse_global_attributes(elementType: HTMLElementType, array: ArrayExprSyntax) -> [String] {
+        var attributes:[String] = []
+        for element in array.elements {
+            let function:FunctionCallExprSyntax = element.expression.as(FunctionCallExprSyntax.self)!
+            var key:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+            if key == "data" {
+                var (value, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: "data", expression: function.arguments.last!.expression)!
+                if returnType == .interpolation {
+                    value = "\\(" + value + ")"
+                }
+                key += "-\(function.arguments.first!.expression.as(StringLiteralExprSyntax.self)!.string)"
+                attributes.append(key + "=\\\"" + value + "\\\"")
+            } else if key == "event" {
+                key = function.arguments.first!.expression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+                attributes.append("on" + key + "=\\\"" + function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string + "\\\"")
+            } else if let string:String = parse_attribute(elementType: elementType, key: key, expression: function.arguments.first!.expression) {
+                attributes.append(string)
+            }
+        }
+        return attributes
     }
     static func parse_element_macro(expression: MacroExpansionExprSyntax) -> String {
         guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
@@ -100,7 +114,7 @@ private extension HTMLElement {
                 return string
             }
             if let string:String = $0.expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
-                return HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
+                return HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
             }
             return nil
         }).joined(separator: get_separator(key: key)) {
@@ -108,7 +122,7 @@ private extension HTMLElement {
         }
         func member(_ value: String) -> String {
             var string:String = String(value[value.index(after: value.startIndex)...])
-            string = HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
+            string = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
             return yup(string)
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
@@ -140,7 +154,7 @@ private extension HTMLElement {
             case "height", "width":
                 var value:String = "\(function)"
                 value = String(value[value.index(after: value.startIndex)...])
-                value = HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
+                value = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
                 return (value, .string)
             default:
                 return ("\(function)", .interpolation)
@@ -160,7 +174,7 @@ private extension HTMLElement {
                     return ("\(member)", .interpolation)
                 }
             } else {
-                return (HTMLElementAttribute.htmlValue(enumName: enumName(elementType: elementType, key: key), for: decl), .string)
+                return (HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: decl), .string)
             }
         }
         return nil
@@ -326,7 +340,7 @@ extension StringLiteralExprSyntax {
     var string : String { "\(segments)" }
 }
 
-extension HTMLElementAttribute {
+extension HTMLElementAttribute.Extra {
     static func htmlValue(enumName: String, for enumCase: String) -> String { // only need to check the ones where the htmlValue is different from the rawValue
         switch enumName {
         case "contenteditable": return contenteditable(rawValue: enumCase)!.htmlValue

@@ -45,11 +45,51 @@ public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/css
 }
 
 // MARK: HTMLElement Attributes
-public enum HTMLElementAttribute {
+public enum HTMLElementAttribute : Hashable {
+    case accesskey(String? = nil)
+    case autocapitalize(Extra.autocapitalize? = nil)
+    case autofocus(Bool = false)
+    case `class`([String] = [])
+    case contenteditable(Extra.contenteditable? = nil)
+    case data(id: String, value: String? = nil)
+    case dir(Extra.dir? = nil)
+    case draggable(Extra.draggable? = nil)
+    case enterkeyhint(Extra.enterkeyhint? = nil)
+    case exportparts([String] = [])
+    case hidden(Extra.hidden? = nil)
+    case id(String? = nil)
+    case inert(Bool = false)
+    case inputmode(Extra.inputmode? = nil)
+    case `is`(String? = nil)
+    case itemid(String? = nil)
+    case itemprop(String? = nil)
+    case itemref(String? = nil)
+    case itemscope(Bool = false)
+    case itemtype(String? = nil)
+    case lang(String? = nil)
+    case nonce(String? = nil)
+    case part([String] = [])
+    case popover(Extra.popover? = nil)
+    case role(Extra.role? = nil)
+    case slot(String? = nil)
+    case spellcheck(Extra.spellcheck? = nil)
+    case style(String? = nil)
+    case tabindex(Int? = nil)
+    case title(String? = nil)
+    case translate(Extra.translate? = nil)
+    case virtualkeyboardpolicy(Extra.virtualkeyboardpolicy? = nil)
+    case writingsuggestions(Extra.writingsuggestions? = nil)
+
+    @available(*, deprecated, message: "\nInline event handlers are an outdated way to handle events. General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript.\n\nThis will never be removed and remains deprecated to encourage use of other techniques.\n\nLearn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
+    case event(Extra.event, value: String? = nil)
 }
 public extension HTMLElementAttribute {
-    typealias height = CSSUnit
-    typealias width = CSSUnit
+    enum Extra {
+    }
+}
+public extension HTMLElementAttribute.Extra {
+    typealias height = HTMLElementAttribute.CSSUnit
+    typealias width = HTMLElementAttribute.CSSUnit
 
     enum `as` : String {
         case audio, document, embed, fetch, font, image, object, script, style, track, video, worker
@@ -127,6 +167,28 @@ public extension HTMLElementAttribute {
 
     enum enterkeyhint : String {
         case enter, done, go, next, previous, search, send
+    }
+
+    enum event : String {
+        case accept, afterprint, animationend, animationiteration, animationstart
+        case beforeprint, beforeunload, blur
+        case canplay, canplaythrough, change, click, contextmenu, copy, cut
+        case dblclick, drag, dragend, dragenter, dragleave, dragover, dragstart, drop, durationchange
+        case ended, error
+        case focus, focusin, focusout, fullscreenchange, fullscreenerror
+        case hashchange
+        case input, invalid
+        case keydown, keypress, keyup
+        case languagechange, load, loadeddata, loadedmetadata, loadstart
+        case message, mousedown, mouseenter, mouseleave, mousemove, mouseover, mouseout, mouseup
+        case offline, online, open
+        case pagehide, pageshow, paste, pause, play, playing, popstate, progress
+        case ratechange, resize, reset
+        case scroll, search, seeked, seeking, select, show, stalled, storage, submit, suspend
+        case timeupdate, toggle, touchcancel, touchend, touchmove, touchstart, transitionend
+        case unload
+        case volumechange
+        case waiting, wheel
     }
 
     enum fetchpriority : String {
