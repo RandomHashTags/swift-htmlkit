@@ -82,7 +82,7 @@ extension HTMLKitTests {
 
 extension HTMLKitTests {
     @Test func test_recursive() {
-        let string:String = #div([
+        let string:StaticString = #div([
             #div(),
             #div([#div(), #div(), #div()]),
             #div()
@@ -130,16 +130,26 @@ extension HTMLKitTests {
 }
 
 extension HTMLKitTests {
-    static let spongebob:String = "Spongebob"
-    static func spongebobCharacter(_ string: StaticString) -> StaticString {
-        if string == "patrick" {
-            return "Patrick Star"
+    static let spongebob:String = "Spongebob Squarepants"
+    static let patrick:StaticString = "Patrick Star"
+    static func spongebobCharacter(_ string: String) -> StaticString {
+        switch string {
+        case "spongebob": return "Spongebob Squarepants"
+        case "patrick":   return "Patrick Star"
+        default:          return "Plankton"
         }
-        return "Plankton"
     }
     
     @Test func test_third_party_literal() {
-        #expect(#div(attributes: [.title(HTMLKitTests.spongebob)]) == "<div title=\"Spongebob\"></div>")
+        var string:String = #div(attributes: [.title(HTMLKitTests.spongebob)])
+        #expect(string == "<div title=\"Spongebob Squarepants\"></div>")
+
+        string = #div(attributes: [.title(HTMLKitTests.patrick)])
+        #expect(string == "<div title=\"Patrick Star\"></div>")
+
+        /*let mr_crabs:StaticString = "Mr. Crabs"
+        let static_string:StaticString = #div(attributes: [.title(mr_crabs)])
+        #expect(static_string == "<div title=\"Mr. Crabs\"></div>")*/
     }
     @Test func test_third_party_func() {
         #expect(#div(attributes: [.title(HTMLKitTests.spongebobCharacter("patrick"))]) == "<div title=\"Patrick Star\"></div>")
