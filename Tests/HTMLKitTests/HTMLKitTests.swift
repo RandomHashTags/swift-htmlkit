@@ -89,6 +89,15 @@ extension HTMLKitTests {
         ])
         #expect(string == "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }
+    /*@Test func test_same_attribute_multiple_times() {
+        let string:StaticString = #div(attributes: [.id("1"), .id("2"), .id("3"), .id("4")])
+        #expect(string == "<div id=\"1\"></div>")
+    }*/
+    @Test func test_attribute_hidden() {
+        #expect(#div(attributes: [.hidden(.true)]) == "<div hidden></div>")
+        #expect(#div(attributes: [.hidden(.untilFound)]) == "<div hidden=\"until-found\"></div>")
+    }
+
     @Test func test_void() {
         let string:StaticString = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
         #expect(string == "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
@@ -165,7 +174,7 @@ extension HTMLKitTests {
                 )
             ])
         ])
-        #expect(test == "<!DOCTYPE html><html><body><div class=\"dark-mode row\" draggable=\"false\" hidden=\"\" inputmode=\"email\" title=\"Hey, you're pretty cool\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
+        #expect(test == "<!DOCTYPE html><html><body><div class=\"dark-mode row\" draggable=\"false\" hidden inputmode=\"email\" title=\"Hey, you're pretty cool\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
     }
 }
 

@@ -13,7 +13,7 @@ import HTMLKitUtilities
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         let type:HTMLElementType = HTMLElementType(rawValue: node.macroName.text)!
-        let data:ElementData = parse_arguments(elementType: type, arguments: node.arguments)
+        let data:ElementData = parse_arguments(context: context, elementType: type, arguments: node.arguments)
         var string:String = (type == .html ? "<!DOCTYPE html>" : "") + "<" + type.rawValue + data.attributes + ">" + data.innerHTML
         if !type.isVoid {
             string += "</" + type.rawValue + ">"
@@ -23,25 +23,25 @@ struct HTMLElement : ExpressionMacro {
 }
 
 private extension HTMLElement {
-    static func parse_arguments(elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
+    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
         for element in arguments.children(viewMode: .all) {
             if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
                 if var key:String = child.label?.text { // attributes
                     if key == "attributes" {
-                        attributes.append(contentsOf: parse_global_attributes(elementType: elementType, array: child.expression.as(ArrayExprSyntax.self)!))
+                        attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.as(ArrayExprSyntax.self)!))
                     } else {
                         if key == "acceptCharset" {
                             key = "accept-charset"
                         }
                         if let string:String = parse_attribute(elementType: elementType, key: key, expression: child.expression) {
-                            attributes.append(string)
+                            attributes.append(key + (string.isEmpty ? "" : "=\\\"" + string + "\\\""))
                         }
                     }
                 } else if let array:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)?.elements { // inner html
                     for yoink in array {
                         if let macro:MacroExpansionExprSyntax = yoink.expression.as(MacroExpansionExprSyntax.self) {
-                            innerHTML.append(parse_element_macro(expression: macro))
+                            innerHTML.append(parse_element_macro(context: context, expression: macro))
                         } else if let string:String = yoink.expression.as(StringLiteralExprSyntax.self)?.string {
                             innerHTML.append(string)
                         }
@@ -51,30 +51,38 @@ private extension HTMLElement {
         }
         return ElementData(attributes: attributes, innerHTML: innerHTML)
     }
-    static func parse_global_attributes(elementType: HTMLElementType, array: ArrayExprSyntax) -> [String] {
-        var attributes:[String] = []
+    static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayExprSyntax) -> [String] {
+        var keys:Set<String> = [], attributes:[String] = []
         for element in array.elements {
             let function:FunctionCallExprSyntax = element.expression.as(FunctionCallExprSyntax.self)!
-            var key:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+            var key:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text, value:String? = nil
             if key == "data" {
-                var (value, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: "data", expression: function.arguments.last!.expression)!
+                var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: "data", expression: function.arguments.last!.expression)!
                 if returnType == .interpolation {
-                    value = "\\(" + value + ")"
+                    literalValue = "\\(" + literalValue + ")"
                 }
+                value = literalValue
                 key += "-\(function.arguments.first!.expression.as(StringLiteralExprSyntax.self)!.string)"
-                attributes.append(key + "=\\\"" + value + "\\\"")
             } else if key == "event" {
-                key = function.arguments.first!.expression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
-                attributes.append("on" + key + "=\\\"" + function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string + "\\\"")
+                key = "on" + function.arguments.first!.expression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+                value = function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string
             } else if let string:String = parse_attribute(elementType: elementType, key: key, expression: function.arguments.first!.expression) {
-                attributes.append(string)
+                value = string
+            }
+            if let value:String = value {
+                if keys.contains(key) {
+                    context.diagnose(Diagnostic(node: element, message: ErrorDiagnostic(id: "globalAttributeAlreadyDefined", message: "Global attribute is already defined.")))
+                } else {
+                    attributes.append(key + (value.isEmpty ? "" : "=\\\"" + value + "\\\""))
+                    keys.insert(key)
+                }
             }
         }
         return attributes
     }
-    static func parse_element_macro(expression: MacroExpansionExprSyntax) -> String {
+    static func parse_element_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax) -> String {
         guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
-        let data:ElementData = parse_arguments(elementType: elementType, arguments: expression.arguments)
+        let data:ElementData = parse_arguments(context: context, elementType: elementType, arguments: expression.arguments)
         return "<" + elementType.rawValue + data.attributes + ">" + data.innerHTML + (elementType.isVoid ? "" : "</" + elementType.rawValue + ">")
     }
 
@@ -98,12 +106,11 @@ private extension HTMLElement {
     }
     
     static func parse_attribute(elementType: HTMLElementType, key: String, expression: ExprSyntax) -> String? {
-        func yup(_ value: String) -> String { key + "=\\\"" + value + "\\\"" }
         if let (string, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: key, expression: expression) {
             switch returnType {
-            case .boolean: return string.elementsEqual("true") ? key : nil
-            case .string: return yup(string)
-            case .interpolation: return yup("\\(" + string + ")")
+            case .boolean: return string.elementsEqual("true") ? "" : nil
+            case .string: return string
+            case .interpolation: return "\\(" + string + ")"
             }
         }
         if let value:String = expression.as(ArrayExprSyntax.self)?.elements.compactMap({
@@ -118,12 +125,12 @@ private extension HTMLElement {
             }
             return nil
         }).joined(separator: get_separator(key: key)) {
-            return yup(value)
+            return value
         }
         func member(_ value: String) -> String {
             var string:String = String(value[value.index(after: value.startIndex)...])
             string = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
-            return yup(string)
+            return string
         }
         if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
             return member("\(function)")
