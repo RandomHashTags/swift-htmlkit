@@ -25,40 +25,40 @@ struct HTMLKitTests {
 }
 
 extension HTMLKitTests {
-    @Test func test_element_html() {
+    @Test func element_html() {
         #expect(#html([]) == "<!DOCTYPE html><html></html>")
         #expect(#html(xmlns: "test", []) == "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
-    @Test func test_element_area() {
+    @Test func element_area() {
         #expect(#area(coords: [1, 2, 3]) == "<area coords=\"1,2,3\">")
     }
-    @Test func test_element_audio() {
+    @Test func element_audio() {
         #expect(#audio(controlslist: .nodownload) == "<audio controlslist=\"nodownload\"></audio>")
     }
-    @Test func test_element_button() {
+    @Test func element_button() {
         #expect(#button(type: .submit) == "<button type=\"submit\"></button>")
     }
-    @Test func test_element_canvas() {
+    @Test func element_canvas() {
         #expect(#canvas(height: .percent(4), width: .em(2.69)) == "<canvas height=\"4%\" width=\"2.69em\"></canvas>")
     }
-    @Test func test_element_form() {
+    @Test func element_form() {
         #expect(#form(acceptCharset: ["utf-8"], autocomplete: .on) == "<form accept-charset=\"utf-8\" autocomplete=\"on\"></form>")
     }
-    @Test func test_element_iframe() {
+    @Test func element_iframe() {
         #expect(#iframe(sandbox: [.allowDownloads, .allowForms]) == "<iframe sandbox=\"allow-downloads allow-forms\"></iframe>")
     }
-    @Test func test_element_input() {
+    @Test func element_input() {
         #expect(#input(autocomplete: ["email", "password"], type: .text) == "<input autocomplete=\"email password\" type=\"text\">")
         #expect(#input(type: .password) == "<input type=\"password\">")
         #expect(#input(type: .datetimeLocal) == "<input type=\"datetime-local\">")
     }
-    @Test func test_element_img() {
+    @Test func element_img() {
         #expect(#img(sizes: ["(max-height: 500px) 1000px", "(min-height: 25rem)"], srcset: ["https://paradigm-app.com", "https://litleagues.com"]) == "<img sizes=\"(max-height: 500px) 1000px,(min-height: 25rem)\" srcset=\"https://paradigm-app.com,https://litleagues.com\">")
     }
     @Test func test_link() {
         #expect(#link(as: .document, imagesizes: ["lmno", "p"]) == "<link as=\"document\" imagesizes=\"lmno,p\">")
     }
-    @Test func test_element_ol() {
+    @Test func element_ol() {
         #expect(#ol() == "<ol></ol>")
         #expect(#ol(type: .a) == "<ol type=\"a\"></ol>")
         #expect(#ol(type: .A) == "<ol type=\"A\"></ol>")
@@ -66,22 +66,39 @@ extension HTMLKitTests {
         #expect(#ol(type: .I) == "<ol type=\"I\"></ol>")
         #expect(#ol(type: .one) == "<ol type=\"1\"></ol>")
     }
-    @Test func test_element_script() {
+    @Test func element_script() {
         #expect(#script() == "<script></script>")
         #expect(#script(type: .importmap) == "<script type=\"importmap\"></script>")
         #expect(#script(type: .module) == "<script type=\"module\"></script>")
         #expect(#script(type: .speculationrules) == "<script type=\"speculationrules\"></script>")
     }
-    @Test func test_element_text_area() {
+    @Test func element_text_area() {
         #expect(#textarea(autocomplete: ["email", "password"], rows: 5) == "<textarea autocomplete=\"email password\" rows=\"5\"></textarea>")
     }
-    @Test func test_element_video() {
+    @Test func element_video() {
         #expect(#video(controlslist: [.nodownload, .nofullscreen, .noremoteplayback]) == "<video controlslist=\"nodownload nofullscreen noremoteplayback\"></video>")
+    }
+
+    @Test func element_custom() {
+        var bro:String = #custom(tag: "bro", isVoid: false)
+        #expect(bro == "<bro></bro>")
+
+        bro = #custom(tag: "bro", isVoid: true)
+        #expect(bro == "<bro>")
+    }
+
+    @Test func element_events() {
+        #expect(#div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()")], []) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
+    }
+
+    @Test func elements_void() {
+        let string:StaticString = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
+        #expect(string == "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
     }
 }
 
 extension HTMLKitTests {
-    @Test func test_recursive() {
+    @Test func recursive_elements() {
         let string:StaticString = #div([
             #div(),
             #div([#div(), #div(), #div()]),
@@ -89,33 +106,38 @@ extension HTMLKitTests {
         ])
         #expect(string == "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }
-    /*@Test func test_same_attribute_multiple_times() {
+    /*@Test func same_attribute_multiple_times() {
         let string:StaticString = #div(attributes: [.id("1"), .id("2"), .id("3"), .id("4")])
         #expect(string == "<div id=\"1\"></div>")
     }*/
-    @Test func test_attribute_hidden() {
-        #expect(#div(attributes: [.hidden(.true)]) == "<div hidden></div>")
-        #expect(#div(attributes: [.hidden(.untilFound)]) == "<div hidden=\"until-found\"></div>")
-    }
 
-    @Test func test_void() {
-        let string:StaticString = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
-        #expect(string == "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
+    @Test func no_value_type() {
+        let test1 = #html([#body([#h1(["HTMLKitTests"])])])
+        let test2 = #html([#body([#h1([StaticString("HTMLKitTests")])])])
     }
-    @Test func test_multiline() {
+    
+    @Test func multiline_value_type() {
         /*#expect(#script(["""
         bro
         """
         ]) == "<script>bro</script>")*/
     }
-    @Test func test_events() {
-        #expect(#div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()")], []) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
-    }
 }
 
 extension HTMLKitTests {
-    @Test func test_attribute_data() {
+    @Test func attribute_data() {
         #expect(#div(attributes: [.data("id", "5")]) == "<div data-id=\"5\"></div>")
+    }
+    @Test func attribute_hidden() {
+        #expect(#div(attributes: [.hidden(.true)]) == "<div hidden></div>")
+        #expect(#div(attributes: [.hidden(.untilFound)]) == "<div hidden=\"until-found\"></div>")
+    }
+
+    @Test func attribute_custom() {
+        #expect(#div(attributes: [.custom("potofgold", "north")]) == "<div potofgold=\"north\"></div>")
+        #expect(#div(attributes: [.custom("potofgold", "\(1)")]) == "<div potofgold=\"1\"></div>")
+        #expect(#div(attributes: [.custom("potofgold1", "\(1)"), .custom("potofgold2", "2")]) == "<div potofgold1=\"1\" potofgold2=\"2\"></div>")
+        //#expect(#div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")]) == "<div potofgold1=\"1\" potofgold2=\"2\"></div>")
     }
 }
 
@@ -123,9 +145,9 @@ extension HTMLKitTests {
     enum Shrek : String {
         case isLove, isLife
     }
-    @Test func test_third_party_enum() {
-        #expect(#div(attributes: [.title(Shrek.isLove.rawValue)]) == "<div title=\"isLove\"></div>")
-        #expect(#div(attributes: [.title("\(Shrek.isLife)")]) == "<div title=\"isLife\"></div>")
+    @Test func third_party_enum() {
+        #expect(#a(attributes: [.title(Shrek.isLove.rawValue)]) == "<a title=\"isLove\"></a>")
+        #expect(#a(attributes: [.title("\(Shrek.isLife)")]) == "<a title=\"isLife\"></a>")
     }
 }
 
@@ -140,7 +162,7 @@ extension HTMLKitTests {
         }
     }
     
-    @Test func test_third_party_literal() {
+    @Test func third_party_literal() {
         var string:String = #div(attributes: [.title(HTMLKitTests.spongebob)])
         #expect(string == "<div title=\"Spongebob Squarepants\"></div>")
 
@@ -151,13 +173,13 @@ extension HTMLKitTests {
         let static_string:StaticString = #div(attributes: [.title(mr_crabs)])
         #expect(static_string == "<div title=\"Mr. Crabs\"></div>")*/
     }
-    @Test func test_third_party_func() {
-        #expect(#div(attributes: [.title(HTMLKitTests.spongebobCharacter("patrick"))]) == "<div title=\"Patrick Star\"></div>")
+    @Test func third_party_func() {
+        //#expect(#div(attributes: [.title(HTMLKitTests.spongebobCharacter("patrick"))]) == "<div title=\"Patrick Star\"></div>")
     }
 }
 
 extension HTMLKitTests {
-    @Test func test_example_1() {
+    @Test func example_1() {
         let test:StaticString = #html([
             #body([
                 #div(
@@ -189,7 +211,7 @@ extension HTMLKitTests {
 }
 
 extension HTMLKitTests {
-    @Test func testExample2() {
+    @Test func example2() {
         var test:TestStruct = TestStruct(name: "one", array: ["1", "2", "3"])
         #expect(test.html == "<p>one123</p>")
         

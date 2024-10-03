@@ -12,22 +12,16 @@ import HTMLKitUtilities
 
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        let type:HTMLElementType = HTMLElementType(rawValue: node.macroName.text)!
-        let data:ElementData = parse_arguments(context: context, elementType: type, arguments: node.arguments)
-        var string:String = (type == .html ? "<!DOCTYPE html>" : "") + "<" + type.rawValue + data.attributes + ">" + data.innerHTML
-        if !type.isVoid {
-            string += "</" + type.rawValue + ">"
-        }
-        return "\"\(raw: string)\""
+        return "\"\(raw: parse_element_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!))\""
     }
 }
 
 private extension HTMLElement {
-    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, arguments: LabeledExprListSyntax) -> ElementData {
+    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
-        for element in arguments.children(viewMode: .all) {
+        for element in children {
             if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
-                if var key:String = child.label?.text { // attributes
+                if var key:String = child.label?.text {
                     if key == "attributes" {
                         attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.as(ArrayExprSyntax.self)!))
                     } else {
@@ -54,24 +48,36 @@ private extension HTMLElement {
     static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayExprSyntax) -> [String] {
         var keys:Set<String> = [], attributes:[String] = []
         for element in array.elements {
-            let function:FunctionCallExprSyntax = element.expression.as(FunctionCallExprSyntax.self)!
+            let function:FunctionCallExprSyntax = element.expression.as(FunctionCallExprSyntax.self)!, key_element:ExprSyntax = function.arguments.first!.expression
             var key:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text, value:String? = nil
-            if key == "data" {
-                var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: "data", expression: function.arguments.last!.expression)!
-                if returnType == .interpolation {
-                    literalValue = "\\(" + literalValue + ")"
-                }
-                value = literalValue
-                key += "-\(function.arguments.first!.expression.as(StringLiteralExprSyntax.self)!.string)"
-            } else if key == "event" {
-                key = "on" + function.arguments.first!.expression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
-                value = function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string
-            } else if let string:String = parse_attribute(elementType: elementType, key: key, expression: function.arguments.first!.expression) {
-                value = string
+            switch key {
+                case "custom", "data":
+                    var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: key, expression: function.arguments.last!.expression)!
+                    if returnType == .interpolation {
+                        literalValue = "\\(" + literalValue + ")"
+                    }
+                    value = literalValue
+                    if key == "custom" {
+                        key = key_element.as(StringLiteralExprSyntax.self)!.string
+                    } else {
+                        key += "-\(key_element.as(StringLiteralExprSyntax.self)!.string)"
+                    }
+                    break
+                case "event":
+                    key = "on" + key_element.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+                    value = function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string
+                    break
+                default:
+                    if let string:String = parse_attribute(elementType: elementType, key: key, expression: key_element) {
+                        value = string
+                    }
+                    break
             }
-            if let value:String = value {
+            if key.contains(" ") {
+                context.diagnose(Diagnostic(node: key_element, message: ErrorDiagnostic(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
+            } else if let value:String = value {
                 if keys.contains(key) {
-                    context.diagnose(Diagnostic(node: element, message: ErrorDiagnostic(id: "globalAttributeAlreadyDefined", message: "Global attribute is already defined.")))
+                    context.diagnose(Diagnostic(node: key_element, message: ErrorDiagnostic(id: "globalAttributeAlreadyDefined", message: "Global attribute is already defined.")))
                 } else {
                     attributes.append(key + (value.isEmpty ? "" : "=\\\"" + value + "\\\""))
                     keys.insert(key)
@@ -82,8 +88,25 @@ private extension HTMLElement {
     }
     static func parse_element_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax) -> String {
         guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
-        let data:ElementData = parse_arguments(context: context, elementType: elementType, arguments: expression.arguments)
-        return "<" + elementType.rawValue + data.attributes + ">" + data.innerHTML + (elementType.isVoid ? "" : "</" + elementType.rawValue + ">")
+        let childs:SyntaxChildren = expression.arguments.children(viewMode: .all)
+        let tag:String, isVoid:Bool
+        var children:Slice<SyntaxChildren>
+        if elementType == .custom {
+            tag = childs.first(where: { $0.as(LabeledExprSyntax.self)?.label?.text == "tag" })!.as(LabeledExprSyntax.self)!.expression.as(StringLiteralExprSyntax.self)!.string
+            isVoid = childs.first(where: { $0.as(LabeledExprSyntax.self)?.label?.text == "isVoid" })!.as(LabeledExprSyntax.self)!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
+            children = childs.dropFirst() // tag
+            children.removeFirst() // isVoid
+        } else {
+            tag = elementType.rawValue
+            isVoid = elementType.isVoid
+            children = childs.prefix(childs.count)
+        }
+        let data:ElementData = parse_arguments(context: context, elementType: elementType, children: children)
+        var string:String = (elementType == .html ? "<!DOCTYPE html>" : "") + "<" + tag + data.attributes + ">" + data.innerHTML
+        if !isVoid {
+            string += "</" + tag + ">"
+        }
+        return string
     }
 
     struct ElementData {
@@ -195,6 +218,7 @@ enum LiteralReturnType {
 // MARK: HTMLElementType
 enum HTMLElementType : String {
     case html
+    case custom
     
     case a
     case abbr
