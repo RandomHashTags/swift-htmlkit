@@ -15,7 +15,7 @@ public extension StaticString {
 
 // MARK: Elements
 @freestanding(expression)
-public macro html<T: ExpressibleByStringLiteral>(xmlns: T? = nil, _ innerHTML: [T]) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro html<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: [T]) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro custom<T: ExpressibleByStringLiteral>(tag: String, isVoid: Bool, attributes: [HTMLElementAttribute] = [], _ innerHTML: [T] = []) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
