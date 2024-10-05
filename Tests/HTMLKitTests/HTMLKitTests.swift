@@ -131,8 +131,19 @@ extension HTMLKitTests {
 
     @Test func no_value_type() {
         let test1 = #html([#body([#h1(["HTMLKitTests"])])])
+        #expect(type(of: test1) == String.self)
         let test2 = #html([#body([#h1([StaticString("HTMLKitTests")])])])
+        #expect(type(of: test2) == StaticString.self)
     }
+
+    /*@Test func nil_values() {
+        #expect(#a(["yippie", (true ? nil : "yiyo")]) == "<a>yippie</a>") // improper
+        #expect(#a(["yippie", (false ? nil : "yiyo")]) == "<a>yippieyiyo</a>") // improper
+        #expect(#a([nil, "sheesh", nil, nil, " capeesh"]) == "<a>sheesh capeesh</a>")
+
+        let ss:StaticString = #a([(true ? "Oh yeah" : nil)]) // improper
+        #expect(ss == "<a>Oh yeah</a>")
+    }*/
     
     @Test func multiline_value_type() {
         /*#expect(#script(["""

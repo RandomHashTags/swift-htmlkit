@@ -20,10 +20,10 @@ private extension HTMLElement {
     static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
         for element in children {
-            if let child:LabeledExprSyntax = element.as(LabeledExprSyntax.self) {
+            if let child:LabeledExprSyntax = element.labeled {
                 if var key:String = child.label?.text {
                     if key == "attributes" {
-                        attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.as(ArrayExprSyntax.self)!))
+                        attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!))
                     } else {
                         if key == "acceptCharset" {
                             key = "accept-charset"
@@ -32,11 +32,11 @@ private extension HTMLElement {
                             attributes.append(key + (string.isEmpty ? "" : "=\\\"" + string + "\\\""))
                         }
                     }
-                } else if let array:ArrayElementListSyntax = child.expression.as(ArrayExprSyntax.self)?.elements { // inner html
+                } else if let array:ArrayElementListSyntax = child.expression.array?.elements { // inner html
                     for yoink in array {
-                        if let macro:MacroExpansionExprSyntax = yoink.expression.as(MacroExpansionExprSyntax.self) {
+                        if let macro:MacroExpansionExprSyntax = yoink.expression.macroExpansion {
                             innerHTML.append(parse_element_macro(context: context, expression: macro))
-                        } else if let string:String = yoink.expression.as(StringLiteralExprSyntax.self)?.string {
+                        } else if let string:String = yoink.expression.stringLiteral?.string {
                             innerHTML.append(string)
                         }
                     }
@@ -49,7 +49,7 @@ private extension HTMLElement {
         var keys:Set<String> = [], attributes:[String] = []
         for element in array.elements {
             let function:FunctionCallExprSyntax = element.expression.as(FunctionCallExprSyntax.self)!, key_element:ExprSyntax = function.arguments.first!.expression
-            var key:String = function.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text, value:String? = nil
+            var key:String = function.calledExpression.memberAccess!.declName.baseName.text, value:String? = nil
             switch key {
                 case "custom", "data":
                     var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: key, expression: function.arguments.last!.expression)!
@@ -58,14 +58,14 @@ private extension HTMLElement {
                     }
                     value = literalValue
                     if key == "custom" {
-                        key = key_element.as(StringLiteralExprSyntax.self)!.string
+                        key = key_element.stringLiteral!.string
                     } else {
-                        key += "-\(key_element.as(StringLiteralExprSyntax.self)!.string)"
+                        key += "-\(key_element.stringLiteral!.string)"
                     }
                     break
                 case "event":
-                    key = "on" + key_element.as(MemberAccessExprSyntax.self)!.declName.baseName.text
-                    value = function.arguments.last!.expression.as(StringLiteralExprSyntax.self)!.string
+                    key = "on" + key_element.memberAccess!.declName.baseName.text
+                    value = function.arguments.last!.expression.stringLiteral!.string
                     break
                 default:
                     if let string:String = parse_attribute(elementType: elementType, key: key, expression: key_element) {
@@ -92,8 +92,8 @@ private extension HTMLElement {
         let tag:String, isVoid:Bool
         var children:Slice<SyntaxChildren>
         if elementType == .custom {
-            tag = childs.first(where: { $0.as(LabeledExprSyntax.self)?.label?.text == "tag" })!.as(LabeledExprSyntax.self)!.expression.as(StringLiteralExprSyntax.self)!.string
-            isVoid = childs.first(where: { $0.as(LabeledExprSyntax.self)?.label?.text == "isVoid" })!.as(LabeledExprSyntax.self)!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
+            tag = childs.first(where: { $0.labeled?.label?.text == "tag" })!.labeled!.expression.stringLiteral!.string
+            isVoid = childs.first(where: { $0.labeled?.label?.text == "isVoid" })!.labeled!.expression.booleanLiteral!.literal.text == "true"
             children = childs.dropFirst() // tag
             children.removeFirst() // isVoid
         } else {
@@ -136,14 +136,14 @@ private extension HTMLElement {
             case .interpolation: return "\\(" + string + ")"
             }
         }
-        if let value:String = expression.as(ArrayExprSyntax.self)?.elements.compactMap({
+        if let value:String = expression.array?.elements.compactMap({
             if let string:String = $0.expression.stringLiteral?.string {
                 return string
             }
             if let string:String = $0.expression.integerLiteral?.literal.text {
                 return string
             }
-            if let string:String = $0.expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
+            if let string:String = $0.expression.memberAccess?.declName.baseName.text {
                 return HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
             }
             return nil
@@ -190,7 +190,7 @@ private extension HTMLElement {
                 return ("\(function)", .interpolation)
             }
         }
-        if let member:MemberAccessExprSyntax = expression.as(MemberAccessExprSyntax.self) {
+        if let member:MemberAccessExprSyntax = expression.memberAccess {
             let decl:String = member.declName.baseName.text
             if let base:ExprSyntax = member.base {
                 if let integer:String = base.integerLiteral?.literal.text {
@@ -366,6 +366,12 @@ extension ExprSyntax {
     var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
     var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
     var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
+    var array : ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
+    var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
+    var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
+}
+extension SyntaxChildren.Element {
+    var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
 }
 extension StringLiteralExprSyntax {
     var string : String { "\(segments)" }
