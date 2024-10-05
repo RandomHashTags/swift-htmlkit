@@ -151,6 +151,26 @@ extension HTMLKitTests {
         """
         ]) == "<script>bro</script>")*/
     }
+
+    /*@Test func not_allowed() {
+        let _:StaticString = #a(
+            attributes: [
+                .class(["lets go"])
+            ],
+            attributionSrc: ["lets go"],
+            ping: ["lets go"]
+        )
+        let _:StaticString = #input(
+            accept: ["lets,go"],
+            autocomplete: ["lets go"]
+        )
+        let _:StaticString = #link(
+            imagesizes: ["lets,go"],
+            imagesrcset: ["lets,go"],
+            rel: ["lets go"],
+            sizes: ["lets,go"]
+        )
+    }*/
 }
 
 extension HTMLKitTests {

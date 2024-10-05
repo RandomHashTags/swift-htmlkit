@@ -28,7 +28,7 @@ private extension HTMLElement {
                         if key == "acceptCharset" {
                             key = "accept-charset"
                         }
-                        if let string:String = parse_attribute(elementType: elementType, key: key, expression: child.expression) {
+                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: child.expression) {
                             attributes.append(key + (string.isEmpty ? "" : "=\\\"" + string + "\\\""))
                         }
                     }
@@ -68,7 +68,7 @@ private extension HTMLElement {
                     value = function.arguments.last!.expression.stringLiteral!.string
                     break
                 default:
-                    if let string:String = parse_attribute(elementType: elementType, key: key, expression: key_element) {
+                    if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: key_element) {
                         value = string
                     }
                     break
@@ -128,7 +128,7 @@ private extension HTMLElement {
         }
     }
     
-    static func parse_attribute(elementType: HTMLElementType, key: String, expression: ExprSyntax) -> String? {
+    static func parse_attribute(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, expression: ExprSyntax) -> String? {
         if let (string, returnType):(String, LiteralReturnType) = parse_literal_value(elementType: elementType, key: key, expression: expression) {
             switch returnType {
             case .boolean: return string.elementsEqual("true") ? "" : nil
@@ -136,9 +136,16 @@ private extension HTMLElement {
             case .interpolation: return "\\(" + string + ")"
             }
         }
+        let separator:String = get_separator(key: key)
+        let string_return_logic:(ExprSyntax, String) -> String = {
+            if $1.contains(separator) {
+                context.diagnose(Diagnostic(node: $0, message: ErrorDiagnostic(id: "characterNotAllowedInDeclaration", message: "Character \"" + separator + "\" is not allowed when declaring values for \"" + key + "\".")))
+            }
+            return $1
+        }
         if let value:String = expression.array?.elements.compactMap({
             if let string:String = $0.expression.stringLiteral?.string {
-                return string
+                return string_return_logic($0.expression, string)
             }
             if let string:String = $0.expression.integerLiteral?.literal.text {
                 return string
@@ -147,7 +154,7 @@ private extension HTMLElement {
                 return HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
             }
             return nil
-        }).joined(separator: get_separator(key: key)) {
+        }).joined(separator: separator) {
             return value
         }
         func member(_ value: String) -> String {
