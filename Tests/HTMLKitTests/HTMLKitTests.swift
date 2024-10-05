@@ -37,6 +37,9 @@ extension HTMLKitTests {
     }
     @Test func element_button() {
         #expect(#button(type: .submit) == "<button type=\"submit\"></button>")
+        #expect(#button(formenctype: .applicationXWWWFormURLEncoded, formmethod: .get, formtarget: ._blank, popovertargetaction: .hide) == "<button formenctype=\"application/x-www-form-urlencoded\" formmethod=\"get\" formtarget=\"_blank\" popovertargetaction=\"hide\"></button>")
+        #expect(#button(formenctype: .multipartFormData, formmethod: .post, popovertargetaction: .show) == "<button formenctype=\"multipart/form-data\" formmethod=\"post\" popovertargetaction=\"show\"></button>")
+        #expect(#button(formenctype: .textPlain, formmethod: .get, type: .reset) == "<button formenctype=\"text/plain\" formmethod=\"get\" type=\"reset\"></button>")
     }
     @Test func element_canvas() {
         #expect(#canvas(height: .percent(4), width: .em(2.69)) == "<canvas height=\"4%\" width=\"2.69em\"></canvas>")
@@ -55,7 +58,7 @@ extension HTMLKitTests {
     @Test func element_img() {
         #expect(#img(sizes: ["(max-height: 500px) 1000px", "(min-height: 25rem)"], srcset: ["https://paradigm-app.com", "https://litleagues.com"]) == "<img sizes=\"(max-height: 500px) 1000px,(min-height: 25rem)\" srcset=\"https://paradigm-app.com,https://litleagues.com\">")
     }
-    @Test func test_link() {
+    @Test func element_link() {
         #expect(#link(as: .document, imagesizes: ["lmno", "p"]) == "<link as=\"document\" imagesizes=\"lmno,p\">")
     }
     @Test func element_ol() {
@@ -72,11 +75,26 @@ extension HTMLKitTests {
         #expect(#script(type: .module) == "<script type=\"module\"></script>")
         #expect(#script(type: .speculationrules) == "<script type=\"speculationrules\"></script>")
     }
-    @Test func element_text_area() {
-        #expect(#textarea(autocomplete: ["email", "password"], rows: 5) == "<textarea autocomplete=\"email password\" rows=\"5\"></textarea>")
+    @Test func element_style() {
+        #expect(#style(blocking: .render) == "<style blocking=\"render\"></style>")
+    }
+    @Test func element_template() {
+        #expect(#template(shadowrootclonable: .false, shadowrootdelegatesfocus: false, shadowrootmode: .closed, shadowrootserializable: true) == "<template shadowrootclonable=\"false\" shadowrootmode=\"closed\" shadowrootserializable></template>")
+    }
+    @Test func element_textarea() {
+        #expect(#textarea(autocomplete: ["email", "password"], dirname: .ltr, rows: 5, wrap: .soft) == "<textarea autocomplete=\"email password\" dirname=\"ltr\" rows=\"5\" wrap=\"soft\"></textarea>")
+    }
+    @Test func element_th() {
+        #expect(#th(rowspan: 2, scope: .colgroup) == "<th rowspan=\"2\" scope=\"colgroup\"></th>")
+    }
+    @Test func element_track() {
+        #expect(#track(default: true, kind: .captions, label: "tesT") == "<track default kind=\"captions\" label=\"tesT\">")
     }
     @Test func element_video() {
         #expect(#video(controlslist: [.nodownload, .nofullscreen, .noremoteplayback]) == "<video controlslist=\"nodownload nofullscreen noremoteplayback\"></video>")
+        #expect(#video(crossorigin: .anonymous) == "<video crossorigin=\"anonymous\"></video>")
+        #expect(#video(crossorigin: .useCredentials) == "<video crossorigin=\"use-credentials\"></video>")
+        #expect(#video(preload: .metadata) == "<video preload=\"metadata\"></video>")
     }
 
     @Test func element_custom() {
@@ -169,12 +187,11 @@ extension HTMLKitTests {
         string = #div(attributes: [.title(HTMLKitTests.patrick)])
         #expect(string == "<div title=\"Patrick Star\"></div>")
 
-        /*let mr_crabs:StaticString = "Mr. Crabs"
-        let static_string:StaticString = #div(attributes: [.title(mr_crabs)])
-        #expect(static_string == "<div title=\"Mr. Crabs\"></div>")*/
+        let static_string:StaticString = #div(attributes: [.title("Mr. Crabs")])
+        #expect(static_string == "<div title=\"Mr. Crabs\"></div>")
     }
     @Test func third_party_func() {
-        //#expect(#div(attributes: [.title(HTMLKitTests.spongebobCharacter("patrick"))]) == "<div title=\"Patrick Star\"></div>")
+        #expect(#div(attributes: [.title(HTMLKitTests.spongebobCharacter("patrick"))]) == "<div title=\"Patrick Star\"></div>")
     }
 }
 
