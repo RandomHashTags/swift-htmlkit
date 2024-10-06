@@ -14,8 +14,11 @@ let package = Package(
         .package(url: "https://github.com/sliemeobn/elementary", from: "0.3.4"),
         .package(url: "https://github.com/vapor-community/HTMLKit", from: "2.8.1"),
         .package(url: "https://github.com/pointfreeco/swift-html", from: "0.4.1"),
-        //.package(name: "BBHTML", url: "https://github.com/BinaryBirds/swift-html", from: "1.7.0")
-        .package(url: "https://github.com/JohnSundell/Plot", from: "0.14.0")
+        //.package(name: "BBHTML", url: "https://github.com/BinaryBirds/swift-html", from: "1.7.0") // conflicting package name
+        .package(url: "https://github.com/JohnSundell/Plot", from: "0.14.0"),
+        //.package(url: "https://github.com/toucansites/toucan", from: "1.0.0-alpha.1"), // unstable
+        //.package(url: "https://github.com/robb/Swim", from: "0.4.0") // compile problem
+        .package(url: "https://github.com/dokun1/Vaux", from: "0.2.0") // result limitation
     ],
     targets: [
         .target(
@@ -64,6 +67,22 @@ let package = Package(
             path: "Benchmarks/SwiftHTMLPF"
         ),
         .target(
+            name: "TestSwim",
+            dependencies: [
+                "Utilities",
+                /*.product(name: "Swim", package: "Swim"),
+                .product(name: "HTML", package: "Swim")*/
+            ],
+            path: "Benchmarks/Swim"
+        ),
+        .target(
+            name: "TestToucan",
+            dependencies: [
+                "Utilities"
+            ],
+            path: "Benchmarks/Toucan"
+        ),
+        .target(
             name: "TestVaporHTMLKit",
             dependencies: [
                 "Utilities",
@@ -71,6 +90,14 @@ let package = Package(
                 .product(name: "HTMLKit", package: "HTMLKit", moduleAliases: ["HTMLKit" : "VaporHTMLKit"])
             ],
             path: "Benchmarks/VaporHTMLKit"
+        ),
+        .target(
+            name: "TestVaux",
+            dependencies: [
+                "Utilities",
+                .product(name: "Vaux", package: "Vaux")
+            ],
+            path: "Benchmarks/Vaux"
         ),
 
         .executableTarget(
@@ -82,7 +109,10 @@ let package = Package(
                 "TestSwiftHTMLBB",
                 "TestSwiftHTMLKit",
                 "TestSwiftHTMLPF",
+                "TestSwim",
+                "TestToucan",
                 "TestVaporHTMLKit",
+                "TestVaux",
                 .product(name: "Benchmark", package: "package-benchmark")
             ],
             path: "Benchmarks/Benchmarks",

@@ -11,3 +11,7 @@ __BenchmarkBoilerplate.d
 __BenchmarkBoilerplate.o
 __BenchmarkBoilerplate.swiftdeps
 __BenchmarkBoilerplate.swiftdeps~
+Tag.d
+Tag.o
+Tag.swiftdeps
+Tags.d

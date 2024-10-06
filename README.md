@@ -141,10 +141,10 @@ Use the `HTMLElementAttribute.event(<type>, "<value>")`.
 ## Benchmarks
 - Libraries tested
   - [sliemeobn/elementary](https://github.com/sliemeobn/elementary) v0.3.4
-  - [vapor-community/HTMLKit](https://github.com/vapor-community/HTMLKit) v2.8.1
   - [JohnSundell/Plot](https://github.com/JohnSundell/Plot) v0.14.0
-  - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
   - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.4.0 (this library)
+  - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
+  - [vapor-community/HTMLKit](https://github.com/vapor-community/HTMLKit) v2.8.1
 <details>
 <summary>Results</summary>
 At least on my iMac (i9 9900k, 72GB RAM, 2TB) using macOS 15.0 and the Swift 6 compiler.

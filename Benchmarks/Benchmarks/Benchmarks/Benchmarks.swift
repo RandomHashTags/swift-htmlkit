@@ -12,7 +12,10 @@ import TestElementary
 import TestPlot
 import TestSwiftHTMLKit
 import TestSwiftHTMLPF
+import TestSwim
+import TestToucan
 import TestVaporHTMLKit
+import TestVaux
 
 let benchmarks = {
     Benchmark.defaultConfiguration = .init(metrics: .all)
@@ -22,6 +25,7 @@ let benchmarks = {
         "Plot" : PlotTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
         "SwiftHTMLPF" : SwiftHTMLPFTests(),
+        //"Swim" : SwimTests(),
         "VaporHTMLKit" : VaporHTMLKitTests()
     ]
 
