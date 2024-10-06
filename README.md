@@ -1,9 +1,15 @@
 Write HTML using Swift Macros.
+
+<a href="https://swift.org"><img src="https://img.shields.io/badge/Swift-5.9+-orange" alt="Requires at least Swift 5.9"></a> <img src="https://img.shields.io/badge/Platforms-Any-gold"> <a href="https://github.com/RandomHashTags/swift-htmlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="Apache 2.0 License">
+
 - [Why?](#why)
 - [Examples](#examples)
   - [Basic](#basic)
   - [Advanced](#advanced)
 - [Benchmarks](#benchmarks)
+  - [Conclusion](#conclusion)
+- [Contributing](#contributing)
+- [Funding](#funding)
 
 ## Why?
 - Swift Macros are powerful and offer performance benefits
@@ -77,7 +83,7 @@ Using String Interpolation.
 let string:String = "any string value", integer:Int = -69, float:Float = 3.14159
 
 // ✅ DO
-let _:String = #p(["\(string) \(integer); \(float)"])
+let _:String = #p(["\(string); \(integer); \(float)"])
 
 // ❌ DON'T
 let _:String = #p([string, "; ", String(describing: integer), "; ", float.description])
