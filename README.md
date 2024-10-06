@@ -11,10 +11,6 @@ Write HTML using Swift Macros.
 - HTML macros enforce safety, can be used anywhere, and compile directly to strings which are easily manipulated
 - The output is minified at no performance cost
 ## Examples
-<style>
-    details { padding-left:20px }
-    summary { margin-left:-20px }
-</style>
 ### Basic
 <details>
 <summary>How do I use this library?</summary>
