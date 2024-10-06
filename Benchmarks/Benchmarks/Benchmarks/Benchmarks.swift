@@ -6,50 +6,30 @@
 //
 
 import Benchmark
-import TestSwiftHTMLKit
+import Utilities
+
 import TestElementary
+import TestPlot
+import TestSwiftHTMLKit
 import TestSwiftHTMLPF
+import TestVaporHTMLKit
 
 let benchmarks = {
     Benchmark.defaultConfiguration = .init(metrics: .all)
 
-    let swifthtmlkit:SwiftHTMLKitTests = SwiftHTMLKitTests()
-    Benchmark("SwiftHTMLKit simpleHTML()") {
-        for _ in $0.scaledIterations {
-            blackHole(swifthtmlkit.simpleHTML())
-        }
-    }
+    let libraries:[String:HTMLGenerator] = [
+        "Elementary" : ElementaryTests(),
+        "Plot" : PlotTests(),
+        "SwiftHTMLKit" : SwiftHTMLKitTests(),
+        "SwiftHTMLPF" : SwiftHTMLPFTests(),
+        "VaporHTMLKit" : VaporHTMLKitTests()
+    ]
 
-    let elementary:ElementaryTests = ElementaryTests()
-    Benchmark("Elementary simpleHTML()") {
-        for _ in $0.scaledIterations {
-            blackHole(elementary.simpleHTML())
-        }
-    }
-
-    /*let renderer:Renderer = Renderer.init()
-    Benchmark("VaporHTMLKit create single html") {
-        for _ in $0.scaledIterations {
-            blackHole(renderer.render(view: VaporHTMLKitTests.SimpleHTML()))
-        }
-    }*/
-
-    let swifthtml:SwiftHTMLPFTests = SwiftHTMLPFTests()
-    Benchmark("SwiftHtml singleHTML()") {
-        for _ in $0.scaledIterations {
-            blackHole(swifthtml.simpleHTML())
-        }
-    }
-}
-
-/*struct VaporHTMLKitTests {
-    struct SimpleHTML : some VaporHTMLKit.View {
-        var body : Content {
-            Html {
-                Body {
-                    Heading1 { "Swift HTML Benchmarks" }
-                }
+    for (key, value) in libraries {
+        Benchmark(key + " simpleHTML()") {
+            for _ in $0.scaledIterations {
+                blackHole(value.simpleHTML())
             }
         }
     }
-}*/
+}

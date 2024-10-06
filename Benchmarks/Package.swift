@@ -15,6 +15,7 @@ let package = Package(
         .package(url: "https://github.com/vapor-community/HTMLKit", from: "2.8.1"),
         .package(url: "https://github.com/pointfreeco/swift-html", from: "0.4.1"),
         //.package(name: "BBHTML", url: "https://github.com/BinaryBirds/swift-html", from: "1.7.0")
+        .package(url: "https://github.com/JohnSundell/Plot", from: "0.14.0")
     ],
     targets: [
         .target(
@@ -28,6 +29,14 @@ let package = Package(
                 .product(name: "Elementary", package: "Elementary"),
             ],
             path: "Benchmarks/Elementary"
+        ),
+        .target(
+            name: "TestPlot",
+            dependencies: [
+                "Utilities",
+                .product(name: "Plot", package: "Plot")
+            ],
+            path: "Benchmarks/Plot"
         ),
         .target(
             name: "TestSwiftHTMLBB",
@@ -67,7 +76,9 @@ let package = Package(
         .executableTarget(
             name: "Benchmarks",
             dependencies: [
+                "Utilities",
                 "TestElementary",
+                "TestPlot",
                 "TestSwiftHTMLBB",
                 "TestSwiftHTMLKit",
                 "TestSwiftHTMLPF",
