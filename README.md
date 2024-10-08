@@ -160,7 +160,7 @@ Worth noting that the metrics not shown below are relatively equal to each other
 Output is from executing this command: `swift package -c release benchmark --grouping metric`
 
 <details>
-<summary>Time (wall clock) [less is better] <i>[winner: swift-htmlkit by 3.17-15.73x]</i></summary>
+<summary>Time (wall clock) [less is better] <i>[winner: swift-htmlkit by 3-15x]</i></summary>
 
 ```swift
 Time (wall clock)
@@ -181,7 +181,7 @@ Time (wall clock)
 </details>
 
 <details>
-<summary>Throughput (# / s) [more is better] <i>[winner: swift-htmlkit by 3.17-15.74x]</i></summary>
+<summary>Throughput (# / s) [more is better] <i>[winner: swift-htmlkit by 3-15x]</i></summary>
 
 ```swift
 Throughput (# / s)
@@ -202,7 +202,7 @@ Throughput (# / s)
 </details>
 
 <details>
-<summary>Instructions [less is better] <i>[winner: swift-htmlkit by 75.67-637.84x]</i></summary>
+<summary>Instructions [less is better] <i>[winner: swift-htmlkit by 75-637x]</i></summary>
 
 ```swift
 Instructions
