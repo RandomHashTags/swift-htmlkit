@@ -124,10 +124,6 @@ extension HTMLKitTests {
         ])
         #expect(string == "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }
-    /*@Test func same_attribute_multiple_times() {
-        let string:StaticString = #div(attributes: [.id("1"), .id("2"), .id("3"), .id("4")])
-        #expect(string == "<div id=\"1\"></div>")
-    }*/
 
     @Test func no_value_type() {
         let test1 = #html([#body([#h1(["HTMLKitTests"])])])
@@ -153,6 +149,7 @@ extension HTMLKitTests {
     }
 
     /*@Test func not_allowed() {
+        let _:StaticString = #div(attributes: [.id("1"), .id("2"), .id("3"), .id("4")])
         let _:StaticString = #a(
             attributes: [
                 .class(["lets go"])
@@ -170,6 +167,7 @@ extension HTMLKitTests {
             rel: ["lets go"],
             sizes: ["lets,go"]
         )
+        //let _:String = #div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")])
     }*/
 }
 
@@ -186,7 +184,7 @@ extension HTMLKitTests {
         #expect(#div(attributes: [.custom("potofgold", "north")]) == "<div potofgold=\"north\"></div>")
         #expect(#div(attributes: [.custom("potofgold", "\(1)")]) == "<div potofgold=\"1\"></div>")
         #expect(#div(attributes: [.custom("potofgold1", "\(1)"), .custom("potofgold2", "2")]) == "<div potofgold1=\"1\" potofgold2=\"2\"></div>")
-        //#expect(#div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")]) == "<div potofgold1=\"1\" potofgold2=\"2\"></div>")
+        
     }
 }
 
