@@ -17,8 +17,9 @@ let package = Package(
         //.package(name: "BBHTML", url: "https://github.com/BinaryBirds/swift-html", from: "1.7.0") // conflicting package name
         .package(url: "https://github.com/JohnSundell/Plot", from: "0.14.0"),
         //.package(url: "https://github.com/toucansites/toucan", from: "1.0.0-alpha.1"), // unstable
-        //.package(url: "https://github.com/robb/Swim", from: "0.4.0") // compile problem
-        .package(url: "https://github.com/dokun1/Vaux", from: "0.2.0") // result limitation
+        //.package(url: "https://github.com/robb/Swim", from: "0.4.0"), // compile problem
+        .package(url: "https://github.com/dokun1/Vaux", from: "0.2.0"), // result limitation
+        .package(url: "https://github.com/vapor/leaf", from: "4.4.0"),
     ],
     targets: [
         .target(
@@ -32,6 +33,14 @@ let package = Package(
                 .product(name: "Elementary", package: "Elementary"),
             ],
             path: "Benchmarks/Elementary"
+        ),
+        .target(
+            name: "TestLeaf",
+            dependencies: [
+                "Utilities",
+                .product(name: "Leaf", package: "Leaf")
+            ],
+            path: "Benchmarks/Leaf"
         ),
         .target(
             name: "TestPlot",
@@ -105,6 +114,7 @@ let package = Package(
             dependencies: [
                 "Utilities",
                 "TestElementary",
+                "TestLeaf",
                 "TestPlot",
                 "TestSwiftHTMLBB",
                 "TestSwiftHTMLKit",
