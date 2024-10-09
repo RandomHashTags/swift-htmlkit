@@ -165,7 +165,7 @@ Executed command: `swift package -c release --allow-writing-to-package-directory
 <img src="Benchmarks/img/throughput_dynamic.png">
 
 ### Conclusion
-This library is the clear leader in performance & efficiency with 75x less instructions and 3x better performance _at minimum_ __for static pages__. The performance improvements are less drastic when using dynamic pages, but are still noticeable (I am actively researching and testing improvements).
+This library is the clear leader in performance & efficiency. Static webpages offer the best performance, while dynamic pages still tops the charts (I am actively researching and testing improvements for dynamic pages).
 
 ## Contributing
 Create a PR.
