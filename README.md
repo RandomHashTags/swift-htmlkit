@@ -155,8 +155,6 @@ Use the `HTMLElementAttribute.event(<type>, "<value>")`.
 <summary>Results</summary>
 At least on my iMac (i9 9900k, 72GB RAM, 2TB) using macOS 15.0 and the Swift 6 compiler.
 
-Worth noting that the metrics not shown below are relatively equal to each other.
-
 Output is from executing this command: `swift package -c release benchmark --grouping metric`
 
 <details>
