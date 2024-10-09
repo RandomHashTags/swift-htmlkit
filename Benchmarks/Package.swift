@@ -14,10 +14,10 @@ let package = Package(
         .package(url: "https://github.com/sliemeobn/elementary", from: "0.3.4"),
         .package(url: "https://github.com/vapor-community/HTMLKit", from: "2.8.1"),
         .package(url: "https://github.com/pointfreeco/swift-html", from: "0.4.1"),
-        //.package(name: "BBHTML", url: "https://github.com/BinaryBirds/swift-html", from: "1.7.0") // conflicting package name
+        .package(url: "https://github.com/RandomHashTags/fork-bb-swift-html", branch: "main"),
         .package(url: "https://github.com/JohnSundell/Plot", from: "0.14.0"),
         //.package(url: "https://github.com/toucansites/toucan", from: "1.0.0-alpha.1"), // unstable
-        //.package(url: "https://github.com/robb/Swim", from: "0.4.0"), // compile problem
+        .package(url: "https://github.com/RandomHashTags/fork-Swim", branch: "main"),
         .package(url: "https://github.com/dokun1/Vaux", from: "0.2.0"), // result limitation
         .package(url: "https://github.com/vapor/leaf", from: "4.4.0"),
     ],
@@ -54,7 +54,7 @@ let package = Package(
             name: "TestSwiftHTMLBB",
             dependencies: [
                 "Utilities",
-                //.product(name: "SwiftHtml", package: "BBHTML")
+                .product(name: "SwiftHtml", package: "fork-bb-swift-html")
             ],
             path: "Benchmarks/SwiftHTMLBB"
         ),
@@ -71,7 +71,7 @@ let package = Package(
             name: "TestSwiftHTMLPF",
             dependencies: [
                 "Utilities",
-                .product(name: "Html", package: "swift-html"),
+                .product(name: "Html", package: "swift-html")
             ],
             path: "Benchmarks/SwiftHTMLPF"
         ),
@@ -79,8 +79,7 @@ let package = Package(
             name: "TestSwim",
             dependencies: [
                 "Utilities",
-                /*.product(name: "Swim", package: "Swim"),
-                .product(name: "HTML", package: "Swim")*/
+                .product(name: "Swim", package: "fork-Swim")
             ],
             path: "Benchmarks/Swim"
         ),

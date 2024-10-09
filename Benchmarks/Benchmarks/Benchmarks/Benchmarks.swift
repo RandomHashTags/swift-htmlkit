@@ -10,6 +10,7 @@ import Utilities
 
 import TestElementary
 import TestPlot
+import TestSwiftHTMLBB
 import TestSwiftHTMLKit
 import TestSwiftHTMLPF
 import TestSwim
@@ -21,28 +22,29 @@ let benchmarks = {
     Benchmark.defaultConfiguration = .init(metrics: .all)
 
     let libraries:[String:HTMLGenerator] = [
+        "BinaryBirds" : SwiftHTMLBBTests(),
         "Elementary" : ElementaryTests(),
         "Plot" : PlotTests(),
+        "Pointfreeco" : SwiftHTMLPFTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
-        "SwiftHTMLPF" : SwiftHTMLPFTests(),
-        //"Swim" : SwimTests(),
+        "Swim" : SwimTests(),
         "VaporHTMLKit" : VaporHTMLKitTests()
     ]
 
-    for (key, value) in libraries {
-        Benchmark(key + " static") {
+    /*for (key, value) in libraries {
+        Benchmark(key) {
             for _ in $0.scaledIterations {
                 blackHole(value.staticHTML())
             }
         }
-    }
+    }*/
 
-    /*let context:HTMLContext = HTMLContext()
+    let context:HTMLContext = HTMLContext()
     for (key, value) in libraries {
-        Benchmark(key + " dynamic") {
+        Benchmark(key) {
             for _ in $0.scaledIterations {
                 blackHole(value.dynamicHTML(context))
             }
         }
-    }*/
+    }
 }
