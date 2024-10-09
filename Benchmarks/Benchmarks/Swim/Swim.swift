@@ -13,7 +13,7 @@ import HTML
 package struct SwimTests : HTMLGenerator {
     package init() {}
 
-    package func simpleHTML() -> String {
+    package func staticHTML() -> String {
         html {
             body {
                 h1 {
@@ -21,8 +21,5 @@ package struct SwimTests : HTMLGenerator {
                 }
             }
         }
-    }
-    package func optimalHTML() -> String {
-        simpleHTML()
     }
 }*/

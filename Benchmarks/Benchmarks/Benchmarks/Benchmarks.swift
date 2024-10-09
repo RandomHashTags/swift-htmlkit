@@ -30,10 +30,19 @@ let benchmarks = {
     ]
 
     for (key, value) in libraries {
-        Benchmark(key + " simpleHTML()") {
+        Benchmark(key + " static") {
             for _ in $0.scaledIterations {
-                blackHole(value.simpleHTML())
+                blackHole(value.staticHTML())
             }
         }
     }
+
+    /*let context:HTMLContext = HTMLContext()
+    for (key, value) in libraries {
+        Benchmark(key + " dynamic") {
+            for _ in $0.scaledIterations {
+                blackHole(value.dynamicHTML(context))
+            }
+        }
+    }*/
 }

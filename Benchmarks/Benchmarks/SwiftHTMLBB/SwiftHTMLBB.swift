@@ -6,3 +6,6 @@
 //
 
 import Utilities
+
+package struct SwiftHTMLBBTests {
+}

@@ -14,13 +14,14 @@ package struct VaporHTMLKitTests : HTMLGenerator {
     package init() {
         renderer = Renderer()
         try! renderer.add(layout: SimpleView())
+        try! renderer.add(layout: DynamicView(context: Utilities.HTMLContext()))
     }
 
-    package func simpleHTML() -> String {
+    package func staticHTML() -> String {
         return try! renderer.render(layout: SimpleView.self)
     }
-    package func optimalHTML() -> String {
-        simpleHTML()
+    package func dynamicHTML(_ context: Utilities.HTMLContext) -> String {
+        return try! renderer.render(layout: DynamicView.self, with: context)
     }
 }
 
@@ -30,6 +31,27 @@ struct SimpleView : View {
         Html {
             Body {
                 Heading1 { "Swift HTML Benchmarks" }
+            }
+        }
+    }
+}
+
+struct DynamicView : View {
+    let context:Utilities.HTMLContext
+
+    var body : AnyContent {
+        Document(.html5)
+        Html {
+            Body {
+                Heading1 { context.heading }
+                Div {
+                    P { context.string }
+                }.id("desc")
+                Heading2 { context.user.details_heading }
+                Heading3 { context.user.qualities_heading }
+                Ul {
+                    context.user.qualities.map({ quality in Li { quality } })
+                }.id("user-qualities")
             }
         }
     }

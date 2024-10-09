@@ -17,7 +17,7 @@ package struct VauxTests : HTMLGenerator {
         vaux = Vaux()
     }
 
-    package func simpleHTML() -> String {
+    package func staticHTML() -> String {
         var stream:HTMLOutputStream = HTMLOutputStream(FileHandle.standardOutput, nil)
         let content = html {
             body {
@@ -31,7 +31,7 @@ package struct VauxTests : HTMLGenerator {
         return ""
     }
 
-    package func optimalHTML() -> String {
-        simpleHTML()
+    package func dynamicHTML(_ context: HTMLContext) -> String {
+        staticHTML()
     }
 }*/
