@@ -2,7 +2,7 @@ Write HTML using Swift Macros.
 
 <a href="https://swift.org"><img src="https://img.shields.io/badge/Swift-5.9+-orange" alt="Requires at least Swift 5.9"></a> <img src="https://img.shields.io/badge/Platforms-Any-gold"> <a href="https://github.com/RandomHashTags/swift-htmlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="Apache 2.0 License">
 
-- [Why?](#why)
+- [Why](#why)
 - [Examples](#examples)
   - [Basic](#basic)
   - [Advanced](#advanced)
@@ -11,10 +11,10 @@ Write HTML using Swift Macros.
 - [Contributing](#contributing)
 - [Funding](#funding)
 
-## Why?
-- Swift Macros are powerful and offer performance benefits
-- Alternative libraries may not fit all situations and may restrict how the html is generated/manipulated, prone to human error, or cost a constant performance overhead (middleware, rendering, result builders, etc)
-- HTML macros enforce safety, can be used anywhere, and compile directly to strings which are easily manipulated
+## Why
+- Swift Macros are powerful, efficient and essentially removes any runtime overhead
+- Alternative libraries may not fit all situations and may restrict how the html is generated, manipulated, prone to human error, or cost a constant performance overhead (middleware, rendering, result builders, etc)
+- HTML macros enforce safety, can be used anywhere, and compile directly to strings
 - The output is minified at no performance cost
 ## Examples
 ### Basic
@@ -160,7 +160,7 @@ Worth noting that the metrics not shown below are relatively equal to each other
 Output is from executing this command: `swift package -c release benchmark --grouping metric`
 
 <details>
-<summary>Time (wall clock) [less is better] <i>[winner: swift-htmlkit by 3-15x]</i></summary>
+<summary>Time (wall clock) [less is better]</summary>
 
 ```swift
 Time (wall clock)
@@ -181,7 +181,7 @@ Time (wall clock)
 </details>
 
 <details>
-<summary>Throughput (# / s) [more is better] <i>[winner: swift-htmlkit by 3-15x]</i></summary>
+<summary>Throughput (# / s) [more is better]</summary>
 
 ```swift
 Throughput (# / s)
@@ -202,7 +202,7 @@ Throughput (# / s)
 </details>
 
 <details>
-<summary>Instructions [less is better] <i>[winner: swift-htmlkit by 75-637x]</i></summary>
+<summary>Instructions [less is better]</summary>
 
 ```swift
 Instructions
@@ -223,7 +223,7 @@ Instructions
 </details>
 
 <details>
-<summary>Malloc (total) [less is better] <i>[winner: swift-htmlkit]</i></summary>
+<summary>Malloc (total) [less is better]</summary>
 
 ```swift
 Malloc (total)
@@ -245,7 +245,7 @@ Malloc (total)
 </details>
 
 <details>
-<summary>Object allocs [less is better] <i>[winner: swift-htmlkit]</i></summary>
+<summary>Object allocs [less is better]</summary>
 
 ```swift
 Object allocs
@@ -267,7 +267,7 @@ Object allocs
 </details>
 
 <details>
-<summary>Releases [less is better] <i>[winner: swift-htmlkit]</i></summary>
+<summary>Releases [less is better]</summary>
 
 ```swift
 Releases
@@ -289,7 +289,7 @@ Releases
 </details>
 
 <details>
-<summary>Retains [less is better] <i>[winner: swift-htmlkit & Elementary]</i></summary>
+<summary>Retains [less is better]</summary>
 
 ```swift
 Retains
@@ -310,56 +310,10 @@ Retains
 
 </details>
 
-<details>
-<summary>Time (user CPU) [less is better] <i>[winner: swift-htmlkit]</i></summary>
-
-```swift
-Time (user CPU)
-╒═════════════════════════════════════════════╤═════════╤═════════╤═════════╤═════════╤═════════╤═════════╤═════════╤═════════╕
-│ Test                                        │      p0 │     p25 │     p50 │     p75 │     p90 │     p99 │    p100 │ Samples │
-╞═════════════════════════════════════════════╪═════════╪═════════╪═════════╪═════════╪═════════╪═════════╪═════════╪═════════╡
-│ Benchmarks:Elementary simpleHTML() (ns) *   │    4501 │    4807 │    4907 │    5019 │    5147 │    6643 │   39542 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:Plot simpleHTML() (μs) *         │      20 │      21 │      22 │      22 │      23 │      34 │     272 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:SwiftHTMLKit simpleHTML() (ns) * │    1606 │    1768 │    1798 │    1841 │    1891 │    3265 │   27394 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:SwiftHTMLPF simpleHTML() (μs) *  │      12 │      13 │      13 │      14 │      14 │      29 │      76 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:VaporHTMLKit simpleHTML() (ns) * │    5175 │    5451 │    5543 │    5643 │    5755 │   11527 │   22320 │   10000 │
-╘═════════════════════════════════════════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╛
-```
-
-</details>
-
-<details>
-<summary>Time (total CPU) [less is better] <i>[winner: swift-htmlkit]</i></summary>
-
-```swift
-Time (total CPU)
-╒═════════════════════════════════════════════╤═════════╤═════════╤═════════╤═════════╤═════════╤═════════╤═════════╤═════════╕
-│ Test                                        │      p0 │     p25 │     p50 │     p75 │     p90 │     p99 │    p100 │ Samples │
-╞═════════════════════════════════════════════╪═════════╪═════════╪═════════╪═════════╪═════════╪═════════╪═════════╪═════════╡
-│ Benchmarks:Elementary simpleHTML() (ns) *   │    8142 │    8535 │    8687 │    8943 │    9159 │   11911 │   53014 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:Plot simpleHTML() (μs) *         │      24 │      26 │      26 │      26 │      27 │      41 │    1154 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:SwiftHTMLKit simpleHTML() (ns) * │    5052 │    5471 │    5527 │    5647 │    5867 │    9655 │   41376 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:SwiftHTMLPF simpleHTML() (μs) *  │      16 │      17 │      17 │      18 │      18 │      36 │     109 │   10000 │
-├─────────────────────────────────────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ Benchmarks:VaporHTMLKit simpleHTML() (ns) * │    8994 │    9351 │    9495 │    9791 │    9967 │   18255 │   90987 │   10000 │
-╘═════════════════════════════════════════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╛
-```
-
-</details>
-
 </details>
 
 ### Conclusion
-This library beats every other Swift HTML library in terms of performance & efficiency.
-
-So stop wasting system resources and energy using other libraries by switching to this one.
+This library is the clear leader in performance & efficiency with 75x less instructions and 3x better performance _at minimum_.
 
 ## Contributing
 Create a PR.
