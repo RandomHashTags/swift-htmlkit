@@ -9,6 +9,7 @@ let package = Package(
         .macOS(.v14)
     ],
     dependencies: [
+        // dsls
         .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.27.0"),
         .package(url: "https://github.com/RandomHashTags/swift-htmlkit", from: "0.4.0"),
         .package(url: "https://github.com/sliemeobn/elementary", from: "0.3.4"),
@@ -20,6 +21,10 @@ let package = Package(
         .package(url: "https://github.com/RandomHashTags/fork-Swim", branch: "main"),
         .package(url: "https://github.com/dokun1/Vaux", from: "0.2.0"),
         .package(url: "https://github.com/vapor/leaf", from: "4.4.0"),
+
+        // networking
+        .package(url: "https://github.com/vapor/vapor", from: "4.106.0"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.1.0")
     ],
     targets: [
         .target(
@@ -112,6 +117,9 @@ let package = Package(
             name: "UnitTests",
             dependencies: [
                 "Utilities",
+                .product(name: "HTMLKit", package: "swift-htmlkit", moduleAliases: ["HTMLKit" : "SwiftHTMLKit"]),
+                .product(name: "HTMLKit", package: "HTMLKit", moduleAliases: ["HTMLKit" : "VaporHTMLKit"]),
+
                 "TestElementary",
                 "TestLeaf",
                 "TestPlot",

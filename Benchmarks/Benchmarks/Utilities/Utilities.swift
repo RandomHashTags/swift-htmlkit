@@ -35,13 +35,14 @@ package actor Cache {
 
 // MARK: HTMLContext
 package struct HTMLContext {
-    package let heading:String
+    package let heading:String, desc_id:String
     package let string:String, integer:Int, double:Double, float:Float, boolean:Bool
     package let now:Date
     package let user:User
 
     package init() {
         heading = "Dynamic HTML Benchmark"
+        desc_id = "desc"
         // 1 paragraph of lorem ipsum
         string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tempor euismod arcu, sed elementum erat lobortis vel. Fusce nec orci purus. Maecenas a rutrum elit, in pellentesque nisl. Cras nec dapibus turpis. Donec finibus auctor arcu, vehicula maximus eros tincidunt et. Praesent nulla urna, imperdiet quis nunc id, auctor varius justo. Integer fringilla tincidunt lectus, et egestas massa molestie ut. Aliquam at augue pulvinar ante dignissim dignissim a at augue. Donec nisi elit, faucibus a ante a, interdum ultrices lacus. Fusce faucibus odio at est imperdiet, id sodales ipsum hendrerit. Nullam vehicula velit non metus malesuada ornare. Proin consequat id nulla sed porttitor."
         integer = 293785
@@ -55,7 +56,7 @@ package struct HTMLContext {
     }
 }
 package struct User {
-    package let details_heading:String, qualities_heading:String
+    package let details_heading:String, qualities_heading:String, qualities_id:String
 
     package let id:UInt64, email:String, username:String
     package let qualities:[String]
@@ -64,6 +65,7 @@ package struct User {
     init() {
         details_heading = "User Details"
         qualities_heading = "Qualities"
+        qualities_id = "user-qualities"
 
         id = 63821
         email = "test@gmail.com"

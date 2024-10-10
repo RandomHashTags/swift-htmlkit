@@ -9,10 +9,18 @@ import Utilities
 import Swim
 
 extension Node {
-    var rendered: String {
-        var result = ""
-        write(to: &result)
-        return result
+    var rendered : String {
+        switch self {
+        case .element(let name, let attributes, let child):
+            let attributes_string:String = attributes.isEmpty ? "" : " " + attributes.map({ $0 + "=\"" + $1 + "\"" }).joined(separator: " ")
+            return (name == "html" ? "<!DOCTYPE html>" : "") + "<" + name + attributes_string + ">" + (child?.rendered ?? "") + "</" + name + ">"
+        case .text(let string): return string
+        case .raw(let string): return string
+        case .comment(let _): return ""
+        case .documentType(let string): return string
+        case .fragment(let children): return children.map({ $0.rendered }).joined()
+        case .trim: return ""
+        }
     }
 }
 
@@ -21,6 +29,9 @@ package struct SwimTests : HTMLGenerator {
 
     package func staticHTML() -> String {
         html {
+            head {
+                title { "StaticView" }
+            }
             body {
                 h1 {
                     "Swift HTML Benchmarks"
@@ -32,12 +43,12 @@ package struct SwimTests : HTMLGenerator {
         html {
             body {
                 h1 { context.heading }
-                div(id: "desc") {
+                div(id: context.desc_id) {
                     p { context.string }
                 }
                 h2 { context.user.details_heading }
                 h3 { context.user.qualities_heading }
-                ul(id: "user-qualities") {
+                ul(id: context.user.qualities_id) {
                     context.user.qualities.map({ quality in li { quality} })
                 }
             }

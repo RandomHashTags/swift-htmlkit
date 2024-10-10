@@ -13,6 +13,9 @@ package struct PlotTests : HTMLGenerator {
 
     package func staticHTML() -> String {
         HTML(
+            .head(
+                .element(named: "title", text: "StaticView")
+            ),
             .body(
                 .h1("Swift HTML Benchmarks")
             )
@@ -42,9 +45,9 @@ struct Context {
 
     init(_ context: Utilities.HTMLContext) {
         heading = H1(context.heading)
-        desc = Div(Paragraph(context.string).id("desc"))
+        desc = Div(Paragraph(context.string).id(context.desc_id))
         details_heading = H2(context.user.details_heading)
         qualities_heading = H3(context.user.qualities_heading)
-        qualities = List(context.user.qualities).id("user-qualities")
+        qualities = List(context.user.qualities).id(context.user.qualities_id)
     }
 }

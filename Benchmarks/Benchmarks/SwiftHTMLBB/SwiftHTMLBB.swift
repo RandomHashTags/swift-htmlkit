@@ -17,6 +17,9 @@ package struct SwiftHTMLBBTests : HTMLGenerator {
     package func staticHTML() -> String {
         renderer.render(Document(.html) {
             Html {
+                Head {
+                    Title("StaticView")
+                }
                 Body {
                     H1("Swift HTML Benchmarks")
                 }
@@ -31,12 +34,12 @@ package struct SwiftHTMLBBTests : HTMLGenerator {
                     H1(context.heading)
                     Div {
                         P(context.string)
-                    }.id("desc")
+                    }.id(context.desc_id)
                     H2(context.user.details_heading)
                     H3(context.user.qualities_heading)
                     Ul {
                         context.user.qualities.map({ Li($0) })
-                    }.id("user-qualities")
+                    }.id(context.user.qualities_id)
                 }
             }
         })

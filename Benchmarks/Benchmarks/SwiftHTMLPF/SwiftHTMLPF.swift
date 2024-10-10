@@ -12,7 +12,16 @@ package struct SwiftHTMLPFTests : HTMLGenerator {
     package init() {}
 
     package func staticHTML() -> String {
-        render(.document(.html(.body(.h1("Swift HTML Benchmarks")))))
+        render(
+            .document(
+                .html(
+                    .head(
+                        .title("StaticView")
+                    ),
+                    .body(.h1("Swift HTML Benchmarks"))
+                )
+            )
+        )
     }
 
     package func dynamicHTML(_ context: HTMLContext) -> String {
@@ -21,10 +30,10 @@ package struct SwiftHTMLPFTests : HTMLGenerator {
                 .html(
                     .body(
                         .h1(.raw(context.heading)),
-                        .div(attributes: [.id("desc")], .p(.raw(context.string))),
+                        .div(attributes: [.id(context.desc_id)], .p(.raw(context.string))),
                         .h2(.raw(context.user.details_heading)),
                         .h3(.raw(context.user.qualities_heading)),
-                        .ul(attributes: [.id("user-qualities")], .fragment(context.user.qualities.map({ quality in .li(.raw(quality)) })))
+                        .ul(attributes: [.id(context.user.qualities_id)], .fragment(context.user.qualities.map({ quality in .li(.raw(quality)) })))
                     )
                 )
             )

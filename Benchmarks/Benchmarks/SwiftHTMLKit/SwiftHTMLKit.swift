@@ -13,6 +13,9 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
 
     package func staticHTML() -> String {
         #html([
+            #head([
+                #title(["StaticView"])
+            ]),
             #body([
                 #h1(["Swift HTML Benchmarks"])
             ])
@@ -23,12 +26,12 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
         return #html([
             #body([
                 #h1(["\(context.heading)"]),
-                #div(attributes: [.id("desc")], [
+                #div(attributes: [.id(context.desc_id)], [
                     #p(["\(context.string)"])
                 ]),
                 #h2(["\(context.user.details_heading)"]),
                 #h3(["\(context.user.qualities_heading)"]),
-                #ul(attributes: [.id("user-qualities")], ["\(qualities)"])
+                #ul(attributes: [.id(context.user.qualities_id)], ["\(qualities)"])
             ])
         ])
     }
