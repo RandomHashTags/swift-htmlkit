@@ -11,11 +11,11 @@ import HTMLKit
 struct HTMLKitTests {
     @Test func measureElapsedTime() {
         measureElapsedTime(key: "htmlkit") {
-            let _:StaticString = #html([
-                #body([
-                    #h1(["Swift HTML Benchmarks"])
-                ])
-            ])
+            let _:StaticString = #html(
+                #body(
+                    #h1("Swift HTML Benchmarks")
+                )
+            )
         }
     }
     func measureElapsedTime(key: String, _ block: () -> Void) {
@@ -26,8 +26,8 @@ struct HTMLKitTests {
 
 extension HTMLKitTests {
     @Test func element_html() {
-        #expect(#html([]) == "<!DOCTYPE html><html></html>")
-        #expect(#html(xmlns: "test", []) == "<!DOCTYPE html><html xmlns=\"test\"></html>")
+        #expect(#html() == "<!DOCTYPE html><html></html>")
+        #expect(#html(xmlns: "test") == "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
     @Test func element_area() {
         #expect(#area(coords: [1, 2, 3]) == "<area coords=\"1,2,3\">")
@@ -106,30 +106,33 @@ extension HTMLKitTests {
     }
 
     @Test func element_events() {
-        #expect(#div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()")], []) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
+        #expect(#div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()")]) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
     }
 
     @Test func elements_void() {
-        let string:StaticString = #area([#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr()])
+        let string:StaticString = #area(#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr())
         #expect(string == "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
     }
 }
 
 extension HTMLKitTests {
     @Test func recursive_elements() {
-        let string:StaticString = #div([
+        let string:StaticString = #div(
             #div(),
-            #div([#div(), #div(), #div()]),
+            #div(#div(), #div(), #div()),
             #div()
-        ])
+        )
         #expect(string == "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }
 
     @Test func no_value_type() {
-        let test1 = #html([#body([#h1(["HTMLKitTests"])])])
+        let expected_string:String = "<!DOCTYPE html><html><body><h1>HTMLKitTests</h1></body></html>"
+        let test1 = #html(#body(#h1("HTMLKitTests")))
         #expect(type(of: test1) == String.self)
-        let test2 = #html([#body([#h1([StaticString("HTMLKitTests")])])])
+        #expect(test1 == expected_string)
+        let test2 = #html(#body(#h1(StaticString("HTMLKitTests"))))
         #expect(type(of: test2) == StaticString.self)
+        #expect(test2 == expected_string)
     }
 
     /*@Test func nil_values() {
@@ -226,8 +229,8 @@ extension HTMLKitTests {
 
 extension HTMLKitTests {
     @Test func example_1() {
-        let test:StaticString = #html([
-            #body([
+        let test:StaticString = #html(
+            #body(
                 #div(
                     attributes: [
                         .class(["dark-mode", "row"]),
@@ -236,22 +239,20 @@ extension HTMLKitTests {
                         .inputmode(.email),
                         .title("Hey, you're pretty cool")
                     ],
-                    [
-                        "Random text",
-                        #div(),
-                        #a([
-                            #div([
-                                #abbr()
-                            ]),
-                            #address()
-                        ]),
-                        #div(),
-                        #button(disabled: true),
-                        #video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1)),
-                    ]
+                    "Random text",
+                    #div(),
+                    #a(
+                        #div(
+                            #abbr()
+                        ),
+                        #address()
+                    ),
+                    #div(),
+                    #button(disabled: true),
+                    #video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1))
                 )
-            ])
-        ])
+            )
+        )
         #expect(test == "<!DOCTYPE html><html><body><div class=\"dark-mode row\" draggable=\"false\" hidden inputmode=\"email\" title=\"Hey, you're pretty cool\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
     }
 }
@@ -269,6 +270,6 @@ extension HTMLKitTests {
         var name:String
         var array:[CustomStringConvertible]
 
-        var html : String { #p(["\(name)", "\(array.map({ "\($0)" }).joined())"]) }
+        var html : String { #p("\(name)", "\(array.map({ "\($0)" }).joined())") }
     }
 }

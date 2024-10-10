@@ -32,14 +32,15 @@ private extension HTMLElement {
                             attributes.append(key + (string.isEmpty ? "" : "=\\\"" + string + "\\\""))
                         }
                     }
-                } else if let array:ArrayElementListSyntax = child.expression.array?.elements { // inner html
-                    for yoink in array {
-                        if let macro:MacroExpansionExprSyntax = yoink.expression.macroExpansion {
-                            innerHTML.append(parse_element_macro(context: context, expression: macro))
-                        } else if let string:String = yoink.expression.stringLiteral?.string {
-                            innerHTML.append(string)
-                        }
-                    }
+                // inner html
+                } else if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
+                    innerHTML.append(parse_element_macro(context: context, expression: macro))
+                } else if let string:String = child.expression.stringLiteral?.string {
+                    innerHTML.append(string)
+                } else if let function:FunctionCallExprSyntax = child.expression.as(FunctionCallExprSyntax.self), function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
+                    innerHTML.append(function.arguments.first!.expression.stringLiteral!.string)
+                } else {
+                    context.diagnose(Diagnostic(node: child, message: ErrorDiagnostic(id: "unallowedExpression", message: "Expression not allowed.")))
                 }
             }
         }

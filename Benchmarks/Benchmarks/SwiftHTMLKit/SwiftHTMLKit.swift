@@ -12,27 +12,27 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
     package init() {}
 
     package func staticHTML() -> String {
-        #html([
-            #head([
-                #title(["StaticView"])
-            ]),
-            #body([
-                #h1(["Swift HTML Benchmarks"])
-            ])
-        ])
+        #html(
+            #head(
+                #title("StaticView")
+            ),
+            #body(
+                #h1("Swift HTML Benchmarks")
+            )
+        )
     }
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        let qualities:String = context.user.qualities.map({ #li(["\($0)"]) }).joined()
-        return #html([
-            #body([
-                #h1(["\(context.heading)"]),
-                #div(attributes: [.id(context.desc_id)], [
-                    #p(["\(context.string)"])
-                ]),
-                #h2(["\(context.user.details_heading)"]),
-                #h3(["\(context.user.qualities_heading)"]),
-                #ul(attributes: [.id(context.user.qualities_id)], ["\(qualities)"])
-            ])
-        ])
+        let qualities:String = context.user.qualities.map({ #li("\($0)") }).joined()
+        return #html(
+            #body(
+                #h1("\(context.heading)"),
+                #div(attributes: [.id(context.desc_id)],
+                    #p("\(context.string)")
+                ),
+                #h2("\(context.user.details_heading)"),
+                #h3("\(context.user.qualities_heading)"),
+                #ul(attributes: [.id(context.user.qualities_id)], "\(qualities)")
+            )
+        )
     }
 }
