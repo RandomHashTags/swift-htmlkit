@@ -17,6 +17,34 @@ struct HTMLElement : ExpressionMacro {
 }
 
 private extension HTMLElement {
+    static func parse_element_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax) -> String {
+        guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
+        let childs:SyntaxChildren = expression.arguments.children(viewMode: .all)
+        if elementType == .escapeHTML {
+            return childs.compactMap({
+                guard let child:LabeledExprSyntax = $0.labeled else { return nil }
+                return parse_inner_html(context: context, elementType: elementType, child: child)
+            }).joined()
+        }
+        let tag:String, isVoid:Bool
+        var children:Slice<SyntaxChildren>
+        if elementType == .custom {
+            tag = childs.first(where: { $0.labeled?.label?.text == "tag" })!.labeled!.expression.stringLiteral!.string
+            isVoid = childs.first(where: { $0.labeled?.label?.text == "isVoid" })!.labeled!.expression.booleanLiteral!.literal.text == "true"
+            children = childs.dropFirst() // tag
+            children.removeFirst() // isVoid
+        } else {
+            tag = elementType.rawValue
+            isVoid = elementType.isVoid
+            children = childs.prefix(childs.count)
+        }
+        let data:ElementData = parse_arguments(context: context, elementType: elementType, children: children)
+        var string:String = (elementType == .html ? "<!DOCTYPE html>" : "") + "<" + tag + data.attributes + ">" + data.innerHTML
+        if !isVoid {
+            string += "</" + tag + ">"
+        }
+        return string
+    }
     static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
         for element in children {
@@ -40,30 +68,6 @@ private extension HTMLElement {
             }
         }
         return ElementData(attributes: attributes, innerHTML: innerHTML)
-    }
-    static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
-        if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
-            var string:String = parse_element_macro(context: context, expression: macro)
-            if elementType == .escapeHTML {
-                string.escapeHTML(attribute: false)
-            }
-            return string
-        } else if var string:String = child.expression.stringLiteral?.string {
-            string.escapeHTML(attribute: false)
-            return string
-        } else if let function:FunctionCallExprSyntax = child.expression.as(FunctionCallExprSyntax.self), function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
-            return function.arguments.first!.expression.stringLiteral!.string.escapingHTML(attribute: false)
-        } else {
-            context.diagnose(Diagnostic(node: child, message: ErrorDiagnostic(id: "unallowedExpression", message: "Expression not allowed. String interpolation is required when encoding runtime values."), fixIts: [
-                FixIt(message: SimpleDiagnosticMessage(id: "useStringInterpolation", message: "Use String Interpolation.", severity: .error), changes: [
-                    FixIt.Change.replace(
-                        oldNode: Syntax(child),
-                        newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(child))"))
-                    )
-                ])
-            ]))
-            return nil
-        }
     }
     static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayExprSyntax) -> [String] {
         var keys:Set<String> = [], attributes:[String] = []
@@ -94,10 +98,10 @@ private extension HTMLElement {
                     break
             }
             if key.contains(" ") {
-                context.diagnose(Diagnostic(node: key_element, message: ErrorDiagnostic(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
+                context.diagnose(Diagnostic(node: key_element, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
             } else if let value:String = value {
                 if keys.contains(key) {
-                    context.diagnose(Diagnostic(node: key_element, message: ErrorDiagnostic(id: "globalAttributeAlreadyDefined", message: "Global attribute is already defined.")))
+                    context.diagnose(Diagnostic(node: key_element, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute is already defined.")))
                 } else {
                     attributes.append(key + (value.isEmpty ? "" : "=\\\"" + value + "\\\""))
                     keys.insert(key)
@@ -106,33 +110,29 @@ private extension HTMLElement {
         }
         return attributes
     }
-    static func parse_element_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax) -> String {
-        guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
-        let childs:SyntaxChildren = expression.arguments.children(viewMode: .all)
-        if elementType == .escapeHTML {
-            return childs.compactMap({
-                guard let child:LabeledExprSyntax = $0.labeled else { return nil }
-                return parse_inner_html(context: context, elementType: elementType, child: child)
-            }).joined()
-        }
-        let tag:String, isVoid:Bool
-        var children:Slice<SyntaxChildren>
-        if elementType == .custom {
-            tag = childs.first(where: { $0.labeled?.label?.text == "tag" })!.labeled!.expression.stringLiteral!.string
-            isVoid = childs.first(where: { $0.labeled?.label?.text == "isVoid" })!.labeled!.expression.booleanLiteral!.literal.text == "true"
-            children = childs.dropFirst() // tag
-            children.removeFirst() // isVoid
+    static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
+        if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
+            var string:String = parse_element_macro(context: context, expression: macro)
+            if elementType == .escapeHTML {
+                string.escapeHTML(attribute: false)
+            }
+            return string
+        } else if var string:String = child.expression.stringLiteral?.string {
+            string.escapeHTML(attribute: false)
+            return string
+        } else if let function:FunctionCallExprSyntax = child.expression.as(FunctionCallExprSyntax.self), function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
+            return function.arguments.first!.expression.stringLiteral!.string.escapingHTML(attribute: false)
         } else {
-            tag = elementType.rawValue
-            isVoid = elementType.isVoid
-            children = childs.prefix(childs.count)
+            context.diagnose(Diagnostic(node: child, message: DiagnosticMsg(id: "unallowedExpression", message: "Expression not allowed. String interpolation is required when encoding runtime values."), fixIts: [
+                FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation.", severity: .error), changes: [
+                    FixIt.Change.replace(
+                        oldNode: Syntax(child),
+                        newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(child))"))
+                    )
+                ])
+            ]))
+            return nil
         }
-        let data:ElementData = parse_arguments(context: context, elementType: elementType, children: children)
-        var string:String = (elementType == .html ? "<!DOCTYPE html>" : "") + "<" + tag + data.attributes + ">" + data.innerHTML
-        if !isVoid {
-            string += "</" + tag + ">"
-        }
-        return string
     }
 
     struct ElementData {
@@ -228,7 +228,7 @@ private extension HTMLElement {
             let separator:String = get_separator(key: key)
             let string_return_logic:(ExprSyntax, String) -> String = {
                 if $1.contains(separator) {
-                    context.diagnose(Diagnostic(node: $0, message: ErrorDiagnostic(id: "characterNotAllowedInDeclaration", message: "Character \"" + separator + "\" is not allowed when declaring values for \"" + key + "\".")))
+                    context.diagnose(Diagnostic(node: $0, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"" + separator + "\" is not allowed when declaring values for \"" + key + "\".")))
                 }
                 return $1
             }
@@ -252,14 +252,14 @@ private extension HTMLElement {
             return nil
         }
         guard var (string, returnType):(String, LiteralReturnType) = return_string_or_interpolation() else {
-            //context.diagnose(Diagnostic(node: expression, message: ErrorDiagnostic(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
+            //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
         if returnType == .interpolation {
             string = "\\(" + string + ")"
         }
         if string.contains("\\(") {
-            context.diagnose(Diagnostic(node: expression, message: ErrorDiagnostic(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML elements.", severity: .warning)))
+            context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML elements.", severity: .warning)))
         }
         return (string, returnType)
     }

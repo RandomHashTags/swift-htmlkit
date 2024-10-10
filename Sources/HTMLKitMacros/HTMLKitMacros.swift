@@ -10,7 +10,7 @@ import SwiftSyntaxMacros
 import SwiftDiagnostics
 
 // MARK: ErrorDiagnostic
-struct ErrorDiagnostic : DiagnosticMessage {
+struct DiagnosticMsg : DiagnosticMessage {
     let message:String
     let diagnosticID:MessageID
     let severity:DiagnosticSeverity
@@ -21,20 +21,7 @@ struct ErrorDiagnostic : DiagnosticMessage {
         self.severity = severity
     }
 }
-
-// MARK: SimpleDiagnosticMessage
-struct SimpleDiagnosticMessage : DiagnosticMessage, Error {
-    let message:String
-    let diagnosticID:MessageID
-    let severity:DiagnosticSeverity
-
-    init(id: String, message: String, severity: DiagnosticSeverity) {
-        self.message = message
-        self.diagnosticID = MessageID(domain: "HTMLKitMacros", id: id)
-        self.severity = severity
-    }
-}
-extension SimpleDiagnosticMessage : FixItMessage {
+extension DiagnosticMsg : FixItMessage {
     var fixItID : MessageID { diagnosticID }
 }
 

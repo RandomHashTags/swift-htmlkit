@@ -112,6 +112,27 @@ let package = Package(
             ],
             path: "Benchmarks/Vaux"
         ),
+        .executableTarget(
+            name: "Run",
+            dependencies: [
+                "Utilities",
+
+                "TestElementary",
+                "TestLeaf",
+                "TestPlot",
+                "TestSwiftHTMLBB",
+                "TestSwiftHTMLKit",
+                "TestSwiftHTMLPF",
+                "TestSwim",
+                "TestToucan",
+                "TestVaporHTMLKit",
+                "TestVaux",
+                .product(name: "Benchmark", package: "package-benchmark"),
+                .product(name: "Vapor", package: "vapor"),
+                .product(name: "Hummingbird", package: "hummingbird")
+            ],
+            path: "Benchmarks/Run"
+        ),
 
         .testTarget(
             name: "UnitTests",
@@ -138,6 +159,7 @@ let package = Package(
             name: "Benchmarks",
             dependencies: [
                 "Utilities",
+
                 "TestElementary",
                 "TestLeaf",
                 "TestPlot",
@@ -151,6 +173,30 @@ let package = Package(
                 .product(name: "Benchmark", package: "package-benchmark")
             ],
             path: "Benchmarks/Benchmarks",
+            plugins: [
+                .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
+            ]
+        ),
+        .executableTarget(
+            name: "Networking",
+            dependencies: [
+                "Utilities",
+
+                "TestElementary",
+                "TestLeaf",
+                "TestPlot",
+                "TestSwiftHTMLBB",
+                "TestSwiftHTMLKit",
+                "TestSwiftHTMLPF",
+                "TestSwim",
+                "TestToucan",
+                "TestVaporHTMLKit",
+                "TestVaux",
+                .product(name: "Benchmark", package: "package-benchmark"),
+                .product(name: "Vapor", package: "vapor"),
+                .product(name: "Hummingbird", package: "hummingbird")
+            ],
+            path: "Benchmarks/Networking",
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
             ]
