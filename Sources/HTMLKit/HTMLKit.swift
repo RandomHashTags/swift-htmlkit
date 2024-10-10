@@ -18,6 +18,9 @@ public extension String {
     static func == (left: Self, right: StaticString) -> Bool { left == right.string }
 }
 
+@freestanding(expression)
+public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+
 // MARK: Elements
 @freestanding(expression)
 public macro html<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")

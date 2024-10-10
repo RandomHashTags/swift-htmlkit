@@ -25,6 +25,18 @@ struct HTMLKitTests {
 }
 
 extension HTMLKitTests {
+    @Test func escape_html() {
+        let expected_result:String = "<p>&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;</p>"
+        #expect(#p(#escapeHTML("<!DOCTYPE html><html>Test</html>")) == expected_result)
+
+        #expect(#p(#escapeHTML(#html("Test"))) == expected_result)
+
+        let string:String = "<!DOCTYPE html><html>Test</html>".escapingHTML(attribute: false)
+        #expect(#p("\(string)") == expected_result)
+    }
+}
+
+extension HTMLKitTests {
     @Test func element_html() {
         #expect(#html() == "<!DOCTYPE html><html></html>")
         #expect(#html(xmlns: "test") == "<!DOCTYPE html><html xmlns=\"test\"></html>")
@@ -170,6 +182,9 @@ extension HTMLKitTests {
             rel: ["lets go"],
             sizes: ["lets,go"]
         )
+        let _:String = #a(1.description)
+        let bro:String = "yup"
+        let _:String = #a(bro)
         //let _:String = #div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")])
     }*/
 }
@@ -187,7 +202,6 @@ extension HTMLKitTests {
         #expect(#div(attributes: [.custom("potofgold", "north")]) == "<div potofgold=\"north\"></div>")
         #expect(#div(attributes: [.custom("potofgold", "\(1)")]) == "<div potofgold=\"1\"></div>")
         #expect(#div(attributes: [.custom("potofgold1", "\(1)"), .custom("potofgold2", "2")]) == "<div potofgold1=\"1\" potofgold2=\"2\"></div>")
-        
     }
 }
 
@@ -219,7 +233,7 @@ extension HTMLKitTests {
         string = #div(attributes: [.title(HTMLKitTests.patrick)])
         #expect(string == "<div title=\"Patrick Star\"></div>")
 
-        let static_string:StaticString = #div(attributes: [.title("Mr. Crabs")])
+        let static_string:StaticString = #div(attributes: [.title(StaticString("Mr. Crabs"))])
         #expect(static_string == "<div title=\"Mr. Crabs\"></div>")
     }
     @Test func third_party_func() {
@@ -268,8 +282,19 @@ extension HTMLKitTests {
     }
     struct TestStruct {
         var name:String
-        var array:[CustomStringConvertible]
+        var array:[CustomStringConvertible] {
+            didSet {
+                array_string = array.map({ "\($0)" }).joined()
+            }
+        }
+        private var array_string:String
+        
+        init(name: String, array: [CustomStringConvertible]) {
+            self.name = name
+            self.array = array
+            self.array_string = array.map({ "\($0)" }).joined()
+        }
 
-        var html : String { #p("\(name)", "\(array.map({ "\($0)" }).joined())") }
+        var html : String { #p("\(name)", "\(array_string)") }
     }
 }

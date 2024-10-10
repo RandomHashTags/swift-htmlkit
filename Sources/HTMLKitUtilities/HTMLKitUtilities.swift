@@ -5,6 +5,24 @@
 //  Created by Evan Anderson on 9/19/24.
 //
 
+// MARK: Escape HTML
+public extension String {
+    func escapingHTML(attribute: Bool) -> String {
+        var string:String = self
+        string.escapeHTML(attribute: attribute)
+        return string
+    }
+    mutating func escapeHTML(attribute: Bool) {
+        self.replace("&", with: "&amp;")
+        self.replace("<", with: "&lt;")
+        self.replace(">", with: "&gt;")
+        if attribute {
+            self.replace("\"", with: "&quot;")
+            self.replace("'", with: "&#39")
+        }
+    }
+}
+
 // MARK: CSSUnit
 public extension HTMLElementAttribute {
     struct CSSUnit {
@@ -82,7 +100,7 @@ public enum HTMLElementAttribute {
 
     case custom(_ id: any ExpressibleByStringLiteral, _ value: (any ExpressibleByStringLiteral)?)
 
-    @available(*, deprecated, message: "\nInline event handlers are an outdated way to handle events. General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript.\n\nThis will never be removed and remains deprecated to encourage use of other techniques.\n\nLearn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
+    @available(*, deprecated, message: "Inline event handlers are an outdated way to handle events.\nGeneral consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript.\n\nThis will never be removed and remains deprecated to encourage use of other techniques.\n\nLearn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
     case event(Extra.event, _ value: (any ExpressibleByStringLiteral)? = nil)
 }
 public extension HTMLElementAttribute {
