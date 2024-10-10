@@ -18,7 +18,7 @@ let package = Package(
         .package(url: "https://github.com/JohnSundell/Plot", from: "0.14.0"),
         //.package(url: "https://github.com/toucansites/toucan", from: "1.0.0-alpha.1"), // unstable
         .package(url: "https://github.com/RandomHashTags/fork-Swim", branch: "main"),
-        .package(url: "https://github.com/dokun1/Vaux", from: "0.2.0"), // result limitation
+        .package(url: "https://github.com/dokun1/Vaux", from: "0.2.0"),
         .package(url: "https://github.com/vapor/leaf", from: "4.4.0"),
     ],
     targets: [
@@ -106,6 +106,24 @@ let package = Package(
                 .product(name: "Vaux", package: "Vaux")
             ],
             path: "Benchmarks/Vaux"
+        ),
+
+        .testTarget(
+            name: "UnitTests",
+            dependencies: [
+                "Utilities",
+                "TestElementary",
+                "TestLeaf",
+                "TestPlot",
+                "TestSwiftHTMLBB",
+                "TestSwiftHTMLKit",
+                "TestSwiftHTMLPF",
+                "TestSwim",
+                "TestToucan",
+                "TestVaporHTMLKit",
+                "TestVaux",
+            ],
+            path: "Benchmarks/UnitTests"
         ),
 
         .executableTarget(

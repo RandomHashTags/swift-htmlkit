@@ -9,7 +9,10 @@ import Utilities
 import Vaux
 import Foundation
 
-/*
+extension HTML {
+    var rendered : String { String(describing: self) }
+}
+
 package struct VauxTests : HTMLGenerator {
 
     let vaux:Vaux
@@ -18,20 +21,30 @@ package struct VauxTests : HTMLGenerator {
     }
 
     package func staticHTML() -> String {
-        var stream:HTMLOutputStream = HTMLOutputStream(FileHandle.standardOutput, nil)
-        let content = html {
+        html {
             body {
                 heading(.h1) {
                     "Swift HTML Benchmarks"
                 }
             }
-        }
-        stream.render(content)
-        let textoutput:TextOutputStream = stream.output
-        return ""
+        }.rendered
     }
 
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        staticHTML()
+        html {
+            body {
+                heading(.h1) { context.heading }
+                div {
+                    paragraph { context.string }
+                }.id("desc")
+                heading(.h2) { context.user.details_heading }
+                heading(.h3) { context.user.qualities_heading }
+                list {
+                    forEach(context.user.qualities) {
+                        listItem(label: $0)
+                    }
+                }.id("user-qualities")
+            }
+        }.rendered
     }
-}*/
+}

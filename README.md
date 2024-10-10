@@ -155,6 +155,7 @@ Use the `HTMLElementAttribute.event(<type>, "<value>")`.
   - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
   - [robb/Swim](https://github.com/robb/Swim) v0.4.0 (fixed version [here](https://github.com/RandomHashTags/fork-Swim))
   - [vapor-community/HTMLKit](https://github.com/vapor-community/HTMLKit) v2.8.1
+  - [dokun1/Vaux](https://github.com/dokun1/Vaux) v0.2.0
 
 Using iMac (i9 9900k, 72GB RAM, 2TB) with macOS 15.0 and the Swift 6 compiler.
 

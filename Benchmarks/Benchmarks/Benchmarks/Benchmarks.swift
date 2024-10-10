@@ -28,7 +28,8 @@ let benchmarks = {
         "Pointfreeco" : SwiftHTMLPFTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
         "Swim" : SwimTests(),
-        "VaporHTMLKit" : VaporHTMLKitTests()
+        "VaporHTMLKit" : VaporHTMLKitTests(),
+        "Vaux" : VauxTests()
     ]
 
     /*for (key, value) in libraries {
