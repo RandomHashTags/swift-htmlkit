@@ -16,7 +16,7 @@ extension Node {
             return (name == "html" ? "<!DOCTYPE html>" : "") + "<" + name + attributes_string + ">" + (child?.rendered ?? "") + "</" + name + ">"
         case .text(let string): return string
         case .raw(let string): return string
-        case .comment(let _): return ""
+        case .comment(_): return ""
         case .documentType(let string): return string
         case .fragment(let children): return children.map({ $0.rendered }).joined()
         case .trim: return ""
@@ -40,7 +40,11 @@ package struct SwimTests : HTMLGenerator {
         }.rendered
     }
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        html {
+        var test:[Node] = []
+        for quality in context.user.qualities {
+            test.append(li { quality } )
+        }
+        return html {
             body {
                 h1 { context.heading }
                 div(id: context.desc_id) {
@@ -48,9 +52,7 @@ package struct SwimTests : HTMLGenerator {
                 }
                 h2 { context.user.details_heading }
                 h3 { context.user.qualities_heading }
-                ul(id: context.user.qualities_id) {
-                    context.user.qualities.map({ quality in li { quality} })
-                }
+                ul(id: context.user.qualities_id) { test }
             }
         }.rendered
     }

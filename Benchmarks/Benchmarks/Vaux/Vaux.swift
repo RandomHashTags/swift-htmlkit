@@ -6,7 +6,7 @@
 //
 
 import Utilities
-@testable import Vaux
+import Vaux
 import Foundation
 
 extension HTML {
@@ -34,16 +34,12 @@ extension HTMLNode {
         if let child = self.child {
             string += child.render
         }
-        return string + "</" + tag + ">" // Vaux doesn't take into account void elements
+        return string + "</" + tag + ">" // Vaux doesn't take void elements into account
     }
 }
 
 package struct VauxTests : HTMLGenerator {
-
-    let vaux:Vaux
-    package init() {
-        vaux = Vaux()
-    }
+    package init() {}
 
     package func staticHTML() -> String {
         html {

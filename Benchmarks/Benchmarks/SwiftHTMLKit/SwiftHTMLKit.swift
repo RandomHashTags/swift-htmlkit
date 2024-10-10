@@ -22,7 +22,10 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
         )
     }
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        let qualities:String = context.user.qualities.map({ #li("\($0)") }).joined()
+        var qualities:String = ""
+        for quality in context.user.qualities {
+            qualities += #li("\(quality)")
+        }
         return #html(
             #body(
                 #h1("\(context.heading)"),
