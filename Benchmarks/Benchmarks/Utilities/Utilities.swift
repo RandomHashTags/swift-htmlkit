@@ -35,12 +35,26 @@ package actor Cache {
 
 // MARK: HTMLContext
 package struct HTMLContext {
+    package let charset:String, keywords:[String], meta_description:String
     package let heading:String, desc_id:String
     package let string:String, integer:Int, double:Double, float:Float, boolean:Bool
     package let now:Date
     package let user:User
 
+    package var keywords_string : String {
+        var s:String = ""
+        for keyword in keywords {
+            s += "," + keyword
+        }
+        s.removeFirst()
+        return s
+    }
+
     package init() {
+        charset = "utf-8"
+        keywords = ["swift", "html", "benchmark"]
+        meta_description = "This website is to benchmark the performance of different Swift DSL libraries."
+
         heading = "Dynamic HTML Benchmark"
         desc_id = "desc"
         // 1 paragraph of lorem ipsum

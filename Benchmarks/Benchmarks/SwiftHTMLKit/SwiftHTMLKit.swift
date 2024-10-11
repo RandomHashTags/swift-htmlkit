@@ -31,12 +31,13 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
         var qualities:String = ""
         for quality in context.user.qualities {
             qualities += #li(["\(quality)"])
-            //qualities += "<li>" + quality + "</li>"
         }
-        //return "<!DOCTYPE html><html><body><h1>" + context.heading + "</h1><div id=\"" + context.desc_id + "\"><p>" + context.string + "</p></div><h2>" + context.user.details_heading + "</h2><h3>" + context.user.qualities_heading + "</h3><ul id=\"" + context.user.qualities_id + "\">" + qualities + "</ul></body></html>"
         return #html([
             #head([
-                #title(["DynamicView"])
+                #meta(charset: "\(context.charset)"),
+                #title(["DynamicView"]),
+                #meta(content: "\(context.meta_description)", name: "description"),
+                #meta(content: "\(context.keywords_string)", name: "keywords")
             ]),
             #body([
                 #h1(["\(context.heading)"]),

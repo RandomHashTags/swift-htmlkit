@@ -50,6 +50,7 @@ struct UnitTests {
     @Test func dynamicHTML() {
         let context:HTMLContext = HTMLContext()
         let expected_value:String = libraries["SwiftHTMLKit"]!.dynamicHTML(context)
+        // Plot closes void tags | Swim uses a dictionary for meta values | Vaux is doodoo
         for (key, value) in libraries {
             #expect(value.dynamicHTML(context) == expected_value, Comment(rawValue: key))
         }

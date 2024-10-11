@@ -24,7 +24,10 @@ package struct PlotTests : HTMLGenerator {
     package func dynamicHTML(_ context: Utilities.HTMLContext) -> String {
         return HTML(
             .head(
-                .element(named: "title", text: "DynamicView")
+                .meta(.attribute(named: "charset", value: context.charset)),
+                .element(named: "title", text: "DynamicView"),
+                .meta(.content(context.meta_description), .name("description")),
+                .meta(.content(context.keywords_string), .name("keywords"))
             ),
             .body(
                 .component(H1(context.heading)),

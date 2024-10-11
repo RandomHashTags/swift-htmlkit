@@ -27,9 +27,9 @@ let benchmarks = {
         "Plot" : PlotTests(),
         "Pointfreeco" : SwiftHTMLPFTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
-        "Swim" : SwimTests(),
+        "Swim (custom renderer)" : SwimTests(),
         "VaporHTMLKit" : VaporHTMLKitTests(),
-        "Vaux" : VauxTests()
+        "Vaux (custom renderer)" : VauxTests()
     ]
 
     /*for (key, value) in libraries {

@@ -16,7 +16,7 @@ extension Node {
             for (key, value) in attributes {
                 attributes_string += " " + key + "=\"" + value + "\""
             }
-            return (name == "html" ? "<!DOCTYPE html>" : "") + "<" + name + attributes_string + ">" + (child?.rendered ?? "") + "</" + name + ">"
+            return (name == "html" ? "<!DOCTYPE html>" : "") + "<" + name + attributes_string + ">" + (child?.rendered ?? "") + (isVoid(name) ? "" : "</" + name + ">")
         case .text(let string): return string
         case .raw(let string): return string
         case .comment(_): return ""
@@ -28,6 +28,12 @@ extension Node {
             }
             return string
         case .trim: return ""
+        }
+    }
+    func isVoid(_ tag: String) -> Bool {
+        switch tag {
+        case "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr": return true
+        default: return false
         }
     }
 }
@@ -54,7 +60,10 @@ package struct SwimTests : HTMLGenerator {
         }
         return html {
             head {
+                meta(charset: context.charset)
                 title { "DynamicView" }
+                meta(customAttributes: ["content":context.meta_description, "name":"description"])
+                meta(customAttributes: ["content":context.keywords_string, "name":"keywords"])
             }
             body {
                 h1 { context.heading }

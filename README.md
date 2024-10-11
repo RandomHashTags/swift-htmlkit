@@ -148,16 +148,16 @@ Use the `HTMLElementAttribute.event(<type>, "<value>")`.
 
 ## Benchmarks
 - Libraries tested
-  - [BinaryBuilds/swift-html](https://github.com/BinaryBirds/swift-html) v1.7.0 (patched version [here](https://github.com/RandomHashTags/fork-bb-swift-html))
+  - [BinaryBuilds/swift-html](https://github.com/BinaryBirds/swift-html) v1.7.0 (patched version [here](https://github.com/RandomHashTags/fork-bb-swift-html); custom renderer [here](https://github.com/RandomHashTags/swift-htmlkit/blob/main/Benchmarks/Benchmarks/Swim/Swim.swift))
   - [sliemeobn/elementary](https://github.com/sliemeobn/elementary) v0.3.4
   - [JohnSundell/Plot](https://github.com/JohnSundell/Plot) v0.14.0
   - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.5.0 (this library)
   - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
   - [robb/Swim](https://github.com/robb/Swim) v0.4.0 (patched version [here](https://github.com/RandomHashTags/fork-Swim))
   - [vapor-community/HTMLKit](https://github.com/vapor-community/HTMLKit) v2.8.1
-  - [dokun1/Vaux](https://github.com/dokun1/Vaux) v0.2.0 (patched version [here](https://github.com/RandomHashTags/fork-Vaux))
+  - [dokun1/Vaux](https://github.com/dokun1/Vaux) v0.2.0 (patched version [here](https://github.com/RandomHashTags/fork-Vaux); custom renderer [here](https://github.com/RandomHashTags/swift-htmlkit/blob/main/Benchmarks/Benchmarks/Vaux/Vaux.swift))
 
-Using iMac (i9 9900k, 72GB RAM, 2TB) with macOS 15.0 and the Swift 6 compiler.
+Test machine: iMac (i9 9900k, 72GB RAM, 2TB) running macOS 15.0 with the Swift 6 compiler.
 
 Executed command: `swift package -c release --allow-writing-to-package-directory benchmark --metric throughput  --format jmh`
 

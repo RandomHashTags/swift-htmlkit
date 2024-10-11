@@ -29,7 +29,10 @@ package struct SwiftHTMLPFTests : HTMLGenerator {
             .document(
                 .html(
                     .head(
-                        .title("DynamicView")
+                        .meta(attributes: [.charset(.utf8)]),
+                        .title("DynamicView"),
+                        .meta(attributes: [.init("content", context.meta_description), .init("name", "description")]),
+                        .meta(attributes: [.init("content", context.keywords_string), .init("name", "keywords")])
                     ),
                     .body(
                         .h1(.raw(context.heading)),

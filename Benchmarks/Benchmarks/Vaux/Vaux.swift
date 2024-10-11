@@ -9,6 +9,7 @@ import Utilities
 import Vaux
 import Foundation
 
+// MARK: Custom rendering
 extension HTML {
     func render(includeTag: Bool) -> (HTMLType, String) {
         if let node:HTMLNode = self as? HTMLNode {
@@ -25,6 +26,12 @@ extension HTML {
             return (.node, String(describing: self))
         }
     }
+    func isVoid(_ tag: String) -> Bool {
+        switch tag {
+        case "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr": return true
+        default: return false
+        }
+    }
 }
 
 enum HTMLType {
@@ -35,7 +42,7 @@ extension AttributedNode {
     var render : String {
         let tag:String = child.getTag()!
         let attribute_string:String = " " + attribute.key + (attribute.value != nil ? "=\"" + attribute.value! + "\"" : "")
-        return "<" + tag + attribute_string + ">" + child.render(includeTag: false).1 + "</" + tag + ">"
+        return "<" + tag + attribute_string + ">" + child.render(includeTag: false).1 + (isVoid(tag) ? "" : "</" + tag + ">")
     }
 }
 
@@ -54,10 +61,11 @@ extension HTMLNode {
                     break
             }
         }
-        return (tag == "html" ? "<!DOCTYPE html>" : "") + (includeTag ? "<" + tag + attributes + ">" : "") + children + (includeTag ? "</" + tag + ">" : "") // Vaux doesn't take void elements into account
+        return (tag == "html" ? "<!DOCTYPE html>" : "") + (includeTag ? "<" + tag + attributes + ">" : "") + children + (!isVoid(tag) && includeTag ? "</" + tag + ">" : "")
     }
 }
 
+// MARK: VauxTests
 package struct VauxTests : HTMLGenerator {
     package init() {}
 
@@ -77,7 +85,10 @@ package struct VauxTests : HTMLGenerator {
     package func dynamicHTML(_ context: HTMLContext) -> String {
         html {
             head {
+                meta().attr("charset", context.charset)
                 title("DynamicView")
+                meta().attr("content", context.meta_description).attr("name", "description")
+                meta().attr("content", context.keywords_string).attr("name", "keywords")
             }
             body {
                 heading(.h1) { context.heading }
