@@ -45,6 +45,9 @@ struct DynamicView : View {
     var body : AnyContent {
         Document(.html5)
         Html {
+            Head {
+                Title { "DynamicView" }
+            }
             Body {
                 Heading1 { context.heading }
                 Div {

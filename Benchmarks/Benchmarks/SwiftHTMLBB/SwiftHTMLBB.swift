@@ -30,6 +30,9 @@ package struct SwiftHTMLBBTests : HTMLGenerator {
     package func dynamicHTML(_ context: HTMLContext) -> String {
         renderer.render(Document(.html) {
             Html {
+                Head {
+                    Title("DynamicView")
+                }
                 Body {
                     H1(context.heading)
                     Div {

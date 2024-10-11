@@ -15,21 +15,7 @@ package struct ElementaryTests : HTMLGenerator {
         StaticView().render()
     }
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        html {
-            body {
-                h1 { context.heading }
-                div(attributes: [.id(context.desc_id)]) {
-                    p { context.string }
-                }
-                h2 { context.user.details_heading }
-                h3 { context.user.qualities_heading }
-                ul(attributes: [.id(context.user.qualities_id)]) {
-                    for quality in context.user.qualities {
-                        li { quality }
-                    }
-                }
-            }
-        }.render()
+        DynamicView(context: context).render()
     }
 }
 
@@ -41,5 +27,29 @@ struct StaticView : HTMLDocument {
     }
     var body : some HTML {
         h1 { "Swift HTML Benchmarks" }
+    }
+}
+
+struct DynamicView : HTMLDocument {
+    var title:String = "DynamicView"
+
+    let context:HTMLContext
+
+    var head : some HTML {
+        ""
+    }
+
+    var body : some HTML {
+        h1 { context.heading }
+        div(attributes: [.id(context.desc_id)]) {
+            p { context.string }
+        }
+        h2 { context.user.details_heading }
+        h3 { context.user.qualities_heading }
+        ul(attributes: [.id(context.user.qualities_id)]) {
+            for quality in context.user.qualities {
+                li { quality }
+            }
+        }
     }
 }

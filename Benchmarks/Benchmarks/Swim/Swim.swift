@@ -12,13 +12,21 @@ extension Node {
     var rendered : String {
         switch self {
         case .element(let name, let attributes, let child):
-            let attributes_string:String = attributes.isEmpty ? "" : " " + attributes.map({ $0 + "=\"" + $1 + "\"" }).joined(separator: " ")
+            var attributes_string:String = ""
+            for (key, value) in attributes {
+                attributes_string += " " + key + "=\"" + value + "\""
+            }
             return (name == "html" ? "<!DOCTYPE html>" : "") + "<" + name + attributes_string + ">" + (child?.rendered ?? "") + "</" + name + ">"
         case .text(let string): return string
         case .raw(let string): return string
         case .comment(_): return ""
         case .documentType(let string): return string
-        case .fragment(let children): return children.map({ $0.rendered }).joined()
+        case .fragment(let children):
+            var string:String = ""
+            for child in children {
+                string += child.rendered
+            }
+            return string
         case .trim: return ""
         }
     }
@@ -45,6 +53,9 @@ package struct SwimTests : HTMLGenerator {
             test.append(li { quality } )
         }
         return html {
+            head {
+                title { "DynamicView" }
+            }
             body {
                 h1 { context.heading }
                 div(id: context.desc_id) {

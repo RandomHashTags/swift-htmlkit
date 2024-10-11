@@ -11,7 +11,8 @@ let package = Package(
     dependencies: [
         // dsls
         .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.27.0"),
-        .package(name: "swift-htmlkit", path: "../"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
+        .package(url: "https://github.com/RandomHashTags/swift-htmlkit", from: "0.5.0"),
         .package(url: "https://github.com/sliemeobn/elementary", from: "0.3.4"),
         .package(url: "https://github.com/vapor-community/HTMLKit", from: "2.8.1"),
         .package(url: "https://github.com/pointfreeco/swift-html", from: "0.4.1"),
@@ -113,7 +114,7 @@ let package = Package(
             path: "Benchmarks/Vaux"
         ),
         .executableTarget(
-            name: "Run",
+            name: "Networking",
             dependencies: [
                 "Utilities",
 
@@ -127,11 +128,10 @@ let package = Package(
                 "TestToucan",
                 "TestVaporHTMLKit",
                 "TestVaux",
-                .product(name: "Benchmark", package: "package-benchmark"),
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "Hummingbird", package: "hummingbird")
             ],
-            path: "Benchmarks/Run"
+            path: "Benchmarks/Networking"
         ),
 
         .testTarget(
@@ -173,30 +173,6 @@ let package = Package(
                 .product(name: "Benchmark", package: "package-benchmark")
             ],
             path: "Benchmarks/Benchmarks",
-            plugins: [
-                .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
-            ]
-        ),
-        .executableTarget(
-            name: "Networking",
-            dependencies: [
-                "Utilities",
-
-                "TestElementary",
-                "TestLeaf",
-                "TestPlot",
-                "TestSwiftHTMLBB",
-                "TestSwiftHTMLKit",
-                "TestSwiftHTMLPF",
-                "TestSwim",
-                "TestToucan",
-                "TestVaporHTMLKit",
-                "TestVaux",
-                .product(name: "Benchmark", package: "package-benchmark"),
-                .product(name: "Vapor", package: "vapor"),
-                .product(name: "Hummingbird", package: "hummingbird")
-            ],
-            path: "Benchmarks/Networking",
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
             ]

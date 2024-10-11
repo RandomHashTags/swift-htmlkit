@@ -10,31 +10,51 @@ import Vaux
 import Foundation
 
 extension HTML {
-    var render : String {
+    func render(includeTag: Bool) -> (HTMLType, String) {
         if let node:HTMLNode = self as? HTMLNode {
-            return node.rendered
+            return (.node, node.rendered(includeTag: includeTag))
         } else if let node:MultiNode = self as? MultiNode {
-            return node.children.map({ $0.render }).joined()
+            var string:String = ""
+            for child in node.children {
+                string += child.render(includeTag: true).1
+            }
+            return (.node, string)
+        } else if let node:AttributedNode = self as? AttributedNode {
+            return (.node, node.render)
         } else {
-            return String(describing: self)
+            return (.node, String(describing: self))
         }
     }
 }
 
+enum HTMLType {
+    case node, attribute
+}
+
+extension AttributedNode {
+    var render : String {
+        let tag:String = child.getTag()!
+        let attribute_string:String = " " + attribute.key + (attribute.value != nil ? "=\"" + attribute.value! + "\"" : "")
+        return "<" + tag + attribute_string + ">" + child.render(includeTag: false).1 + "</" + tag + ">"
+    }
+}
+
 extension HTMLNode {
-    var rendered : String {
+    func rendered(includeTag: Bool) -> String {
         guard let tag:String = getTag() else { return String(describing: self) }
-        var string:String
-        if tag == "html" {
-            string = "<!DOCTYPE html>"
-        } else {
-            string = ""
-        }
-        string += "<" + tag + ">"
+        var attributes:String = "", children:String = ""
         if let child = self.child {
-            string += child.render
+            let (type, value):(HTMLType, String) = child.render(includeTag: true)
+            switch type {
+                case .attribute:
+                    attributes += " " + value
+                    break
+                case .node:
+                    children += value
+                    break
+            }
         }
-        return string + "</" + tag + ">" // Vaux doesn't take void elements into account
+        return (tag == "html" ? "<!DOCTYPE html>" : "") + (includeTag ? "<" + tag + attributes + ">" : "") + children + (includeTag ? "</" + tag + ">" : "") // Vaux doesn't take void elements into account
     }
 }
 
@@ -51,11 +71,14 @@ package struct VauxTests : HTMLGenerator {
                     "Swift HTML Benchmarks"
                 }
             }
-        }.render
+        }.render(includeTag: true).1
     }
 
     package func dynamicHTML(_ context: HTMLContext) -> String {
         html {
+            head {
+                title("DynamicView")
+            }
             body {
                 heading(.h1) { context.heading }
                 div {
@@ -69,6 +92,6 @@ package struct VauxTests : HTMLGenerator {
                     }
                 }.id(context.user.qualities_id)
             }
-        }.render
+        }.render(includeTag: true).1
     }
 }

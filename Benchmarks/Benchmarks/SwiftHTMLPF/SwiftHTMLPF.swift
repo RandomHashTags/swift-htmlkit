@@ -28,6 +28,9 @@ package struct SwiftHTMLPFTests : HTMLGenerator {
         render(
             .document(
                 .html(
+                    .head(
+                        .title("DynamicView")
+                    ),
                     .body(
                         .h1(.raw(context.heading)),
                         .div(attributes: [.id(context.desc_id)], .p(.raw(context.string))),
