@@ -65,6 +65,39 @@ public struct DynamicString {
     }
 }*/
 
+/*
+package struct NonCopyableString : ~Copyable {
+    private let storage:UnsafeMutableBufferPointer<UInt8>
+
+    package init(capacity: Int) {
+        storage = .allocate(capacity: capacity)
+    }
+    package init(_ string: String) {
+        storage = .allocate(capacity: string.count)
+        for i in 0..<string.count {
+            storage[i] = string[string.index(string.startIndex, offsetBy: i)].asciiValue!
+        }
+    }
+
+    package subscript(_ index: Int) -> UInt8 {
+        get {
+            storage[index]
+        }
+        set {
+            storage[index] = newValue
+        }
+    }
+
+    package var count : Int { storage.count }
+    package var isEmpty : Bool { storage.isEmpty }
+    package var string : String { String(decoding: storage, as: UTF8.self) }
+
+    deinit {
+        storage.deinitialize()
+        storage.deallocate()
+    }
+}*/
+
 @freestanding(expression)
 public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 

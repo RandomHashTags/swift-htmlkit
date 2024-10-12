@@ -32,7 +32,7 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
         for quality in context.user.qualities {
             qualities += #li("\(quality)")
         }
-        let string:String = #html(
+        return #html(
             #head(
                 #meta(charset: "\(context.charset)"),
                 #title("\(context.title)"),
@@ -49,6 +49,5 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
                 #ul(attributes: [.id(context.user.qualities_id)], "\(qualities)")
             )
         )
-        return string
     }
 }

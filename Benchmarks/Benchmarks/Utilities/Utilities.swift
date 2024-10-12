@@ -18,9 +18,11 @@ package protocol HTMLGenerator {
 // MARK: Simple cache
 package actor Cache {
     private var values:[String:String]
+    //private var loading:[String:Task<String, Never>]
 
     init() {
         values = Dictionary(minimumCapacity: 20)
+        //loading = [:]
     }
 
     func get(id: String, _ onLoad: () -> String) async -> String {
@@ -59,7 +61,7 @@ package struct HTMLContext {
         heading = "Dynamic HTML Benchmark"
         desc_id = "desc"
         // 5 paragraphs of lorem ipsum
-        string = """
+        let lorem_ipsum:String = """
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eget ornare ligula, sit amet pretium justo. Nunc vestibulum sollicitudin sem sed ultricies. Nullam ultrices mattis rutrum. Quisque venenatis lacus non tortor aliquam elementum. Nullam dictum, dolor vel efficitur semper, metus nisi porta elit, in tincidunt nunc eros quis nunc. Aliquam id eros sed leo feugiat aliquet quis eget augue. Praesent molestie quis libero vulputate cursus. Aenean lobortis cursus lacinia. Quisque imperdiet suscipit mi in rutrum. Suspendisse potenti.
 
         In condimentum non turpis non porta. In vehicula rutrum risus eget placerat. Nulla neque quam, dignissim eu luctus at, elementum at nisl. Cras volutpat mi sem, at congue felis pellentesque sed. Sed maximus orci vel enim iaculis condimentum. Integer maximus consectetur arcu quis aliquet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas eget feugiat elit. Maecenas pellentesque, urna at iaculis pretium, diam lectus dapibus est, et fermentum nisl ex vel ligula. Aliquam dignissim dapibus est, nec tincidunt tortor sagittis in. Vestibulum id lacus a nunc auctor ultricies. Praesent ante sapien, ultricies vel lorem id, tempus mollis justo. Curabitur sollicitudin, augue hendrerit suscipit tristique, sem lacus consectetur leo, id eleifend diam tellus sit amet nulla. Etiam metus augue, consequat ut dictum a, aliquet nec neque. Vestibulum gravida vel ligula at interdum. Nam cursus sapien non malesuada lobortis.
@@ -70,6 +72,12 @@ package struct HTMLContext {
 
         Mauris eros quam, dictum id elementum et, pharetra in metus. Quisque fermentum congue risus, accumsan consectetur neque aliquam quis. Vestibulum ipsum massa, euismod faucibus est in, condimentum venenatis risus. Quisque congue vehicula tellus, et dignissim augue accumsan ac. Pellentesque tristique ornare ligula, vitae iaculis dui varius vel. Ut sed sem sed purus facilisis porta quis eu tortor. Donec in vehicula tortor. Sed eget aliquet enim. Mauris tincidunt placerat risus, ut gravida lacus vehicula eget. Curabitur ultrices sapien tortor, eu gravida velit efficitur sed. Suspendisse eu volutpat est, ut bibendum velit. Maecenas mollis sit amet sapien laoreet pulvinar. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi lorem ante, volutpat et accumsan a, fermentum vel metus.
         """
+        var string:String = ""
+        for _ in 0..<10 {
+            string += lorem_ipsum
+        }
+        self.string = string
+
         integer = 293785
         double = 39848.9348019843
         float = 616905.2098238
