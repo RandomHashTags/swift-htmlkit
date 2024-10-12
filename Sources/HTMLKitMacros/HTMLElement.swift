@@ -12,19 +12,21 @@ import HTMLKitUtilities
 
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        return "\"\(raw: parse_element_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!))\""
+        var dynamicVariables:[String] = []
+        let (string, isDynamic):(String, Bool) = parse_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!, isRoot: true, dynamicVariables: &dynamicVariables)
+        return isDynamic ? "\(raw: string)" : "\"\(raw: string)\""
     }
 }
 
 private extension HTMLElement {
-    static func parse_element_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax) -> String {
-        guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
+    static func parse_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax, isRoot: Bool, dynamicVariables: inout [String]) -> (String, Bool) {
+        guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return ("\(expression)", true) }
         let childs:SyntaxChildren = expression.arguments.children(viewMode: .all)
         if elementType == .escapeHTML {
-            return childs.compactMap({
+            return (childs.compactMap({
                 guard let child:LabeledExprSyntax = $0.labeled else { return nil }
-                return parse_inner_html(context: context, elementType: elementType, child: child)
-            }).joined()
+                return parse_inner_html(context: context, elementType: elementType, child: child, dynamicVariables: &dynamicVariables)
+            }).joined(), false)
         }
         let tag:String, isVoid:Bool
         var children:Slice<SyntaxChildren>
@@ -38,45 +40,51 @@ private extension HTMLElement {
             isVoid = elementType.isVoid
             children = childs.prefix(childs.count)
         }
-        let data:ElementData = parse_arguments(context: context, elementType: elementType, children: children)
+        let data:ElementData = parse_arguments(context: context, elementType: elementType, children: children, dynamicVariables: &dynamicVariables)
         var string:String = (elementType == .html ? "<!DOCTYPE html>" : "") + "<" + tag + data.attributes + ">" + data.innerHTML
         if !isVoid {
             string += "</" + tag + ">"
         }
-        return string
+        return (string, false)
+
+        if isRoot {
+            return dynamicVariables.isEmpty ? (string, false) : ("DynamicString(string: \"" + string + "\").test", true)
+            //return dynamicVariables.isEmpty ? (string, false) : ("DynamicString(string: \"" + string + "\", values: [" + dynamicVariables.map({ $0.contains("\\(") ? "\"\($0)\"" : $0 }).joined(separator: ",") + "]).test", true)
+        } else {
+            return (string, false)
+        }
     }
-    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> ElementData {
+    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>, dynamicVariables: inout [String]) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
         for element in children {
             if let child:LabeledExprSyntax = element.labeled {
                 if var key:String = child.label?.text {
                     if key == "attributes" {
-                        attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!))
+                        attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!, dynamicVariables: &dynamicVariables))
                     } else {
                         if key == "acceptCharset" {
                             key = "accept-charset"
                         }
-                        if var string:String = parse_attribute(context: context, elementType: elementType, key: key, argument: child) {
-                            string.escapeHTML(attribute: true)
+                        if var string:String = parse_attribute(context: context, elementType: elementType, key: key, argument: child, dynamicVariables: &dynamicVariables) {
                             attributes.append(key + (string.isEmpty ? "" : "=\\\"" + string + "\\\""))
                         }
                     }
                 // inner html
-                } else if let inner_html:String = parse_inner_html(context: context, elementType: elementType, child: child) {
+                } else if let inner_html:String = parse_inner_html(context: context, elementType: elementType, child: child, dynamicVariables: &dynamicVariables) {
                     innerHTML.append(inner_html)
                 }
             }
         }
         return ElementData(attributes: attributes, innerHTML: innerHTML)
     }
-    static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayExprSyntax) -> [String] {
+    static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayExprSyntax, dynamicVariables: inout [String]) -> [String] {
         var keys:Set<String> = [], attributes:[String] = []
         for element in array.elements {
             let function:FunctionCallExprSyntax = element.expression.as(FunctionCallExprSyntax.self)!, key_argument:LabeledExprSyntax = function.arguments.first!, key_element:ExprSyntax = key_argument.expression
             var key:String = function.calledExpression.memberAccess!.declName.baseName.text, value:String? = nil
             switch key {
                 case "custom", "data":
-                    var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: function.arguments.last!)!
+                    var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: function.arguments.last!, dynamicVariables: &dynamicVariables)!
                     if returnType == .string {
                         literalValue.escapeHTML(attribute: true)
                     }
@@ -92,7 +100,7 @@ private extension HTMLElement {
                     value = function.arguments.last!.expression.stringLiteral!.string.escapingHTML(attribute: true)
                     break
                 default:
-                    if let string:String = parse_attribute(context: context, elementType: elementType, key: key, argument: key_argument) {
+                    if let string:String = parse_attribute(context: context, elementType: elementType, key: key, argument: key_argument, dynamicVariables: &dynamicVariables) {
                         value = string
                     }
                     break
@@ -110,18 +118,16 @@ private extension HTMLElement {
         }
         return attributes
     }
-    static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
+    static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax, dynamicVariables: inout [String]) -> String? {
         if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
-            var string:String = parse_element_macro(context: context, expression: macro)
+            var string:String = parse_macro(context: context, expression: macro, isRoot: false, dynamicVariables: &dynamicVariables).0
             if elementType == .escapeHTML {
                 string.escapeHTML(attribute: false)
             }
             return string
-        } else if var string:String = child.expression.stringLiteral?.string {
+        } else if var (string, returnType) = parse_literal_value(context: context, elementType: elementType, key: "", argument: child, dynamicVariables: &dynamicVariables) {
             string.escapeHTML(attribute: false)
             return string
-        } else if let function:FunctionCallExprSyntax = child.expression.as(FunctionCallExprSyntax.self), function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
-            return function.arguments.first!.expression.stringLiteral!.string.escapingHTML(attribute: false)
         } else {
             context.diagnose(Diagnostic(node: child, message: DiagnosticMsg(id: "unallowedExpression", message: "Expression not allowed. String interpolation is required when encoding runtime values."), fixIts: [
                 FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation.", severity: .error), changes: [
@@ -154,12 +160,14 @@ private extension HTMLElement {
         }
     }
     
-    static func parse_attribute(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, argument: LabeledExprSyntax) -> String? {
+    static func parse_attribute(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, argument: LabeledExprSyntax, dynamicVariables: inout [String]) -> String? {
         let expression:ExprSyntax = argument.expression
-        if let (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: argument) {
+        if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: argument, dynamicVariables: &dynamicVariables) {
             switch returnType {
             case .boolean: return string.elementsEqual("true") ? "" : nil
-            case .string: return string
+            case .string:
+                string.escapeHTML(attribute: true)
+                return string
             case .interpolation: return string
             }
         }
@@ -179,7 +187,7 @@ private extension HTMLElement {
             default: return " "
         }
     }
-    static func parse_literal_value(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, argument: LabeledExprSyntax) -> (value: String, returnType: LiteralReturnType)? {
+    static func parse_literal_value(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, argument: LabeledExprSyntax, dynamicVariables: inout [String]) -> (value: String, returnType: LiteralReturnType)? {
         let expression:ExprSyntax = argument.expression
         if let boolean:String = expression.booleanLiteral?.literal.text {
             return (boolean, .boolean)
@@ -255,11 +263,11 @@ private extension HTMLElement {
             //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
-        if returnType == .interpolation {
-            string = "\\(" + string + ")"
-        }
-        if string.contains("\\(") {
+        if returnType == .interpolation || string.contains("\\(") {
             context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML elements.", severity: .warning)))
+            //dynamicVariables.append(string)
+            string = string.contains("\\(") ? string : "\\(" + string + ")"
+            returnType = .interpolation
         }
         return (string, returnType)
     }

@@ -31,14 +31,14 @@ struct UnitTests {
         "Vaux" : VauxTests()
     ]
     @Test func staticHTML() {
-        let expected_value:String = #html([
-            #head([
-                #title(["StaticView"])
-            ]),
-            #body([
-                #h1(["Swift HTML Benchmarks"])
-            ])
-        ])
+        let expected_value:String = #html(
+            #head(
+                #title("StaticView")
+            ),
+            #body(
+                #h1("Swift HTML Benchmarks")
+            )
+        )
         for (key, value) in libraries {
             var string:String = value.staticHTML()
             if key == "Swim" {

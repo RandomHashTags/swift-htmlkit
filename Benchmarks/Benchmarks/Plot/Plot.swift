@@ -25,7 +25,7 @@ package struct PlotTests : HTMLGenerator {
         return HTML(
             .head(
                 .meta(.attribute(named: "charset", value: context.charset)),
-                .element(named: "title", text: "DynamicView"),
+                .element(named: "title", text: context.title),
                 .meta(.content(context.meta_description), .name("description")),
                 .meta(.content(context.keywords_string), .name("keywords"))
             ),

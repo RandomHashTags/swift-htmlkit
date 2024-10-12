@@ -9,22 +9,6 @@ import Testing
 import HTMLKit
 
 struct HTMLKitTests {
-    @Test func measureElapsedTime() {
-        measureElapsedTime(key: "htmlkit") {
-            let _:StaticString = #html(
-                #body(
-                    #h1("Swift HTML Benchmarks")
-                )
-            )
-        }
-    }
-    func measureElapsedTime(key: String, _ block: () -> Void) {
-        let duration:ContinuousClock.Duration = ContinuousClock().measure(block)
-        print("measureElapsedTime;" + key + " took=\(duration)")
-    }
-}
-
-extension HTMLKitTests {
     @Test func escape_html() {
         let expected_result:String = "<p>&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;</p>"
         #expect(#p(#escapeHTML("<!DOCTYPE html><html>Test</html>")) == expected_result)
@@ -233,7 +217,10 @@ extension HTMLKitTests {
         string = #div(attributes: [.title(HTMLKitTests.patrick)])
         #expect(string == "<div title=\"Patrick Star\"></div>")
 
-        let static_string:StaticString = #div(attributes: [.title(StaticString("Mr. Crabs"))])
+        var static_string:StaticString = #div(attributes: [.title(StaticString("Mr. Crabs"))])
+        #expect(static_string == "<div title=\"Mr. Crabs\"></div>")
+
+        static_string = #div(attributes: [.title("Mr. Crabs")])
         #expect(static_string == "<div title=\"Mr. Crabs\"></div>")
     }
     @Test func third_party_func() {
@@ -267,10 +254,39 @@ extension HTMLKitTests {
                 )
             )
         )
-        #expect(test == "<!DOCTYPE html><html><body><div class=\"dark-mode row\" draggable=\"false\" hidden inputmode=\"email\" title=\"Hey, you're pretty cool\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
+        #expect(test == "<!DOCTYPE html><html><body><div class=\"dark-mode row\" draggable=\"false\" hidden inputmode=\"email\" title=\"Hey, you&#39re pretty cool\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
     }
 }
 
+extension HTMLKitTests {
+    @Test func dynamic() {
+        let charset:String = "utf-8", title:String = "Dynamic"
+        var qualities:String = ""
+        for quality in ["one", "two", "three", "four"] {
+            qualities += #li("\(quality)")
+        }
+        let string:String = #html(
+            #head(
+                #meta(charset: "\(charset)"),
+                #title("\(title)"),
+                #meta(content: "\("description")", name: "description"),
+                #meta(content: "\("keywords")", name: "keywords")
+            ),
+            #body(
+                #h1("\("Heading")"),
+                #div(attributes: [.id("desc")],
+                    #p("\("bro")")
+                ),
+                #h2("\("Details")"),
+                #h3("\("Qualities")"),
+                #ul(attributes: [.id("user-qualities")], "\(qualities)")
+            )
+        )
+        #expect(string == "<!DOCTYPE html><html><head><meta charset=\"\(charset)\"><title>\(title)</title><meta content=\"description\" name=\"description\"><meta content=\"keywords\" name=\"keywords\"></head><body><h1>Heading</h1><div id=\"desc\"><p>bro</p></div><h2>Details</h2><h3>Qualities</h3><ul id=\"user-qualities\">\(qualities)</ul></body></html>")
+    }
+}
+
+/*
 extension HTMLKitTests {
     @Test func example2() {
         var test:TestStruct = TestStruct(name: "one", array: ["1", "2", "3"])
@@ -298,3 +314,4 @@ extension HTMLKitTests {
         var html : String { #p("\(name)", "\(array_string)") }
     }
 }
+*/

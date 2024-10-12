@@ -47,7 +47,7 @@ struct DynamicView : View {
         Html {
             Head {
                 Meta().charset(.utf8) // TODO: fix? | not dynamic
-                Title { "DynamicView" }
+                Title { context.title }
                 Meta().content(context.meta_description).name(.description)
                 Meta().content(context.keywords_string).name(.keywords)
             }

@@ -7,16 +7,63 @@
 
 import HTMLKitUtilities
 
+// MARK: StaticString equality
 public extension StaticString {
     static func == (left: Self, right: String) -> Bool { left.string == right }
 
     static func == (left: Self, right: Self) -> Bool { left.string == right.string }
     static func != (left: Self, right: Self) -> Bool { left.string != right.string }
-    var string : String { withUTF8Buffer { String(decoding: $0, as: UTF8.self) } }
+    var string : String {
+        withUTF8Buffer {
+            String(decoding: $0, as: UTF8.self)
+        }
+    }
+    /*func string(with replacements: [String]) -> String {
+        return withUTF8Buffer { p in
+            let values = p.split(separator: 96)
+            let last:Int = values.count-1
+            var amount:Int = p.count - last
+            for i in 0..<values.count-1 {
+                amount += replacements[i].count
+            }
+            let buffer:UnsafeMutableBufferPointer<UInt8> = .allocate(capacity: amount)
+            var new_index:Int = 0
+            for index in 0..<values.count {
+                let value:UnsafeBufferPointer<UInt8>.SubSequence = values[index]
+                for i in 0..<value.count {
+                    buffer[new_index] = value[value.index(value.startIndex, offsetBy: i)]
+                    new_index += 1
+                }
+                if index != last {
+                    for char in replacements[index] {
+                        buffer[new_index] = char.asciiValue!
+                        new_index += 1
+                    }
+                }
+            }
+            return String(decoding: buffer, as: UTF8.self)
+        }
+    }*/
 }
 public extension String {
     static func == (left: Self, right: StaticString) -> Bool { left == right.string }
 }
+
+/*
+// MARK: DynamicString
+public struct DynamicString {
+    public let string:StaticString
+    public let values:[String]
+
+    public init(string: StaticString, values: [String]) {
+        self.string = string
+        self.values = values
+    }
+
+    public var test : String {
+        return string.string
+    }
+}*/
 
 @freestanding(expression)
 public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")

@@ -61,7 +61,7 @@ package struct SwimTests : HTMLGenerator {
         return html {
             head {
                 meta(charset: context.charset)
-                title { "DynamicView" }
+                title { context.title }
                 meta(customAttributes: ["content":context.meta_description, "name":"description"])
                 meta(customAttributes: ["content":context.keywords_string, "name":"keywords"])
             }

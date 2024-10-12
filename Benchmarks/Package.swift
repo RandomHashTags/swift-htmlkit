@@ -12,7 +12,8 @@ let package = Package(
         // dsls
         .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.27.0"),
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
-        .package(url: "https://github.com/RandomHashTags/swift-htmlkit", from: "0.5.0"),
+        .package(name: "swift-htmlkit", path: "../"),
+        //.package(url: "https://github.com/RandomHashTags/swift-htmlkit", from: "0.5.0"),
         .package(url: "https://github.com/sliemeobn/elementary", from: "0.3.4"),
         .package(url: "https://github.com/vapor-community/HTMLKit", from: "2.8.1"),
         .package(url: "https://github.com/pointfreeco/swift-html", from: "0.4.1"),

@@ -17,9 +17,17 @@ public extension String {
         self.replace("<", with: "&lt;")
         self.replace(">", with: "&gt;")
         if attribute {
-            self.replace("\"", with: "&quot;")
-            self.replace("'", with: "&#39")
+            self.escapeHTMLAttribute()
         }
+    }
+    func escapingHTMLAttribute() -> String {
+        var string:String = self
+        string.escapeHTMLAttribute()
+        return string
+    }
+    mutating func escapeHTMLAttribute() {
+        self.replace("\"", with: "&quot;")
+        self.replace("'", with: "&#39")
     }
 }
 

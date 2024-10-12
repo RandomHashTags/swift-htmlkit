@@ -32,7 +32,7 @@ package struct SwiftHTMLBBTests : HTMLGenerator {
             Html {
                 Head {
                     Meta().charset(context.charset)
-                    Title("DynamicView")
+                    Title(context.title)
                     Meta().content(context.meta_description).name("description")
                     Meta().content(context.keywords_string).name("keywords")
                 }

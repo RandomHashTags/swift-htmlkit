@@ -35,14 +35,9 @@ let libraries:[String:HTMLGenerator] = [
 import Hummingbird
 
 struct HeaderMiddleware<Context: RequestContext> : RouterMiddleware {
-    let output:String
-
-    init(_ output: String = "Content-Type") {
-        self.output = output
-    }
     func handle(_ request: Request, context: Context, next: (Request, Context) async throws -> Response) async throws -> Response {
         var response = try await next(request, context)
-        response.headers[HTTPField.Name(output)!] = "text/html"
+        response.headers[HTTPField.Name("Content-Type")!] = "text/html"
         return response
     }
 }

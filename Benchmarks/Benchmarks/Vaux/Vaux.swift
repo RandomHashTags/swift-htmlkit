@@ -86,7 +86,7 @@ package struct VauxTests : HTMLGenerator {
         html {
             head {
                 meta().attr("charset", context.charset)
-                title("DynamicView")
+                title(context.title)
                 meta().attr("content", context.meta_description).attr("name", "description")
                 meta().attr("content", context.keywords_string).attr("name", "keywords")
             }

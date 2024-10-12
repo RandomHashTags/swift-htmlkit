@@ -39,7 +39,7 @@ struct DynamicView {
         html {
             head {
                 meta(.custom(name: "charset", value: context.charset))
-                title { "DynamicView" }
+                title { context.title }
                 meta(.content(context.meta_description), .name("description"))
                 meta(.content(context.keywords_string), .name("keywords"))
             }

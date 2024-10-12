@@ -12,14 +12,14 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
     package init() {}
 
     package func staticHTML() -> String {
-        #html([
-            #head([
-                #title(["StaticView"])
-            ]),
-            #body([
-                #h1(["Swift HTML Benchmarks"])
-            ])
-        ])
+        #html(
+            #head(
+                #title("StaticView")
+            ),
+            #body(
+                #h1("Swift HTML Benchmarks")
+            )
+        )
     }
     // performance notes
     // - maping makes unneccessary copies and hurts throughput
@@ -30,24 +30,25 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
     package func dynamicHTML(_ context: HTMLContext) -> String {
         var qualities:String = ""
         for quality in context.user.qualities {
-            qualities += #li(["\(quality)"])
+            qualities += #li("\(quality)")
         }
-        return #html([
-            #head([
+        let string:String = #html(
+            #head(
                 #meta(charset: "\(context.charset)"),
-                #title(["DynamicView"]),
+                #title("\(context.title)"),
                 #meta(content: "\(context.meta_description)", name: "description"),
                 #meta(content: "\(context.keywords_string)", name: "keywords")
-            ]),
-            #body([
-                #h1(["\(context.heading)"]),
-                #div(attributes: [.id(context.desc_id)], [
-                    #p(["\(context.string)"])
-                ]),
-                #h2(["\(context.user.details_heading)"]),
-                #h3(["\(context.user.qualities_heading)"]),
-                #ul(attributes: [.id(context.user.qualities_id)], ["\(qualities)"])
-            ])
-        ])
+            ),
+            #body(
+                #h1("\(context.heading)"),
+                #div(attributes: [.id(context.desc_id)],
+                    #p("\(context.string)")
+                ),
+                #h2("\(context.user.details_heading)"),
+                #h3("\(context.user.qualities_heading)"),
+                #ul(attributes: [.id(context.user.qualities_id)], "\(qualities)")
+            )
+        )
+        return string
     }
 }
