@@ -10,12 +10,15 @@ import HTMLKit
 
 struct HTMLKitTests {
     @Test func escape_html() {
-        let expected_result:String = "<p>&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;</p>"
-        #expect(#p(#escapeHTML("<!DOCTYPE html><html>Test</html>")) == expected_result)
+        let unescaped:String = "<!DOCTYPE html><html>Test</html>"
+        let escaped:String = "&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;"
+        let expected_result:String = "<p>\(escaped)</p>"
+        #expect(#p("<!DOCTYPE html><html>Test</html>") == expected_result)
+        #expect(#escapeHTML("<!DOCTYPE html><html>Test</html>") == escaped)
 
         #expect(#p(#escapeHTML(#html("Test"))) == expected_result)
 
-        let string:String = "<!DOCTYPE html><html>Test</html>".escapingHTML(attribute: false)
+        let string:String = unescaped.escapingHTML(escapeAttributes: false)
         #expect(#p("\(string)") == expected_result)
     }
 }
@@ -102,7 +105,8 @@ extension HTMLKitTests {
     }
 
     @Test func element_events() {
-        #expect(#div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()")]) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\"></div>")
+        let third_thing:String = "doAThirdThing()"
+        #expect(#div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()"), .event(.focus, "\(third_thing)")]) == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\" onfocus=\"doAThirdThing()\"></div>")
     }
 
     @Test func elements_void() {
@@ -269,7 +273,7 @@ extension HTMLKitTests {
             #head(
                 #meta(charset: "\(charset)"),
                 #title("\(title)"),
-                #meta(content: "\("description")", name: "description"),
+                #meta(content: "description \(title)", name: "description"),
                 #meta(content: "\("keywords")", name: "keywords")
             ),
             #body(
@@ -279,14 +283,13 @@ extension HTMLKitTests {
                 ),
                 #h2("\("Details")"),
                 #h3("\("Qualities")"),
-                #ul(attributes: [.id("user-qualities")], "\(qualities)")
+                #ul(attributes: [.id("user-qualities")], String(describing: qualities))
             )
         )
-        #expect(string == "<!DOCTYPE html><html><head><meta charset=\"\(charset)\"><title>\(title)</title><meta content=\"description\" name=\"description\"><meta content=\"keywords\" name=\"keywords\"></head><body><h1>Heading</h1><div id=\"desc\"><p>bro</p></div><h2>Details</h2><h3>Qualities</h3><ul id=\"user-qualities\">\(qualities)</ul></body></html>")
+        #expect(string == "<!DOCTYPE html><html><head><meta charset=\"\(charset)\"><title>\(title)</title><meta content=\"description \(title)\" name=\"description\"><meta content=\"keywords\" name=\"keywords\"></head><body><h1>Heading</h1><div id=\"desc\"><p>bro</p></div><h2>Details</h2><h3>Qualities</h3><ul id=\"user-qualities\">\(qualities)</ul></body></html>")
     }
 }
 
-/*
 extension HTMLKitTests {
     @Test func example2() {
         var test:TestStruct = TestStruct(name: "one", array: ["1", "2", "3"])
@@ -314,4 +317,3 @@ extension HTMLKitTests {
         var html : String { #p("\(name)", "\(array_string)") }
     }
 }
-*/

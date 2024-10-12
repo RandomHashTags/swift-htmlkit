@@ -47,12 +47,12 @@ private extension HTMLElement {
         }
         return (string, false)
 
-        if isRoot {
+        /*if isRoot {
             return dynamicVariables.isEmpty ? (string, false) : ("DynamicString(string: \"" + string + "\").test", true)
             //return dynamicVariables.isEmpty ? (string, false) : ("DynamicString(string: \"" + string + "\", values: [" + dynamicVariables.map({ $0.contains("\\(") ? "\"\($0)\"" : $0 }).joined(separator: ",") + "]).test", true)
         } else {
             return (string, false)
-        }
+        }*/
     }
     static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>, dynamicVariables: inout [String]) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
@@ -65,7 +65,7 @@ private extension HTMLElement {
                         if key == "acceptCharset" {
                             key = "accept-charset"
                         }
-                        if var string:String = parse_attribute(context: context, elementType: elementType, key: key, argument: child, dynamicVariables: &dynamicVariables) {
+                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, argument: child, dynamicVariables: &dynamicVariables) {
                             attributes.append(key + (string.isEmpty ? "" : "=\\\"" + string + "\\\""))
                         }
                     }
@@ -86,7 +86,7 @@ private extension HTMLElement {
                 case "custom", "data":
                     var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: function.arguments.last!, dynamicVariables: &dynamicVariables)!
                     if returnType == .string {
-                        literalValue.escapeHTML(attribute: true)
+                        literalValue.escapeHTML(escapeAttributes: true)
                     }
                     value = literalValue
                     if key == "custom" {
@@ -97,7 +97,15 @@ private extension HTMLElement {
                     break
                 case "event":
                     key = "on" + key_element.memberAccess!.declName.baseName.text
-                    value = function.arguments.last!.expression.stringLiteral!.string.escapingHTML(attribute: true)
+                    if var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: function.arguments.last!, dynamicVariables: &dynamicVariables) {
+                        if returnType == .string {
+                            literalValue.escapeHTML(escapeAttributes: true)
+                        }
+                        value = literalValue
+                    } else {
+                        unallowed_expression(context: context, node: function.arguments.last!)
+                        return []
+                    }
                     break
                 default:
                     if let string:String = parse_attribute(context: context, elementType: elementType, key: key, argument: key_argument, dynamicVariables: &dynamicVariables) {
@@ -122,23 +130,26 @@ private extension HTMLElement {
         if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
             var string:String = parse_macro(context: context, expression: macro, isRoot: false, dynamicVariables: &dynamicVariables).0
             if elementType == .escapeHTML {
-                string.escapeHTML(attribute: false)
+                string.escapeHTML(escapeAttributes: false)
             }
             return string
-        } else if var (string, returnType) = parse_literal_value(context: context, elementType: elementType, key: "", argument: child, dynamicVariables: &dynamicVariables) {
-            string.escapeHTML(attribute: false)
+        } else if var string:String = parse_literal_value(context: context, elementType: elementType, key: "", argument: child, dynamicVariables: &dynamicVariables)?.value {
+            string.escapeHTML(escapeAttributes: false)
             return string
         } else {
-            context.diagnose(Diagnostic(node: child, message: DiagnosticMsg(id: "unallowedExpression", message: "Expression not allowed. String interpolation is required when encoding runtime values."), fixIts: [
-                FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation.", severity: .error), changes: [
-                    FixIt.Change.replace(
-                        oldNode: Syntax(child),
-                        newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(child))"))
-                    )
-                ])
-            ]))
+            unallowed_expression(context: context, node: child)
             return nil
         }
+    }
+    static func unallowed_expression(context: some MacroExpansionContext, node: LabeledExprSyntax) {
+        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unallowedExpression", message: "String Interpolation is required when encoding runtime values."), fixIts: [
+            FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation.", severity: .error), changes: [
+                FixIt.Change.replace(
+                    oldNode: Syntax(node),
+                    newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(node))"))
+                )
+            ])
+        ]))
     }
 
     struct ElementData {
@@ -166,7 +177,7 @@ private extension HTMLElement {
             switch returnType {
             case .boolean: return string.elementsEqual("true") ? "" : nil
             case .string:
-                string.escapeHTML(attribute: true)
+                string.escapeHTML(escapeAttributes: true)
                 return string
             case .interpolation: return string
             }
@@ -213,7 +224,7 @@ private extension HTMLElement {
                     if function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
                         return (function.arguments.first!.expression.stringLiteral!.string, .string)
                     }
-                    return ("\(function)", .interpolation)
+                    return ("\\(\(function))", .interpolation)
                 }
             }
             if let member:MemberAccessExprSyntax = expression.memberAccess {
@@ -227,7 +238,7 @@ private extension HTMLElement {
                             return (integer, .interpolation)
                         }
                     } else {*/
-                        return ("\(member)", .interpolation)
+                        return ("\\(\(member))", .interpolation)
                     //}
                 } else {
                     return (HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: decl), .string)
@@ -263,13 +274,47 @@ private extension HTMLElement {
             //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
-        if returnType == .interpolation || string.contains("\\(") {
-            context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML elements.", severity: .warning)))
+        var remaining_interpolation:Int = 0
+        if let list:StringLiteralSegmentListSyntax = expression.stringLiteral?.segments {
+            for segment in list {
+                if let expr:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
+                    remaining_interpolation += 1
+                    if flatten_interpolation(string: &string, remaining_interpolation: &remaining_interpolation, expr: expr) {
+                        remaining_interpolation -= 1
+                    }
+                }
+            }
+        }
+        if returnType == .interpolation || remaining_interpolation > 0 {
             //dynamicVariables.append(string)
-            string = string.contains("\\(") ? string : "\\(" + string + ")"
+            if !string.contains("\\(") {
+                string = "\\(" + string + ")"
+            }
             returnType = .interpolation
+            context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
         }
         return (string, returnType)
+    }
+    static func flatten_interpolation(string: inout String, remaining_interpolation: inout Int, expr: ExpressionSegmentSyntax) -> Bool { // TODO: can still be improved ("\(description \(title))" doesn't get flattened)
+        let expression:ExprSyntax = expr.expressions.first!.expression
+        if let list:StringLiteralSegmentListSyntax = expression.stringLiteral?.segments {
+            for segment in list {
+                if let expr:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
+                    remaining_interpolation += 1
+                    if flatten_interpolation(string: &string, remaining_interpolation: &remaining_interpolation, expr: expr) {
+                        remaining_interpolation -= 1
+                    }
+                } else if let fix:String = segment.as(StringSegmentSyntax.self)?.content.text {
+                    string.replace("\(expr)", with: fix)
+                    remaining_interpolation -= 1
+                }
+            }
+        }
+        if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
+            string.replace("\(expr)", with: fix)
+            return true
+        }
+        return false
     }
 }
 
@@ -278,7 +323,7 @@ enum LiteralReturnType {
 }
 
 // MARK: HTMLElementType
-enum HTMLElementType : String {
+enum HTMLElementType : String, CaseIterable {
     case escapeHTML
     case html
     case custom
@@ -424,6 +469,7 @@ enum HTMLElementType : String {
     }
 }
 
+// MARK: Misc
 extension ExprSyntax {
     var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
     var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }

@@ -23,14 +23,14 @@ Write HTML using Swift Macros.
 <details>
 <summary>How do I use this library?</summary>
 
-Syntax: `#<html element>(attributes: [], <element specific attributes>: V?, _ innerHTML: [ExpressibleByStringLiteral])`
+Syntax: `#<html element>(attributes: [], <element specific attributes>: V?, _ innerHTML: ExpressibleByStringLiteral...)`
 #### Examples
 
 ```swift
 // <div class="dark"><p>Macros are beautiful</p></div>
-#div(attributes: [.class(["dark"])], [
-    #p(["Macros are beautiful"])
-])
+#div(attributes: [.class(["dark"])],
+    #p("Macros are beautiful")
+)
 
 // <a href="https://github.com/RandomHashTags/litleagues" target="_blank"></a>
 #a(href: "https://github.com/RandomHashTags/litleagues", target: ._blank)
@@ -47,8 +47,8 @@ Syntax: `#<html element>(attributes: [], <element specific attributes>: V?, _ in
 )
 
 // html example
-let test:String = #html([
-    #body([
+let test:String = #html(
+    #body(
         #div(
             attributes: [
                 .class(["dark-mode", "row"]),
@@ -57,38 +57,65 @@ let test:String = #html([
                 .inputmode(.email),
                 .title("Hey, you're pretty cool")
             ],
-            [
-                "Random text",
-                #div(),
-                #a([
-                    #div([
-                        #abbr()
-                    ]),
-                    #address()
-                ]),
-                #div(),
-                #button(disabled: true),
-                #video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1)),
-            ]
+            "Random text",
+            #div(),
+            #a(
+                #div(
+                    #abbr()
+                ),
+                #address()
+            ),
+            #div(),
+            #button(disabled: true),
+            #video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1)),
         )
-    ])
-])
+    )
+)
 ```
 </details>
 
 <details>
+<summary>How do I escape HTML?</summary>
+
+The output automatically escapes html characters **known only at compile time**.
+
+
+If you know the data **at compile time** (and not working with HTML macros):
+- `#escapeHTML()` macro
+
+If you're working with **runtime** data:
+- `<string>.escapeHTML(escapeAttributes:)`
+  - mutates `self` escaping HTML and, optionally, attribute characters
+- `<string>.escapeHTMLAttributes()`
+  - mutates `self` escaping only attribute characters
+- `<string>.escapingHTML(escapeAttributes:)`
+  - creates a copy of `self` escaping HTML and, optionally, attribute characters
+- `<string>.escapingHTMLAttributes()`
+  - creates a copy of `self` escaping only attribute characters
+
+</details>
+
+<details>
 <summary>How do I encode variables?</summary>
+
 Using String Interpolation.
+
+> You will get a compiler warning saying *interpolation may introduce raw HTML*.
+> 
+> Its up to you whether or not to suppress this warning or escape the HTML at runtime using an method described above.
 
 #### Example
 ```swift
 let string:String = "any string value", integer:Int = -69, float:Float = 3.14159
 
 // ✅ DO
-let _:String = #p(["\(string); \(integer); \(float)"])
+let _:String = #p("\(string); \(integer); \(float)")
+let _:String = #p("\(string)", "; ", String(describing: integer), "; ", float.description)
 
-// ❌ DON'T
-let _:String = #p([string, "; ", String(describing: integer), "; ", float.description])
+// ❌ DON'T; compiler error: String Interpolation required
+let integer_string:String = String(describing: integer), float_string:String = String(describing: float)
+let _:String = #p(string, "; ", integer_string, "; ", float_string)
+
 ```
 
 </details>
@@ -151,7 +178,7 @@ Use the `HTMLElementAttribute.event(<type>, "<value>")`.
   - [BinaryBuilds/swift-html](https://github.com/BinaryBirds/swift-html) v1.7.0 (patched version [here](https://github.com/RandomHashTags/fork-bb-swift-html))
   - [sliemeobn/elementary](https://github.com/sliemeobn/elementary) v0.3.4
   - [JohnSundell/Plot](https://github.com/JohnSundell/Plot) v0.14.0
-  - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.5.0 (this library)
+  - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.6.0 (this library)
   - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
   - [robb/Swim](https://github.com/robb/Swim) v0.4.0 (patched version [here](https://github.com/RandomHashTags/fork-Swim); custom renderer [here](https://github.com/RandomHashTags/swift-htmlkit/blob/main/Benchmarks/Benchmarks/Swim/Swim.swift))
   - [vapor-community/HTMLKit](https://github.com/vapor-community/HTMLKit) v2.8.1

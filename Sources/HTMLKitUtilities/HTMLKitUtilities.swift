@@ -7,25 +7,35 @@
 
 // MARK: Escape HTML
 public extension String {
-    func escapingHTML(attribute: Bool) -> String {
+    /// Escapes all occurrences of source-breaking HTML characters
+    /// - Parameters:
+    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters
+    /// - Returns: A new `String` escaping source-breaking HTML
+    func escapingHTML(escapeAttributes: Bool) -> String {
         var string:String = self
-        string.escapeHTML(attribute: attribute)
+        string.escapeHTML(escapeAttributes: escapeAttributes)
         return string
     }
-    mutating func escapeHTML(attribute: Bool) {
+    /// Escapes all occurrences of source-breaking HTML characters
+    /// - Parameters:
+    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters
+    mutating func escapeHTML(escapeAttributes: Bool) {
         self.replace("&", with: "&amp;")
         self.replace("<", with: "&lt;")
         self.replace(">", with: "&gt;")
-        if attribute {
-            self.escapeHTMLAttribute()
+        if escapeAttributes {
+            self.escapeHTMLAttributes()
         }
     }
-    func escapingHTMLAttribute() -> String {
+    /// Escapes all occurrences of source-breaking HTML attribute characters
+    /// - Returns: A new `String` escaping source-breaking HTML attribute characters
+    func escapingHTMLAttributes() -> String {
         var string:String = self
-        string.escapeHTMLAttribute()
+        string.escapeHTMLAttributes()
         return string
     }
-    mutating func escapeHTMLAttribute() {
+    /// Escapes all occurrences of source-breaking HTML attribute characters
+    mutating func escapeHTMLAttributes() {
         self.replace("\"", with: "&quot;")
         self.replace("'", with: "&#39")
     }
