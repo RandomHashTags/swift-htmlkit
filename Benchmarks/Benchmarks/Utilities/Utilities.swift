@@ -72,10 +72,10 @@ package struct HTMLContext {
 
         Mauris eros quam, dictum id elementum et, pharetra in metus. Quisque fermentum congue risus, accumsan consectetur neque aliquam quis. Vestibulum ipsum massa, euismod faucibus est in, condimentum venenatis risus. Quisque congue vehicula tellus, et dignissim augue accumsan ac. Pellentesque tristique ornare ligula, vitae iaculis dui varius vel. Ut sed sem sed purus facilisis porta quis eu tortor. Donec in vehicula tortor. Sed eget aliquet enim. Mauris tincidunt placerat risus, ut gravida lacus vehicula eget. Curabitur ultrices sapien tortor, eu gravida velit efficitur sed. Suspendisse eu volutpat est, ut bibendum velit. Maecenas mollis sit amet sapien laoreet pulvinar. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi lorem ante, volutpat et accumsan a, fermentum vel metus.
         """
-        var string:String = ""
-        for _ in 0..<10 {
+        var string:String = lorem_ipsum
+        /*for _ in 1..<10 {
             string += lorem_ipsum
-        }
+        }*/
         self.string = string
 
         integer = 293785
