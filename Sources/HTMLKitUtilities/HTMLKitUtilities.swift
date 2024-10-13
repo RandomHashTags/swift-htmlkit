@@ -118,7 +118,7 @@ public enum HTMLElementAttribute {
 
     case custom(_ id: any ExpressibleByStringLiteral, _ value: (any ExpressibleByStringLiteral)?)
 
-    @available(*, deprecated, message: "Inline event handlers are an outdated way to handle events.\nGeneral consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript.\n\nThis will never be removed and remains deprecated to encourage use of other techniques.\n\nLearn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
+    @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
     case event(Extra.event, _ value: (any ExpressibleByStringLiteral)? = nil)
 }
 public extension HTMLElementAttribute {

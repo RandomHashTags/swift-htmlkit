@@ -10,6 +10,7 @@ import Utilities
 
 import TestElementary
 import TestPlot
+import TestSwiftDOM
 import TestSwiftHTMLBB
 import TestSwiftHTMLKit
 import TestSwiftHTMLPF

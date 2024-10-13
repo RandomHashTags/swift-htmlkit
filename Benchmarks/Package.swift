@@ -13,7 +13,6 @@ let package = Package(
         .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.27.0"),
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
         .package(name: "swift-htmlkit", path: "../"),
-        //.package(url: "https://github.com/RandomHashTags/swift-htmlkit", from: "0.5.0"),
         .package(url: "https://github.com/sliemeobn/elementary", from: "0.4.0"),
         .package(url: "https://github.com/vapor-community/HTMLKit", from: "2.8.1"),
         .package(url: "https://github.com/pointfreeco/swift-html", from: "0.4.1"),
@@ -22,6 +21,9 @@ let package = Package(
         //.package(url: "https://github.com/toucansites/toucan", from: "1.0.0-alpha.1"), // unstable
         .package(url: "https://github.com/RandomHashTags/fork-Swim", branch: "main"),
         .package(url: "https://github.com/RandomHashTags/fork-Vaux", branch: "master"),
+        //.package(url: "https://github.com/tayloraswift/swift-dom", from: "1.1.0"), // bad exports
+        //.package(url: "https://github.com/TokamakUI/Tokamak", from: "0.11.1"), // swift-benchmark problem
+
         .package(url: "https://github.com/vapor/leaf", from: "4.4.0"),
 
         // networking
@@ -58,10 +60,19 @@ let package = Package(
             path: "Benchmarks/Plot"
         ),
         .target(
+            name: "TestSwiftDOM",
+            dependencies: [
+                "Utilities",
+                //.product(name: "DOM", package: "swift-dom", moduleAliases: ["DOM":"SwiftDOM"]),
+                //.product(name: "HTML", package: "swift-dom", moduleAliases: ["HTML":"SwiftDOMHTML"])
+            ],
+            path: "Benchmarks/SwiftDOM"
+        ),
+        .target(
             name: "TestSwiftHTMLBB",
             dependencies: [
                 "Utilities",
-                .product(name: "SwiftHtml", package: "fork-bb-swift-html")
+                .product(name: "SwiftHtml", package: "fork-bb-swift-html", moduleAliases: ["SwiftHtml":"SwiftHTMLBB"])
             ],
             path: "Benchmarks/SwiftHTMLBB"
         ),
@@ -69,8 +80,8 @@ let package = Package(
             name: "TestSwiftHTMLKit",
             dependencies: [
                 "Utilities",
-                .product(name: "HTMLKit", package: "swift-htmlkit", moduleAliases: ["HTMLKit" : "SwiftHTMLKit"]),
-                .product(name: "HTMLKit", package: "HTMLKit", moduleAliases: ["HTMLKit" : "VaporHTMLKit"])
+                .product(name: "HTMLKit", package: "swift-htmlkit", moduleAliases: ["HTMLKit":"SwiftHTMLKit"]),
+                .product(name: "HTMLKit", package: "HTMLKit", moduleAliases: ["HTMLKit":"VaporHTMLKit"]),
             ],
             path: "Benchmarks/SwiftHTMLKit"
         ),
@@ -78,7 +89,7 @@ let package = Package(
             name: "TestSwiftHTMLPF",
             dependencies: [
                 "Utilities",
-                .product(name: "Html", package: "swift-html")
+                .product(name: "Html", package: "swift-html", moduleAliases: ["Html":"SwiftHTMLPF"])
             ],
             path: "Benchmarks/SwiftHTMLPF"
         ),
@@ -91,6 +102,15 @@ let package = Package(
             path: "Benchmarks/Swim"
         ),
         .target(
+            name: "TestTokamak",
+            dependencies: [
+                "Utilities",
+                //.product(name: "TokamakDOM", package: "Tokamak"),
+                //.product(name: "TokamakStaticHTML", package: "Tokamak")
+            ],
+            path: "Benchmarks/Tokamak"
+        ),
+        .target(
             name: "TestToucan",
             dependencies: [
                 "Utilities"
@@ -101,8 +121,8 @@ let package = Package(
             name: "TestVaporHTMLKit",
             dependencies: [
                 "Utilities",
-                .product(name: "HTMLKit", package: "swift-htmlkit", moduleAliases: ["HTMLKit" : "SwiftHTMLKit"]),
-                .product(name: "HTMLKit", package: "HTMLKit", moduleAliases: ["HTMLKit" : "VaporHTMLKit"])
+                .product(name: "HTMLKit", package: "HTMLKit", moduleAliases: ["HTMLKit":"VaporHTMLKit"]),
+                .product(name: "HTMLKit", package: "swift-htmlkit", moduleAliases: ["HTMLKit":"SwiftHTMLKit"])
             ],
             path: "Benchmarks/VaporHTMLKit"
         ),
@@ -122,6 +142,7 @@ let package = Package(
                 "TestElementary",
                 "TestLeaf",
                 "TestPlot",
+                "TestSwiftDOM",
                 "TestSwiftHTMLBB",
                 "TestSwiftHTMLKit",
                 "TestSwiftHTMLPF",
@@ -145,6 +166,7 @@ let package = Package(
                 "TestElementary",
                 "TestLeaf",
                 "TestPlot",
+                "TestSwiftDOM",
                 "TestSwiftHTMLBB",
                 "TestSwiftHTMLKit",
                 "TestSwiftHTMLPF",
@@ -164,6 +186,7 @@ let package = Package(
                 "TestElementary",
                 "TestLeaf",
                 "TestPlot",
+                "TestSwiftDOM",
                 "TestSwiftHTMLBB",
                 "TestSwiftHTMLKit",
                 "TestSwiftHTMLPF",

@@ -11,6 +11,7 @@ import SwiftHTMLKit
 
 import TestElementary
 import TestPlot
+import TestSwiftDOM
 import TestSwiftHTMLBB
 import TestSwiftHTMLKit
 import TestSwiftHTMLPF
@@ -25,6 +26,7 @@ struct UnitTests {
         "Elementary" : ElementaryTests(),
         "Plot" : PlotTests(),
         "Pointfreeco" : SwiftHTMLPFTests(),
+        //"SwiftDOM" : SwiftDOMTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
         "Swim" : SwimTests(),
         "VaporHTMLKit" : VaporHTMLKitTests(),
