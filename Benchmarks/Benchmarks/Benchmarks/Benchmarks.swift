@@ -27,25 +27,25 @@ let benchmarks = {
         "Plot" : PlotTests(),
         "Pointfreeco" : SwiftHTMLPFTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
-        "Swim (custom renderer)" : SwimTests(),
+        "Swim" : SwimTests(),
         "VaporHTMLKit" : VaporHTMLKitTests(),
         "Vaux (custom renderer)" : VauxTests()
     ]
 
-    for (key, value) in libraries {
+    /*for (key, value) in libraries {
         Benchmark(key) {
             for _ in $0.scaledIterations {
                 blackHole(value.staticHTML())
             }
         }
-    }
+    }*/
 
-    /*let context:HTMLContext = HTMLContext()
+    let context:HTMLContext = HTMLContext()
     for (key, value) in libraries {
         Benchmark(key) {
             for _ in $0.scaledIterations {
                 blackHole(value.dynamicHTML(context))
             }
         }
-    }*/
+    }
 }
