@@ -199,7 +199,3 @@ This library is the clear leader in performance & efficiency. Static webpages of
 
 ## Contributing
 Create a PR.
-
-## Funding
-Love this library? Consider supporting this project by sponsoring the developers.
-- [RandomHashTags](https://github.com/sponsors/RandomHashTags)
