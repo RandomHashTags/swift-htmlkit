@@ -19,7 +19,7 @@ let package = Package(
         .package(url: "https://github.com/RandomHashTags/fork-bb-swift-html", branch: "main"),
         .package(url: "https://github.com/JohnSundell/Plot", from: "0.14.0"),
         //.package(url: "https://github.com/toucansites/toucan", from: "1.0.0-alpha.1"), // unstable
-        .package(url: "https://github.com/RandomHashTags/fork-Swim", branch: "main"),
+        .package(url: "https://github.com/robb/Swim", from: "0.4.0"),
         .package(url: "https://github.com/RandomHashTags/fork-Vaux", branch: "master"),
         //.package(url: "https://github.com/tayloraswift/swift-dom", from: "1.1.0"), // bad exports
         //.package(url: "https://github.com/TokamakUI/Tokamak", from: "0.11.1"), // swift-benchmark problem
@@ -97,7 +97,8 @@ let package = Package(
             name: "TestSwim",
             dependencies: [
                 "Utilities",
-                .product(name: "Swim", package: "fork-Swim")
+                .product(name: "Swim", package: "Swim"),
+                .product(name: "HTML", package: "Swim", moduleAliases: ["HTML":"SwimHTML"])
             ],
             path: "Benchmarks/Swim"
         ),

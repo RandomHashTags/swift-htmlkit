@@ -180,7 +180,7 @@ Use the `HTMLElementAttribute.event(<type>, "<value>")`.
   - [JohnSundell/Plot](https://github.com/JohnSundell/Plot) v0.14.0
   - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.6.0 (this library)
   - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
-  - [robb/Swim](https://github.com/robb/Swim) v0.4.0 (patched version [here](https://github.com/RandomHashTags/fork-Swim))
+  - [robb/Swim](https://github.com/robb/Swim) v0.4.0
   - [vapor-community/HTMLKit](https://github.com/vapor-community/HTMLKit) v2.8.1
   - [dokun1/Vaux](https://github.com/dokun1/Vaux) v0.2.0 (patched version [here](https://github.com/RandomHashTags/fork-Vaux); custom renderer [here](https://github.com/RandomHashTags/swift-htmlkit/blob/main/Benchmarks/Benchmarks/Vaux/Vaux.swift))
 

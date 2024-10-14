@@ -7,6 +7,7 @@
 
 import Utilities
 import Swim
+import HTML
 
 package struct SwimTests : HTMLGenerator {
     package init() {}
