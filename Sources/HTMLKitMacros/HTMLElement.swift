@@ -108,7 +108,7 @@ private extension HTMLElement {
                 context.diagnose(Diagnostic(node: key_element, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
             } else if let value:String = value {
                 if keys.contains(key) {
-                    context.diagnose(Diagnostic(node: key_element, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute is already defined.")))
+                    context.diagnose(Diagnostic(node: key_element, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + key + "\" is already defined.")))
                 } else {
                     attributes.append(key + (value.isEmpty ? "" : "=\\\"" + value + "\\\""))
                     keys.insert(key)
@@ -265,16 +265,10 @@ private extension HTMLElement {
             //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
-        var remaining_interpolation:Int = 0
-        if let list:StringLiteralSegmentListSyntax = expression.stringLiteral?.segments {
-            for segment in list {
-                if let expr:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                    remaining_interpolation += 1
-                    if flatten_interpolation(string: &string, remaining_interpolation: &remaining_interpolation, expr: expr) {
-                        remaining_interpolation -= 1
-                    }
-                }
-            }
+        let interpolation:[ExpressionSegmentSyntax] = expression.stringLiteral?.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) }) ?? []
+        var remaining_interpolation:Int = interpolation.count
+        for expr in interpolation {
+            string = flatten_interpolation(remaining_interpolation: &remaining_interpolation, expr: expr)
         }
         if returnType == .interpolation || remaining_interpolation > 0 {
             if !string.contains("\\(") {
@@ -285,26 +279,32 @@ private extension HTMLElement {
         }
         return (string, returnType)
     }
-    static func flatten_interpolation(string: inout String, remaining_interpolation: inout Int, expr: ExpressionSegmentSyntax) -> Bool { // TODO: can still be improved ("\(description \(title))" doesn't get flattened)
+    static func flatten_interpolation(remaining_interpolation: inout Int, expr: ExpressionSegmentSyntax) -> String {
         let expression:ExprSyntax = expr.expressions.first!.expression
-        if let list:StringLiteralSegmentListSyntax = expression.stringLiteral?.segments {
-            for segment in list {
-                if let expr:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                    remaining_interpolation += 1
-                    if flatten_interpolation(string: &string, remaining_interpolation: &remaining_interpolation, expr: expr) {
-                        remaining_interpolation -= 1
+        var string:String = "\(expr)"
+        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
+            let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
+            if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
+                remaining_interpolation = 0
+                string = segments.map({ $0.as(StringSegmentSyntax.self)!.content.text }).joined()
+            } else {
+                var values:[String] = []
+                for segment in segments {
+                    if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
+                        values.append(literal)
+                    } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
+                        values.append(flatten_interpolation(remaining_interpolation: &remaining_interpolation, expr: interpolation))
+                    } else {
+                        values.append("\(segment)")
                     }
-                } else if let fix:String = segment.as(StringSegmentSyntax.self)?.content.text {
-                    string.replace("\(expr)", with: fix)
-                    remaining_interpolation -= 1
                 }
+                string = values.joined()
             }
-        }
-        if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
+        } else if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
+            remaining_interpolation -= string.ranges(of: "\(expr)").count
             string.replace("\(expr)", with: fix)
-            return true
         }
-        return false
+        return string
     }
 }
 
