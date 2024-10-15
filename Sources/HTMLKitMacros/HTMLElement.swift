@@ -73,18 +73,11 @@ struct HTMLElement : ExpressionMacro {
             #endif
 
             #if canImport(NIOCore)
-            case .byteBuffer: return "ByteBuffer(string: \(raw: string))"
+            case .byteBuffer: return "ByteBuffer(string: \"\(raw: string)\")"
             #endif
 
             default: return "\"\(raw: string)\""
         }
-    }
-}
-
-extension HTMLDataRepresentation {
-    enum Result {
-        case string(String)
-        case uint8Array([UInt8])
     }
 }
 

@@ -43,7 +43,7 @@ struct HTMLKitTests {
 }
 
 extension HTMLKitTests {
-    func representation1() {
+    func representations() {
         let _:StaticString = #html(representation: .string)
         let _:String = #html(representation: .string)
         let _:[UInt8] = #html(representation: .uint8Array)
@@ -52,25 +52,25 @@ extension HTMLKitTests {
         let _:Data = #html(representation: .data)
         #endif
         #if canImport(NIOCore)
-        let _:[ByteBuffer] = #html(representation: .byteBuffer)
+        let _:ByteBuffer = #html(representation: .byteBuffer)
         #endif
     }
-    func representation2() -> StaticString {
+    func representation1() -> StaticString {
         #html()
     }
-    func representation3() -> String {
+    func representation2() -> String {
         #html()
     }
-    func representation4() -> [UInt8] {
+    func representation3() -> [UInt8] {
         #html()
     }
     #if canImport(Foundation)
-    func representation5() -> Data {
+    func representation4() -> Data {
         #html()
     }
     #endif
     #if canImport(NIOCore)
-    func representation6() -> ByteBuffer {
+    func representation5() -> ByteBuffer {
         #html()
     }
     #endif
