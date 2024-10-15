@@ -12,7 +12,7 @@ struct HTMLKitTests {
     @Test func escape_html() {
         let unescaped:String = "<!DOCTYPE html><html>Test</html>"
         let escaped:String = "&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;"
-        let expected_result:String = "<p>\(escaped)</p>"
+        var expected_result:String = "<p>\(escaped)</p>"
 
         var string:String = #p("<!DOCTYPE html><html>Test</html>")
         #expect(string == expected_result)
@@ -24,6 +24,16 @@ struct HTMLKitTests {
         #expect(string == expected_result)
 
         string = #p("\(unescaped.escapingHTML(escapeAttributes: false))")
+        #expect(string == expected_result)
+
+        expected_result = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
+        string = #div(attributes: [.title(StaticString("<p>"))], StaticString("<p></p>")).description
+        #expect(string == expected_result)
+
+        string = #div(attributes: [.title("<p>")], StaticString("<p></p>")).description
+        #expect(string == expected_result)
+
+        string = #div(attributes: [.title("<p>")], "<p></p>")
         #expect(string == expected_result)
     }
 }
