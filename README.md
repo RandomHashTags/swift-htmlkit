@@ -11,7 +11,6 @@ Write HTML using Swift Macros.
   - [Dynamic](#dynamic)
   - [Conclusion](#conclusion)
 - [Contributing](#contributing)
-- [Funding](#funding)
 
 ## Why
 - Swift Macros are powerful, efficient and essentially removes any runtime overhead
@@ -89,9 +88,9 @@ If you're working with **runtime** data:
 - `<string>.escapeHTMLAttributes()`
   - mutates `self` escaping only attribute characters
 - `<string>.escapingHTML(escapeAttributes:)`
-  - creates a copy of `self` escaping HTML and, optionally, attribute characters
+  - returns a copy of `self` escaping HTML and, optionally, attribute characters
 - `<string>.escapingHTMLAttributes()`
-  - creates a copy of `self` escaping only attribute characters
+  - returns a copy of `self` escaping only attribute characters
 
 </details>
 

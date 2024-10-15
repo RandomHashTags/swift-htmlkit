@@ -8,6 +8,10 @@
 import Testing
 import HTMLKit
 
+#if canImport(Foundation)
+import Foundation
+#endif
+
 struct HTMLKitTests {
     @Test func escape_html() {
         let unescaped:String = "<!DOCTYPE html><html>Test</html>"
@@ -36,6 +40,40 @@ struct HTMLKitTests {
         string = #div(attributes: [.title("<p>")], "<p></p>")
         #expect(string == expected_result)
     }
+}
+
+extension HTMLKitTests {
+    func representation1() {
+        let _:StaticString = #html(representation: .string)
+        let _:String = #html(representation: .string)
+        let _:[UInt8] = #html(representation: .uint8Array)
+        let _:[UInt16] = #html(representation: .uint16Array)
+        #if canImport(Foundation)
+        let _:Data = #html(representation: .data)
+        #endif
+        #if canImport(NIOCore)
+        let _:[ByteBuffer] = #html(representation: .byteBuffer)
+        #endif
+    }
+    func representation2() -> StaticString {
+        #html()
+    }
+    func representation3() -> String {
+        #html()
+    }
+    func representation4() -> [UInt8] {
+        #html()
+    }
+    #if canImport(Foundation)
+    func representation5() -> Data {
+        #html()
+    }
+    #endif
+    #if canImport(NIOCore)
+    func representation6() -> ByteBuffer {
+        #html()
+    }
+    #endif
 }
 
 extension HTMLKitTests {
@@ -195,10 +233,10 @@ extension HTMLKitTests {
 
     @Test func no_value_type() {
         let expected_string:String = "<!DOCTYPE html><html><body><h1>HTMLKitTests</h1></body></html>"
-        let test1 = #html(#body(#h1("HTMLKitTests")))
+        let test1:String = #html(#body(#h1("HTMLKitTests")))
         #expect(type(of: test1) == String.self)
         #expect(test1 == expected_string)
-        let test2 = #html(#body(#h1(StaticString("HTMLKitTests"))))
+        let test2:StaticString = #html(#body(#h1(StaticString("HTMLKitTests"))))
         #expect(type(of: test2) == StaticString.self)
         #expect(test2 == expected_string)
     }

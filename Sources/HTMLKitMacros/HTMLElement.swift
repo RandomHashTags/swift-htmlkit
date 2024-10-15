@@ -10,9 +10,81 @@ import SwiftSyntaxMacros
 import SwiftDiagnostics
 import HTMLKitUtilities
 
+#if canImport(Foundation)
+import struct Foundation.Data
+#endif
+
+#if canImport(NIOCore)
+import struct NIOCore.ByteBuffer
+#endif
+
 struct HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        return "\"\(raw: parse_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!))\""
+        var representation:HTMLDataRepresentation
+        if let declared:String = node.arguments.children(viewMode: .all).first(where: { $0.labeled?.label?.text == "representation" })?.labeled?.expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
+            //context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "test", message: context.lexicalContext.last!.debugDescription)))
+            representation = HTMLDataRepresentation(rawValue: declared) ?? .string
+        } else {
+            representation = .string
+            //context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "test", message: context.lexicalContext.last!.debugDescription)))
+            if let returnClause:ReturnClauseSyntax = context.lexicalContext.first?.as(FunctionDeclSyntax.self)?.signature.returnClause {
+                if let array_type:String = returnClause.type.as(ArrayTypeSyntax.self)?.element.as(IdentifierTypeSyntax.self)?.name.text {
+                    switch array_type {
+                        case "UInt8":
+                            representation = .uint8Array
+                            break
+                        case "UInt16":
+                            representation = .uint16Array
+                            break
+                        default:
+                            break
+                    }
+                } else if let id:String = returnClause.type.as(IdentifierTypeSyntax.self)?.name.text {
+                    switch id {
+                        case "Data":
+                            #if canImport(Foundation)
+                            representation = .data
+                            #endif
+                            break
+                        case "ByteBuffer":
+                            #if canImport(NIOCore)
+                            representation = .byteBuffer
+                            #endif
+                            break
+                        default:
+                            break
+                    }
+                }
+            } else {
+                //context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "test", message: context.lexicalContext.first!.debugDescription)))
+            }
+        }
+        let string:String = parse_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!)
+        // TODO: check for interpolation
+        func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
+            return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
+        }
+        switch representation {
+            case .uint8Array: return "\(raw: bytes([UInt8](string.utf8)))"
+            case .uint16Array: return "\(raw: bytes([UInt16](string.utf16)))"
+
+            #if canImport(Foundation)
+            case .data: return "Data(\(raw: bytes([UInt8](string.utf8))))"
+            #endif
+
+            #if canImport(NIOCore)
+            case .byteBuffer: return "ByteBuffer(string: \(raw: string))"
+            #endif
+
+            default: return "\"\(raw: string)\""
+        }
+    }
+}
+
+extension HTMLDataRepresentation {
+    enum Result {
+        case string(String)
+        case uint8Array([UInt8])
     }
 }
 
@@ -50,7 +122,8 @@ private extension HTMLElement {
         for element in children {
             if let child:LabeledExprSyntax = element.labeled {
                 if var key:String = child.label?.text {
-                    if key == "attributes" {
+                    if key == "representation" { // we don't care
+                    } else if key == "attributes" {
                         attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!))
                     } else {
                         if key == "acceptCharset" {

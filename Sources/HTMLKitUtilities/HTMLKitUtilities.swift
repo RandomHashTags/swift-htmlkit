@@ -5,6 +5,30 @@
 //  Created by Evan Anderson on 9/19/24.
 //
 
+// MARK: Data Representation
+/// Determines what value type the HTML is compiled to.
+public enum HTMLDataRepresentation : String {
+    // native Swift
+    /// the raw compiled `StaticString`/`String`
+    case string
+    /// converts the compiled output to `[UInt8]` using utf8 encoding
+    case uint8Array
+    /// converts the compiled output to `[UInt16]` using utf16 encoding
+    case uint16Array
+
+    // Foundation
+    #if canImport(Foundation)
+    /// converts the compiled output to `Data` using utf8 encoding
+    case data
+    #endif
+
+    // NIOCore
+    #if canImport(NIOCore)
+    /// converts the compiled output to `ByteBuffer` using utf8 encoding
+    case byteBuffer
+    #endif
+}
+
 // MARK: Escape HTML
 public extension String {
     /// Escapes all occurrences of source-breaking HTML characters
