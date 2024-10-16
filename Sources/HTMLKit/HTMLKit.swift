@@ -12,9 +12,9 @@ import struct Foundation.Data
 #endif
 
 
-#if canImport(NIOCore)
-import struct Foundation.ByteBuffer
-#endif
+/*#if canImport(NIOCore)
+import struct NIOCore.ByteBuffer
+#endif*/
 
 // MARK: StaticString equality
 public extension StaticString {
@@ -48,10 +48,10 @@ public macro htmlUTF8CString<T: ExpressibleByStringLiteral>(attributes: [HTMLEle
 public macro htmlData<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> Data = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 #endif
 
-#if canImport(NIOCore)
+/*#if canImport(NIOCore)
 @freestanding(expression)
 public macro htmlByteBuffer<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> ByteBuffer = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
-#endif
+#endif*/
 
 // MARK: Elements
 

@@ -14,9 +14,9 @@ import HTMLKitUtilities
 import struct Foundation.Data
 #endif
 
-#if canImport(NIOCore)
+/*#if canImport(NIOCore)
 import struct NIOCore.ByteBuffer
-#endif
+#endif*/
 
 enum HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
@@ -27,9 +27,9 @@ enum HTMLElement : ExpressionMacro {
         set.insert(.htmlData)
         #endif
 
-        #if canImport(NIOCore)
+        /*#if canImport(NIOCore)
         set.insert(.htmlByteBuffer)
-        #endif
+        #endif*/
 
         if set.contains(HTMLElementType(rawValue: node.macroName.text)) {
             let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
@@ -53,10 +53,10 @@ enum HTMLElement : ExpressionMacro {
                     return "Data(\(raw: bytes([UInt8](string.utf8))))"
                 #endif
 
-                #if canImport(NIOCore)
+                /*#if canImport(NIOCore)
                 case .htmlByteBuffer:
                     return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
-                #endif
+                #endif*/
 
                 default: break
             }
@@ -373,9 +373,9 @@ enum HTMLElementType : String, CaseIterable {
     case htmlData
     #endif
 
-    #if canImport(NIOCore)
+    /*#if canImport(NIOCore)
     case htmlByteBuffer
-    #endif
+    #endif*/
     
     case a
     case abbr
