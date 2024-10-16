@@ -21,30 +21,47 @@ import struct NIOCore.ByteBuffer
 enum HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         let string:String = parse_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!)
-        // TODO: check for interpolation
-        func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
-            return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
+        let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
+        var set:Set<HTMLElementType?> = [.htmlUTF8Bytes, .htmlUTF16Bytes, .htmlUTF8CString]
+
+        #if canImport(Foundation)
+        set.insert(.htmlData)
+        #endif
+
+        #if canImport(NIOCore)
+        set.insert(.htmlByteBuffer)
+        #endif
+
+        if set.contains(HTMLElementType(rawValue: node.macroName.text)) {
+            guard !has_interpolation else {
+                context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
+                return ""
+            }
+            func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
+                return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
+            }
+            switch HTMLElementType(rawValue: node.macroName.text) {
+                case .htmlUTF8Bytes:
+                    return "\(raw: bytes([UInt8](string.utf8)))"
+                case .htmlUTF16Bytes:
+                    return "\(raw: bytes([UInt16](string.utf16)))"
+                case .htmlUTF8CString:
+                    return "\(raw: string.utf8CString)"
+
+                #if canImport(Foundation)
+                case .htmlData:
+                    return "Data(\(raw: bytes([UInt8](string.utf8))))"
+                #endif
+
+                #if canImport(NIOCore)
+                case .htmlByteBuffer:
+                    return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
+                #endif
+
+                default: break
+            }
         }
-        switch HTMLElementType(rawValue: node.macroName.text) {
-            case .htmlUTF8Bytes:
-                return "\(raw: bytes([UInt8](string.utf8)))"
-            case .htmlUTF16Bytes:
-                return "\(raw: bytes([UInt16](string.utf16)))"
-            case .htmlUTF8CString:
-                return "\(raw: string.utf8CString)"
-
-            #if canImport(Foundation)
-            case .htmlData:
-                return "Data(\(raw: bytes([UInt8](string.utf8))))"
-            #endif
-
-            #if canImport(NIOCore)
-            case .htmlByteBuffer:
-                return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
-            #endif
-
-            default: return "\"\(raw: string)\""
-        }
+        return "\"\(raw: string)\""
     }
 }
 

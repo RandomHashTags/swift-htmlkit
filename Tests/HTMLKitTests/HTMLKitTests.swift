@@ -59,6 +59,9 @@ extension HTMLKitTests {
         #if canImport(NIOCore)
         let _:ByteBuffer = #htmlByteBuffer("")
         #endif
+
+        //let bro:String = ""
+        //let _:[UInt8] = #htmlUTF8Bytes("\(bro)")
     }
     func representation1() -> StaticString {
         #html()
@@ -244,10 +247,10 @@ extension HTMLKitTests {
 
     @Test func no_value_type() {
         let expected_string:String = "<!DOCTYPE html><html><body><h1>HTMLKitTests</h1></body></html>"
-        let test1:String = #html(#body(#h1("HTMLKitTests")))
+        let test1 = #html(#body(#h1("HTMLKitTests")))
         #expect(type(of: test1) == String.self)
         #expect(test1 == expected_string)
-        let test2:StaticString = #html(#body(#h1(StaticString("HTMLKitTests"))))
+        let test2 = #html(#body(#h1(StaticString("HTMLKitTests"))))
         #expect(type(of: test2) == StaticString.self)
         #expect(test2 == expected_string)
     }
