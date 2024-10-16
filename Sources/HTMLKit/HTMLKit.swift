@@ -7,13 +7,22 @@
 
 import HTMLKitUtilities
 
+#if canImport(Foundation)
+import struct Foundation.Data
+#endif
+
+
+#if canImport(NIOCore)
+import struct Foundation.ByteBuffer
+#endif
+
 // MARK: StaticString equality
 public extension StaticString {
     static func == (left: Self, right: Self) -> Bool { left.description == right.description }
     static func != (left: Self, right: Self) -> Bool { left.description != right.description }
 }
-// MARK: StaticString == String equality
-public extension String {
+// MARK: StaticString and StringProtocol equality
+public extension StringProtocol {
     static func == (left: Self, right: StaticString) -> Bool { left == right.description }
     static func == (left: StaticString, right: Self) -> Bool { left.description == right }
 }
@@ -21,9 +30,30 @@ public extension String {
 @freestanding(expression)
 public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
-// MARK: Elements
+// MARK: HTML Representation
 @freestanding(expression)
-public macro html<V>(representation: HTMLDataRepresentation = .string, attributes: [HTMLElementAttribute] = [], xmlns: (any ExpressibleByStringLiteral)? = nil, _ innerHTML: any ExpressibleByStringLiteral...) -> V = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro html<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+
+@freestanding(expression)
+public macro htmlUTF8Bytes<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> [UInt8] = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+
+@freestanding(expression)
+public macro htmlUTF16Bytes<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> [UInt16] = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+
+@freestanding(expression)
+public macro htmlUTF8CString<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> ContiguousArray<CChar> = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+
+#if canImport(Foundation)
+@freestanding(expression)
+public macro htmlData<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> Data = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+#endif
+
+#if canImport(NIOCore)
+@freestanding(expression)
+public macro htmlByteBuffer<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> ByteBuffer = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+#endif
+
+// MARK: Elements
 
 @freestanding(expression)
 public macro custom<T: ExpressibleByStringLiteral>(tag: String, isVoid: Bool, attributes: [HTMLElementAttribute] = [], _ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")

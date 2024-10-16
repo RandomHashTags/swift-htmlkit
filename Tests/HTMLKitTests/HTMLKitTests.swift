@@ -9,7 +9,11 @@ import Testing
 import HTMLKit
 
 #if canImport(Foundation)
-import Foundation
+import struct Foundation.Data
+#endif
+
+#if canImport(NIOCore)
+import struct NIOCore.ByteBuffer
 #endif
 
 struct HTMLKitTests {
@@ -44,15 +48,16 @@ struct HTMLKitTests {
 
 extension HTMLKitTests {
     func representations() {
-        let _:StaticString = #html(representation: .string)
-        let _:String = #html(representation: .string)
-        let _:[UInt8] = #html(representation: .uint8Array)
-        let _:[UInt16] = #html(representation: .uint16Array)
+        let _:StaticString = #html()
+        let _:String = #html()
+        let _:[UInt8] = #htmlUTF8Bytes("")
+        let _:[UInt16] = #htmlUTF16Bytes("")
+        let _:ContiguousArray<CChar> = #htmlUTF8CString("")
         #if canImport(Foundation)
-        let _:Data = #html(representation: .data)
+        let _:Data = #htmlData("")
         #endif
         #if canImport(NIOCore)
-        let _:ByteBuffer = #html(representation: .byteBuffer)
+        let _:ByteBuffer = #htmlByteBuffer("")
         #endif
     }
     func representation1() -> StaticString {
@@ -62,16 +67,22 @@ extension HTMLKitTests {
         #html()
     }
     func representation3() -> [UInt8] {
-        #html()
+        #htmlUTF8Bytes("")
+    }
+    func representation4() -> [UInt16] {
+        #htmlUTF16Bytes("")
+    }
+    func representation5() -> ContiguousArray<CChar> {
+        #htmlUTF8CString("")
     }
     #if canImport(Foundation)
-    func representation4() -> Data {
-        #html()
+    func representation5() -> Data {
+        #htmlData("")
     }
     #endif
     #if canImport(NIOCore)
-    func representation5() -> ByteBuffer {
-        #html()
+    func representation6() -> ByteBuffer {
+        #htmlByteBuffer("")
     }
     #endif
 }

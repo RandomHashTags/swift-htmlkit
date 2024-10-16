@@ -18,62 +18,29 @@ import struct Foundation.Data
 import struct NIOCore.ByteBuffer
 #endif
 
-struct HTMLElement : ExpressionMacro {
+enum HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        var representation:HTMLDataRepresentation
-        if let declared:String = node.arguments.children(viewMode: .all).first(where: { $0.labeled?.label?.text == "representation" })?.labeled?.expression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
-            //context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "test", message: context.lexicalContext.last!.debugDescription)))
-            representation = HTMLDataRepresentation(rawValue: declared) ?? .string
-        } else {
-            representation = .string
-            //context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "test", message: context.lexicalContext.last!.debugDescription)))
-            if let returnClause:ReturnClauseSyntax = context.lexicalContext.first?.as(FunctionDeclSyntax.self)?.signature.returnClause {
-                if let array_type:String = returnClause.type.as(ArrayTypeSyntax.self)?.element.as(IdentifierTypeSyntax.self)?.name.text {
-                    switch array_type {
-                        case "UInt8":
-                            representation = .uint8Array
-                            break
-                        case "UInt16":
-                            representation = .uint16Array
-                            break
-                        default:
-                            break
-                    }
-                } else if let id:String = returnClause.type.as(IdentifierTypeSyntax.self)?.name.text {
-                    switch id {
-                        case "Data":
-                            #if canImport(Foundation)
-                            representation = .data
-                            #endif
-                            break
-                        case "ByteBuffer":
-                            #if canImport(NIOCore)
-                            representation = .byteBuffer
-                            #endif
-                            break
-                        default:
-                            break
-                    }
-                }
-            } else {
-                //context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "test", message: context.lexicalContext.first!.debugDescription)))
-            }
-        }
         let string:String = parse_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!)
         // TODO: check for interpolation
         func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
             return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
         }
-        switch representation {
-            case .uint8Array: return "\(raw: bytes([UInt8](string.utf8)))"
-            case .uint16Array: return "\(raw: bytes([UInt16](string.utf16)))"
+        switch HTMLElementType(rawValue: node.macroName.text) {
+            case .htmlUTF8Bytes:
+                return "\(raw: bytes([UInt8](string.utf8)))"
+            case .htmlUTF16Bytes:
+                return "\(raw: bytes([UInt16](string.utf16)))"
+            case .htmlUTF8CString:
+                return "\(raw: string.utf8CString)"
 
             #if canImport(Foundation)
-            case .data: return "Data(\(raw: bytes([UInt8](string.utf8))))"
+            case .htmlData:
+                return "Data(\(raw: bytes([UInt8](string.utf8))))"
             #endif
 
             #if canImport(NIOCore)
-            case .byteBuffer: return "ByteBuffer(string: \"\(raw: string)\")"
+            case .htmlByteBuffer:
+                return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
             #endif
 
             default: return "\"\(raw: string)\""
@@ -99,12 +66,12 @@ private extension HTMLElement {
             children = childs.dropFirst() // tag
             children.removeFirst() // isVoid
         } else {
-            tag = elementType.rawValue
+            tag = elementType.rawValue.starts(with: "html") ? "html" : elementType.rawValue
             isVoid = elementType.isVoid
             children = childs.prefix(childs.count)
         }
         let data:ElementData = parse_arguments(context: context, elementType: elementType, children: children)
-        var string:String = (elementType == .html ? "<!DOCTYPE html>" : "") + "<" + tag + data.attributes + ">" + data.innerHTML
+        var string:String = (tag == "html" ? "<!DOCTYPE html>" : "") + "<" + tag + data.attributes + ">" + data.innerHTML
         if !isVoid {
             string += "</" + tag + ">"
         }
@@ -115,7 +82,7 @@ private extension HTMLElement {
         for element in children {
             if let child:LabeledExprSyntax = element.labeled {
                 if var key:String = child.label?.text {
-                    if key == "representation" { // we don't care
+                    if key == "dataType" { // HTMLDataRepresentation; we don't care
                     } else if key == "attributes" {
                         attributes.append(contentsOf: parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!))
                     } else {
@@ -387,8 +354,17 @@ enum LiteralReturnType {
 // MARK: HTMLElementType
 enum HTMLElementType : String, CaseIterable {
     case escapeHTML
-    case html
     case custom
+
+    case html, htmlUTF8Bytes, htmlUTF16Bytes, htmlUTF8CString
+    
+    #if canImport(Foundation)
+    case htmlData
+    #endif
+
+    #if canImport(NIOCore)
+    case htmlByteBuffer
+    #endif
     
     case a
     case abbr
