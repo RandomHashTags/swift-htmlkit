@@ -99,8 +99,11 @@ extension HTMLKitTests {
         #expect(string == "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
     @Test func element_area() {
-        let string:StaticString = #area(coords: [1, 2, 3])
+        var string:StaticString = #area(coords: [1, 2, 3])
         #expect(string == "<area coords=\"1,2,3\">")
+
+        string = #area(coords: [])
+        #expect(string == "<area>")
     }
     @Test func element_audio() {
         let string:StaticString = #audio(controlslist: .nodownload)
@@ -291,9 +294,12 @@ extension HTMLKitTests {
             rel: ["lets go"],
             sizes: ["lets,go"]
         )
-        let bro:String = "yup"
+        var bro:String = "yup"
         let _:String = #a(bro)
         let _:String = #div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")])
+
+        let test:[Int] = [1]
+        bro = #area(coords: test)
     }*/
 }
 
