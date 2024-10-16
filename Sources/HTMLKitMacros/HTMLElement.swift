@@ -20,8 +20,7 @@ import struct NIOCore.ByteBuffer
 
 enum HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        let string:String = parse_macro(context: context, expression: node.as(MacroExpansionExprSyntax.self)!)
-        let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
+        let string:String = parse_macro(context: context, expression: node.macroExpansion!)
         var set:Set<HTMLElementType?> = [.htmlUTF8Bytes, .htmlUTF16Bytes, .htmlUTF8CString]
 
         #if canImport(Foundation)
@@ -33,6 +32,7 @@ enum HTMLElement : ExpressionMacro {
         #endif
 
         if set.contains(HTMLElementType(rawValue: node.macroName.text)) {
+            let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !has_interpolation else {
                 context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
                 return ""
@@ -66,6 +66,7 @@ enum HTMLElement : ExpressionMacro {
 }
 
 private extension HTMLElement {
+    // MARK: Parse Macro
     static func parse_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax) -> String {
         guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
         let childs:SyntaxChildren = expression.arguments.children(viewMode: .all)
@@ -94,6 +95,7 @@ private extension HTMLElement {
         }
         return string
     }
+    // MARK: Parse Arguments
     static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> ElementData {
         var attributes:[String] = [], innerHTML:[String] = []
         for element in children {
@@ -118,6 +120,7 @@ private extension HTMLElement {
         }
         return ElementData(attributes: attributes, innerHTML: innerHTML)
     }
+    // MARK: Parse Global Attributes
     static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayExprSyntax) -> [String] {
         var keys:Set<String> = [], attributes:[String] = []
         for element in array.elements {
@@ -125,7 +128,7 @@ private extension HTMLElement {
             var key:String = function.calledExpression.memberAccess!.declName.baseName.text, value:String? = nil
             switch key {
                 case "custom", "data":
-                    var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: function.arguments.last!)!
+                    var (literalValue, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression)!
                     if returnType == .string {
                         literalValue.escapeHTML(escapeAttributes: true)
                     }
@@ -138,7 +141,7 @@ private extension HTMLElement {
                     break
                 case "event":
                     key = "on" + key_element.memberAccess!.declName.baseName.text
-                    if var result:(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: function.arguments.last!) {
+                    if var result:(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression) {
                         if result.1 == .string {
                             result.0.escapeHTML(escapeAttributes: true)
                         }
@@ -167,6 +170,7 @@ private extension HTMLElement {
         }
         return attributes
     }
+    // MARK: Parse innerHTML
     static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
         if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
             var string:String = parse_macro(context: context, expression: macro)
@@ -174,7 +178,7 @@ private extension HTMLElement {
                 string.escapeHTML(escapeAttributes: false)
             }
             return string
-        } else if var string:String = parse_literal_value(context: context, elementType: elementType, key: "", argument: child)?.value {
+        } else if var string:String = parse_literal_value(context: context, elementType: elementType, key: "", expression: child.expression)?.value {
             string.escapeHTML(escapeAttributes: false)
             return string
         } else {
@@ -184,7 +188,7 @@ private extension HTMLElement {
     }
     static func unallowed_expression(context: some MacroExpansionContext, node: LabeledExprSyntax) {
         context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unallowedExpression", message: "String Interpolation is required when encoding runtime values."), fixIts: [
-            FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation.", severity: .error), changes: [
+            FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation."), changes: [
                 FixIt.Change.replace(
                     oldNode: Syntax(node),
                     newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(node))"))
@@ -212,9 +216,10 @@ private extension HTMLElement {
         }
     }
     
+    // MARK: Parse Attribute
     static func parse_attribute(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, argument: LabeledExprSyntax) -> String? {
         let expression:ExprSyntax = argument.expression
-        if var result:(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, argument: argument) {
+        if var result:(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: expression) {
             switch result.1 {
             case .boolean: return result.0.elementsEqual("true") ? "" : nil
             case .string:
@@ -233,26 +238,14 @@ private extension HTMLElement {
         }
         return nil
     }
-    static func get_separator(key: String) -> String {
-        switch key {
-            case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset": return ","
-            default: return " "
-        }
-    }
-    static func parse_literal_value(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, argument: LabeledExprSyntax) -> (value: String, returnType: LiteralReturnType)? {
-        let expression:ExprSyntax = argument.expression
+    // MARK: Parse Literal Value
+    static func parse_literal_value(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, expression: ExprSyntax) -> (value: String, returnType: LiteralReturnType)? {
         if let boolean:String = expression.booleanLiteral?.literal.text {
             return (boolean, .boolean)
         }
         func return_string_or_interpolation() -> (String, LiteralReturnType)? {
-            if let string:String = expression.stringLiteral?.string {
+            if let string:String = expression.stringLiteral?.string ?? expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
                 return (string, .string)
-            }
-            if let integer:String = expression.integerLiteral?.literal.text {
-                return (integer, .string)
-            }
-            if let float:String = expression.floatLiteral?.literal.text {
-                return (float, .string)
             }
             if let function:FunctionCallExprSyntax = expression.as(FunctionCallExprSyntax.self) {
                 switch key {
@@ -276,29 +269,32 @@ private extension HTMLElement {
                     return (HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: decl), .string)
                 }
             }
-            let separator:String = get_separator(key: key)
-            let string_return_logic:(ExprSyntax, String) -> String = {
-                if $1.contains(separator) {
-                    context.diagnose(Diagnostic(node: $0, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"" + separator + "\" is not allowed when declaring values for \"" + key + "\".")))
+            if let array:ArrayExprSyntax = expression.array {
+                let separator:String
+                switch key {
+                    case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
+                        separator = ","
+                        break
+                    default:
+                        separator = " "
+                        break
                 }
-                return $1
-            }
-            if let value:String = expression.array?.elements.compactMap({
-                if let string:String = $0.expression.stringLiteral?.string {
-                    return string_return_logic($0.expression, string)
-                }
-                if let string:String = $0.expression.integerLiteral?.literal.text {
-                    return string
-                }
-                if let string:String = $0.expression.floatLiteral?.literal.text {
-                    return string
-                }
-                if let string:String = $0.expression.memberAccess?.declName.baseName.text {
-                    return HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
-                }
-                return nil
-            }).joined(separator: separator) {
-                return (value, .string)
+                return (array.elements.compactMap({
+                    if let string:String = $0.expression.stringLiteral?.string {
+                        if string.contains(separator) {
+                            context.diagnose(Diagnostic(node: $0.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"" + separator + "\" is not allowed when declaring values for \"" + key + "\".")))
+                            return nil
+                        }
+                        return string
+                    }
+                    if let string:String = $0.expression.integerLiteral?.literal.text ?? $0.expression.floatLiteral?.literal.text {
+                        return string
+                    }
+                    if let string:String = $0.expression.memberAccess?.declName.baseName.text {
+                        return HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string)
+                    }
+                    return nil
+                }).joined(separator: separator), .string)
             }
             return nil
         }
@@ -320,6 +316,7 @@ private extension HTMLElement {
         }
         return (string, returnType)
     }
+    // MARK: Flatten Interpolation
     static func flatten_interpolation(context: some MacroExpansionContext, remaining_interpolation: inout Int, expr: ExpressionSegmentSyntax) -> String {
         let expression:ExprSyntax = expr.expressions.first!.expression
         var string:String = "\(expr)"
@@ -525,7 +522,7 @@ enum HTMLElementType : String, CaseIterable {
 }
 
 // MARK: Misc
-extension ExprSyntax {
+extension SyntaxProtocol {
     var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
     var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
     var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
