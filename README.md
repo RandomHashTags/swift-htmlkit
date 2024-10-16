@@ -3,7 +3,7 @@ Write HTML using Swift Macros.
 <a href="https://swift.org"><img src="https://img.shields.io/badge/Swift-5.9+-orange" alt="Requires at least Swift 5.9"></a> <img src="https://img.shields.io/badge/Platforms-Any-gold"> <a href="https://github.com/RandomHashTags/swift-htmlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="Apache 2.0 License">
 
 - [Why](#why)
-- [Examples](#examples)
+- [Usage](#usage)
   - [Basic](#basic)
   - [Advanced](#advanced)
 - [Benchmarks](#benchmarks)
@@ -17,7 +17,7 @@ Write HTML using Swift Macros.
 - Alternative libraries may not fit all situations and may restrict how the html is generated, manipulated, prone to human error, or cost a constant performance overhead (middleware, rendering, result builders, etc)
 - HTML macros enforce safety, can be used anywhere, and compile directly to strings
 - The output is minified at no performance cost
-## Examples
+## Usage
 ### Basic
 <details>
 <summary>How do I use this library?</summary>
@@ -83,6 +83,9 @@ If you know the data **at compile time** (and not working with HTML macros):
 - `#escapeHTML()` macro
 
 If you're working with **runtime** data:
+
+> \>\>\> !! You need to `import HTMLKitUtilities` to use these functions !! <<<
+
 - `<string>.escapeHTML(escapeAttributes:)`
   - mutates `self` escaping HTML and, optionally, attribute characters
 - `<string>.escapeHTMLAttributes()`
@@ -170,6 +173,19 @@ Use the `HTMLElementAttribute.event(<type>, "<value>")`.
 ```swift
 #div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()")])
 ```
+</details>
+
+<details>
+<summary>I need the output as a different type!</summary>
+
+Use a different html macro. Currently supported types (more to come with new language features):
+- `#html()` -> `String`/`StaticString`
+- `#htmlUTF8Bytes()` -> `[UInt8]`
+- `#htmlUTF16Bytes()` -> `[UInt16]`
+- `#htmlUTF8CString()` -> `ContiguousArray<CChar>`
+- `#htmlData()` -> `Foundation.Data`
+- `#htmlByteBuffer()` -> `NIOCore.ByteBuffer`
+
 </details>
 
 ## Benchmarks

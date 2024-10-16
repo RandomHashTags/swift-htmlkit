@@ -16,6 +16,7 @@ import struct Foundation.Data
 import struct NIOCore.ByteBuffer
 #endif
 
+// MARK: Escaping HTML
 struct HTMLKitTests {
     @Test func escape_html() {
         let unescaped:String = "<!DOCTYPE html><html>Test</html>"
@@ -46,6 +47,7 @@ struct HTMLKitTests {
     }
 }
 
+// MARK: Representations
 extension HTMLKitTests {
     func representations() {
         let _:StaticString = #html()
@@ -90,6 +92,7 @@ extension HTMLKitTests {
     #endif
 }
 
+// MARK: Element tests
 extension HTMLKitTests {
     @Test func element_html() {
         var string:StaticString = #html()
@@ -238,6 +241,7 @@ extension HTMLKitTests {
     }
 }
 
+// MARK: Misc element tests
 extension HTMLKitTests {
     @Test func recursive_elements() {
         let string:StaticString = #div(
@@ -303,6 +307,7 @@ extension HTMLKitTests {
     }*/
 }
 
+// MARK: Attribute tests
 extension HTMLKitTests {
     @Test func attribute_data() {
         let string:StaticString = #div(attributes: [.data("id", "5")])
@@ -328,6 +333,7 @@ extension HTMLKitTests {
     }
 }
 
+// MARK: 3rd party tests
 extension HTMLKitTests {
     enum Shrek : String {
         case isLove, isLife
@@ -371,6 +377,7 @@ extension HTMLKitTests {
     }
 }
 
+// MARK: StaticString Example
 extension HTMLKitTests {
     @Test func example_1() {
         let test:StaticString = #html(
@@ -401,6 +408,7 @@ extension HTMLKitTests {
     }
 }
 
+// MARK: Dynamic test
 extension HTMLKitTests {
     @Test func dynamic() {
         let charset:String = "utf-8", title:String = "Dynamic"
@@ -429,6 +437,7 @@ extension HTMLKitTests {
     }
 }
 
+// MARK: Example2
 extension HTMLKitTests {
     @Test func example2() {
         var test:TestStruct = TestStruct(name: "one", array: ["1", "2", "3"])
