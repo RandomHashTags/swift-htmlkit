@@ -14,27 +14,31 @@ package struct ElementaryTests : HTMLGenerator {
     package func staticHTML() -> String {
         StaticView().render()
     }
+
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        DynamicView(context: context).rawHTML.render()
+        DynamicView(context: context).render()
     }
 }
 
-struct StaticView : HTMLDocument {
-    var title:String = "StaticView"
-
-    var head : some HTML {
-        ""
-    }
-    var body : some HTML {
-        h1 { "Swift HTML Benchmarks" }
+struct StaticView: HTML {
+    var content: some HTML {
+        HTMLRaw("<!DOCTYPE html>")
+        html {
+            head {
+                title { "StaticView" }
+            }
+            body {
+                h1 { "Swift HTML Benchmarks" }
+            }
+        }
     }
 }
 
-struct DynamicView { 
+struct DynamicView: HTML { 
     let context:HTMLContext
 
     // Elementary puts the title element first in the head, which is wrong; it needs to be charset | this is a workaround
-    @HTMLBuilder var rawHTML : some HTML {
+    var content : some HTML {
         HTMLRaw("<!DOCTYPE html>")
         html {
             head {
@@ -45,12 +49,12 @@ struct DynamicView {
             }
             body {
                 h1 { context.heading }
-                div(attributes: [.id(context.desc_id)]) {
+                div(.id(context.desc_id)) {
                     p { context.string }
                 }
                 h2 { context.user.details_heading }
                 h3 { context.user.qualities_heading }
-                ul(attributes: [.id(context.user.qualities_id)]) {
+                ul(.id(context.user.qualities_id)) {
                     for quality in context.user.qualities {
                         li { quality }
                     }
