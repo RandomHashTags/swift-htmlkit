@@ -12,6 +12,17 @@ package struct ElementaryTests : HTMLGenerator {
     package init() {}
     
     package func staticHTML() -> String {
+        StaticView().render()
+    }
+
+    package func dynamicHTML(_ context: HTMLContext) -> String {
+        DynamicView(context: context).render()
+    }
+}
+
+struct StaticView: HTML {
+    var content: some HTML {
+        HTMLRaw("<!DOCTYPE html>")
         html {
             head {
                 title { "StaticView" }
@@ -19,11 +30,7 @@ package struct ElementaryTests : HTMLGenerator {
             body {
                 h1 { "Swift HTML Benchmarks" }
             }
-        }.render()
-    }
-
-    package func dynamicHTML(_ context: HTMLContext) -> String {
-        DynamicView(context: context).render()
+        }
     }
 }
 
