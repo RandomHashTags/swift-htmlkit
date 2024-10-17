@@ -24,7 +24,7 @@ let package = Package(
         .package(url: "https://github.com/RandomHashTags/fork-swift-dom", branch: "master"),
         //.package(url: "https://github.com/TokamakUI/Tokamak", from: "0.11.1"), // swift-benchmark problem
 
-        .package(url: "https://github.com/vapor/leaf", exact: "4.4.0"),
+        //.package(url: "https://github.com/vapor/leaf", exact: "4.4.0"), // tight integration with Vapor
 
         // networking
         .package(url: "https://github.com/apple/swift-nio", from: "2.75.0"),
@@ -51,7 +51,7 @@ let package = Package(
             name: "TestLeaf",
             dependencies: [
                 "Utilities",
-                .product(name: "Leaf", package: "Leaf")
+                //.product(name: "Leaf", package: "Leaf")
             ],
             path: "Benchmarks/Leaf"
         ),

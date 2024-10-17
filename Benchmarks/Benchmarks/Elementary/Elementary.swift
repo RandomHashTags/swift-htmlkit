@@ -20,8 +20,8 @@ package struct ElementaryTests : HTMLGenerator {
     }
 }
 
-struct StaticView: HTML {
-    var content: some HTML {
+struct StaticView : HTML {
+    var content : some HTML {
         HTMLRaw("<!DOCTYPE html>")
         html {
             head {
@@ -34,10 +34,9 @@ struct StaticView: HTML {
     }
 }
 
-struct DynamicView: HTML { 
+struct DynamicView : HTML { 
     let context:HTMLContext
-
-    // Elementary puts the title element first in the head, which is wrong; it needs to be charset | this is a workaround
+    
     var content : some HTML {
         HTMLRaw("<!DOCTYPE html>")
         html {
