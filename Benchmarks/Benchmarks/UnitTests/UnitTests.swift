@@ -26,19 +26,25 @@ struct UnitTests {
         "Elementary" : ElementaryTests(),
         "Plot" : PlotTests(),
         "Pointfreeco" : SwiftHTMLPFTests(),
-        //"SwiftDOM" : SwiftDOMTests(),
+        "SwiftDOM" : SwiftDOMTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
         "Swim" : SwimTests(),
         "VaporHTMLKit" : VaporHTMLKitTests(),
         "Vaux (custom renderer)" : VauxTests()
     ]
+    // Some tests fail due to:
+    // - Plot closes void tags
+    // - Swim doesn't minify (keeps new line characters and some whitespace); uses a dictionary for meta values; closes void tags
+    // - Vaux is doodoo
+
     @Test func staticHTML() {
         let expected_value:String = libraries["SwiftHTMLKit"]!.staticHTML()
-        // Swim doesn't minify (keeps new line characters and some whitespace)
         for (key, value) in libraries {
             var string:String = value.staticHTML()
             if key == "Swim" {
                 string.replace("\n", with: "")
+            } else if key == "SwiftDOM" {
+                string.replace("'", with: "\"")
             }
             #expect(string == expected_value, Comment(rawValue: key))
         }
@@ -46,13 +52,12 @@ struct UnitTests {
     @Test func dynamicHTML() {
         let context:HTMLContext = HTMLContext()
         let expected_value:String = libraries["SwiftHTMLKit"]!.dynamicHTML(context)
-        // Plot closes void tags
-        // Swim doesn't minify (keeps new line characters and some whitespace); uses a dictionary for meta values; closes void tags
-        // Vaux is doodoo
         for (key, value) in libraries {
             var string:String = value.dynamicHTML(context)
             if key == "Swim" {
                 string.replace("\n", with: "")
+            } else if key == "SwiftDOM" {
+                string.replace("'", with: "\"")
             }
             #expect(string == expected_value, Comment(rawValue: key))
         }

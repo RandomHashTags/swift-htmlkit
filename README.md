@@ -191,8 +191,9 @@ Use a different html macro. Currently supported types (more to come with new lan
 ## Benchmarks
 - Libraries tested
   - [BinaryBuilds/swift-html](https://github.com/BinaryBirds/swift-html) v1.7.0 (patched version [here](https://github.com/RandomHashTags/fork-bb-swift-html))
-  - [sliemeobn/elementary](https://github.com/sliemeobn/elementary) v0.4.0
+  - [sliemeobn/elementary](https://github.com/sliemeobn/elementary) v0.4.1
   - [JohnSundell/Plot](https://github.com/JohnSundell/Plot) v0.14.0
+  - [tayloraswift/swift-dom](https://github.com/tayloraswift/swift-dom) v1.1.0 (patched version [here](https://github.com/RandomHashTags/fork-swift-dom))
   - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.6.0 (this library)
   - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
   - [robb/Swim](https://github.com/robb/Swim) v0.4.0

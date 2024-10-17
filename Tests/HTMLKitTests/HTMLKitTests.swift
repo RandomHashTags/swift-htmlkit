@@ -12,9 +12,7 @@ import HTMLKit
 import struct Foundation.Data
 #endif
 
-/*#if canImport(NIOCore)
 import struct NIOCore.ByteBuffer
-#endif*/
 
 // MARK: Escaping HTML
 struct HTMLKitTests {
@@ -58,9 +56,7 @@ extension HTMLKitTests {
         #if canImport(Foundation)
         let _:Data = #htmlData("")
         #endif
-        /*#if canImport(NIOCore)
         let _:ByteBuffer = #htmlByteBuffer("")
-        #endif*/
 
         //let bro:String = ""
         //let _:[UInt8] = #htmlUTF8Bytes("\(bro)")
@@ -85,11 +81,9 @@ extension HTMLKitTests {
         #htmlData("")
     }
     #endif
-    /*#if canImport(NIOCore)
     func representation6() -> ByteBuffer {
         #htmlByteBuffer("")
     }
-    #endif*/
 }
 
 // MARK: Element tests

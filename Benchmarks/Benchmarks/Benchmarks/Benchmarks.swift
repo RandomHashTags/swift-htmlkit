@@ -28,6 +28,7 @@ let benchmarks = {
         "Plot" : PlotTests(),
         "Pointfreeco" : SwiftHTMLPFTests(),
         "SwiftHTMLKit" : SwiftHTMLKitTests(),
+        "SwiftDOM" : SwiftDOMTests(),
         "Swim" : SwimTests(),
         "VaporHTMLKit" : VaporHTMLKitTests(),
         "Vaux (custom renderer)" : VauxTests()
@@ -49,4 +50,26 @@ let benchmarks = {
             }
         }
     }
+
+    /*let test:SwiftHTMLKitTests = SwiftHTMLKitTests()
+    Benchmark("SwiftHTMLKit static (StaticString)") {
+        for _ in $0.scaledIterations {
+            blackHole(test.staticHTML())
+        }
+    }
+    Benchmark("SwiftHTMLKit static ([UInt8])") {
+        for _ in $0.scaledIterations {
+            blackHole(test.staticHTMLUTF8Bytes())
+        }
+    }
+    Benchmark("SwiftHTMLKit static ([UInt16])") {
+        for _ in $0.scaledIterations {
+            blackHole(test.staticHTMLUTF16Bytes())
+        }
+    }
+    Benchmark("SwiftHTMLKit static (ByteBuffer)") {
+        for _ in $0.scaledIterations {
+            blackHole(test.staticHTMLByteBuffer())
+        }
+    }*/
 }

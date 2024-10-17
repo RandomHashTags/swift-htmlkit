@@ -5,10 +5,9 @@
 //  Created by Evan Anderson on 10/13/24.
 //
 
-/*
+
 import Utilities
 import DOM
-import HTML
 
 package struct SwiftDOMTests : HTMLGenerator {
     package init() {}
@@ -23,7 +22,7 @@ package struct SwiftDOMTests : HTMLGenerator {
         return "\(document)"
     }
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        let qualities:(inout DOM.HTML.ContentEncoder) throws -> () = {
+        let qualities:(inout HTML.ContentEncoder) throws -> () = {
             for quality in context.user.qualities {
                 $0[.li] = quality
             }
@@ -32,7 +31,7 @@ package struct SwiftDOMTests : HTMLGenerator {
             $0[.html] {
                 $0[.head] {
                     $0[.meta] { $0[name: .charset] = context.charset }
-                    $0[.title] { $0[name: .title] = context.title }
+                    $0[.title] = context.title
                     $0[.meta] {
                         $0[name: .content] = context.meta_description
                         $0[name: .name] = "description"
@@ -61,4 +60,12 @@ package struct SwiftDOMTests : HTMLGenerator {
         }
         return "\(document)"
     }
-}*/
+}
+
+// required to compile
+extension String:HTML.OutputStreamable
+{
+}
+extension String:SVG.OutputStreamable
+{
+}

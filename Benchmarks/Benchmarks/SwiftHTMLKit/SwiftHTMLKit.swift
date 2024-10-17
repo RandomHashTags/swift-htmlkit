@@ -7,6 +7,7 @@
 
 import Utilities
 import SwiftHTMLKit
+import NIOCore
 
 package struct SwiftHTMLKitTests : HTMLGenerator {
     package init() {}
@@ -21,8 +22,42 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
             )
         )
     }
+
+    package func staticHTMLUTF8Bytes() -> [UInt8] {
+        #htmlUTF8Bytes(
+            #head(
+                #title("StaticView")
+            ),
+            #body(
+                #h1("Swift HTML Benchmarks")
+            )
+        )
+    }
+
+    package func staticHTMLUTF16Bytes() -> [UInt16] {
+        #htmlUTF16Bytes(
+            #head(
+                #title("StaticView")
+            ),
+            #body(
+                #h1("Swift HTML Benchmarks")
+            )
+        )
+    }
+
+    package func staticHTMLByteBuffer() -> ByteBuffer {
+        #htmlByteBuffer(
+            #head(
+                #title("StaticView")
+            ),
+            #body(
+                #h1("Swift HTML Benchmarks")
+            )
+        )
+    }
+
     // performance notes
-    // - maping makes unneccessary copies and hurts throughput
+    // - maping makes unnecessary copies and hurts throughput
     // - interpolation hurts performance, a lot less than maping but still noticeable
     // - adding strings (concatenation) is faster than interpolation
     // - calculating the size of the result than assigning the contents in a String is significantly worse than interpolation and concatenation
