@@ -18,7 +18,7 @@ import struct NIOCore.ByteBuffer
 
 enum HTMLElement : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        let string:String = parse_macro(context: context, expression: node.macroExpansion!)
+        let string:String = expand_macro(context: context, macro: node.macroExpansion!)
         var set:Set<HTMLElementType?> = [.htmlUTF8Bytes, .htmlUTF16Bytes, .htmlUTF8CString, .htmlByteBuffer]
 
         #if canImport(Foundation)
@@ -58,10 +58,12 @@ enum HTMLElement : ExpressionMacro {
 }
 
 private extension HTMLElement {
-    // MARK: Parse Macro
-    static func parse_macro(context: some MacroExpansionContext, expression: MacroExpansionExprSyntax) -> String {
-        guard let elementType:HTMLElementType = HTMLElementType(rawValue: expression.macroName.text) else { return "\(expression)" }
-        let childs:SyntaxChildren = expression.arguments.children(viewMode: .all)
+    // MARK: Expand Macro
+    static func expand_macro(context: some MacroExpansionContext, macro: MacroExpansionExprSyntax) -> String {
+        guard let elementType:HTMLElementType = HTMLElementType(rawValue: macro.macroName.text) else {
+            return "\(macro)"
+        }
+        let childs:SyntaxChildren = macro.arguments.children(viewMode: .all)
         if elementType == .escapeHTML {
             return childs.compactMap({
                 guard let child:LabeledExprSyntax = $0.labeled else { return nil }
@@ -167,7 +169,7 @@ private extension HTMLElement {
     // MARK: Parse innerHTML
     static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
         if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
-            var string:String = parse_macro(context: context, expression: macro)
+            var string:String = expand_macro(context: context, macro: macro)
             if elementType == .escapeHTML {
                 string.escapeHTML(escapeAttributes: false)
             }

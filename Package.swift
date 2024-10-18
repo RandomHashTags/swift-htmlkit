@@ -13,7 +13,7 @@ let package = Package(
         .library(
             name: "HTMLKit",
             targets: ["HTMLKit"]
-        ),
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
