@@ -6,6 +6,7 @@
 //
 
 import HTTPTypes
+import ServiceLifecycle
 
 import Utilities
 
@@ -37,7 +38,7 @@ import Hummingbird
 struct HeaderMiddleware<Context: RequestContext> : RouterMiddleware {
     func handle(_ request: Request, context: Context, next: (Request, Context) async throws -> Response) async throws -> Response {
         var response = try await next(request, context)
-        response.headers[HTTPField.Name("Content-Type")!] = "text/html"
+        response.headers[HTTPField.Name.contentType] = "text/html"
         return response
     }
 }
