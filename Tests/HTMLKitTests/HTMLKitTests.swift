@@ -95,6 +95,20 @@ extension HTMLKitTests {
         string = #html(xmlns: "test")
         #expect(string == "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
+    @Test func element_a() {
+        var string:String = #a("Test")
+        #expect(string == "<a>Test</a>")
+
+        string = #a(href: "test", "Test")
+        #expect(string == "<a href=\"test\">Test</a>")
+
+        string = #a(href: "", "Test")
+        #expect(string == "<a href>Test</a>")
+
+        let test:String = "test"
+        string = #a(href: "\(test)", "Test")
+        #expect(string == "<a href=\"test\">Test</a>")
+    }
     @Test func element_area() {
         var string:StaticString = #area(coords: [1, 2, 3])
         #expect(string == "<area coords=\"1,2,3\">")

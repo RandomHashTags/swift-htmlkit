@@ -209,7 +209,7 @@ private extension HTMLElement {
             switch returnType {
             case .boolean: return string.elementsEqual("true") ? "" : nil
             case .string, .enumCase:
-                if returnType == .string && string.isEmpty {
+                if returnType == .string && string.isEmpty && key != "href" {
                     return nil
                 }
                 string.escapeHTML(escapeAttributes: true)
