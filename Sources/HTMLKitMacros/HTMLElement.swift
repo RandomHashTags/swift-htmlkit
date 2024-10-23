@@ -296,7 +296,7 @@ private extension HTMLElement {
         let interpolation:[ExpressionSegmentSyntax] = expression.stringLiteral?.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) }) ?? []
         var remaining_interpolation:Int = interpolation.count
         for expr in interpolation {
-            string = flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr)
+            string.replace("\(expr)", with: flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr))
         }
         if returnType == .interpolation || remaining_interpolation > 0 {
             if !string.contains("\\(") {

@@ -299,6 +299,28 @@ extension HTMLKitTests {
         let test:[Int] = [1]
         bro = #area(coords: test)
     }*/
+
+
+    @Test func interpolation_flattening() {
+        let title:String = "flattening"
+        var string:String = #meta(content: "\("interpolation \(title)")", name: "description")
+        #expect(string == "<meta content=\"interpolation \(title)\" name=\"description\">")
+
+        string = #meta(content: "interpolation \(title)", name: "description")
+        #expect(string == "<meta content=\"interpolation \(title)\" name=\"description\">")
+
+        string = #meta(content: "interpolation\(title)", name: "description")
+        #expect(string == "<meta content=\"interpolation\(title)\" name=\"description\">")
+
+        string = #meta(content: "\(title) interpolation", name: "description")
+        #expect(string == "<meta content=\"flattening interpolation\" name=\"description\">")
+
+        string = #meta(content: "\(title)interpolation", name: "description")
+        #expect(string == "<meta content=\"flatteninginterpolation\" name=\"description\">")
+
+        string = #meta(content: "\(title)\("interpolation")", name: "description")
+        #expect(string == "<meta content=\"flatteninginterpolation\" name=\"description\">")
+    }
 }
 
 // MARK: Attribute tests
