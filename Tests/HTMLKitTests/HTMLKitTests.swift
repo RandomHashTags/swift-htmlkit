@@ -270,6 +270,11 @@ extension HTMLKitTests {
         #expect(test2 == expected_string)
     }
 
+    @Test func interpolation() {
+        let test:String = "again"
+        let _:String = #meta(content: test)
+    }
+
     /*@Test func nil_values() {
         #expect(#a("yippie", (true ? nil : "yiyo")) == "<a>yippie</a>") // improper
         #expect(#a("yippie", (false ? nil : "yiyo")) == "<a>yippieyiyo</a>") // improper
@@ -306,12 +311,10 @@ extension HTMLKitTests {
             rel: ["lets go"],
             sizes: ["lets,go"]
         )
-        var bro:String = "yup"
-        let _:String = #a(bro)
         let _:String = #div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")])
 
-        let test:[Int] = [1]
-        bro = #area(coords: test)
+        let _:StaticString = #div(attributes: [.trailingSlash])
+        let _:StaticString = #custom(tag: "slash", isVoid: false, attributes: [.trailingSlash])
     }*/
 
 
@@ -360,6 +363,14 @@ extension HTMLKitTests {
 
         string = #div(attributes: [.custom("potofgold1", "\(1)"), .custom("potofgold2", "2")])
         #expect(string == "<div potofgold1=\"1\" potofgold2=\"2\"></div>")
+    }
+
+    @Test func attribute_trailingSlash() {
+        var string:StaticString = #meta(attributes: [.trailingSlash])
+        #expect(string == "<meta />")
+
+        string = #custom(tag: "slash", isVoid: true, attributes: [.trailingSlash])
+        #expect(string == "<slash />")
     }
 }
 

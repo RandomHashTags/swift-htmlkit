@@ -82,21 +82,32 @@ private extension HTMLElement {
             isVoid = elementType.isVoid
             children = childs.prefix(childs.count)
         }
-        let (attributes, innerHTML):(String, String) = parse_arguments(context: context, elementType: elementType, children: children)
-        var string:String = (tag == "html" ? "<!DOCTYPE html>" : "") + "<" + tag + attributes + ">" + innerHTML
+        let (attributes, innerHTML, trailingSlash):(String, String, Bool) = parse_arguments(context: context, elementType: elementType, children: children)
+        var string:String = (tag == "html" ? "<!DOCTYPE html>" : "") + "<" + tag + attributes
+        if trailingSlash {
+            if isVoid {
+                string += " /"
+            } else {
+                context.diagnose(Diagnostic(node: macro, message: DiagnosticMsg(id: "trailingSlashGlobalAttributeMisused", message: "Trailing Slash global attribute can only be applied to void elements.")))
+                return ""
+            }
+        }
+        string += ">" + innerHTML
         if !isVoid {
             string += "</" + tag + ">"
         }
         return string
     }
     // MARK: Parse Arguments
-    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> (attributes: String, innerHTML: String) {
-        var attributes:String = " ", innerHTML:String = ""
+    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> (attributes: String, innerHTML: String, trailingSlash: Bool) {
+        var attributes:String = " ", innerHTML:String = "", trailingSlash:Bool = false
         for element in children {
             if let child:LabeledExprSyntax = element.labeled {
                 if var key:String = child.label?.text {
                     if key == "attributes" {
-                        for attribute in parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!.elements) {
+                        let (attributes_array, ts):([String], Bool) = parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!.elements)
+                        trailingSlash = ts
+                        for attribute in attributes_array {
                             attributes += attribute + " "
                         }
                     } else {
@@ -114,57 +125,69 @@ private extension HTMLElement {
             }
         }
         attributes.removeLast()
-        return (attributes, innerHTML)
+        return (attributes, innerHTML, trailingSlash)
     }
     // MARK: Parse Global Attributes
-    static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayElementListSyntax) -> [String] {
-        var keys:Set<String> = [], attributes:[String] = []
+    static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayElementListSyntax) -> (attributes: [String], trailingSlash: Bool) {
+        var keys:Set<String> = [], attributes:[String] = [], trailingSlash:Bool = false
         for element in array {
-            let function:FunctionCallExprSyntax = element.expression.functionCall!, first_expression:ExprSyntax = function.arguments.first!.expression
-            var key:String = function.calledExpression.memberAccess!.declName.baseName.text, value:String! = nil
-            switch key {
-                case "custom", "data":
-                    var returnType:LiteralReturnType = .string
-                    (value, returnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression)!
-                    if returnType == .string {
-                        value.escapeHTML(escapeAttributes: true)
-                    }
-                    if key == "custom" {
-                        key = first_expression.stringLiteral!.string
-                    } else {
-                        key += "-\(first_expression.stringLiteral!.string)"
-                    }
-                    break
-                case "event":
-                    key = "on" + first_expression.memberAccess!.declName.baseName.text
-                    if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression) {
+            if let function:FunctionCallExprSyntax = element.expression.functionCall {
+                let first_expression:ExprSyntax = function.arguments.first!.expression
+                var key:String = function.calledExpression.memberAccess!.declName.baseName.text, value:String! = nil
+                switch key {
+                    case "custom", "data":
+                        var returnType:LiteralReturnType = .string
+                        (value, returnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression)!
                         if returnType == .string {
-                            string.escapeHTML(escapeAttributes: true)
+                            value.escapeHTML(escapeAttributes: true)
                         }
-                        value = string
+                        if key == "custom" {
+                            key = first_expression.stringLiteral!.string
+                        } else {
+                            key += "-\(first_expression.stringLiteral!.string)"
+                        }
+                        break
+                    case "event":
+                        key = "on" + first_expression.memberAccess!.declName.baseName.text
+                        if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression) {
+                            if returnType == .string {
+                                string.escapeHTML(escapeAttributes: true)
+                            }
+                            value = string
+                        } else {
+                            unallowed_expression(context: context, node: function.arguments.last!)
+                            return ([], false)
+                        }
+                        break
+                    default:
+                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression) {
+                            value = string
+                        }
+                        break
+                }
+                if key.contains(" ") {
+                    context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
+                } else if let value:String = value {
+                    if keys.contains(key) {
+                        global_attribute_already_defined(context: context, attribute: key, node: first_expression)
                     } else {
-                        unallowed_expression(context: context, node: function.arguments.last!)
-                        return []
+                        attributes.append(key + (value.isEmpty ? "" : "=\\\"" + value + "\\\""))
+                        keys.insert(key)
                     }
-                    break
-                default:
-                    if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression) {
-                        value = string
-                    }
-                    break
-            }
-            if key.contains(" ") {
-                context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
-            } else if let value:String = value {
-                if keys.contains(key) {
-                    context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + key + "\" is already defined.")))
+                }
+            } else if let member:String = element.expression.memberAccess?.declName.baseName.text, member == "trailingSlash" {
+                if keys.contains(member) {
+                    global_attribute_already_defined(context: context, attribute: member, node: element.expression)
                 } else {
-                    attributes.append(key + (value.isEmpty ? "" : "=\\\"" + value + "\\\""))
-                    keys.insert(key)
+                    trailingSlash = true
+                    keys.insert(member)
                 }
             }
         }
-        return attributes
+        return (attributes, trailingSlash)
+    }
+    static func global_attribute_already_defined(context: some MacroExpansionContext, attribute: String, node: some SyntaxProtocol) {
+        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + attribute + "\" is already defined.")))
     }
     // MARK: Parse innerHTML
     static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
@@ -285,7 +308,8 @@ private extension HTMLElement {
                 return (result, .string)
             }
             if let _:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
-                context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "runtimeValueNotAllowed", message: "Runtime value not allowed here.")))
+                warn_interpolation(context: context, node: expression)
+                return ("\\(\(expression))", .interpolation)
             }
             return nil
         }
