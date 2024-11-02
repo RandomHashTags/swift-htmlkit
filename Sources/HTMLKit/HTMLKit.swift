@@ -29,7 +29,7 @@ public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T =
 
 // MARK: HTML Representation
 @freestanding(expression)
-public macro html<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
+public macro html<T: ExpressibleByStringLiteral>(lookupFiles: Set<String> = [], attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
 @freestanding(expression)
 public macro htmlUTF8Bytes<T: ExpressibleByStringLiteral>(attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> [UInt8] = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")

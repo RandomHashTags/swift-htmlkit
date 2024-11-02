@@ -22,3 +22,6 @@ Node.*
 Tag.*
 Tags.*
 XmlRender.*
+InterpolationLookup.d
+InterpolationLookup.o
+InterpolationLookup.swiftdeps*

@@ -68,7 +68,7 @@ private extension HTMLElement {
         if elementType == .escapeHTML {
             return childs.compactMap({
                 guard let child:LabeledExprSyntax = $0.labeled else { return nil }
-                return parse_inner_html(context: context, elementType: elementType, child: child)
+                return parse_inner_html(context: context, elementType: elementType, child: child, lookupFiles: [])
             }).joined()
         }
         let tag:String, isVoid:Bool
@@ -100,13 +100,20 @@ private extension HTMLElement {
         return string
     }
     // MARK: Parse Arguments
-    static func parse_arguments(context: some MacroExpansionContext, elementType: HTMLElementType, children: Slice<SyntaxChildren>) -> (attributes: String, innerHTML: String, trailingSlash: Bool) {
+    static func parse_arguments(
+        context: some MacroExpansionContext,
+        elementType: HTMLElementType,
+        children: Slice<SyntaxChildren>
+    ) -> (attributes: String, innerHTML: String, trailingSlash: Bool) {
         var attributes:String = " ", innerHTML:String = "", trailingSlash:Bool = false
+        var lookupFiles:Set<String> = []
         for element in children {
             if let child:LabeledExprSyntax = element.labeled {
                 if var key:String = child.label?.text {
-                    if key == "attributes" {
-                        let (attributes_array, ts):([String], Bool) = parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!.elements)
+                    if key == "lookupFiles" {
+                        lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string }))
+                    } else if key == "attributes" {
+                        let (attributes_array, ts):([String], Bool) = parse_global_attributes(context: context, elementType: elementType, array: child.expression.array!.elements, lookupFiles: lookupFiles)
                         trailingSlash = ts
                         for attribute in attributes_array {
                             attributes += attribute + " "
@@ -115,12 +122,12 @@ private extension HTMLElement {
                         if key == "acceptCharset" {
                             key = "accept-charset"
                         }
-                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: child.expression) {
+                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             attributes += key + (string.isEmpty ? "" : "=\\\"" + string + "\\\"") + " "
                         }
                     }
                 // inner html
-                } else if let inner_html:String = parse_inner_html(context: context, elementType: elementType, child: child) {
+                } else if let inner_html:String = parse_inner_html(context: context, elementType: elementType, child: child, lookupFiles: lookupFiles) {
                     innerHTML += inner_html
                 }
             }
@@ -129,7 +136,12 @@ private extension HTMLElement {
         return (attributes, innerHTML, trailingSlash)
     }
     // MARK: Parse Global Attributes
-    static func parse_global_attributes(context: some MacroExpansionContext, elementType: HTMLElementType, array: ArrayElementListSyntax) -> (attributes: [String], trailingSlash: Bool) {
+    static func parse_global_attributes(
+        context: some MacroExpansionContext,
+        elementType: HTMLElementType,
+        array: ArrayElementListSyntax,
+        lookupFiles: Set<String>
+    ) -> (attributes: [String], trailingSlash: Bool) {
         var keys:Set<String> = [], attributes:[String] = [], trailingSlash:Bool = false
         for element in array {
             if let function:FunctionCallExprSyntax = element.expression.functionCall {
@@ -138,7 +150,7 @@ private extension HTMLElement {
                 switch key {
                     case "custom", "data":
                         var returnType:LiteralReturnType = .string
-                        (value, returnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression)!
+                        (value, returnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression, lookupFiles: lookupFiles)!
                         if returnType == .string {
                             value.escapeHTML(escapeAttributes: true)
                         }
@@ -150,7 +162,7 @@ private extension HTMLElement {
                         break
                     case "event":
                         key = "on" + first_expression.memberAccess!.declName.baseName.text
-                        if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression) {
+                        if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: function.arguments.last!.expression, lookupFiles: lookupFiles) {
                             if returnType == .string {
                                 string.escapeHTML(escapeAttributes: true)
                             }
@@ -161,7 +173,7 @@ private extension HTMLElement {
                         }
                         break
                     default:
-                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression) {
+                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression, lookupFiles: lookupFiles) {
                             value = string
                         }
                         break
@@ -191,14 +203,19 @@ private extension HTMLElement {
         context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + attribute + "\" is already defined.")))
     }
     // MARK: Parse innerHTML
-    static func parse_inner_html(context: some MacroExpansionContext, elementType: HTMLElementType, child: LabeledExprSyntax) -> String? {
+    static func parse_inner_html(
+        context: some MacroExpansionContext,
+        elementType: HTMLElementType,
+        child: LabeledExprSyntax,
+        lookupFiles: Set<String>
+    ) -> String? {
         if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
             var string:String = expand_macro(context: context, macro: macro)
             if elementType == .escapeHTML {
                 string.escapeHTML(escapeAttributes: false)
             }
             return string
-        } else if var string:String = parse_literal_value(context: context, elementType: elementType, key: "", expression: child.expression)?.value {
+        } else if var string:String = parse_literal_value(context: context, elementType: elementType, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value {
             string.escapeHTML(escapeAttributes: false)
             return string
         } else {
@@ -228,8 +245,14 @@ private extension HTMLElement {
     }
     
     // MARK: Parse Attribute
-    static func parse_attribute(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, expression: ExprSyntax) -> String? {
-        if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: expression) {
+    static func parse_attribute(
+        context: some MacroExpansionContext,
+        elementType: HTMLElementType,
+        key: String,
+        expression: ExprSyntax,
+        lookupFiles: Set<String>
+    ) -> String? {
+        if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: expression, lookupFiles: lookupFiles) {
             switch returnType {
             case .boolean: return string.elementsEqual("true") ? "" : nil
             case .string, .enumCase:
@@ -248,7 +271,7 @@ private extension HTMLElement {
         return nil
     }
     // MARK: Parse Literal Value
-    static func parse_literal_value(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, expression: ExprSyntax) -> (value: String, returnType: LiteralReturnType)? {
+    static func parse_literal_value(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, expression: ExprSyntax, lookupFiles: Set<String>) -> (value: String, returnType: LiteralReturnType)? {
         if let boolean:String = expression.booleanLiteral?.literal.text {
             return (boolean, .boolean)
         }
@@ -309,7 +332,7 @@ private extension HTMLElement {
                 return (result, .string)
             }
             if let _:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
-                warn_interpolation(context: context, node: expression)
+                warn_interpolation(context: context, node: expression, lookupFiles: lookupFiles)
                 return ("\\(\(expression))", .interpolation)
             }
             return nil
@@ -321,19 +344,19 @@ private extension HTMLElement {
         let interpolation:[ExpressionSegmentSyntax] = expression.stringLiteral?.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) }) ?? []
         var remaining_interpolation:Int = interpolation.count
         for expr in interpolation {
-            string.replace("\(expr)", with: flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr))
+            string.replace("\(expr)", with: flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
         }
         if returnType == .interpolation || remaining_interpolation > 0 {
             if !string.contains("\\(") {
                 string = "\\(" + string + ")"
-                warn_interpolation(context: context, node: expression)
+                warn_interpolation(context: context, node: expression, lookupFiles: lookupFiles)
             }
             returnType = .interpolation
         }
         return (string, returnType)
     }
     // MARK: Flatten Interpolation
-    static func flatten_interpolation(context: some MacroExpansionContext, remaining_interpolation: inout Int, expr: ExpressionSegmentSyntax) -> String {
+    static func flatten_interpolation(context: some MacroExpansionContext, remaining_interpolation: inout Int, expr: ExpressionSegmentSyntax, lookupFiles: Set<String>) -> String {
         let expression:ExprSyntax = expr.expressions.first!.expression
         var string:String = "\(expr)"
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
@@ -347,17 +370,17 @@ private extension HTMLElement {
                     if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
                         string += literal
                     } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                        let flattened:String = flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation)
+                        let flattened:String = flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
                         if "\(interpolation)" == flattened {
                             //string += "\\(\"\(flattened)\".escapingHTML(escapeAttributes: true))"
                             string += "\(flattened)"
-                            warn_interpolation(context: context, node: interpolation)
+                            warn_interpolation(context: context, node: interpolation, lookupFiles: lookupFiles)
                         } else {
                             string += flattened
                         }
                     } else {
                         //string += "\\(\"\(segment)\".escapingHTML(escapeAttributes: true))"
-                        warn_interpolation(context: context, node: segment)
+                        warn_interpolation(context: context, node: segment, lookupFiles: lookupFiles)
                         string += "\(segment)"
                     }
                 }
@@ -368,11 +391,11 @@ private extension HTMLElement {
             string.replace(target, with: fix)
         } else {
             //string = "\\(\"\(string)\".escapingHTML(escapeAttributes: true))"
-            warn_interpolation(context: context, node: expr)
+            warn_interpolation(context: context, node: expr, lookupFiles: lookupFiles)
         }
         return string
     }
-    static func warn_interpolation(context: some MacroExpansionContext, node: some SyntaxProtocol) {
+    static func warn_interpolation(context: some MacroExpansionContext, node: some SyntaxProtocol, lookupFiles: Set<String>) {
         /*print("node=" + node.debugDescription)
         for c in context.lexicalContext {
             for t in node.tokens(viewMode: .fixedUp) {
@@ -390,6 +413,9 @@ private extension HTMLElement {
             }
         }
         */
+        if let test:String = InterpolationLookup.find(node, files: lookupFiles) {
+            //print("interpolationLookup.item=\(test)")
+        }
         context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
     }
 }
@@ -562,6 +588,7 @@ extension SyntaxProtocol {
     var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
     var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
     var functionCall : FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
+    var declRef : DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
 }
 extension SyntaxChildren.Element {
     var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
