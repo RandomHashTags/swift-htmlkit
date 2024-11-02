@@ -5,10 +5,11 @@
 //  Created by Evan Anderson on 9/14/24.
 //
 
+import HTMLKitUtilities
+import SwiftDiagnostics
+//@_spi(Experimental) import SwiftLexicalLookup
 import SwiftSyntax
 import SwiftSyntaxMacros
-import SwiftDiagnostics
-import HTMLKitUtilities
 
 #if canImport(Foundation)
 import struct Foundation.Data
@@ -372,6 +373,23 @@ private extension HTMLElement {
         return string
     }
     static func warn_interpolation(context: some MacroExpansionContext, node: some SyntaxProtocol) {
+        /*print("node=" + node.debugDescription)
+        for c in context.lexicalContext {
+            for t in node.tokens(viewMode: .fixedUp) {
+                let results = c.lookup(t.identifier)
+                for result:LookupResult in results {
+                    switch result {
+                        case .lookInGenericParametersOfExtendedType(let decl):
+                            print(decl.memberBlock)
+                            break
+                        default:
+                            print(result)
+                            break
+                    }
+                }
+            }
+        }
+        */
         context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
     }
 }
