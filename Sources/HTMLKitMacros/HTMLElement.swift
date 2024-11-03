@@ -358,7 +358,7 @@ private extension HTMLElement {
                     string = "\\(" + string + ")"
                 }
             }
-            returnType = .interpolation
+            returnType = remaining_interpolation > 0 ? .interpolation : .string
         }
         return (string, returnType)
     }
