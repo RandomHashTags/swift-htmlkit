@@ -271,99 +271,124 @@ private extension HTMLElement {
         return nil
     }
     // MARK: Parse Literal Value
-    static func parse_literal_value(context: some MacroExpansionContext, elementType: HTMLElementType, key: String, expression: ExprSyntax, lookupFiles: Set<String>) -> (value: String, returnType: LiteralReturnType)? {
+    static func parse_literal_value(
+        context: some MacroExpansionContext,
+        elementType: HTMLElementType,
+        key: String,
+        expression: ExprSyntax,
+        lookupFiles: Set<String>
+    ) -> (value: String, returnType: LiteralReturnType)? {
         if let boolean:String = expression.booleanLiteral?.literal.text {
             return (boolean, .boolean)
         }
-        func return_string_or_interpolation() -> (String, LiteralReturnType)? {
-            if let string:String = expression.stringLiteral?.string ?? expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
-                return (string, .string)
-            }
-            if let function:FunctionCallExprSyntax = expression.functionCall {
-                switch key {
-                case "height", "width":
-                    var value:String = "\(function)"
-                    value = String(value[value.index(after: value.startIndex)...])
-                    value = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
-                    return (value, .enumCase)
-                default:
-                    if function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
-                        return (function.arguments.first!.expression.stringLiteral!.string, .string)
-                    }
-                    return ("\(function)", .interpolation)
-                }
-            }
-            if let member:MemberAccessExprSyntax = expression.memberAccess {
-                if let _:ExprSyntax = member.base {
-                    return ("\(member)", .interpolation)
-                }
-                return (HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: member.declName.baseName.text), .enumCase)
-            }
-            if let array:ArrayExprSyntax = expression.array {
-                let separator:Character, separator_string:String
-                switch key {
-                    case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
-                        separator = ","
-                        break
-                    default:
-                        separator = " "
-                        break
-                }
-                separator_string = String(separator)
-                var result:String = ""
-                for element in array.elements {
-                    if let string:String = element.expression.stringLiteral?.string {
-                        if string.contains(separator) {
-                            context.diagnose(Diagnostic(node: element.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + key + "\".")))
-                            return nil
-                        }
-                        result += string + separator_string
-                    }
-                    if let string:String = element.expression.integerLiteral?.literal.text ?? element.expression.floatLiteral?.literal.text {
-                        result += string + separator_string
-                    }
-                    if let string:String = element.expression.memberAccess?.declName.baseName.text {
-                        result += HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string) + separator_string
-                    }
-                }
-                if !result.isEmpty {
-                    result.removeLast()
-                }
-                return (result, .string)
-            }
-            if let _:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
-                var string:String = "\(expression)", remaining_interpolation:Int = 1
-                warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-                if remaining_interpolation > 0 {
-                    return ("\\(" + string + ")", .interpolation)
-                } else {
-                    return (string, .string)
-                }
-            }
-            return nil
+        if let string:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
+            return (string, .string)
         }
-        guard var (string, returnType):(String, LiteralReturnType) = return_string_or_interpolation() else {
+        guard var (string, returnType):(String, LiteralReturnType) = extract_string_or_interpolation(context: context, elementType: elementType, key: key, expression: expression, lookupFiles: lookupFiles) else {
             //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
-        let interpolation:[ExpressionSegmentSyntax] = expression.stringLiteral?.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) }) ?? []
-        var remaining_interpolation:Int = interpolation.count
+        var remaining_interpolation:Int = returnType == .interpolation ? 1 : 0, interpolation:[ExpressionSegmentSyntax] = []
+        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
+            remaining_interpolation = stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) })
+            interpolation = stringLiteral.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) })
+        }
         for expr in interpolation {
             string.replace("\(expr)", with: flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
         }
-        if returnType == .interpolation || remaining_interpolation > 0 {
-            if !string.contains("\\(") {
-                warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-                if remaining_interpolation > 0 {
-                    string = "\\(" + string + ")"
-                }
+        if remaining_interpolation > 0 {
+            warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+            if remaining_interpolation > 0 && !string.contains("\\(") {
+                string = "\\(" + string + ")"
             }
-            returnType = remaining_interpolation > 0 ? .interpolation : .string
+        }
+        if remaining_interpolation > 0 {
+            returnType = .interpolation
         }
         return (string, returnType)
     }
+    // MARK: Extract string/interpolation
+    static func extract_string_or_interpolation(
+        context: some MacroExpansionContext,
+        elementType: HTMLElementType,
+        key: String,
+        expression: ExprSyntax,
+        lookupFiles: Set<String>
+    ) -> (String, LiteralReturnType)? {
+        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
+            let return_type:LiteralReturnType = stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 ? .string : .interpolation
+            return (stringLiteral.string, return_type)
+        }
+        if let function:FunctionCallExprSyntax = expression.functionCall {
+            switch key {
+            case "height", "width":
+                var value:String = "\(function)"
+                value = String(value[value.index(after: value.startIndex)...])
+                value = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
+                return (value, .enumCase)
+            default:
+                if function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
+                    return (function.arguments.first!.expression.stringLiteral!.string, .string)
+                }
+                return ("\(function)", .interpolation)
+            }
+        }
+        if let member:MemberAccessExprSyntax = expression.memberAccess {
+            if let _:ExprSyntax = member.base {
+                return ("\(member)", .interpolation)
+            }
+            return (HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: member.declName.baseName.text), .enumCase)
+        }
+        if let array:ArrayExprSyntax = expression.array {
+            let separator:Character, separator_string:String
+            switch key {
+                case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
+                    separator = ","
+                    break
+                default:
+                    separator = " "
+                    break
+            }
+            separator_string = String(separator)
+            var result:String = ""
+            for element in array.elements {
+                if let string:String = element.expression.stringLiteral?.string {
+                    if string.contains(separator) {
+                        context.diagnose(Diagnostic(node: element.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + key + "\".")))
+                        return nil
+                    }
+                    result += string + separator_string
+                }
+                if let string:String = element.expression.integerLiteral?.literal.text ?? element.expression.floatLiteral?.literal.text {
+                    result += string + separator_string
+                }
+                if let string:String = element.expression.memberAccess?.declName.baseName.text {
+                    result += HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string) + separator_string
+                }
+            }
+            if !result.isEmpty {
+                result.removeLast()
+            }
+            return (result, .string)
+        }
+        if let _:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
+            var string:String = "\(expression)", remaining_interpolation:Int = 1
+            warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+            if remaining_interpolation > 0 {
+                return ("\\(" + string + ")", .interpolation)
+            } else {
+                return (string, .string)
+            }
+        }
+        return nil
+    }
     // MARK: Flatten Interpolation
-    static func flatten_interpolation(context: some MacroExpansionContext, remaining_interpolation: inout Int, expr: ExpressionSegmentSyntax, lookupFiles: Set<String>) -> String {
+    static func flatten_interpolation(
+        context: some MacroExpansionContext,
+        remaining_interpolation: inout Int,
+        expr: ExpressionSegmentSyntax,
+        lookupFiles: Set<String>
+    ) -> String {
         let expression:ExprSyntax = expr.expressions.first!.expression
         var string:String = "\(expr)"
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
@@ -409,9 +434,11 @@ private extension HTMLElement {
         remaining_interpolation: inout Int,
         lookupFiles: Set<String>
     ) {
-        if let test:String = InterpolationLookup.find(node, files: lookupFiles) {
-            string.replace("\(node)", with: test)
-            remaining_interpolation -= 1
+        if let fix:String = InterpolationLookup.find(node, files: lookupFiles) {
+            let expression:String = "\(node)"
+            let ranges:[Range<String.Index>] = string.ranges(of: expression)
+            string.replace(expression, with: fix)
+            remaining_interpolation -= ranges.count
         } else {
             context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
         }
