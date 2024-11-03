@@ -123,7 +123,7 @@ private extension HTMLElement {
                             key = "accept-charset"
                         }
                         if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: child.expression, lookupFiles: lookupFiles) {
-                            attributes += key + (string.isEmpty ? "" : "=\\\"" + string + "\\\"") + " "
+                            attributes += string + " "
                         }
                     }
                 // inner html
@@ -159,6 +159,7 @@ private extension HTMLElement {
                         } else {
                             key += "-\(first_expression.stringLiteral!.string)"
                         }
+                        value = key + "=\\\"" + value + "\\\""
                         break
                     case "event":
                         key = "on" + first_expression.memberAccess!.declName.baseName.text
@@ -166,7 +167,7 @@ private extension HTMLElement {
                             if returnType == .string {
                                 string.escapeHTML(escapeAttributes: true)
                             }
-                            value = string
+                            value = key + "=\\\"" + string + "\\\""
                         } else {
                             unallowed_expression(context: context, node: function.arguments.last!)
                             return ([], false)
@@ -184,7 +185,7 @@ private extension HTMLElement {
                     if keys.contains(key) {
                         global_attribute_already_defined(context: context, attribute: key, node: first_expression)
                     } else {
-                        attributes.append(key + (value.isEmpty ? "" : "=\\\"" + value + "\\\""))
+                        attributes.append(value)
                         keys.insert(key)
                     }
                 }
@@ -254,14 +255,15 @@ private extension HTMLElement {
     ) -> String? {
         if var (string, returnType):(String, LiteralReturnType) = parse_literal_value(context: context, elementType: elementType, key: key, expression: expression, lookupFiles: lookupFiles) {
             switch returnType {
-            case .boolean: return string.elementsEqual("true") ? "" : nil
+            case .boolean: return string.elementsEqual("true") ? key : nil
             case .string, .enumCase:
-                if returnType == .string && string.isEmpty && key != "href" {
-                    return nil
+                if returnType == .enumCase && string.isEmpty {
+                    return key
                 }
                 string.escapeHTML(escapeAttributes: true)
-                return string
-            case .interpolation: return string
+                return key + "=\\\"" + string + "\\\""
+            case .interpolation:
+                return key + "=\\\"" + string + "\\\""
             }
         }
         if let function:FunctionCallExprSyntax = expression.functionCall {
