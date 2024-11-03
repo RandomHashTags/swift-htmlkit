@@ -13,31 +13,33 @@ enum InterpolationLookup {
     private static var cached:[String:SourceFileSyntax] = [:]
 
     static func find(_ node: some SyntaxProtocol, files: Set<String>) -> String? {
-        guard let item:Item = item(node) else { return nil }
-        /*for file in files {
+        guard !files.isEmpty, let item:Item = item(node) else { return nil }
+        for file in files {
             if cached[file] == nil, let string:String = try? String.init(contentsOfFile: file, encoding: .utf8) {
                 let parsed:SourceFileSyntax = Parser.parse(source: string)
                 cached[file] = parsed
             }
-        }*/
+        }
+        //print("InterpolationLookup;find;item=\(item)")
         switch item {
-            case .literal(let target):
+            case .literal(let tokens):
                 for (_, source_file) in cached {
-                    if let flattened:String = flatten(target, file: source_file) {
+                    if let flattened:String = flatten(tokens, file: source_file) {
                         return flattened
                     }
                 }
                 return nil
-            case .function(let target, let parameters):
-                return target + "(" + parameters.map({ "\"" + $0 + "\"" }).joined(separator: ",") + ")"
+            case .function(let tokens, let parameters):
+                return nil
+                //return target + "(" + parameters.map({ "\"" + $0 + "\"" }).joined(separator: ",") + ")"
         }
     }
 
     private static func item(_ node: some SyntaxProtocol) -> Item? {
         if let function:FunctionCallExprSyntax = node.functionCall {
-            var path:String = ""
+            var array:[String] = []
             if let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
-                path += test(member)
+                array.append(contentsOf: test(member))
             }
             var parameters:[String] = []
             for argument in function.arguments {
@@ -45,525 +47,129 @@ enum InterpolationLookup {
                     parameters.append(string)
                 }
             }
-            return .function(path, parameters)
+            return .function(tokens: array, parameters: parameters)
         } else if let member:MemberAccessExprSyntax = node.memberAccess {
-            let path:String = test(member)
-            return .literal(path)
+            let path:[String] = test(member)
+            return .literal(tokens: path)
         }
         return nil
     }
     
-    private static func test(_ member: MemberAccessExprSyntax) -> String {
-        var string:String = ""
+    private static func test(_ member: MemberAccessExprSyntax) -> [String] {
+        var array:[String] = []
         if let base:MemberAccessExprSyntax = member.base?.memberAccess {
-            string += test(base) + "."
+            array.append(contentsOf: test(base))
         } else if let decl:DeclReferenceExprSyntax = member.base?.declRef {
-            string += decl.baseName.text + "."
+            array.append(decl.baseName.text)
         }
-        string += member.declName.baseName.text
-        return string
+        array.append(member.declName.baseName.text)
+        return array
     }
 
     private enum Item {
-        case literal(String)
-        case function(String, [String])
+        case literal(tokens: [String])
+        case function(tokens: [String], parameters: [String])
     }
 }
+// MARK: Flatten
 private extension InterpolationLookup {
-    static func flatten(_ target: String, file: SourceFileSyntax) -> String? {
+    static func flatten(_ tokens: [String], file: SourceFileSyntax) -> String? {
         for statement in file.statements {
-            if let ext:ExtensionDeclSyntax = statement.item.as(ExtensionDeclSyntax.self) {
-                if ext.extendedType.as(IdentifierTypeSyntax.self)?.name.text == "HTMLKitTests" {
+            var index:Int = 0
+            let item = statement.item
+            if let ext:ExtensionDeclSyntax = item.ext {
+                if ext.extendedType.identifierType?.name.text == tokens[index] {
+                    index += 1
                 }
                 for member in ext.memberBlock.members {
-                    if let function:FunctionDeclSyntax = member.decl.as(FunctionDeclSyntax.self) {
+                    if let string:String = parse_function(syntax: member.decl, tokens: tokens, index: index)
+                            ?? parse_enumeration(syntax: member.decl, tokens: tokens, index: index)
+                            ?? parse_variable(syntax: member.decl, tokens: tokens, index: index) {
+                        return string
+                    }
+                }
+            } else if let structure:StructDeclSyntax = item.structure {
+                for member in structure.memberBlock.members {
+                    if let function:FunctionDeclSyntax = member.functionDecl, function.name.text == tokens[index], function.signature.returnClause?.type.as(IdentifierTypeSyntax.self)?.name.text == "StaticString" {
+                        index += 1
+                        if let body = function.body {
+                        }
+                        index -= 1
+                    }
+                }
+            } else if let enumeration:String = parse_enumeration(syntax: item, tokens: tokens, index: index) {
+                return enumeration
+            } else if let variable:String = parse_variable(syntax: item, tokens: tokens, index: index) {
+                return variable
+            }
+        }
+        return nil
+    }
+    // MARK: Parse function
+    static func parse_function(syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+        guard let function:FunctionDeclSyntax = syntax.functionDecl else { return nil }
+        return nil
+    }
+    // MARK: Parse enumeration
+    static func parse_enumeration(syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+        let allowed_inheritances:Set<String?> = ["String", "Int", "Double", "Float"]
+        guard let enumeration:EnumDeclSyntax = syntax.enumeration,
+            enumeration.name.text == tokens[index]
+        else {
+            return nil
+        }
+        //print("InterpolationLookup;parse_enumeration;enumeration=\(enumeration.debugDescription)")
+        let value_type:String? = enumeration.inheritanceClause?.inheritedTypes.first(where: { allowed_inheritances.contains($0.type.identifierType?.name.text) })?.type.identifierType!.name.text
+        var index:Int = index + 1
+        for member in enumeration.memberBlock.members {
+            if let decl:EnumCaseDeclSyntax = member.decl.enumCaseDecl {
+                for element in decl.elements {
+                    if let enum_case:EnumCaseElementSyntax = element.enumCaseElem, enum_case.name.text == tokens[index] {
+                        index += 1
+                        let case_name:String = enum_case.name.text
+                        if index == tokens.count {
+                            return case_name
+                        }
+                        switch value_type {
+                            case "String":          return enum_case.rawValue?.value.stringLiteral!.string ?? case_name
+                            case "Int":             return enum_case.rawValue?.value.integerLiteral!.literal.text ?? case_name
+                            case "Double", "Float": return enum_case.rawValue?.value.floatLiteral!.literal.text ?? case_name
+                            default:
+                                // TODO: check body (can have nested enums)
+                                break
+                        }
                     }
                 }
             }
         }
         return nil
     }
+    // MARK: Parse variable
+    static func parse_variable(syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+        guard let variable:VariableDeclSyntax = syntax.variableDecl else { return nil }
+        for binding in variable.bindings {
+            if binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text == tokens[index], let initializer:InitializerClauseSyntax = binding.initializer {
+                return initializer.value.stringLiteral?.string
+                        ?? initializer.value.integerLiteral?.literal.text
+                        ?? initializer.value.floatLiteral?.literal.text
+            }
+        }
+        return nil
+    }
 }
 
-// the below is the last statement in the parsed source file of `HTMLKitTests.swift`
-// ...to be read and understood in order to lookup the stuff we want, and check whether or not we can replace it with a compile time equivalent
-/*
+// copy & paste `HTMLKitTests.swift` into https://swift-ast-explorer.com/ to get this working
+extension TypeSyntax {
+    var identifierType : IdentifierTypeSyntax? { self.as(IdentifierTypeSyntax.self) }
+}
 
+extension SyntaxProtocol {
+    var enumCaseDecl : EnumCaseDeclSyntax? { self.as(EnumCaseDeclSyntax.self) }
+    var enumCaseElem : EnumCaseElementSyntax? { self.as(EnumCaseElementSyntax.self) }
+    var functionDecl : FunctionDeclSyntax? { self.as(FunctionDeclSyntax.self) }
+    var variableDecl : VariableDeclSyntax? { self.as(VariableDeclSyntax.self) }
 
-CodeBlockItemSyntax
-╰─item: ExtensionDeclSyntax
-  ├─attributes: AttributeListSyntax
-  ├─modifiers: DeclModifierListSyntax
-  ├─extensionKeyword: keyword(SwiftSyntax.Keyword.extension)
-  ├─extendedType: IdentifierTypeSyntax
-  │ ╰─name: identifier("HTMLKitTests")
-  ╰─memberBlock: MemberBlockSyntax
-    ├─leftBrace: leftBrace
-    ├─members: MemberBlockItemListSyntax
-    │ ├─[0]: MemberBlockItemSyntax
-    │ │ ╰─decl: FunctionDeclSyntax
-    │ │   ├─attributes: AttributeListSyntax
-    │ │   │ ╰─[0]: AttributeSyntax
-    │ │   │   ├─atSign: atSign
-    │ │   │   ╰─attributeName: IdentifierTypeSyntax
-    │ │   │     ╰─name: identifier("Test")
-    │ │   ├─modifiers: DeclModifierListSyntax
-    │ │   ├─funcKeyword: keyword(SwiftSyntax.Keyword.func)
-    │ │   ├─name: identifier("example2")
-    │ │   ├─signature: FunctionSignatureSyntax
-    │ │   │ ╰─parameterClause: FunctionParameterClauseSyntax
-    │ │   │   ├─leftParen: leftParen
-    │ │   │   ├─parameters: FunctionParameterListSyntax
-    │ │   │   ╰─rightParen: rightParen
-    │ │   ╰─body: CodeBlockSyntax
-    │ │     ├─leftBrace: leftBrace
-    │ │     ├─statements: CodeBlockItemListSyntax
-    │ │     │ ├─[0]: CodeBlockItemSyntax
-    │ │     │ │ ╰─item: VariableDeclSyntax
-    │ │     │ │   ├─attributes: AttributeListSyntax
-    │ │     │ │   ├─modifiers: DeclModifierListSyntax
-    │ │     │ │   ├─bindingSpecifier: keyword(SwiftSyntax.Keyword.var)
-    │ │     │ │   ╰─bindings: PatternBindingListSyntax
-    │ │     │ │     ╰─[0]: PatternBindingSyntax
-    │ │     │ │       ├─pattern: IdentifierPatternSyntax
-    │ │     │ │       │ ╰─identifier: identifier("test")
-    │ │     │ │       ├─typeAnnotation: TypeAnnotationSyntax
-    │ │     │ │       │ ├─colon: colon
-    │ │     │ │       │ ╰─type: IdentifierTypeSyntax
-    │ │     │ │       │   ╰─name: identifier("TestStruct")
-    │ │     │ │       ╰─initializer: InitializerClauseSyntax
-    │ │     │ │         ├─equal: equal
-    │ │     │ │         ╰─value: FunctionCallExprSyntax
-    │ │     │ │           ├─calledExpression: DeclReferenceExprSyntax
-    │ │     │ │           │ ╰─baseName: identifier("TestStruct")
-    │ │     │ │           ├─leftParen: leftParen
-    │ │     │ │           ├─arguments: LabeledExprListSyntax
-    │ │     │ │           │ ├─[0]: LabeledExprSyntax
-    │ │     │ │           │ │ ├─label: identifier("name")
-    │ │     │ │           │ │ ├─colon: colon
-    │ │     │ │           │ │ ├─expression: StringLiteralExprSyntax
-    │ │     │ │           │ │ │ ├─openingQuote: stringQuote
-    │ │     │ │           │ │ │ ├─segments: StringLiteralSegmentListSyntax
-    │ │     │ │           │ │ │ │ ╰─[0]: StringSegmentSyntax
-    │ │     │ │           │ │ │ │   ╰─content: stringSegment("one")
-    │ │     │ │           │ │ │ ╰─closingQuote: stringQuote
-    │ │     │ │           │ │ ╰─trailingComma: comma
-    │ │     │ │           │ ╰─[1]: LabeledExprSyntax
-    │ │     │ │           │   ├─label: identifier("array")
-    │ │     │ │           │   ├─colon: colon
-    │ │     │ │           │   ╰─expression: ArrayExprSyntax
-    │ │     │ │           │     ├─leftSquare: leftSquare
-    │ │     │ │           │     ├─elements: ArrayElementListSyntax
-    │ │     │ │           │     │ ├─[0]: ArrayElementSyntax
-    │ │     │ │           │     │ │ ├─expression: StringLiteralExprSyntax
-    │ │     │ │           │     │ │ │ ├─openingQuote: stringQuote
-    │ │     │ │           │     │ │ │ ├─segments: StringLiteralSegmentListSyntax
-    │ │     │ │           │     │ │ │ │ ╰─[0]: StringSegmentSyntax
-    │ │     │ │           │     │ │ │ │   ╰─content: stringSegment("1")
-    │ │     │ │           │     │ │ │ ╰─closingQuote: stringQuote
-    │ │     │ │           │     │ │ ╰─trailingComma: comma
-    │ │     │ │           │     │ ├─[1]: ArrayElementSyntax
-    │ │     │ │           │     │ │ ├─expression: StringLiteralExprSyntax
-    │ │     │ │           │     │ │ │ ├─openingQuote: stringQuote
-    │ │     │ │           │     │ │ │ ├─segments: StringLiteralSegmentListSyntax
-    │ │     │ │           │     │ │ │ │ ╰─[0]: StringSegmentSyntax
-    │ │     │ │           │     │ │ │ │   ╰─content: stringSegment("2")
-    │ │     │ │           │     │ │ │ ╰─closingQuote: stringQuote
-    │ │     │ │           │     │ │ ╰─trailingComma: comma
-    │ │     │ │           │     │ ╰─[2]: ArrayElementSyntax
-    │ │     │ │           │     │   ╰─expression: StringLiteralExprSyntax
-    │ │     │ │           │     │     ├─openingQuote: stringQuote
-    │ │     │ │           │     │     ├─segments: StringLiteralSegmentListSyntax
-    │ │     │ │           │     │     │ ╰─[0]: StringSegmentSyntax
-    │ │     │ │           │     │     │   ╰─content: stringSegment("3")
-    │ │     │ │           │     │     ╰─closingQuote: stringQuote
-    │ │     │ │           │     ╰─rightSquare: rightSquare
-    │ │     │ │           ├─rightParen: rightParen
-    │ │     │ │           ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-    │ │     │ ├─[1]: CodeBlockItemSyntax
-    │ │     │ │ ╰─item: MacroExpansionExprSyntax
-    │ │     │ │   ├─pound: pound
-    │ │     │ │   ├─macroName: identifier("expect")
-    │ │     │ │   ├─leftParen: leftParen
-    │ │     │ │   ├─arguments: LabeledExprListSyntax
-    │ │     │ │   │ ╰─[0]: LabeledExprSyntax
-    │ │     │ │   │   ╰─expression: SequenceExprSyntax
-    │ │     │ │   │     ╰─elements: ExprListSyntax
-    │ │     │ │   │       ├─[0]: MemberAccessExprSyntax
-    │ │     │ │   │       │ ├─base: DeclReferenceExprSyntax
-    │ │     │ │   │       │ │ ╰─baseName: identifier("test")
-    │ │     │ │   │       │ ├─period: period
-    │ │     │ │   │       │ ╰─declName: DeclReferenceExprSyntax
-    │ │     │ │   │       │   ╰─baseName: identifier("html")
-    │ │     │ │   │       ├─[1]: BinaryOperatorExprSyntax
-    │ │     │ │   │       │ ╰─operator: binaryOperator("==")
-    │ │     │ │   │       ╰─[2]: StringLiteralExprSyntax
-    │ │     │ │   │         ├─openingQuote: stringQuote
-    │ │     │ │   │         ├─segments: StringLiteralSegmentListSyntax
-    │ │     │ │   │         │ ╰─[0]: StringSegmentSyntax
-    │ │     │ │   │         │   ╰─content: stringSegment("<p>one123</p>")
-    │ │     │ │   │         ╰─closingQuote: stringQuote
-    │ │     │ │   ├─rightParen: rightParen
-    │ │     │ │   ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-    │ │     │ ├─[2]: CodeBlockItemSyntax
-    │ │     │ │ ╰─item: SequenceExprSyntax
-    │ │     │ │   ╰─elements: ExprListSyntax
-    │ │     │ │     ├─[0]: MemberAccessExprSyntax
-    │ │     │ │     │ ├─base: DeclReferenceExprSyntax
-    │ │     │ │     │ │ ╰─baseName: identifier("test")
-    │ │     │ │     │ ├─period: period
-    │ │     │ │     │ ╰─declName: DeclReferenceExprSyntax
-    │ │     │ │     │   ╰─baseName: identifier("name")
-    │ │     │ │     ├─[1]: AssignmentExprSyntax
-    │ │     │ │     │ ╰─equal: equal
-    │ │     │ │     ╰─[2]: StringLiteralExprSyntax
-    │ │     │ │       ├─openingQuote: stringQuote
-    │ │     │ │       ├─segments: StringLiteralSegmentListSyntax
-    │ │     │ │       │ ╰─[0]: StringSegmentSyntax
-    │ │     │ │       │   ╰─content: stringSegment("two")
-    │ │     │ │       ╰─closingQuote: stringQuote
-    │ │     │ ├─[3]: CodeBlockItemSyntax
-    │ │     │ │ ╰─item: SequenceExprSyntax
-    │ │     │ │   ╰─elements: ExprListSyntax
-    │ │     │ │     ├─[0]: MemberAccessExprSyntax
-    │ │     │ │     │ ├─base: DeclReferenceExprSyntax
-    │ │     │ │     │ │ ╰─baseName: identifier("test")
-    │ │     │ │     │ ├─period: period
-    │ │     │ │     │ ╰─declName: DeclReferenceExprSyntax
-    │ │     │ │     │   ╰─baseName: identifier("array")
-    │ │     │ │     ├─[1]: AssignmentExprSyntax
-    │ │     │ │     │ ╰─equal: equal
-    │ │     │ │     ╰─[2]: ArrayExprSyntax
-    │ │     │ │       ├─leftSquare: leftSquare
-    │ │     │ │       ├─elements: ArrayElementListSyntax
-    │ │     │ │       │ ├─[0]: ArrayElementSyntax
-    │ │     │ │       │ │ ├─expression: IntegerLiteralExprSyntax
-    │ │     │ │       │ │ │ ╰─literal: integerLiteral("4")
-    │ │     │ │       │ │ ╰─trailingComma: comma
-    │ │     │ │       │ ├─[1]: ArrayElementSyntax
-    │ │     │ │       │ │ ├─expression: IntegerLiteralExprSyntax
-    │ │     │ │       │ │ │ ╰─literal: integerLiteral("5")
-    │ │     │ │       │ │ ╰─trailingComma: comma
-    │ │     │ │       │ ├─[2]: ArrayElementSyntax
-    │ │     │ │       │ │ ├─expression: IntegerLiteralExprSyntax
-    │ │     │ │       │ │ │ ╰─literal: integerLiteral("6")
-    │ │     │ │       │ │ ╰─trailingComma: comma
-    │ │     │ │       │ ├─[3]: ArrayElementSyntax
-    │ │     │ │       │ │ ├─expression: IntegerLiteralExprSyntax
-    │ │     │ │       │ │ │ ╰─literal: integerLiteral("7")
-    │ │     │ │       │ │ ╰─trailingComma: comma
-    │ │     │ │       │ ╰─[4]: ArrayElementSyntax
-    │ │     │ │       │   ╰─expression: IntegerLiteralExprSyntax
-    │ │     │ │       │     ╰─literal: integerLiteral("8")
-    │ │     │ │       ╰─rightSquare: rightSquare
-    │ │     │ ╰─[4]: CodeBlockItemSyntax
-    │ │     │   ╰─item: MacroExpansionExprSyntax
-    │ │     │     ├─pound: pound
-    │ │     │     ├─macroName: identifier("expect")
-    │ │     │     ├─leftParen: leftParen
-    │ │     │     ├─arguments: LabeledExprListSyntax
-    │ │     │     │ ╰─[0]: LabeledExprSyntax
-    │ │     │     │   ╰─expression: SequenceExprSyntax
-    │ │     │     │     ╰─elements: ExprListSyntax
-    │ │     │     │       ├─[0]: MemberAccessExprSyntax
-    │ │     │     │       │ ├─base: DeclReferenceExprSyntax
-    │ │     │     │       │ │ ╰─baseName: identifier("test")
-    │ │     │     │       │ ├─period: period
-    │ │     │     │       │ ╰─declName: DeclReferenceExprSyntax
-    │ │     │     │       │   ╰─baseName: identifier("html")
-    │ │     │     │       ├─[1]: BinaryOperatorExprSyntax
-    │ │     │     │       │ ╰─operator: binaryOperator("==")
-    │ │     │     │       ╰─[2]: StringLiteralExprSyntax
-    │ │     │     │         ├─openingQuote: stringQuote
-    │ │     │     │         ├─segments: StringLiteralSegmentListSyntax
-    │ │     │     │         │ ╰─[0]: StringSegmentSyntax
-    │ │     │     │         │   ╰─content: stringSegment("<p>two45678</p>")
-    │ │     │     │         ╰─closingQuote: stringQuote
-    │ │     │     ├─rightParen: rightParen
-    │ │     │     ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-    │ │     ╰─rightBrace: rightBrace
-    │ ╰─[1]: MemberBlockItemSyntax
-    │   ╰─decl: StructDeclSyntax
-    │     ├─attributes: AttributeListSyntax
-    │     ├─modifiers: DeclModifierListSyntax
-    │     ├─structKeyword: keyword(SwiftSyntax.Keyword.struct)
-    │     ├─name: identifier("TestStruct")
-    │     ╰─memberBlock: MemberBlockSyntax
-    │       ├─leftBrace: leftBrace
-    │       ├─members: MemberBlockItemListSyntax
-    │       │ ├─[0]: MemberBlockItemSyntax
-    │       │ │ ╰─decl: VariableDeclSyntax
-    │       │ │   ├─attributes: AttributeListSyntax
-    │       │ │   ├─modifiers: DeclModifierListSyntax
-    │       │ │   ├─bindingSpecifier: keyword(SwiftSyntax.Keyword.var)
-    │       │ │   ╰─bindings: PatternBindingListSyntax
-    │       │ │     ╰─[0]: PatternBindingSyntax
-    │       │ │       ├─pattern: IdentifierPatternSyntax
-    │       │ │       │ ╰─identifier: identifier("name")
-    │       │ │       ╰─typeAnnotation: TypeAnnotationSyntax
-    │       │ │         ├─colon: colon
-    │       │ │         ╰─type: IdentifierTypeSyntax
-    │       │ │           ╰─name: identifier("String")
-    │       │ ├─[1]: MemberBlockItemSyntax
-    │       │ │ ╰─decl: VariableDeclSyntax
-    │       │ │   ├─attributes: AttributeListSyntax
-    │       │ │   ├─modifiers: DeclModifierListSyntax
-    │       │ │   ├─bindingSpecifier: keyword(SwiftSyntax.Keyword.var)
-    │       │ │   ╰─bindings: PatternBindingListSyntax
-    │       │ │     ╰─[0]: PatternBindingSyntax
-    │       │ │       ├─pattern: IdentifierPatternSyntax
-    │       │ │       │ ╰─identifier: identifier("array")
-    │       │ │       ├─typeAnnotation: TypeAnnotationSyntax
-    │       │ │       │ ├─colon: colon
-    │       │ │       │ ╰─type: ArrayTypeSyntax
-    │       │ │       │   ├─leftSquare: leftSquare
-    │       │ │       │   ├─element: IdentifierTypeSyntax
-    │       │ │       │   │ ╰─name: identifier("CustomStringConvertible")
-    │       │ │       │   ╰─rightSquare: rightSquare
-    │       │ │       ╰─accessorBlock: AccessorBlockSyntax
-    │       │ │         ├─leftBrace: leftBrace
-    │       │ │         ├─accessors: AccessorDeclListSyntax
-    │       │ │         │ ╰─[0]: AccessorDeclSyntax
-    │       │ │         │   ├─attributes: AttributeListSyntax
-    │       │ │         │   ├─accessorSpecifier: keyword(SwiftSyntax.Keyword.didSet)
-    │       │ │         │   ╰─body: CodeBlockSyntax
-    │       │ │         │     ├─leftBrace: leftBrace
-    │       │ │         │     ├─statements: CodeBlockItemListSyntax
-    │       │ │         │     │ ╰─[0]: CodeBlockItemSyntax
-    │       │ │         │     │   ╰─item: SequenceExprSyntax
-    │       │ │         │     │     ╰─elements: ExprListSyntax
-    │       │ │         │     │       ├─[0]: DeclReferenceExprSyntax
-    │       │ │         │     │       │ ╰─baseName: identifier("array_string")
-    │       │ │         │     │       ├─[1]: AssignmentExprSyntax
-    │       │ │         │     │       │ ╰─equal: equal
-    │       │ │         │     │       ╰─[2]: FunctionCallExprSyntax
-    │       │ │         │     │         ├─calledExpression: MemberAccessExprSyntax
-    │       │ │         │     │         │ ├─base: FunctionCallExprSyntax
-    │       │ │         │     │         │ │ ├─calledExpression: MemberAccessExprSyntax
-    │       │ │         │     │         │ │ │ ├─base: DeclReferenceExprSyntax
-    │       │ │         │     │         │ │ │ │ ╰─baseName: identifier("array")
-    │       │ │         │     │         │ │ │ ├─period: period
-    │       │ │         │     │         │ │ │ ╰─declName: DeclReferenceExprSyntax
-    │       │ │         │     │         │ │ │   ╰─baseName: identifier("map")
-    │       │ │         │     │         │ │ ├─leftParen: leftParen
-    │       │ │         │     │         │ │ ├─arguments: LabeledExprListSyntax
-    │       │ │         │     │         │ │ │ ╰─[0]: LabeledExprSyntax
-    │       │ │         │     │         │ │ │   ╰─expression: ClosureExprSyntax
-    │       │ │         │     │         │ │ │     ├─leftBrace: leftBrace
-    │       │ │         │     │         │ │ │     ├─statements: CodeBlockItemListSyntax
-    │       │ │         │     │         │ │ │     │ ╰─[0]: CodeBlockItemSyntax
-    │       │ │         │     │         │ │ │     │   ╰─item: StringLiteralExprSyntax
-    │       │ │         │     │         │ │ │     │     ├─openingQuote: stringQuote
-    │       │ │         │     │         │ │ │     │     ├─segments: StringLiteralSegmentListSyntax
-    │       │ │         │     │         │ │ │     │     │ ├─[0]: StringSegmentSyntax
-    │       │ │         │     │         │ │ │     │     │ │ ╰─content: stringSegment("")
-    │       │ │         │     │         │ │ │     │     │ ├─[1]: ExpressionSegmentSyntax
-    │       │ │         │     │         │ │ │     │     │ │ ├─backslash: backslash
-    │       │ │         │     │         │ │ │     │     │ │ ├─leftParen: leftParen
-    │       │ │         │     │         │ │ │     │     │ │ ├─expressions: LabeledExprListSyntax
-    │       │ │         │     │         │ │ │     │     │ │ │ ╰─[0]: LabeledExprSyntax
-    │       │ │         │     │         │ │ │     │     │ │ │   ╰─expression: DeclReferenceExprSyntax
-    │       │ │         │     │         │ │ │     │     │ │ │     ╰─baseName: dollarIdentifier("$0")
-    │       │ │         │     │         │ │ │     │     │ │ ╰─rightParen: rightParen
-    │       │ │         │     │         │ │ │     │     │ ╰─[2]: StringSegmentSyntax
-    │       │ │         │     │         │ │ │     │     │   ╰─content: stringSegment("")
-    │       │ │         │     │         │ │ │     │     ╰─closingQuote: stringQuote
-    │       │ │         │     │         │ │ │     ╰─rightBrace: rightBrace
-    │       │ │         │     │         │ │ ├─rightParen: rightParen
-    │       │ │         │     │         │ │ ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-    │       │ │         │     │         │ ├─period: period
-    │       │ │         │     │         │ ╰─declName: DeclReferenceExprSyntax
-    │       │ │         │     │         │   ╰─baseName: identifier("joined")
-    │       │ │         │     │         ├─leftParen: leftParen
-    │       │ │         │     │         ├─arguments: LabeledExprListSyntax
-    │       │ │         │     │         ├─rightParen: rightParen
-    │       │ │         │     │         ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-    │       │ │         │     ╰─rightBrace: rightBrace
-    │       │ │         ╰─rightBrace: rightBrace
-    │       │ ├─[2]: MemberBlockItemSyntax
-    │       │ │ ╰─decl: VariableDeclSyntax
-    │       │ │   ├─attributes: AttributeListSyntax
-    │       │ │   ├─modifiers: DeclModifierListSyntax
-    │       │ │   │ ╰─[0]: DeclModifierSyntax
-    │       │ │   │   ╰─name: keyword(SwiftSyntax.Keyword.private)
-    │       │ │   ├─bindingSpecifier: keyword(SwiftSyntax.Keyword.var)
-    │       │ │   ╰─bindings: PatternBindingListSyntax
-    │       │ │     ╰─[0]: PatternBindingSyntax
-    │       │ │       ├─pattern: IdentifierPatternSyntax
-    │       │ │       │ ╰─identifier: identifier("array_string")
-    │       │ │       ╰─typeAnnotation: TypeAnnotationSyntax
-    │       │ │         ├─colon: colon
-    │       │ │         ╰─type: IdentifierTypeSyntax
-    │       │ │           ╰─name: identifier("String")
-    │       │ ├─[3]: MemberBlockItemSyntax
-    │       │ │ ╰─decl: InitializerDeclSyntax
-    │       │ │   ├─attributes: AttributeListSyntax
-    │       │ │   ├─modifiers: DeclModifierListSyntax
-    │       │ │   ├─initKeyword: keyword(SwiftSyntax.Keyword.init)
-    │       │ │   ├─signature: FunctionSignatureSyntax
-    │       │ │   │ ╰─parameterClause: FunctionParameterClauseSyntax
-    │       │ │   │   ├─leftParen: leftParen
-    │       │ │   │   ├─parameters: FunctionParameterListSyntax
-    │       │ │   │   │ ├─[0]: FunctionParameterSyntax
-    │       │ │   │   │ │ ├─attributes: AttributeListSyntax
-    │       │ │   │   │ │ ├─modifiers: DeclModifierListSyntax
-    │       │ │   │   │ │ ├─firstName: identifier("name")
-    │       │ │   │   │ │ ├─colon: colon
-    │       │ │   │   │ │ ├─type: IdentifierTypeSyntax
-    │       │ │   │   │ │ │ ╰─name: identifier("String")
-    │       │ │   │   │ │ ╰─trailingComma: comma
-    │       │ │   │   │ ╰─[1]: FunctionParameterSyntax
-    │       │ │   │   │   ├─attributes: AttributeListSyntax
-    │       │ │   │   │   ├─modifiers: DeclModifierListSyntax
-    │       │ │   │   │   ├─firstName: identifier("array")
-    │       │ │   │   │   ├─colon: colon
-    │       │ │   │   │   ╰─type: ArrayTypeSyntax
-    │       │ │   │   │     ├─leftSquare: leftSquare
-    │       │ │   │   │     ├─element: IdentifierTypeSyntax
-    │       │ │   │   │     │ ╰─name: identifier("CustomStringConvertible")
-    │       │ │   │   │     ╰─rightSquare: rightSquare
-    │       │ │   │   ╰─rightParen: rightParen
-    │       │ │   ╰─body: CodeBlockSyntax
-    │       │ │     ├─leftBrace: leftBrace
-    │       │ │     ├─statements: CodeBlockItemListSyntax
-    │       │ │     │ ├─[0]: CodeBlockItemSyntax
-    │       │ │     │ │ ╰─item: SequenceExprSyntax
-    │       │ │     │ │   ╰─elements: ExprListSyntax
-    │       │ │     │ │     ├─[0]: MemberAccessExprSyntax
-    │       │ │     │ │     │ ├─base: DeclReferenceExprSyntax
-    │       │ │     │ │     │ │ ╰─baseName: keyword(SwiftSyntax.Keyword.self)
-    │       │ │     │ │     │ ├─period: period
-    │       │ │     │ │     │ ╰─declName: DeclReferenceExprSyntax
-    │       │ │     │ │     │   ╰─baseName: identifier("name")
-    │       │ │     │ │     ├─[1]: AssignmentExprSyntax
-    │       │ │     │ │     │ ╰─equal: equal
-    │       │ │     │ │     ╰─[2]: DeclReferenceExprSyntax
-    │       │ │     │ │       ╰─baseName: identifier("name")
-    │       │ │     │ ├─[1]: CodeBlockItemSyntax
-    │       │ │     │ │ ╰─item: SequenceExprSyntax
-    │       │ │     │ │   ╰─elements: ExprListSyntax
-    │       │ │     │ │     ├─[0]: MemberAccessExprSyntax
-    │       │ │     │ │     │ ├─base: DeclReferenceExprSyntax
-    │       │ │     │ │     │ │ ╰─baseName: keyword(SwiftSyntax.Keyword.self)
-    │       │ │     │ │     │ ├─period: period
-    │       │ │     │ │     │ ╰─declName: DeclReferenceExprSyntax
-    │       │ │     │ │     │   ╰─baseName: identifier("array")
-    │       │ │     │ │     ├─[1]: AssignmentExprSyntax
-    │       │ │     │ │     │ ╰─equal: equal
-    │       │ │     │ │     ╰─[2]: DeclReferenceExprSyntax
-    │       │ │     │ │       ╰─baseName: identifier("array")
-    │       │ │     │ ╰─[2]: CodeBlockItemSyntax
-    │       │ │     │   ╰─item: SequenceExprSyntax
-    │       │ │     │     ╰─elements: ExprListSyntax
-    │       │ │     │       ├─[0]: MemberAccessExprSyntax
-    │       │ │     │       │ ├─base: DeclReferenceExprSyntax
-    │       │ │     │       │ │ ╰─baseName: keyword(SwiftSyntax.Keyword.self)
-    │       │ │     │       │ ├─period: period
-    │       │ │     │       │ ╰─declName: DeclReferenceExprSyntax
-    │       │ │     │       │   ╰─baseName: identifier("array_string")
-    │       │ │     │       ├─[1]: AssignmentExprSyntax
-    │       │ │     │       │ ╰─equal: equal
-    │       │ │     │       ╰─[2]: FunctionCallExprSyntax
-    │       │ │     │         ├─calledExpression: MemberAccessExprSyntax
-    │       │ │     │         │ ├─base: FunctionCallExprSyntax
-    │       │ │     │         │ │ ├─calledExpression: MemberAccessExprSyntax
-    │       │ │     │         │ │ │ ├─base: DeclReferenceExprSyntax
-    │       │ │     │         │ │ │ │ ╰─baseName: identifier("array")
-    │       │ │     │         │ │ │ ├─period: period
-    │       │ │     │         │ │ │ ╰─declName: DeclReferenceExprSyntax
-    │       │ │     │         │ │ │   ╰─baseName: identifier("map")
-    │       │ │     │         │ │ ├─leftParen: leftParen
-    │       │ │     │         │ │ ├─arguments: LabeledExprListSyntax
-    │       │ │     │         │ │ │ ╰─[0]: LabeledExprSyntax
-    │       │ │     │         │ │ │   ╰─expression: ClosureExprSyntax
-    │       │ │     │         │ │ │     ├─leftBrace: leftBrace
-    │       │ │     │         │ │ │     ├─statements: CodeBlockItemListSyntax
-    │       │ │     │         │ │ │     │ ╰─[0]: CodeBlockItemSyntax
-    │       │ │     │         │ │ │     │   ╰─item: StringLiteralExprSyntax
-    │       │ │     │         │ │ │     │     ├─openingQuote: stringQuote
-    │       │ │     │         │ │ │     │     ├─segments: StringLiteralSegmentListSyntax
-    │       │ │     │         │ │ │     │     │ ├─[0]: StringSegmentSyntax
-    │       │ │     │         │ │ │     │     │ │ ╰─content: stringSegment("")
-    │       │ │     │         │ │ │     │     │ ├─[1]: ExpressionSegmentSyntax
-    │       │ │     │         │ │ │     │     │ │ ├─backslash: backslash
-    │       │ │     │         │ │ │     │     │ │ ├─leftParen: leftParen
-    │       │ │     │         │ │ │     │     │ │ ├─expressions: LabeledExprListSyntax
-    │       │ │     │         │ │ │     │     │ │ │ ╰─[0]: LabeledExprSyntax
-    │       │ │     │         │ │ │     │     │ │ │   ╰─expression: DeclReferenceExprSyntax
-    │       │ │     │         │ │ │     │     │ │ │     ╰─baseName: dollarIdentifier("$0")
-    │       │ │     │         │ │ │     │     │ │ ╰─rightParen: rightParen
-    │       │ │     │         │ │ │     │     │ ╰─[2]: StringSegmentSyntax
-    │       │ │     │         │ │ │     │     │   ╰─content: stringSegment("")
-    │       │ │     │         │ │ │     │     ╰─closingQuote: stringQuote
-    │       │ │     │         │ │ │     ╰─rightBrace: rightBrace
-    │       │ │     │         │ │ ├─rightParen: rightParen
-    │       │ │     │         │ │ ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-    │       │ │     │         │ ├─period: period
-    │       │ │     │         │ ╰─declName: DeclReferenceExprSyntax
-    │       │ │     │         │   ╰─baseName: identifier("joined")
-    │       │ │     │         ├─leftParen: leftParen
-    │       │ │     │         ├─arguments: LabeledExprListSyntax
-    │       │ │     │         ├─rightParen: rightParen
-    │       │ │     │         ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-    │       │ │     ╰─rightBrace: rightBrace
-    │       │ ╰─[4]: MemberBlockItemSyntax
-    │       │   ╰─decl: VariableDeclSyntax
-    │       │     ├─attributes: AttributeListSyntax
-    │       │     ├─modifiers: DeclModifierListSyntax
-    │       │     ├─bindingSpecifier: keyword(SwiftSyntax.Keyword.var)
-    │       │     ╰─bindings: PatternBindingListSyntax
-    │       │       ╰─[0]: PatternBindingSyntax
-    │       │         ├─pattern: IdentifierPatternSyntax
-    │       │         │ ╰─identifier: identifier("html")
-    │       │         ├─typeAnnotation: TypeAnnotationSyntax
-    │       │         │ ├─colon: colon
-    │       │         │ ╰─type: IdentifierTypeSyntax
-    │       │         │   ╰─name: identifier("String")
-    │       │         ╰─accessorBlock: AccessorBlockSyntax
-    │       │           ├─leftBrace: leftBrace
-    │       │           ├─accessors: CodeBlockItemListSyntax
-    │       │           │ ╰─[0]: CodeBlockItemSyntax
-    │       │           │   ╰─item: MacroExpansionExprSyntax
-    │       │           │     ├─pound: pound
-    │       │           │     ├─macroName: identifier("p")
-    │       │           │     ├─leftParen: leftParen
-    │       │           │     ├─arguments: LabeledExprListSyntax
-    │       │           │     │ ├─[0]: LabeledExprSyntax
-    │       │           │     │ │ ├─expression: StringLiteralExprSyntax
-    │       │           │     │ │ │ ├─openingQuote: stringQuote
-    │       │           │     │ │ │ ├─segments: StringLiteralSegmentListSyntax
-    │       │           │     │ │ │ │ ├─[0]: StringSegmentSyntax
-    │       │           │     │ │ │ │ │ ╰─content: stringSegment("")
-    │       │           │     │ │ │ │ ├─[1]: ExpressionSegmentSyntax
-    │       │           │     │ │ │ │ │ ├─backslash: backslash
-    │       │           │     │ │ │ │ │ ├─leftParen: leftParen
-    │       │           │     │ │ │ │ │ ├─expressions: LabeledExprListSyntax
-    │       │           │     │ │ │ │ │ │ ╰─[0]: LabeledExprSyntax
-    │       │           │     │ │ │ │ │ │   ╰─expression: DeclReferenceExprSyntax
-    │       │           │     │ │ │ │ │ │     ╰─baseName: identifier("name")
-    │       │           │     │ │ │ │ │ ╰─rightParen: rightParen
-    │       │           │     │ │ │ │ ╰─[2]: StringSegmentSyntax
-    │       │           │     │ │ │ │   ╰─content: stringSegment("")
-    │       │           │     │ │ │ ╰─closingQuote: stringQuote
-    │       │           │     │ │ ╰─trailingComma: comma
-    │       │           │     │ ╰─[1]: LabeledExprSyntax
-    │       │           │     │   ╰─expression: StringLiteralExprSyntax
-    │       │           │     │     ├─openingQuote: stringQuote
-    │       │           │     │     ├─segments: StringLiteralSegmentListSyntax
-    │       │           │     │     │ ├─[0]: StringSegmentSyntax
-    │       │           │     │     │ │ ╰─content: stringSegment("")
-    │       │           │     │     │ ├─[1]: ExpressionSegmentSyntax
-    │       │           │     │     │ │ ├─backslash: backslash
-    │       │           │     │     │ │ ├─leftParen: leftParen
-    │       │           │     │     │ │ ├─expressions: LabeledExprListSyntax
-    │       │           │     │     │ │ │ ╰─[0]: LabeledExprSyntax
-    │       │           │     │     │ │ │   ╰─expression: DeclReferenceExprSyntax
-    │       │           │     │     │ │ │     ╰─baseName: identifier("array_string")
-    │       │           │     │     │ │ ╰─rightParen: rightParen
-    │       │           │     │     │ ╰─[2]: StringSegmentSyntax
-    │       │           │     │     │   ╰─content: stringSegment("")
-    │       │           │     │     ╰─closingQuote: stringQuote
-    │       │           │     ├─rightParen: rightParen
-    │       │           │     ╰─additionalTrailingClosures: MultipleTrailingClosureElementListSyntax
-
-*/
+    var ext : ExtensionDeclSyntax? { self.as(ExtensionDeclSyntax.self) }
+    var structure : StructDeclSyntax? { self.as(StructDeclSyntax.self) }
+    var enumeration : EnumDeclSyntax? { self.as(EnumDeclSyntax.self) }
+}

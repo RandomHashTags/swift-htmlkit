@@ -332,8 +332,13 @@ private extension HTMLElement {
                 return (result, .string)
             }
             if let _:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
-                warn_interpolation(context: context, node: expression, lookupFiles: lookupFiles)
-                return ("\\(\(expression))", .interpolation)
+                var string:String = "\(expression)", remaining_interpolation:Int = 1
+                warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+                if remaining_interpolation > 0 {
+                    return ("\\(" + string + ")", .interpolation)
+                } else {
+                    return (string, .string)
+                }
             }
             return nil
         }
@@ -348,8 +353,10 @@ private extension HTMLElement {
         }
         if returnType == .interpolation || remaining_interpolation > 0 {
             if !string.contains("\\(") {
-                string = "\\(" + string + ")"
-                warn_interpolation(context: context, node: expression, lookupFiles: lookupFiles)
+                warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+                if remaining_interpolation > 0 {
+                    string = "\\(" + string + ")"
+                }
             }
             returnType = .interpolation
         }
@@ -374,13 +381,13 @@ private extension HTMLElement {
                         if "\(interpolation)" == flattened {
                             //string += "\\(\"\(flattened)\".escapingHTML(escapeAttributes: true))"
                             string += "\(flattened)"
-                            warn_interpolation(context: context, node: interpolation, lookupFiles: lookupFiles)
+                            warn_interpolation(context: context, node: interpolation, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
                         } else {
                             string += flattened
                         }
                     } else {
                         //string += "\\(\"\(segment)\".escapingHTML(escapeAttributes: true))"
-                        warn_interpolation(context: context, node: segment, lookupFiles: lookupFiles)
+                        warn_interpolation(context: context, node: segment, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
                         string += "\(segment)"
                     }
                 }
@@ -391,32 +398,23 @@ private extension HTMLElement {
             string.replace(target, with: fix)
         } else {
             //string = "\\(\"\(string)\".escapingHTML(escapeAttributes: true))"
-            warn_interpolation(context: context, node: expr, lookupFiles: lookupFiles)
+            warn_interpolation(context: context, node: expr, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
         }
         return string
     }
-    static func warn_interpolation(context: some MacroExpansionContext, node: some SyntaxProtocol, lookupFiles: Set<String>) {
-        /*print("node=" + node.debugDescription)
-        for c in context.lexicalContext {
-            for t in node.tokens(viewMode: .fixedUp) {
-                let results = c.lookup(t.identifier)
-                for result:LookupResult in results {
-                    switch result {
-                        case .lookInGenericParametersOfExtendedType(let decl):
-                            print(decl.memberBlock)
-                            break
-                        default:
-                            print(result)
-                            break
-                    }
-                }
-            }
-        }
-        */
+    static func warn_interpolation(
+        context: some MacroExpansionContext,
+        node: some SyntaxProtocol,
+        string: inout String,
+        remaining_interpolation: inout Int,
+        lookupFiles: Set<String>
+    ) {
         if let test:String = InterpolationLookup.find(node, files: lookupFiles) {
-            //print("interpolationLookup.item=\(test)")
+            string.replace("\(node)", with: test)
+            remaining_interpolation -= 1
+        } else {
+            context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
         }
-        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
     }
 }
 

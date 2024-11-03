@@ -338,6 +338,9 @@ extension HTMLKitTests {
         string = #meta(content: "\(title)\("interpolation")", name: "description")
         #expect(string == "<meta content=\"flatteninginterpolation\" name=\"description\">")
     }
+    @Test func interpolation_flattening_with_lookup_files() {
+        //var string:StaticString = #html(lookupFiles: ["/home/paradigm/Desktop/GitProjects/swift-htmlkit/Tests/HTMLKitTests/HTMLKitTests.swift"], attributes: [.title(HTMLKitTests.spongebob)])
+    }
 }
 
 // MARK: Attribute tests
@@ -403,8 +406,6 @@ extension HTMLKitTests {
         var string:String = #div(attributes: [.title(HTMLKitTests.spongebob)])
         #expect(string == "<div title=\"Spongebob Squarepants\"></div>")
 
-        //string = #html(lookupFiles: ["/home/paradigm/Desktop/GitProjects/swift-htmlkit/Tests/HTMLKitTests/HTMLKitTests.swift"], attributes: [.title(HTMLKitTests.spongebob)])
-        
         string = #div(attributes: [.title(HTMLKitTests.patrick)])
         #expect(string == "<div title=\"Patrick Star\"></div>")
 
