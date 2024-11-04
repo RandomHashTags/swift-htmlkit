@@ -6,18 +6,25 @@
 //
 
 import Foundation
+import SwiftDiagnostics
+import SwiftSyntaxMacros
 import SwiftParser
 import SwiftSyntax
 
 enum InterpolationLookup {
     private static var cached:[String:SourceFileSyntax] = [:]
 
-    static func find(_ node: some SyntaxProtocol, files: Set<String>) -> String? {
+    static func find(context: some MacroExpansionContext, _ node: some SyntaxProtocol, files: Set<String>) -> String? {
         guard !files.isEmpty, let item:Item = item(node) else { return nil }
         for file in files {
-            if cached[file] == nil, let string:String = try? String.init(contentsOfFile: file, encoding: .utf8) {
-                let parsed:SourceFileSyntax = Parser.parse(source: string)
-                cached[file] = parsed
+            if cached[file] == nil {
+                if let string:String = try? String.init(contentsOfFile: file, encoding: .utf8) {
+                    let parsed:SourceFileSyntax = Parser.parse(source: string)
+                    cached[file] = parsed
+                } else {
+                    context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "fileNotFound", message: "Could not find file (\(file)) on disk, or was denied disk access (file access is always denied on macOS due to the macro being in a sandbox).", severity: .warning)))
+                    return nil
+                }
             }
         }
         //print("InterpolationLookup;find;item=\(item)")

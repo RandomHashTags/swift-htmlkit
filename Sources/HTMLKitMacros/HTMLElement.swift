@@ -436,7 +436,7 @@ private extension HTMLElement {
         remaining_interpolation: inout Int,
         lookupFiles: Set<String>
     ) {
-        if let fix:String = InterpolationLookup.find(node, files: lookupFiles) {
+        if let fix:String = InterpolationLookup.find(context: context, node, files: lookupFiles) {
             let expression:String = "\(node)"
             let ranges:[Range<String.Index>] = string.ranges(of: expression)
             string.replace(expression, with: fix)
