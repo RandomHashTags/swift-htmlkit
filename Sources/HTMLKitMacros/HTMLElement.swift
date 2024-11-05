@@ -26,7 +26,8 @@ enum HTMLElement : ExpressionMacro {
         set.insert(.htmlData)
         #endif
 
-        if set.contains(HTMLElementType(rawValue: node.macroName.text)) {
+        let elementType:HTMLElementType? = HTMLElementType(rawValue: node.macroName.text)
+        if set.contains(elementType) {
             let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !has_interpolation else {
                 context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
@@ -35,7 +36,7 @@ enum HTMLElement : ExpressionMacro {
             func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
                 return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
             }
-            switch HTMLElementType(rawValue: node.macroName.text) {
+            switch elementType {
                 case .htmlUTF8Bytes:
                     return "\(raw: bytes([UInt8](string.utf8)))"
                 case .htmlUTF16Bytes:
