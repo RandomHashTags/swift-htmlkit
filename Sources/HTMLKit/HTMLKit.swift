@@ -810,6 +810,7 @@ public macro script<T: ExpressibleByStringLiteral>(
     fetchpriority: HTMLElementAttribute.Extra.fetchpriority? = nil,
     integrity: T? = nil,
     nomodule: Bool = false,
+    nonce: T? = nil,
     referrerpolicy: HTMLElementAttribute.Extra.referrerpolicy? = nil,
     src: T? = nil,
     type: HTMLElementAttribute.Extra.scripttype? = nil,

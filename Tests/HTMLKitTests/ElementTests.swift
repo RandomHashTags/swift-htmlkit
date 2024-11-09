@@ -269,6 +269,7 @@ extension ElementTests {
     }
 
     // MARK: ol
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ol
     @Test func ol() {
         var string:StaticString = #ol()
         #expect(string == "<ol></ol>")
@@ -290,6 +291,7 @@ extension ElementTests {
     }
 
     // MARK: option
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option
     @Test func option() {
         var string:StaticString = #option()
         #expect(string == "<option></option>")
@@ -301,7 +303,15 @@ extension ElementTests {
         #expect(string == "<option value=\"earth\"></option>")
     }
 
+    // MARK: output
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/output
+    @Test func output() {
+        let string:StaticString = #output(for: ["whats", "it", "tuya"])
+        #expect(string == "<output for=\"whats it tuya\"></output>")
+    }
+
     // MARK: script
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script
     @Test func script() {
         var string:StaticString = #script()
         #expect(string == "<script></script>")
