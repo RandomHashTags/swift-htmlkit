@@ -116,7 +116,7 @@ public macro audio<T: ExpressibleByStringLiteral>(
     
     autoplay: Bool = false,
     controls: Bool = true,
-    controlslist: HTMLElementAttribute.Extra.controlslist? = nil,
+    controlslist: [HTMLElementAttribute.Extra.controlslist] = [],
     crossorigin: HTMLElementAttribute.Extra.crossorigin? = nil,
     disableremoteplayback: Bool = false,
     loop: Bool = false,

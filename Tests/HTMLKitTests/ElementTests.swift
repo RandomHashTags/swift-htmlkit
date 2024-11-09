@@ -110,9 +110,25 @@ extension ElementTests {
     }
 
     // MARK: audio
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
     @Test func audio() {
-        let string:StaticString = #audio(controlslist: .nodownload)
+        var string:StaticString = #audio(controlslist: [.nodownload])
         #expect(string == "<audio controlslist=\"nodownload\"></audio>")
+
+        string = #audio(controlslist: [.nodownload, .nofullscreen, .noremoteplayback])
+        #expect(string == "<audio controlslist=\"nodownload nofullscreen noremoteplayback\"></audio>")
+
+        string = #audio(autoplay: true)
+        #expect(string == "<audio autoplay></audio>")
+
+        string = #audio(autoplay: false, controls: true)
+        #expect(string == "<audio controls></audio>")
+
+        string = #audio(crossorigin: .anonymous)
+        #expect(string == "<audio crossorigin=\"anonymous\"></audio>")
+
+        string = #audio(crossorigin: .useCredentials)
+        #expect(string == "<audio crossorigin=\"use-credentials\"></audio>")
     }
 
     // MARK: button
