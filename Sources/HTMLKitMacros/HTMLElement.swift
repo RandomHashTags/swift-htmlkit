@@ -238,11 +238,12 @@ private extension HTMLElement {
     
     static func enumName(elementType: HTMLElementType, key: String) -> String {
         switch elementType.rawValue + key {
-        case "buttontype": return "buttontype"
-        case "inputtype":  return "inputtype"
-        case "oltype":     return "numberingtype"
-        case "scripttype": return "scripttype"
-        default:           return key
+        case "buttontype":  return "buttontype"
+        case "formenctype": return "formenctype"
+        case "inputtype":   return "inputtype"
+        case "oltype":      return "numberingtype"
+        case "scripttype":  return "scripttype"
+        default:            return key
         }
     }
     

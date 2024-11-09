@@ -169,15 +169,43 @@ extension ElementTests {
     }
 
     // MARK: canvas
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas
     @Test func canvas() {
         let string:StaticString = #canvas(height: .percent(4), width: .em(2.69))
         #expect(string == "<canvas height=\"4%\" width=\"2.69em\"></canvas>")
     }
 
+    // MARK: col
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col
+    @Test func col() {
+        let string:StaticString = #col(span: 4)
+        #expect(string == "<col span=\"4\">")
+    }
+
+    // MARK: colgroup
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup
+    @Test func colgroup() {
+        let string:StaticString = #colgroup(span: 3)
+        #expect(string == "<colgroup span=\"3\"></colgroup>")
+    }
+
     // MARK: form
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form
     @Test func form() {
-        let string:StaticString = #form(acceptCharset: ["utf-8"], autocomplete: .on)
+        var string:StaticString = #form(acceptCharset: ["utf-8"], autocomplete: .on)
         #expect(string == "<form accept-charset=\"utf-8\" autocomplete=\"on\"></form>")
+
+        string = #form(acceptCharset: ["utf-8", "utf-16"])
+        #expect(string == "<form accept-charset=\"utf-8 utf-16\"></form>")
+
+        string = #form(enctype: .textPlain)
+        #expect(string == "<form enctype=\"text/plain\"></form>")
+
+        string = #form(method: "post")
+        #expect(string == "<form method=\"post\"></form>")
+
+        string = #form(novalidate: true)
+        #expect(string == "<form novalidate></form>")
     }
 
     // MARK: iframe

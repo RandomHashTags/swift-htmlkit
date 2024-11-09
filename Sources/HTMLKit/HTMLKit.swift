@@ -372,9 +372,14 @@ public macro form<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
     acceptCharset: [T] = [],
+    action: T? = nil,
     autocomplete: HTMLElementAttribute.Extra.autocomplete? = nil,
+    enctype: HTMLElementAttribute.Extra.formenctype? = nil,
+    method: T? = nil,
     name: T? = nil,
+    novalidate: Bool = false,
     rel: T? = nil,
+    target: HTMLElementAttribute.Extra.target? = nil,
     _ innerHTML: T...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
 
