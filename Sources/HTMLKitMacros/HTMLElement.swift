@@ -122,6 +122,8 @@ private extension HTMLElement {
                     } else {
                         if key == "acceptCharset" {
                             key = "accept-charset"
+                        } else if key == "httpEquiv" {
+                            key = "http-equiv"
                         }
                         if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             attributes += string + " "
@@ -238,12 +240,13 @@ private extension HTMLElement {
     
     static func enumName(elementType: HTMLElementType, key: String) -> String {
         switch elementType.rawValue + key {
-        case "buttontype":  return "buttontype"
-        case "formenctype": return "formenctype"
-        case "inputtype":   return "inputtype"
-        case "oltype":      return "numberingtype"
-        case "scripttype":  return "scripttype"
-        default:            return key
+        case "buttontype":     return "buttontype"
+        case "formenctype":    return "formenctype"
+        case "inputtype":      return "inputtype"
+        case "metahttp-equiv": return "httpequiv"
+        case "oltype":         return "numberingtype"
+        case "scripttype":     return "scripttype"
+        default:               return key
         }
     }
     

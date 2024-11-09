@@ -254,6 +254,13 @@ extension ElementTests {
         #expect(string == "<link imagesrcset=\"blah,bling\">")
     }
 
+    // MARK: meta
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta
+    @Test func meta() {
+        let string:StaticString = #meta(charset: "utf-8", httpEquiv: .contentType)
+        #expect(string == "<meta charset=\"utf-8\" http-equiv=\"content-type\">")
+    }
+
     // MARK: ol
     @Test func ol() {
         var string:StaticString = #ol()
