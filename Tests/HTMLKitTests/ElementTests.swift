@@ -261,6 +261,13 @@ extension ElementTests {
         #expect(string == "<meta charset=\"utf-8\" http-equiv=\"content-type\">")
     }
 
+    // MARK: object
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object
+    @Test func object() {
+        let string:StaticString = #object(archive: ["https://github.com/RandomHashTags/destiny", "https://youtube.com"], border: 5)
+        #expect(string == "<object archive=\"https://github.com/RandomHashTags/destiny https://youtube.com\" border=\"5\"></object>")
+    }
+
     // MARK: ol
     @Test func ol() {
         var string:StaticString = #ol()

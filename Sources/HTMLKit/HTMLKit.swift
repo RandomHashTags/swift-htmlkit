@@ -663,10 +663,19 @@ public macro noscript<T: ExpressibleByStringLiteral>(
 public macro object<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
+    archive: [T] = [],
+    border: Int? = nil,
+    classid: T? = nil,
+    codebase: T? = nil,
+    codetype: T? = nil,
+    data: T? = nil,
+    declare: Bool = false,
     form: T? = nil,
     height: HTMLElementAttribute.CSSUnit? = nil,
     name: T? = nil,
+    standby: T? = nil,
     type: T? = nil,
+    usemap: T? = nil,
     width: HTMLElementAttribute.CSSUnit? = nil,
     _ innerHTML: T...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
