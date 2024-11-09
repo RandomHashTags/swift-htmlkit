@@ -179,6 +179,7 @@ public macro button<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
     command: HTMLElementAttribute.Extra.command? = nil,
+    commandfor: T? = nil,
     disabled: Bool = false,
     form: T? = nil,
     formaction: T? = nil,
