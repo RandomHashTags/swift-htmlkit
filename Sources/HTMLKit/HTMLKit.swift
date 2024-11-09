@@ -64,7 +64,7 @@ public macro a<T: ExpressibleByStringLiteral>(
     hreflang: T? = nil,
     ping: [T] = [],
     referrerpolicy: HTMLElementAttribute.Extra.referrerpolicy? = nil,
-    rel: T? = nil,
+    rel: [HTMLElementAttribute.Extra.rel] = [],
     target: HTMLElementAttribute.Extra.target? = nil,
     type: T? = nil,
     _ innerHTML: T...
@@ -93,7 +93,7 @@ public macro area<T: ExpressibleByStringLiteral>(
     shape: HTMLElementAttribute.Extra.shape? = nil,
     ping: [T] = [],
     referrerpolicy: HTMLElementAttribute.Extra.referrerpolicy? = nil,
-    rel: T? = nil,
+    rel: [HTMLElementAttribute.Extra.rel] = [],
     target: HTMLElementAttribute.Extra.formtarget? = nil,
     _ innerHTML: T...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
@@ -378,7 +378,7 @@ public macro form<T: ExpressibleByStringLiteral>(
     method: T? = nil,
     name: T? = nil,
     novalidate: Bool = false,
-    rel: T? = nil,
+    rel: [HTMLElementAttribute.Extra.rel] = [],
     target: HTMLElementAttribute.Extra.target? = nil,
     _ innerHTML: T...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElement")
@@ -587,7 +587,7 @@ public macro link<T: ExpressibleByStringLiteral>(
     integrity: T? = nil,
     media: T? = nil,
     referrerpolicy: HTMLElementAttribute.Extra.referrerpolicy? = nil,
-    rel: [T] = [],
+    rel: [HTMLElementAttribute.Extra.rel] = [],
     sizes: [T] = [],
     type: T? = nil,
     _ innerHTML: T...

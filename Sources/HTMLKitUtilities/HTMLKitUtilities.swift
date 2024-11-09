@@ -296,6 +296,7 @@ public extension HTMLElementAttribute.Extra {
         case high, low, auto
     }
 
+    // MARK: formenctype
     enum formenctype : String {
         case applicationXWWWFormURLEncoded
         case multipartFormData
@@ -310,14 +311,17 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: formmethod
     enum formmethod : String {
         case get, post, dialog
     }
 
+    // MARK: formtarget
     enum formtarget : String {
         case _self, _blank, _parent, _top
     }
 
+    // MARK: hidden
     enum hidden : String {
         case `true`
         case untilFound
@@ -330,6 +334,7 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: httpequiv
     enum httpequiv : String {
         case contentSecurityPolicy
         case contentType
@@ -348,10 +353,12 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: inputmode
     enum inputmode : String {
         case none, text, decimal, numeric, tel, search, email, url
     }
     
+    // MARK: inputtype
     enum inputtype : String {
         case button, checkbox, color, date
         case datetimeLocal
@@ -365,10 +372,12 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: loading
     enum loading : String {
         case eager, lazy
     }
 
+    // MARK: numberingtype
     enum numberingtype : String {
         case a, A, i, I, one
 
@@ -380,17 +389,22 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: popover
     enum popover : String {
         case auto, manual
     }
+
+    // MARK: popovertargetaction
     enum popovertargetaction : String {
         case hide, show, toggle
     }
 
+    // MARK: preload
     enum preload : String {
         case none, metadata, auto
     }
 
+    // MARK: referrerpolicy
     enum referrerpolicy : String {
         case noReferrer
         case noReferrerWhenDowngrade
@@ -414,6 +428,28 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: rel
+    enum rel : String {
+        case alternate, author, bookmark, canonical
+        case dnsPrefetch
+        case external, expect, help, icon, license
+        case manifest, me, modulepreload, next, nofollow, noopener, noreferrer
+        case opener, pingback, preconnect, prefetch, preload, prerender, prev
+        case privacyPolicy
+        case search, stylesheet, tag
+        case termsOfService
+
+        public var htmlValue : String {
+            switch self {
+                case .dnsPrefetch:    return "dns-prefetch"
+                case .privacyPolicy:  return "privacy-policy"
+                case .termsOfService: return "terms-of-service"
+                default:               return rawValue
+            }
+        }
+    }
+
+    // MARK: role
     /// [The first rule](https://www.w3.org/TR/using-aria/#rule1) of ARIA use is "If you can use a native HTML element or attribute with the semantics and behavior you require already built in, instead of re-purposing an element and adding an ARIA role, state or property to make it accessible, then do so."
     /// 
     /// - Note: There is a saying "No ARIA is better than bad ARIA." In [WebAim's survey of over one million home pages](https://webaim.org/projects/million/#aria), they found that Home pages with ARIA present averaged 41% more detected errors than those without ARIA. While ARIA is designed to make web pages more accessible, if used incorrectly, it can do more harm than good.

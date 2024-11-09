@@ -82,6 +82,9 @@ extension ElementTests {
 
         string = #a(target: ._blank)
         #expect(string == "<a target=\"_blank\"></a>")
+
+        string = #a(rel: [.stylesheet, .alternate, .privacyPolicy, .termsOfService, .dnsPrefetch])
+        #expect(string == "<a rel=\"stylesheet alternate privacy-policy terms-of-service dns-prefetch\"></a>")
     }
 
     // MARK: area
@@ -218,7 +221,15 @@ extension ElementTests {
         #expect(string == "<iframe allow=\"geolocation;test\"></iframe>")
     }
 
+    // MARK: img
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img
+    @Test func img() {
+        let string:StaticString = #img(sizes: ["(max-height: 500px) 1000px", "(min-height: 25rem)"], srcset: ["https://paradigm-app.com", "https://litleagues.com"])
+        #expect(string == "<img sizes=\"(max-height: 500px) 1000px,(min-height: 25rem)\" srcset=\"https://paradigm-app.com,https://litleagues.com\">")
+    }
+
     // MARK: input
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
     @Test func input() {
         var string:StaticString = #input(autocomplete: ["email", "password"], type: .text)
         #expect(string == "<input autocomplete=\"email password\" type=\"text\">")
@@ -228,18 +239,19 @@ extension ElementTests {
 
         string = #input(type: .datetimeLocal)
         #expect(string == "<input type=\"datetime-local\">")
-    }
 
-    // MARK: img
-    @Test func img() {
-        let string:StaticString = #img(sizes: ["(max-height: 500px) 1000px", "(min-height: 25rem)"], srcset: ["https://paradigm-app.com", "https://litleagues.com"])
-        #expect(string == "<img sizes=\"(max-height: 500px) 1000px,(min-height: 25rem)\" srcset=\"https://paradigm-app.com,https://litleagues.com\">")
+        string = #input(accept: [".docx", ".json"])
+        #expect(string == "<input accept=\".docx,.json\">")
     }
 
     // MARK: link
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link
     @Test func link() {
-        let string:StaticString = #link(as: .document, imagesizes: ["lmno", "p"])
+        var string:StaticString = #link(as: .document, imagesizes: ["lmno", "p"])
         #expect(string == "<link as=\"document\" imagesizes=\"lmno,p\">")
+
+        string = #link(imagesrcset: ["blah", "bling"])
+        #expect(string == "<link imagesrcset=\"blah,bling\">")
     }
 
     // MARK: ol

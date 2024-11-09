@@ -642,6 +642,7 @@ extension HTMLElementAttribute.Extra {
         case "inputtype":       return inputtype(rawValue: enumCase)!.htmlValue
         case "numberingtype":   return numberingtype(rawValue: enumCase)!.htmlValue
         case "referrerpolicy":  return referrerpolicy(rawValue: enumCase)!.htmlValue
+        case "rel":             return rel(rawValue: enumCase)!.htmlValue
         case "sandbox":         return sandbox(rawValue: enumCase)!.htmlValue
         case "height", "width":
             let values:[Substring] = enumCase.split(separator: "("), key:String = String(values[0]), value:String = String(values[1])
