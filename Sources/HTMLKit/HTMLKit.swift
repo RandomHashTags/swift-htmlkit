@@ -90,6 +90,7 @@ public macro area<T: ExpressibleByStringLiteral>(
     coords: [Int] = [],
     download: HTMLElementAttribute.Extra.download? = nil,
     href: T? = nil,
+    shape: HTMLElementAttribute.Extra.shape? = nil,
     ping: [T] = [],
     referrerpolicy: HTMLElementAttribute.Extra.referrerpolicy? = nil,
     rel: T? = nil,

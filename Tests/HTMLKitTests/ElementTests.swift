@@ -73,15 +73,40 @@ extension ElementTests {
         
         string = #a(download: .filename("yippie.json"))
         #expect(string == "<a download=\"yippie.json\"></a>")
+
+        string = #a(ping: ["https://litleagues.com", "https://github.com/RandomHashTags"])
+        #expect(string == "<a ping=\"https://litleagues.com https://github.com/RandomHashTags\"></a>")
+
+        string = #a(referrerpolicy: .noReferrer)
+        #expect(string == "<a referrerpolicy=\"no-referrer\"></a>")
+
+        string = #a(target: ._blank)
+        #expect(string == "<a target=\"_blank\"></a>")
     }
 
     // MARK: area
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area
     @Test func area() {
         var string:StaticString = #area(coords: [1, 2, 3])
         #expect(string == "<area coords=\"1,2,3\">")
 
         string = #area(coords: [])
         #expect(string == "<area coords=\"\">")
+
+        string = #area(href: "")
+        #expect(string == "<area href=\"\">")
+
+        string = #area(href: "https://github.com/RandomHashTags")
+        #expect(string == "<area href=\"https://github.com/RandomHashTags\">")
+
+        string = #area(shape: .poly)
+        #expect(string == "<area shape=\"poly\">")
+
+        string = #area(shape: .default)
+        #expect(string == "<area shape=\"default\">")
+
+        string = #area(target: ._self)
+        #expect(string == "<area target=\"_self\">")
     }
 
     // MARK: audio
