@@ -327,18 +327,28 @@ extension ElementTests {
     }
 
     // MARK: style
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style
     @Test func style() {
         let string:StaticString = #style(blocking: .render)
         #expect(string == "<style blocking=\"render\"></style>")
     }
 
+    // MARK: td
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td
+    @Test func td() {
+        let string:StaticString = #td(headers: ["puss", "in", "boots"])
+        #expect(string == "<td headers=\"puss in boots\"></td>")
+    }
+
     // MARK: template
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
     @Test func template() {
         let string:StaticString = #template(shadowrootclonable: .false, shadowrootdelegatesfocus: false, shadowrootmode: .closed, shadowrootserializable: true)
         #expect(string == "<template shadowrootclonable=\"false\" shadowrootmode=\"closed\" shadowrootserializable></template>")
     }
 
     // MARK: textarea
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea
     @Test func textarea() {
         let string:StaticString = #textarea(autocomplete: ["email", "password"], dirname: .ltr, rows: 5, wrap: .soft)
         #expect(string == "<textarea autocomplete=\"email password\" dirname=\"ltr\" rows=\"5\" wrap=\"soft\"></textarea>")

@@ -810,7 +810,6 @@ public macro script<T: ExpressibleByStringLiteral>(
     fetchpriority: HTMLElementAttribute.Extra.fetchpriority? = nil,
     integrity: T? = nil,
     nomodule: Bool = false,
-    nonce: T? = nil,
     referrerpolicy: HTMLElementAttribute.Extra.referrerpolicy? = nil,
     src: T? = nil,
     type: HTMLElementAttribute.Extra.scripttype? = nil,
@@ -947,8 +946,8 @@ public macro template<T: ExpressibleByStringLiteral>(
 public macro textarea<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
-    autocomplete: [T]? = nil,
-    autocorrect: T? = nil,
+    autocomplete: [T] = [],
+    autocorrect: HTMLElementAttribute.Extra.autocorrect? = nil,
     cols: Int? = nil,
     dirname: HTMLElementAttribute.Extra.dirname? = nil,
     disabled: Bool = false,
@@ -958,6 +957,7 @@ public macro textarea<T: ExpressibleByStringLiteral>(
     name: T? = nil,
     placeholder: T? = nil,
     readonly: Bool = false,
+    required: Bool = false,
     rows: Int? = nil,
     wrap: HTMLElementAttribute.Extra.wrap? = nil,
     _ innerHTML: T...

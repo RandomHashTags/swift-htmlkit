@@ -126,6 +126,7 @@ public enum HTMLElementAttribute {
     @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
     case event(Extra.event, _ value: (any ExpressibleByStringLiteral)? = nil)
 }
+// MARK: Extra attributes 
 public extension HTMLElementAttribute {
     enum Extra {
     }
@@ -134,32 +135,44 @@ public extension HTMLElementAttribute.Extra {
     typealias height = HTMLElementAttribute.CSSUnit
     typealias width = HTMLElementAttribute.CSSUnit
 
+    // MARK: as
     enum `as` : String {
         case audio, document, embed, fetch, font, image, object, script, style, track, video, worker
     }
 
+    // MARK: autocapitalize
     enum autocapitalize : String {
         case on, off
         case none
         case sentences, words, characters
     }
 
+    // MARK: autocomplete
     enum autocomplete : String {
         case off, on
     }
 
+    // MARK: autocorrect
+    enum autocorrect : String {
+        case off, on
+    }
+
+    // MARK: blocking
     enum blocking : String {
         case render
     }
 
+    // MARK: buttontype
     enum buttontype : String {
         case submit, reset, button
     }
 
+    // MARK: capture
     enum capture : String {
         case user, environment
     }
 
+    // MARK: command
     enum command {
         case showModal
         case close
