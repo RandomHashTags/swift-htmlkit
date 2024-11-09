@@ -324,7 +324,7 @@ private extension HTMLElement {
         }
         if let function:FunctionCallExprSyntax = expression.functionCall {
             switch key {
-            case "height", "width":
+            case "download", "height", "width":
                 var value:String = "\(function)"
                 value = String(value[value.index(after: value.startIndex)...])
                 value = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
@@ -630,6 +630,7 @@ extension HTMLElementAttribute.Extra {
         switch enumName {
         case "contenteditable": return contenteditable(rawValue: enumCase)!.htmlValue
         case "crossorigin":     return crossorigin(rawValue: enumCase)!.htmlValue
+        case "download":        return download(rawValue: enumCase)!.htmlValue
         case "formenctype":     return formenctype(rawValue: enumCase)!.htmlValue
         case "hidden":          return hidden(rawValue: enumCase)!.htmlValue
         case "httpequiv":       return httpequiv(rawValue: enumCase)!.htmlValue

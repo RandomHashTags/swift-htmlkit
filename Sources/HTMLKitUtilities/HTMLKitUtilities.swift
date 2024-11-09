@@ -204,8 +204,29 @@ public extension HTMLElementAttribute.Extra {
         case `true`, `false`
     }
 
-    enum download : String {
-        case filename
+    enum download {
+        case empty
+        case filename(String)
+
+        public init?(rawValue: String) {
+            if rawValue == "empty" {
+                self = .empty
+            } else {
+                if rawValue.starts(with: "filename(\"") && rawValue.hasSuffix("\")") {
+                    let value:String = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: 10)..<rawValue.index(rawValue.endIndex, offsetBy: -2)])
+                    self = .filename(value)
+                } else {
+                    return nil
+                }
+            }
+        }
+
+        public var htmlValue : String {
+            switch self {
+                case .empty: return ""
+                case .filename(let value): return value
+            }
+        }
     }
 
     enum enterkeyhint : String {

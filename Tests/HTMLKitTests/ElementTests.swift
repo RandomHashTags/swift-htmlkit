@@ -57,6 +57,7 @@ extension ElementTests {
     }
 
     // MARK: a
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
     @Test func a() {
         var string:String = #a("Test")
         #expect(string == "<a>Test</a>")
@@ -66,6 +67,12 @@ extension ElementTests {
 
         string = #a(href: "", "Test")
         #expect(string == "<a href=\"\">Test</a>")
+        
+        string = #a(download: .empty)
+        #expect(string == "<a download></a>")
+        
+        string = #a(download: .filename("yippie.json"))
+        #expect(string == "<a download=\"yippie.json\"></a>")
     }
 
     // MARK: area
