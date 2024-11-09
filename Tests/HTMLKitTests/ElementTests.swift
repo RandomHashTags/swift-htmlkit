@@ -129,9 +129,16 @@ extension ElementTests {
 
         string = #audio(crossorigin: .useCredentials)
         #expect(string == "<audio crossorigin=\"use-credentials\"></audio>")
+
+        string = #audio(disableremoteplayback: true)
+        #expect(string == "<audio disableremoteplayback></audio>")
+
+        string = #audio(preload: .auto)
+        #expect(string == "<audio preload=\"auto\"></audio>")
     }
 
     // MARK: button
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button
     @Test func button() {
         var string:StaticString = #button(type: .submit)
         #expect(string == "<button type=\"submit\"></button>")
@@ -144,6 +151,21 @@ extension ElementTests {
 
         string = #button(formenctype: .textPlain, formmethod: .get, type: .reset)
         #expect(string == "<button formenctype=\"text/plain\" formmethod=\"get\" type=\"reset\"></button>")
+
+        string = #button(command: .showModal)
+        #expect(string == "<button command=\"show-modal\"></button>")
+
+        string = #button(command: .showPopover)
+        #expect(string == "<button command=\"show-popover\"></button>")
+
+        string = #button(command: .hidePopover)
+        #expect(string == "<button command=\"hide-popover\"></button>")
+
+        string = #button(command: .togglePopover)
+        #expect(string == "<button command=\"toggle-popover\"></button>")
+
+        string = #button(command: .custom("bingbong"))
+        #expect(string == "<button command=\"--bingbong\"></button>")
     }
 
     // MARK: canvas

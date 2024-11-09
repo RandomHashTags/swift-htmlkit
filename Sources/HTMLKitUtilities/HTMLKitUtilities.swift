@@ -160,6 +160,43 @@ public extension HTMLElementAttribute.Extra {
         case user, environment
     }
 
+    enum command {
+        case showModal
+        case close
+        case showPopover
+        case hidePopover
+        case togglePopover
+        case custom(String)
+
+        public init?(rawValue: String) {
+            switch rawValue {
+                case "showModal":     self = .showModal
+                case "close":         self = .close
+                case "showPopover":   self = .showPopover
+                case "hidePopover":   self = .hidePopover
+                case "togglePopover": self = .togglePopover
+                default:
+                    if rawValue.starts(with: "custom(\"") && rawValue.hasSuffix("\")") {
+                        let value:String = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: 8)..<rawValue.index(rawValue.endIndex, offsetBy: -2)])
+                        self = .custom(value)
+                    } else {
+                        return nil
+                    }
+            }
+        }
+
+        public var htmlValue : String {
+            switch self {
+                case .showModal:          return "show-modal"
+                case .close:              return "close"
+                case .showPopover:        return "show-popover"
+                case .hidePopover:        return "hide-popover"
+                case .togglePopover:      return "toggle-popover"
+                case .custom(let value): return "--" + value
+            }
+        }
+    }
+
     enum contenteditable : String {
         case `true`, `false`
         case plaintextOnly

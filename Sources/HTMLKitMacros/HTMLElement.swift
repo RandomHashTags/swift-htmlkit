@@ -324,7 +324,7 @@ private extension HTMLElement {
         }
         if let function:FunctionCallExprSyntax = expression.functionCall {
             switch key {
-            case "download", "height", "width":
+            case "command", "download", "height", "width":
                 var value:String = "\(function)"
                 value = String(value[value.index(after: value.startIndex)...])
                 value = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
@@ -628,6 +628,7 @@ extension StringLiteralExprSyntax {
 extension HTMLElementAttribute.Extra {
     static func htmlValue(enumName: String, for enumCase: String) -> String { // only need to check the ones where the htmlValue is different from the rawValue
         switch enumName {
+        case "command":         return command(rawValue: enumCase)!.htmlValue
         case "contenteditable": return contenteditable(rawValue: enumCase)!.htmlValue
         case "crossorigin":     return crossorigin(rawValue: enumCase)!.htmlValue
         case "download":        return download(rawValue: enumCase)!.htmlValue
