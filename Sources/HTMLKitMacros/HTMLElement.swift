@@ -349,6 +349,9 @@ private extension HTMLElement {
                 case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
                     separator = ","
                     break
+                case "allow":
+                    separator = ";"
+                    break
                 default:
                     separator = " "
                     break

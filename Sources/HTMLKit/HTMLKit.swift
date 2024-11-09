@@ -455,7 +455,7 @@ public macro i<T: ExpressibleByStringLiteral>(
 public macro iframe<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
-    allow: T? = nil,
+    allow: [T] = [],
     browsingtopics: Bool = false,
     credentialless: Bool = false,
     csp: T? = nil,

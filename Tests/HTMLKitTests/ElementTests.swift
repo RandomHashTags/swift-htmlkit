@@ -209,9 +209,13 @@ extension ElementTests {
     }
 
     // MARK: iframe
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
     @Test func iframe() {
-        let string:StaticString = #iframe(sandbox: [.allowDownloads, .allowForms])
+        var string:StaticString = #iframe(sandbox: [.allowDownloads, .allowForms])
         #expect(string == "<iframe sandbox=\"allow-downloads allow-forms\"></iframe>")
+
+        string = #iframe(allow: ["geolocation", "test"])
+        #expect(string == "<iframe allow=\"geolocation;test\"></iframe>")
     }
 
     // MARK: input
