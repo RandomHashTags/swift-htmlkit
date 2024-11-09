@@ -164,6 +164,7 @@ private extension InterpolationLookup {
     }
 }
 
+// MARK: Misc
 // copy & paste `HTMLKitTests.swift` into https://swift-ast-explorer.com/ to get this working
 extension TypeSyntax {
     var identifierType : IdentifierTypeSyntax? { self.as(IdentifierTypeSyntax.self) }

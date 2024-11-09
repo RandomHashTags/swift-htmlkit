@@ -210,6 +210,7 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: contenteditable
     enum contenteditable : String {
         case `true`, `false`
         case plaintextOnly
@@ -222,10 +223,12 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: controlslist
     enum controlslist : String {
         case nodownload, nofullscreen, noremoteplayback
     }
 
+    // MARK: crossorigin
     enum crossorigin : String {
         case anonymous
         case useCredentials
@@ -238,22 +241,27 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: decoding
     enum decoding : String {
         case sync, async, auto
     }
 
+    // MARK: dir
     enum dir : String {
         case auto, ltr, rtl
     }
 
+    // MARK: dirname
     enum dirname : String {
         case ltr, rtl
     }
 
+    // MARK: draggable
     enum draggable : String {
         case `true`, `false`
     }
 
+    // MARK: download
     enum download {
         case empty
         case filename(String)
@@ -279,10 +287,12 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: enterkeyhint
     enum enterkeyhint : String {
         case enter, done, go, next, previous, search, send
     }
 
+    // MARK: event
     enum event : String {
         case accept, afterprint, animationend, animationiteration, animationstart
         case beforeprint, beforeunload, blur
@@ -305,6 +315,7 @@ public extension HTMLElementAttribute.Extra {
         case waiting, wheel
     }
 
+    // MARK: fetchpriority
     enum fetchpriority : String {
         case high, low, auto
     }
@@ -383,6 +394,11 @@ public extension HTMLElementAttribute.Extra {
                 default: return rawValue
             }
         }
+    }
+
+    // MARK: kind
+    enum kind : String {
+        case subtitles, captions, chapters, metadata
     }
 
     // MARK: loading
@@ -547,6 +563,7 @@ public extension HTMLElementAttribute.Extra {
         case treeitem
     }
 
+    // MARK: sandbox
     enum sandbox : String {
         case allowDownloads
         case allowForms
@@ -583,49 +600,57 @@ public extension HTMLElementAttribute.Extra {
         }
     }
 
+    // MARK: scripttype
     enum scripttype : String {
         case importmap, module, speculationrules
     }
 
+    // MARK: scope
     enum scope : String {
         case row, col, rowgroup, colgroup
     }
 
+    // MARK: shadowrootmode
     enum shadowrootmode : String {
         case open, closed
     }
+
+    // MARK: shadowrootclonable
     enum shadowrootclonable : String {
         case `true`, `false`
     }
 
+    // MARK: shape
     enum shape : String {
         case rect, circle, poly, `default`
     }
 
+    // MARK: spellcheck
     enum spellcheck : String {
         case `true`, `false`
     }
 
+    // MARK: target
     enum target : String {
         case _self, _blank, _parent, _top, _unfencedTop
     }
 
-    enum kind : String {
-        case subtitles, captions, chapters, metadata
-    }
-
+    // MARK: translate
     enum translate : String {
         case yes, no
     }
 
+    // MARK: virtualkeyboardpolicy
     enum virtualkeyboardpolicy : String {
         case auto, manual
     }
 
+    // MARK: wrap
     enum wrap : String {
         case hard, soft
     }
 
+    // MARK: writingsuggestions
     enum writingsuggestions : String {
         case `true`, `false`
     }
