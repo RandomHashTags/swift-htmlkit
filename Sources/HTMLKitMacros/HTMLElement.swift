@@ -177,6 +177,9 @@ private extension HTMLElement {
                         }
                         break
                     default:
+                        if key == "ariaattribute" {
+                            key = "aria-" + first_expression.functionCall!.calledExpression.memberAccess!.declName.baseName.text
+                        }
                         if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression, lookupFiles: lookupFiles) {
                             value = string
                         }
@@ -246,7 +249,11 @@ private extension HTMLElement {
         case "metahttp-equiv": return "httpequiv"
         case "oltype":         return "numberingtype"
         case "scripttype":     return "scripttype"
-        default:               return key
+        default:
+            if key.hasPrefix("aria-") {
+                return "ariaattribute"
+            }
+            return key
         }
     }
     
@@ -327,13 +334,13 @@ private extension HTMLElement {
             return (stringLiteral.string, return_type)
         }
         if let function:FunctionCallExprSyntax = expression.functionCall {
-            switch key {
-            case "command", "download", "height", "width":
+            let enums:Set<String> = ["command", "download", "height", "width"]
+            if enums.contains(key) || key.hasPrefix("aria-") {
                 var value:String = "\(function)"
                 value = String(value[value.index(after: value.startIndex)...])
                 value = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
                 return (value, .enumCase)
-            default:
+            } else {
                 if function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "StaticString" {
                     return (function.arguments.first!.expression.stringLiteral!.string, .string)
                 }
@@ -635,6 +642,7 @@ extension StringLiteralExprSyntax {
 extension HTMLElementAttribute.Extra {
     static func htmlValue(enumName: String, for enumCase: String) -> String { // only need to check the ones where the htmlValue is different from the rawValue
         switch enumName {
+        case "ariaattribute":   return ariaattribute(rawValue: enumCase)?.htmlValue ?? "???"
         case "command":         return command(rawValue: enumCase)!.htmlValue
         case "contenteditable": return contenteditable(rawValue: enumCase)!.htmlValue
         case "crossorigin":     return crossorigin(rawValue: enumCase)!.htmlValue

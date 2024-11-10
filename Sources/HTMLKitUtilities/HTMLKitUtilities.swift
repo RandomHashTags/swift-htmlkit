@@ -83,6 +83,10 @@ public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/css
 // MARK: HTMLElement Attributes
 public enum HTMLElementAttribute {
     case accesskey((any ExpressibleByStringLiteral)? = nil)
+
+    case ariaattribute(Extra.ariaattribute? = nil)
+    case role(Extra.ariarole? = nil)
+
     case autocapitalize(Extra.autocapitalize? = nil)
     case autofocus(Bool = false)
     case `class`([any ExpressibleByStringLiteral] = [])
@@ -106,7 +110,6 @@ public enum HTMLElementAttribute {
     case nonce((any ExpressibleByStringLiteral)? = nil)
     case part([(any ExpressibleByStringLiteral)] = [])
     case popover(Extra.popover? = nil)
-    case role(Extra.role? = nil)
     case slot((any ExpressibleByStringLiteral)? = nil)
     case spellcheck(Extra.spellcheck? = nil)
     case style((any ExpressibleByStringLiteral)? = nil)
@@ -134,6 +137,384 @@ public extension HTMLElementAttribute {
 public extension HTMLElementAttribute.Extra {
     typealias height = HTMLElementAttribute.CSSUnit
     typealias width = HTMLElementAttribute.CSSUnit
+
+    // MARK: aria attributes (states and properties)
+    // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes
+    enum ariaattribute {
+        case activedescendant(String)
+        case atomic(Bool)
+        case autocomplete(Autocomplete)
+
+        case braillelabel(String)
+        case brailleroledescription(String)
+        case busy(Bool)
+        
+        case checked(Checked)
+        case colcount(Int)
+        case colindex(Int)
+        case colindextext(String)
+        case colspan(Int)
+        case controls([String])
+        case current(Current)
+
+        case describedby([String])
+        case description(String)
+        case details([String])
+        case disabled(Bool)
+        case dropeffect(DropEffect)
+
+        case errormessage(String)
+        case expanded(Expanded)
+        
+        case flowto([String])
+        
+        case grabbed(Grabbed)
+
+        case haspopup(HasPopup)
+        case hidden(Hidden)
+
+        case invalid(Invalid)
+
+        case keyshortcuts(String)
+
+        case label(String)
+        case labelledby([String])
+        case level(Int)
+        case live(Live)
+
+        case modal(Bool)
+        case multiline(Bool)
+        case multiselectable(Bool)
+
+        case orientation(Orientation)
+        case owns([String])
+
+        case placeholder(String)
+        case posinset(Int)
+        case pressed(Pressed)
+
+        case readonly(Bool)
+
+        case relevant(Relevant)
+        case required(Bool)
+        case roledescription(String)
+        case rowcount(Int)
+        case rowindex(Int)
+        case rowindextext(String)
+        case rowspan(Int)
+
+        case selected(Selected)
+        case setsize(Int)
+        case sort(Sort)
+
+        case valuemax(Float)
+        case valuemin(Float)
+        case valuenow(Float)
+        case valuetext(String)
+
+        public init?(rawValue: String) {
+            guard rawValue.last == ")" else { return nil }
+            let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
+            let key:Substring = rawValue.split(separator: "(")[0]
+            func string() -> String {
+                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
+            }
+            func boolean() -> Bool {
+                return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
+            }
+            func enumeration<T : RawRepresentable>() -> T where T.RawValue == String {
+                return T(rawValue: String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end]))!
+            }
+            func int() -> Int {
+                return Int(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
+            }
+            func array_string() -> [String] {
+                let string:String = string()
+                let ranges:[Range<String.Index>] = try! string.ranges(of: Regex("\"([^\"]+)\"")) // TODO: fix? (doesn't parse correctly if the string contains escaped quotation marks)
+                return ranges.map({
+                    let item:String = String(string[$0])
+                    return String(item[item.index(after: item.startIndex)..<item.index(before: item.endIndex)])
+                })
+            }
+            func float() -> Float {
+                return Float(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
+            }
+            switch key {
+                case "activedescendant":       self = .activedescendant(string())
+                case "atomic":                 self = .atomic(boolean())
+                case "autocomplete":           self = .autocomplete(enumeration())
+                case "braillelabel":           self = .braillelabel(string())
+                case "brailleroledescription": self = .brailleroledescription(string())
+                case "busy":                   self = .busy(boolean())
+                case "checked":                self = .checked(enumeration())
+                case "colcount":               self = .colcount(int())
+                case "colindex":               self = .colindex(int())
+                case "colindextext":           self = .colindextext(string())
+                case "colspan":                self = .colspan(int())
+                case "controls":               self = .controls(array_string())
+                case "current":                self = .current(enumeration())
+                case "describedby":            self = .describedby(array_string())
+                case "description":            self = .description(string())
+                case "details":                self = .details(array_string())
+                case "disabled":               self = .disabled(boolean())
+                case "dropeffect":             self = .dropeffect(enumeration())
+                case "errormessage":           self = .errormessage(string())
+                case "expanded":               self = .expanded(enumeration())
+                case "flowto":                 self = .flowto(array_string())
+                case "grabbed":                self = .grabbed(enumeration())
+                case "haspopup":               self = .haspopup(enumeration())
+                case "hidden":                 self = .hidden(enumeration())
+                case "invalid":                self = .invalid(enumeration())
+                case "keyshortcuts":           self = .keyshortcuts(string())
+                case "label":                  self = .label(string())
+                case "labelledby":             self = .labelledby(array_string())
+                case "level":                  self = .level(int())
+                case "live":                   self = .live(enumeration())
+                case "modal":                  self = .modal(boolean())
+                case "multiline":              self = .multiline(boolean())
+                case "multiselectable":        self = .multiselectable(boolean())
+                case "orientation":            self = .orientation(enumeration())
+                case "owns":                   self = .owns(array_string())
+                case "placeholder":            self = .placeholder(string())
+                case "posinset":               self = .posinset(int())
+                case "pressed":                self = .pressed(enumeration())
+                case "readonly":               self = .readonly(boolean())
+                case "relevant":               self = .relevant(enumeration())
+                case "required":               self = .required(boolean())
+                case "roledescription":        self = .roledescription(string())
+                case "rowcount":               self = .rowcount(int())
+                case "rowindex":               self = .rowindex(int())
+                case "rowindextext":           self = .rowindextext(string())
+                case "rowspan":                self = .rowspan(int())
+                case "selected":               self = .selected(enumeration())
+                case "setsize":                self = .setsize(int())
+                case "sort":                   self = .sort(enumeration())
+                case "valuemax":               self = .valuemax(float())
+                case "valuemin":               self = .valuemin(float())
+                case "valuenow":               self = .valuenow(float())
+                case "valuetext":              self = .valuetext(string())
+                default:                       return nil
+            }
+        }
+
+        public var htmlValue : String {
+            switch self {
+                case .activedescendant(let value): return value
+                case .atomic(let value): return "\(value)"
+                case .autocomplete(let value): return value.rawValue
+                case .braillelabel(let value): return value
+                case .brailleroledescription(let value): return value
+                case .busy(let value): return "\(value)"
+                case .checked(let value): return value.rawValue
+                case .colcount(let value): return "\(value)"
+                case .colindex(let value): return "\(value)"
+                case .colindextext(let value): return value
+                case .colspan(let value): return "\(value)"
+                case .controls(let value): return value.joined(separator: " ")
+                case .current(let value): return value.rawValue
+                case .describedby(let value): return value.joined(separator: " ")
+                case .description(let value): return value
+                case .details(let value): return value.joined(separator: " ")
+                case .disabled(let value): return "\(value)"
+                case .dropeffect(let value): return value.rawValue
+                case .errormessage(let value): return value
+                case .expanded(let value): return value.rawValue
+                case .flowto(let value): return value.joined(separator: " ")
+                case .grabbed(let value): return value.rawValue
+                case .haspopup(let value): return value.rawValue
+                case .hidden(let value): return value.rawValue
+                case .invalid(let value): return value.rawValue
+                case .keyshortcuts(let value): return value
+                case .label(let value): return value
+                case .labelledby(let value): return value.joined(separator: " ")
+                case .level(let value): return "\(value)"
+                case .live(let value): return value.rawValue
+                case .modal(let value): return "\(value)"
+                case .multiline(let value): return "\(value)"
+                case .multiselectable(let value): return "\(value)"
+                case .orientation(let value): return value.rawValue
+                case .owns(let value): return value.joined(separator: " ")
+                case .placeholder(let value): return value
+                case .posinset(let value): return "\(value)"
+                case .pressed(let value): return value.rawValue
+                case .readonly(let value): return "\(value)"
+                case .relevant(let value): return value.rawValue
+                case .required(let value): return "\(value)"
+                case .roledescription(let value): return value
+                case .rowcount(let value): return "\(value)"
+                case .rowindex(let value): return "\(value)"
+                case .rowindextext(let value): return value
+                case .rowspan(let value): return "\(value)"
+                case .selected(let value): return value.rawValue
+                case .setsize(let value): return "\(value)"
+                case .sort(let value): return value.rawValue
+                case .valuemax(let value): return "\(value)"
+                case .valuemin(let value): return "\(value)"
+                case .valuenow(let value): return "\(value)"
+                case .valuetext(let value): return value
+            }
+        }
+
+        public enum Autocomplete : String {
+            case none, inline, list, both
+        }
+        public enum Checked : String {
+            case `false`, `true`, mixed, undefined
+        }
+        public enum Current : String {
+            case page, step, location, date, time, `true`, `false`
+        }
+        public enum DropEffect : String {
+            case copy, execute, link, move, none, popup
+        }
+        public enum Expanded : String {
+            case `false`, `true`, undefined
+        }
+        public enum Grabbed : String {
+            case `true`, `false`, undefined
+        }
+        public enum HasPopup : String {
+            case `false`, `true`, menu, listbox, tree, grid, dialog
+        }
+        public enum Hidden : String {
+            case `false`, `true`, undefined
+        }
+        public enum Invalid : String {
+            case grammar, `false`, spelling, `true`
+        }
+        public enum Live : String {
+            case assertive, off, polite
+        }
+        public enum Orientation : String {
+            case horizontal, undefined, vertical
+        }
+        public enum Pressed : String {
+            case `false`, mixed, `true`, undefined
+        }
+        public enum Relevant : String {
+            case additions, all, removals, text
+        }
+        public enum Selected : String {
+            case `true`, `false`, undefined
+        }
+        public enum Sort : String {
+            case ascending, descending, none, other
+        }
+    }
+
+    // MARK: aria role
+    /// [The first rule](https://www.w3.org/TR/using-aria/#rule1) of ARIA use is "If you can use a native HTML element or attribute with the semantics and behavior you require already built in, instead of re-purposing an element and adding an ARIA role, state or property to make it accessible, then do so."
+    /// 
+    /// - Note: There is a saying "No ARIA is better than bad ARIA." In [WebAim's survey of over one million home pages](https://webaim.org/projects/million/#aria), they found that Home pages with ARIA present averaged 41% more detected errors than those without ARIA. While ARIA is designed to make web pages more accessible, if used incorrectly, it can do more harm than good.
+    /// 
+    /// Like any other web technology, there are varying degrees of support for ARIA. Support is based on the operating system and browser being used, as well as the kind of assistive technology interfacing with it. In addition, the version of the operating system, browser, and assistive technology are contributing factors. Older software versions may not support certain ARIA roles, have only partial support, or misreport its functionality.
+    ///
+    /// It is also important to acknowledge that some people who rely on assistive technology are reluctant to upgrade their software, for fear of losing the ability to interact with their computer and browser. Because of this, it is important to use semantic HTML elements whenever possible, as semantic HTML has far better support for assistive technology.
+    /// 
+    /// It is also important to test your authored ARIA with actual assistive technology. This is because browser emulators and simulators are not really effective for testing full support. Similarly, proxy assistive technology solutions are not sufficient to fully guarantee functionality.
+    ///
+    /// Learn more at https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA .
+    enum ariarole : String {
+        case alert, alertdialog
+        case application
+        case article
+        case associationlist, associationlistitemkey, associationlistitemvalue
+
+        case banner
+        case blockquote
+        case button
+
+        case caption
+        case cell
+        case checkbox
+        case code
+        case columnheader
+        case combobox
+        case command
+        case comment
+        case complementary
+        case composite
+        case contentinfo
+
+        case definition
+        case deletion
+        case dialog
+        case directory
+        case document
+
+        case emphasis
+
+        case feed
+        case figure
+        case form
+
+        case generic
+        case grid, gridcell
+        case group
+
+        case heading
+
+        case img
+        case input
+        case insertion
+
+        case landmark
+        case link
+        case listbox, listitem
+        case log
+
+        case main
+        case mark
+        case marquee
+        case math
+        case menu, menubar
+        case menuitem, menuitemcheckbox, menuitemradio
+        case meter
+
+        case navigation
+        case none
+        case note
+
+        case option
+        
+        case paragraph
+        case presentation
+        case progressbar
+
+        case radio, radiogroup
+        case range
+        case region
+        case roletype
+        case row, rowgroup, rowheader
+
+        case scrollbar
+        case search, searchbox
+        case section, sectionhead
+        case select
+        case separator
+        case slider
+        case spinbutton
+        case status
+        case structure
+        case strong
+        case `subscript`
+        case superscript
+        case suggestion
+        case `switch`
+
+        case tab, tablist, tabpanel
+        case table
+        case term
+        case textbox
+        case time
+        case timer
+        case toolbar
+        case tooltip
+        case tree, treegrid, treeitem
+
+        case widget
+        case window
+    }
 
     // MARK: as
     enum `as` : String {
@@ -476,91 +857,6 @@ public extension HTMLElementAttribute.Extra {
                 default:               return rawValue
             }
         }
-    }
-
-    // MARK: role
-    /// [The first rule](https://www.w3.org/TR/using-aria/#rule1) of ARIA use is "If you can use a native HTML element or attribute with the semantics and behavior you require already built in, instead of re-purposing an element and adding an ARIA role, state or property to make it accessible, then do so."
-    /// 
-    /// - Note: There is a saying "No ARIA is better than bad ARIA." In [WebAim's survey of over one million home pages](https://webaim.org/projects/million/#aria), they found that Home pages with ARIA present averaged 41% more detected errors than those without ARIA. While ARIA is designed to make web pages more accessible, if used incorrectly, it can do more harm than good.
-    /// 
-    /// Like any other web technology, there are varying degrees of support for ARIA. Support is based on the operating system and browser being used, as well as the kind of assistive technology interfacing with it. In addition, the version of the operating system, browser, and assistive technology are contributing factors. Older software versions may not support certain ARIA roles, have only partial support, or misreport its functionality.
-    ///
-    /// It is also important to acknowledge that some people who rely on assistive technology are reluctant to upgrade their software, for fear of losing the ability to interact with their computer and browser. Because of this, it is important to use semantic HTML elements whenever possible, as semantic HTML has far better support for assistive technology.
-    /// 
-    /// It is also important to test your authored ARIA with actual assistive technology. This is because browser emulators and simulators are not really effective for testing full support. Similarly, proxy assistive technology solutions are not sufficient to fully guarantee functionality.
-    ///
-    /// Learn more at https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA .
-    enum role : String {
-        case alert
-        case alertdialog
-        case associationlist
-        case associationlistitemkey
-        case associationlistitemvalue
-
-        case banner
-        case blockquote
-
-        case caption
-        case code
-        case combobox
-        case comment
-        case complementary
-        case contentinfo
-
-        case deletion
-        case dialog
-
-        case emphasis
-
-        case feed
-        case form
-
-        case generic
-
-        case insertion
-
-        case log
-
-        case main
-        case mark
-        case marquee
-        case math
-        case menu
-        case menubar
-
-        case navigation
-        case none
-        case note
-        
-        case paragraph
-        case presentation
-
-        case region
-
-        case scrollbar
-        case search
-        case searchbox
-        case sectionhead
-        case separator
-        case slider
-        case spinbutton
-        case status
-        case strong
-        case `subscript`
-        case superscript
-        case suggestion
-        case `switch`
-
-        case tab
-        case tablist
-        case tabpanel
-        case time
-        case timer
-        case toolbar
-        case tooltip
-        case tree
-        case treegrid
-        case treeitem
     }
 
     // MARK: sandbox
