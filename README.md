@@ -84,8 +84,6 @@ If you know the data **at compile time** (and not working with HTML macros):
 
 If you're working with **runtime** data:
 
-> \>\>\> !! You need to `import HTMLKitUtilities` to use these functions !! <<<
-
 - `<string>.escapeHTML(escapeAttributes:)`
   - mutates `self` escaping HTML and, optionally, attribute characters
 - `<string>.escapeHTMLAttributes()`
