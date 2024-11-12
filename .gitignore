@@ -15,6 +15,12 @@ DebugRender.*
 DebugXmlRender.*
 Elements.*
 Events.*
+HTMX.d
+HTMX.o
+HTMX.swiftdeps*
+HTMXTests.d
+HTMXTests.o
+HTMXTests.swiftdeps*
 Html4.*
 HtmlRender.*
 MediaType.*

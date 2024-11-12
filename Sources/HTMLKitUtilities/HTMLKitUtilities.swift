@@ -119,12 +119,14 @@ public enum HTMLElementAttribute {
     case virtualkeyboardpolicy(Extra.virtualkeyboardpolicy? = nil)
     case writingsuggestions(Extra.writingsuggestions? = nil)
 
-    case custom(_ id: any ExpressibleByStringLiteral, _ value: (any ExpressibleByStringLiteral)?)
-
     /// This attribute adds a space and slash (" /") character before closing a void element tag.
     ///
     /// Usually only used if certain browsers need it for compatibility.
     case trailingSlash
+
+    case htmx(_ attribute: HTMLElementAttribute.HTMX)
+
+    case custom(_ id: any ExpressibleByStringLiteral, _ value: (any ExpressibleByStringLiteral)?)
 
     @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
     case event(Extra.event, _ value: (any ExpressibleByStringLiteral)? = nil)

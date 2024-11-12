@@ -180,7 +180,15 @@ private extension HTMLElement {
                         if key == "ariaattribute" {
                             key = "aria-" + first_expression.functionCall!.calledExpression.memberAccess!.declName.baseName.text
                         }
-                        if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression, lookupFiles: lookupFiles) {
+                        if key == "htmx" {
+                            let target:String = first_expression.functionCall!.calledExpression.memberAccess!.declName.baseName.text
+                            var string:String = "\(first_expression)"
+                            string = String(string[string.index(after: string.startIndex)...])
+                            if let htmx:HTMLElementAttribute.HTMX = HTMLElementAttribute.HTMX(rawValue: string) {
+                                let htmlValue:String = htmx.htmlValue
+                                value = "hx-" + target + (htmlValue.isEmpty ? "" : "=\\\"" + htmlValue + "\\\"")
+                            }
+                        } else if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression, lookupFiles: lookupFiles) {
                             value = string
                         }
                         break
