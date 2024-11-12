@@ -18,7 +18,19 @@ struct HTMXTests {
     // MARK: on
     @Test func on() {
         var string:StaticString = #div(attributes: [.htmx(.on(.abort, "bruh"))])
-        #expect(string == "<div hx-on:abort=\"bruh\"></div>")
+        #expect(string == "<div hx-on::abort=\"bruh\"></div>")
+
+        string = #div(attributes: [.htmx(.on(.afterOnLoad, "test()"))])
+        #expect(string == "<div hx-on::after-on-load=\"test()\"></div>")
+    }
+
+    // MARK: onevent
+    @Test func onevent() {
+        var string:StaticString = #div(attributes: [.htmx(.onevent(.click, "thing()"))])
+        #expect(string == "<div hx-on:click=\"thing()\"></div>")
+
+        string = #div(attributes: [.htmx(.onevent(.durationchange, "durationChanged()"))])
+        #expect(string == "<div hx-on:durationchange=\"durationChanged()\"></div>")
     }
 
     // MARK: post

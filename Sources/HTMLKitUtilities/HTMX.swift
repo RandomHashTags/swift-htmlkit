@@ -34,6 +34,7 @@ public extension HTMLElementAttribute {
         case get(String)
         case post(String)
         case on(Event, String)
+        case onevent(HTMLElementAttribute.Extra.event, String)
         case pushURL(URL)
         case select(String)
         case selectOOB(String)
@@ -88,7 +89,7 @@ public extension HTMLElementAttribute {
 
                 case "get": self = .get(string())
                 case "post": self = .post(string())
-                case "on":
+                case "on", "onevent":
                     let string:String = literal()
                     let values:[Substring] = string.split(separator: ",")
                     let event_string:String = String(values[0])
@@ -97,8 +98,13 @@ public extension HTMLElementAttribute {
                         value.removeFirst()
                     }
                     value.removeLast()
-                    let event:Event = Event(rawValue: event_string)!
-                    self = .on(event, value)
+                    if key == "on" {
+                        let event:Event = Event(rawValue: event_string)!
+                        self = .on(event, value)
+                    } else {
+                        let event:HTMLElementAttribute.Extra.event = .init(rawValue: event_string)!
+                        self = .onevent(event, value)
+                    }
                     break
                 case "pushURL": self = .pushURL(URL(rawValue: string())!)
                 case "select": self = .select(string())
@@ -126,7 +132,7 @@ public extension HTMLElementAttribute {
                 case .ext(_): return "ext"
                 case .headers(_, _): return "headers"
                 case .history(_): return "history"
-                case .historyElt(_): return "historyElt"
+                case .historyElt(_): return "history-elt"
                 case .include(_): return "include"
                 case .indicator(_): return "indicator"
                 case .inherit(_): return "inherit"
@@ -142,7 +148,8 @@ public extension HTMLElementAttribute {
 
                 case .get(_): return "get"
                 case .post(_): return "post"
-                case .on(let event, _): return "on:" + event.rawValue
+                case .on(let event, _): return "on:" + event.key
+                case .onevent(let event, _): return "on:" + event.rawValue
                 case .pushURL(_): return "push-url"
                 case .select(_): return "select"
                 case .selectOOB(_): return "select-oob"
@@ -188,6 +195,7 @@ public extension HTMLElementAttribute {
                 case .get(let value):  return value
                 case .post(let value): return value
                 case .on(_, let value): return value
+                case .onevent(_, let value): return value
                 case .pushURL(let url): return url.htmlValue
                 case .select(let value): return value
                 case .selectOOB(let value): return value
@@ -226,8 +234,8 @@ public extension HTMLElementAttribute.HTMX {
         case beforeOnLoad
         case beforeProcessNode
         case beforeRequest
-        case beforeSwap
         case beforeSend
+        case beforeSwap
         case beforeTransition
         case configRequest
         case confirm
@@ -244,7 +252,9 @@ public extension HTMLElementAttribute.HTMX {
         case oobBeforeSwap
         case oobErrorNoTarget
         case prompt
+        case beforeHistoryUpdate
         case pushedIntoHistory
+        case replacedInHistory
         case responseError
         case sendError
         case sseError
@@ -252,6 +262,8 @@ public extension HTMLElementAttribute.HTMX {
         case swapError
         case targetError
         case timeout
+        case trigger
+        case validateURL
         case validationValidate
         case validationFailed
         case validationHalted
@@ -260,17 +272,54 @@ public extension HTMLElementAttribute.HTMX {
         case xhrLoadStart
         case xhrProgress
 
-        public var htmlValue : String {
-            switch self {
-                case .validationValidate: return "validation:validate"
-                case .validationFailed:   return "validation:failed"
-                case .validationHalted:   return "validation:halted"
-                case .xhrAbort:           return "xhr:abort"
-                case .xhrLoadEnd:         return "xhr:loadend"
-                case .xhrLoadStart:       return "xhr:loadstart"
-                case .xhrProgress:        return "xhr:progress"
-                default:                  return rawValue
+        public var key : String {
+            func slug() -> String {
+                switch self {
+                    case .afterOnLoad:           return "after-on-load"
+                    case .afterProcessNode:      return "after-process-node"
+                    case .afterRequest:          return "after-request"
+                    case .afterSettle:           return "after-settle"
+                    case .afterSwap:             return "after-swap"
+                    case .beforeCleanupElement:  return "before-cleanup-element"
+                    case .beforeOnLoad:          return "before-on-load"
+                    case .beforeProcessNode:     return "before-process-node"
+                    case .beforeRequest:         return "before-request"
+                    case .beforeSend:            return "before-send"
+                    case .beforeSwap:            return "before-swap"
+                    case .beforeTransition:      return "before-transition"
+                    case .configRequest:         return "config-request"
+                    case .historyCacheError:     return "history-cache-error"
+                    case .historyCacheMiss:      return "history-cache-miss"
+                    case .historyCacheMissError: return "history-cache-miss-error"
+                    case .historyCacheMissLoad:  return "history-cache-miss-load"
+                    case .historyRestore:        return "history-restore"
+                    case .beforeHistorySave:     return "before-history-save"
+                    case .noSSESourceError:      return "no-sse-source-error"
+                    case .onLoadError:           return "on-load-error"
+                    case .oobAfterSwap:          return "oob-after-swap"
+                    case .oobBeforeSwap:         return "oob-before-swap"
+                    case .oobErrorNoTarget:      return "oob-error-no-target"
+                    case .beforeHistoryUpdate:   return "before-history-update"
+                    case .pushedIntoHistory:     return "pushed-into-history"
+                    case .replacedInHistory:     return "replaced-in-history"
+                    case .responseError:         return "response-error"
+                    case .sendError:             return "send-error"
+                    case .sseError:              return "sse-error"
+                    case .sseOpen:               return "sse-open"
+                    case .swapError:             return "swap-error"
+                    case .targetError:           return "target-error"
+                    case .validateURL:           return "validate-url"
+                    case .validationValidate:    return "validation:validate"
+                    case .validationFailed:      return "validation:failed"
+                    case .validationHalted:      return "validation:halted"
+                    case .xhrAbort:              return "xhr:abort"
+                    case .xhrLoadEnd:            return "xhr:loadend"
+                    case .xhrLoadStart:          return "xhr:loadstart"
+                    case .xhrProgress:           return "xhr:progress"
+                    default:                     return rawValue
+                }
             }
+            return ":" + slug()
         }
     }
 
