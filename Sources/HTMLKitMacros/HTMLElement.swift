@@ -181,12 +181,19 @@ private extension HTMLElement {
                             key = "aria-" + first_expression.functionCall!.calledExpression.memberAccess!.declName.baseName.text
                         }
                         if key == "htmx" {
-                            let target:String = first_expression.functionCall!.calledExpression.memberAccess!.declName.baseName.text
                             var string:String = "\(first_expression)"
                             string = String(string[string.index(after: string.startIndex)...])
                             if let htmx:HTMLElementAttribute.HTMX = HTMLElementAttribute.HTMX(rawValue: string) {
+                                switch htmx {
+                                    case .ws(let value):
+                                        key = "ws-" + value.key
+                                        break
+                                    default:
+                                        key = "hx-" + htmx.key
+                                        break
+                                }
                                 let htmlValue:String = htmx.htmlValue
-                                value = "hx-" + target + (htmlValue.isEmpty ? "" : "=\\\"" + htmlValue + "\\\"")
+                                value = key + (htmlValue.isEmpty ? "" : "=\\\"" + htmlValue + "\\\"")
                             }
                         } else if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression, lookupFiles: lookupFiles) {
                             value = string

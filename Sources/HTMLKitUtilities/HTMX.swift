@@ -43,10 +43,15 @@ public extension HTMLElementAttribute {
         case trigger(String)
         case vals(String)
 
+        case ws(WebSocket)
+
         public init?(rawValue: String) {
             guard rawValue.last == ")" else { return nil }
             let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
             let key:Substring = rawValue.split(separator: "(")[0]
+            func literal() -> String {
+                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end])
+            }
             func string() -> String {
                 return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
             }
@@ -65,26 +70,37 @@ public extension HTMLElementAttribute {
                 case "disinherit": self = .disinherit(string())
                 case "encoding": self = .encoding(string())
                 case "ext": self = .ext(string())
-                //case "headers": self = .headers(js: Bool, [String : String])
+                //case "headers": self = .headers(js: Bool, [String : String]) // TODO: fix
                 case "history": self = .history(enumeration())
                 case "historyElt": self = .historyElt(boolean())
                 case "include": self = .include(string())
                 case "indicator": self = .indicator(string())
                 case "inherit": self = .inherit(string())
-                //case "params": self = .params(enumeration())
+                case "params": self = .params(Params(rawValue: literal())!)
                 case "patch": self = .patch(string())
                 case "preserve": self = .preserve(boolean())
                 case "prompt": self = .prompt(string())
                 case "put": self = .put(string())
-                //case "replaceURL": self = .replaceURL(enumeration())
-                //case "request": self = .request(js: Bool, timeout: Int, credentials: Bool, noHeaders: Bool)
-                //case "sync": self = .sync(String, strategy: SyncStrategy?)
+                case "replaceURL": self = .replaceURL(URL(rawValue: literal())!)
+                //case "request": self = .request(js: Bool, timeout: Int, credentials: Bool, noHeaders: Bool) // TODO: fix
+                //case "sync": self = .sync(String, strategy: SyncStrategy?) // TODO: fix
                 case "validate": self = .validate(enumeration())
 
                 case "get": self = .get(string())
                 case "post": self = .post(string())
-                //case "on": self = .on(Event, String)
-                //case "pushURL": self = .pushURL(enumeration())
+                case "on":
+                    let string:String = literal()
+                    let values:[Substring] = string.split(separator: ",")
+                    let event_string:String = String(values[0])
+                    var value:String = String(string[values[1].startIndex...])
+                    while (value.first?.isWhitespace ?? false) || value.first == "\"" {
+                        value.removeFirst()
+                    }
+                    value.removeLast()
+                    let event:Event = Event(rawValue: event_string)!
+                    self = .on(event, value)
+                    break
+                case "pushURL": self = .pushURL(URL(rawValue: string())!)
                 case "select": self = .select(string())
                 case "selectOOB": self = .selectOOB(string())
                 case "swap": self = .swap(enumeration())
@@ -92,7 +108,51 @@ public extension HTMLElementAttribute {
                 case "target": self = .target(string())
                 case "trigger": self = .trigger(string())
                 case "vals": self = .vals(string())
+
+                case "ws": self = .ws(WebSocket(rawValue: literal())!)
                 default: return nil
+            }
+        }
+
+        public var key : String {
+            switch self {
+                case .boost(_): return "boost"
+                case .confirm(_): return "confirm"
+                case .delete(_): return "delete"
+                case .disable(_): return "disable"
+                case .disabledElt(_): return "disable-elt"
+                case .disinherit(_): return "disinherit"
+                case .encoding(_): return "encoding"
+                case .ext(_): return "ext"
+                case .headers(_, _): return "headers"
+                case .history(_): return "history"
+                case .historyElt(_): return "historyElt"
+                case .include(_): return "include"
+                case .indicator(_): return "indicator"
+                case .inherit(_): return "inherit"
+                case .params(_): return "params"
+                case .patch(_): return "patch"
+                case .preserve(_): return "preserve"
+                case .prompt(_): return "prompt"
+                case .put(_): return "put"
+                case .replaceURL(_): return "replace-url"
+                case .request(_, _, _, _): return "request"
+                case .sync(_, _): return "sync"
+                case .validate(_): return "validate"
+
+                case .get(_): return "get"
+                case .post(_): return "post"
+                case .on(let event, _): return "on:" + event.rawValue
+                case .pushURL(_): return "push-url"
+                case .select(_): return "select"
+                case .selectOOB(_): return "select-oob"
+                case .swap(_): return "swap"
+                case .swapOOB(_): return "swap-oob"
+                case .target(_): return "target"
+                case .trigger(_): return "trigger"
+                case .vals(_): return "vals"
+
+                case .ws(let value): return "ws-" + value.key
             }
         }
 
@@ -106,8 +166,8 @@ public extension HTMLElementAttribute {
                 case .disinherit(let value): return value
                 case .encoding(let value): return value
                 case .ext(let value): return value
-                case .headers(let js, let headers):
-                    return js ? "" : headers.map({ "\"" + $0.key + "\":\"" + $0.value + "\"" }).joined(separator: ",")
+                case .headers(let js, let headers): // TODO: fix
+                    return js ? "" : "{" + headers.map({ "\\\"" + $0.key + "\\\":\\\"" + $0.value + "\\\"" }).joined(separator: ",") + "}"
                 case .history(let value): return value.rawValue
                 case .historyElt(_): return ""
                 case .include(let value): return value
@@ -120,7 +180,7 @@ public extension HTMLElementAttribute {
                 case .put(let value): return value
                 case .replaceURL(let url): return url.htmlValue
                 case .request(let js, let timeout, let credentials, let noHeaders):
-                    return ""
+                    return "" // TODO: fix
                 case .sync(let selector, let strategy):
                     return selector + (strategy == nil ? "" : ":" + strategy!.htmlValue)
                 case .validate(let value): return value.rawValue
@@ -136,6 +196,8 @@ public extension HTMLElementAttribute {
                 case .target(let value): return value
                 case .trigger(let value): return value
                 case .vals(let value): return value
+
+                case .ws(let value): return value.htmlValue
             }
         }
     }
@@ -223,6 +285,25 @@ public extension HTMLElementAttribute.HTMX {
         case not([String])
         case list([String])
 
+        public init?(rawValue: String) {
+            let key:Substring = rawValue.split(separator: "(")[0]
+            func array_string() -> [String] {
+                let string:String = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count + 2)..<rawValue.index(before: rawValue.endIndex)])
+                let ranges:[Range<String.Index>] = try! string.ranges(of: Regex("\"([^\"]+)\"")) // TODO: fix? (doesn't parse correctly if the string contains escaped quotation marks)
+                return ranges.map({
+                    let item:String = String(string[$0])
+                    return String(item[item.index(after: item.startIndex)..<item.index(before: item.endIndex)])
+                })
+            }
+            switch key {
+                case "all":  self = .all
+                case "none": self = .none
+                case "not":  self = .not(array_string())
+                case "list": self = .list(array_string())
+                default: return nil
+            }
+        }
+
         public var htmlValue : String {
             switch self {
                 case .all:             return "*"
@@ -266,12 +347,74 @@ public extension HTMLElementAttribute.HTMX {
         case `true`, `false`
         case url(String)
 
+        public init?(rawValue: String) {
+            let key:Substring = rawValue.split(separator: "(")[0]
+            let end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
+            func string() -> String {
+                return String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count + 2)..<end_minus_one])
+            }
+            switch key {
+                case "true": self = .true
+                case "false": self = .false
+                case "url": self = .url(string())
+                default: return nil
+            }
+        }
+
         public var htmlValue : String {
             switch self {
                 case .true: return "true"
                 case .false: return "false"
                 case .url(let url): return url.hasPrefix("http://") || url.hasPrefix("https://") ? url : (url.first == "/" ? "" : "/") + url
             }
+        }
+    }
+}
+
+// MARK: WebSocket
+public extension HTMLElementAttribute.HTMX {
+    enum WebSocket {
+        case connect(String)
+        case send(String)
+
+        public init?(rawValue: String) {
+            guard rawValue.last == ")" else { return nil }
+            let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
+            let key:Substring = rawValue.split(separator: "(")[0]
+            func string() -> String {
+                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
+            }
+            switch key {
+                case "connect": self = .connect(string())
+                case "send": self = .send(string())
+                default: return nil
+            }
+        }
+
+        public var key : String {
+            switch self {
+                case .connect(_): return "connect"
+                case .send(_): return "send"
+            }
+        }
+
+        public var htmlValue : String {
+            switch self {
+                case .connect(let value): return value
+                case .send(let value): return value
+            }
+        }
+
+        public enum Event : String {
+            case wsConnecting
+            case wsOpen
+            case wsClose
+            case wsError
+            case wsBeforeMessage
+            case wsAfterMessage
+            case wsConfigSend
+            case wsBeforeSend
+            case wsAfterSend
         }
     }
 }
