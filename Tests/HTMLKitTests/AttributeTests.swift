@@ -26,6 +26,13 @@ struct AttributeTests {
         string = #div(attributes: [.ariaattribute(.controls(["testing", "123", "yup"]))])
         #expect(string == "<div aria-controls=\"testing 123 yup\"></div>")
     }
+    @Test func attributionsrc() {
+        var string:StaticString = #a(attributionsrc: [])
+        #expect(string == "<a attributionsrc></a>")
+
+        string = #a(attributionsrc: ["https://github.com/RandomHashTags", "https://litleagues.com"])
+        #expect(string == "<a attributionsrc=\"https://github.com/RandomHashTags https://litleagues.com\"></a>")
+    }
     @Test func data() {
         let string:StaticString = #div(attributes: [.data("id", "5")])
         #expect(string == "<div data-id=\"5\"></div>")

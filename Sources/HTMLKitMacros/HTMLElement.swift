@@ -269,7 +269,8 @@ private extension HTMLElement {
             switch returnType {
             case .boolean: return string.elementsEqual("true") ? key : nil
             case .string, .enumCase:
-                if returnType == .enumCase && string.isEmpty {
+                if returnType == .enumCase && string.isEmpty
+                    || returnType == .string && key == "attributionsrc" && string.isEmpty {
                     return key
                 }
                 string.escapeHTML(escapeAttributes: true)

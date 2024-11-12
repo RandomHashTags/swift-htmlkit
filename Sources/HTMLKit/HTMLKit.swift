@@ -58,7 +58,7 @@ public macro custom<T: ExpressibleByStringLiteral>(tag: String, isVoid: Bool, at
 public macro a<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
-    attributionSrc: [T]? = nil,
+    attributionsrc: [T] = [],
     download: HTMLElementAttribute.Extra.download? = nil,
     href: T? = nil,
     hreflang: T? = nil,
@@ -475,7 +475,7 @@ public macro img<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
     alt: T? = nil,
-    attributionSrc: [T]? = nil,
+    attributionsrc: [T] = [],
     crossorigin: HTMLElementAttribute.Extra.crossorigin? = nil,
     decoding: HTMLElementAttribute.Extra.decoding? = nil,
     elementtiming: T? = nil,
@@ -803,7 +803,7 @@ public macro script<T: ExpressibleByStringLiteral>(
     attributes: [HTMLElementAttribute] = [],
     
     async: Bool = false,
-    attributionSrc: [T]? = nil,
+    attributionsrc: [T] = [],
     blocking: HTMLElementAttribute.Extra.blocking? = nil,
     crossorigin: HTMLElementAttribute.Extra.crossorigin? = nil,
     defer: Bool = false,
