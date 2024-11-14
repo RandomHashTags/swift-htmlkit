@@ -188,7 +188,7 @@ private extension HTMLElement {
                                 let htmlValue:String = htmx.htmlValue
                                 var delimiter:String = "\\\""
                                 switch htmx {
-                                    case .request(_, _, _, _):
+                                    case .request(_, _, _, _), .headers(_, _):
                                         delimiter = "'"
                                         break
                                     case .ws(let value):

@@ -71,7 +71,27 @@ public extension HTMLElementAttribute {
                 case "disinherit": self = .disinherit(string())
                 case "encoding": self = .encoding(string())
                 case "ext": self = .ext(string())
-                //case "headers": self = .headers(js: Bool, [String : String]) // TODO: fix
+                case "headers":
+                    let values:[Substring] = rawValue.split(separator: ",")
+                    let js:Bool = values[0].hasSuffix("true")
+                    var headers_string:Substring = rawValue[rawValue.firstIndex(of: "[")!...]
+                    headers_string.removeLast() // )
+                    let regex:Regex = try! Regex("(\"[^\"]+\")")
+                    let matches:[Range<Substring.Index>] = headers_string.ranges(of: regex)
+                    var headers:[String:String] = [:]
+                    var header_key:Substring = ""
+                    for i in 0..<matches.count {
+                        var value:Substring = headers_string[matches[i]]
+                        value.removeFirst() // "
+                        value.removeLast() // "
+                        if i % 2 == 0 {
+                            header_key = value
+                        } else {
+                            headers[String(header_key)] = String(value)
+                        }
+                    }
+                    self = .headers(js: js, headers)
+                    break
                 case "history": self = .history(enumeration())
                 case "historyElt": self = .historyElt(boolean())
                 case "include": self = .include(string())
@@ -117,7 +137,21 @@ public extension HTMLElementAttribute {
                     }
                     self = .request(js: javascript, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
                     break
-                //case "sync": self = .sync(String, strategy: SyncStrategy?) // TODO: fix
+                case "sync":
+                    let string:String = literal()
+                    let values:[Substring] = string.split(separator: ",")
+                    var key:Substring = values[0]
+                    key.removeLast() // "
+                    var strategy:SyncStrategy? = nil
+                    var strategy_string:Substring = values[1].split(separator: ":")[1]
+                    if !strategy_string.hasSuffix("nil") {
+                        while (strategy_string.first?.isWhitespace ?? false) || strategy_string.first == "." {
+                            strategy_string.removeFirst()
+                        }
+                        strategy = SyncStrategy(rawValue: String(strategy_string))
+                    }
+                    self = .sync(String(key), strategy: strategy)
+                    break
                 case "validate": self = .validate(enumeration())
 
                 case "get": self = .get(string())
@@ -364,10 +398,6 @@ public extension HTMLElementAttribute.HTMX {
         }
     }
 
-    // MARK: Modifiers
-    enum Modifier {
-    }
-
     // MARK: Params
     enum Params {
         case all
@@ -418,6 +448,21 @@ public extension HTMLElementAttribute.HTMX {
         case drop, abort, replace
         case queue(Queue)
 
+        public init?(rawValue: String) {
+            let values:[Substring] = rawValue.split(separator: "(")
+            switch values[0] {
+                case "drop":    self = .drop
+                case "abort":   self = .abort
+                case "replace": self = .replace
+                case "queue":
+                    guard let value_index:Substring.Index = values[1].firstIndex(where: { $0.isLetter }) else { return nil }
+                    let value:Substring = rawValue[value_index..<values[1].index(before: values[1].endIndex)]
+                    self = .queue(Queue(rawValue: String(value))!)
+                    break
+                default:        return nil
+            }
+        }
+
         public enum Queue : String {
             case first, last, all
         }
@@ -427,7 +472,7 @@ public extension HTMLElementAttribute.HTMX {
                 case .drop:             return "drop"
                 case .abort:            return "abort"
                 case .replace:          return "replace"
-                case .queue(let queue): return queue.rawValue
+                case .queue(let queue): return "queue " + queue.rawValue
             }
         }
     }

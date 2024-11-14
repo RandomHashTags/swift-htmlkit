@@ -23,6 +23,49 @@ struct HTMXTests {
         #expect(string == "<div hx-get=\"/test\"></div>")
     }
 
+    // MARK: headers
+    @Test func headers() {
+        let set:Set<String> = dictionary_json_results(tag: "div", closingTag: true, attribute: "hx-headers", delimiter: "'", ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"])
+        let string:StaticString = #div(attributes: [.htmx(.headers(js: false, ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]))])
+        #expect(set.contains(string.description), Comment(rawValue: "string=\(string)\nset=\(set)"))
+    }
+    func dictionary_json_results(
+        tag: String,
+        closingTag: Bool,
+        attribute: String,
+        delimiter: String,
+        _ dictionary: [String:String]
+    ) -> Set<String> { // TODO: fix (doesn't check all available values)
+        var set:Set<String> = []
+        let prefix:String = "<" + tag + " " + attribute + "=" + delimiter
+        let suffix:String = delimiter + ">" + (closingTag ? "</" + tag + ">" : "")
+        set.reserveCapacity(dictionary.count*dictionary.count)
+        for (key1, value1) in dictionary {
+            let string:String = prefix + "{\"" + key1 + "\":\"" + value1 + "\","
+
+            var string1:String = string
+            for (key2, value2) in dictionary {
+                if key1 != key2 {
+                    string1 += "\"" + key2 + "\":\"" + value2 + "\","
+                }
+            }
+            string1.removeLast()
+            string1 += "}" + suffix
+            set.insert(string1)
+
+            var string2:String = string
+            for (key2, value2) in dictionary.reversed() {
+                if key1 != key2 {
+                    string2 += "\"" + key2 + "\":\"" + value2 + "\","
+                }
+            }
+            string2.removeLast()
+            string2 += "}" + suffix
+            set.insert(string2)
+        }
+        return set
+    }
+
     // MARK: on
     @Test func on() {
         var string:StaticString = #div(attributes: [.htmx(.on(.abort, "bruh"))])
@@ -69,6 +112,15 @@ struct HTMXTests {
 
         string = #div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: nil, noHeaders: "true"))])
         #expect(string == "<div hx-request='{\"noHeaders\":true}'></div>")
+    }
+
+    // MARK: sync
+    @Test func sync() {
+        var string:StaticString = #div(attributes: [.htmx(.sync("closest form", strategy: .abort))])
+        #expect(string == "<div hx-sync=\"closest form:abort\"></div>")
+
+        string = #div(attributes: [.htmx(.sync("#submit-button", strategy: .queue(.first)))])
+        #expect(string == "<div hx-sync=\"#submit-button:queue first\"></div>")
     }
 
     // MARK: ws
