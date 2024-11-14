@@ -1,11 +1,13 @@
-Write HTML using Swift Macros.
+Write HTML using Swift Macros. Supports HTMX via global attributes.
 
 <a href="https://swift.org"><img src="https://img.shields.io/badge/Swift-5.9+-F05138?style=&logo=swift" alt="Requires at least Swift 5.9"></a> <img src="https://img.shields.io/badge/Platforms-Any-gold"> <a href="https://discord.com/invite/VyuFQUpcUz"><img src="https://img.shields.io/badge/Chat-Discord-7289DA?style=&logo=discord"></a> <a href="https://github.com/RandomHashTags/swift-htmlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue" alt="Apache 2.0 License"></a>
 
+## Table of Contents
 - [Why](#why)
 - [Usage](#usage)
   - [Basic](#basic)
   - [Advanced](#advanced)
+  - [HTMX](#htmx)
 - [Benchmarks](#benchmarks)
   - [Static](#static)
   - [Dynamic](#dynamic)
@@ -240,7 +242,7 @@ string = #div(attributes: [.htmx(.ext("ws")), .htmx(.ws(.send(true)))])
 
 Test machine: iMac (i9 9900k, 72GB RAM, 2TB) running macOS 15.0 with the Swift 6 compiler.
 
-Executed command: `swift package -c release --allow-writing-to-package-directory benchmark --target Benchmarks --metric throughput --format jmh`
+Executed command: `swift package --allow-writing-to-package-directory benchmark --target Benchmarks --metric throughput --format jmh`
 
 ### Static
 <img src="Benchmarks/img/throughput_static.png">
@@ -252,4 +254,8 @@ Executed command: `swift package -c release --allow-writing-to-package-directory
 This library is the clear leader in performance & efficiency. Static webpages offer the best performance, while dynamic pages still tops the charts (I am actively researching and testing improvements for dynamic pages).
 
 ## Contributing
-Create a PR.
+Contributions are always welcome.
+
+Please try to use this library's syntax when creating a PR.
+
+Changes in syntax **must** solve real-word problems to be accepted.
