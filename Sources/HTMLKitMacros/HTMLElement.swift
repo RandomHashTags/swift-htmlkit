@@ -184,16 +184,20 @@ private extension HTMLElement {
                             var string:String = "\(first_expression)"
                             string = String(string[string.index(after: string.startIndex)...])
                             if let htmx:HTMLElementAttribute.HTMX = HTMLElementAttribute.HTMX(rawValue: string) {
+                                key = "hx-" + htmx.key
+                                let htmlValue:String = htmx.htmlValue
+                                var delimiter:String = "\\\""
                                 switch htmx {
+                                    case .request(_, _, _, _):
+                                        delimiter = "'"
+                                        break
                                     case .ws(let value):
                                         key = "ws-" + value.key
                                         break
                                     default:
-                                        key = "hx-" + htmx.key
                                         break
                                 }
-                                let htmlValue:String = htmx.htmlValue
-                                value = key + (htmlValue.isEmpty ? "" : "=\\\"" + htmlValue + "\\\"")
+                                value = key + (htmlValue.isEmpty ? "" : "=" + delimiter + htmlValue + delimiter)
                             }
                         } else if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression, lookupFiles: lookupFiles) {
                             value = string

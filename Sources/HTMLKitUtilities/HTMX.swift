@@ -27,7 +27,7 @@ public extension HTMLElementAttribute {
         case prompt(String)
         case put(String)
         case replaceURL(URL)
-        case request(js: Bool, timeout: Int = 0, credentials: Bool = false, noHeaders: Bool = false)
+        case request(js: Bool, timeout: String?, credentials: String?, noHeaders: String?)
         case sync(String, strategy: SyncStrategy?)
         case validate(TrueOrFalse)
 
@@ -83,7 +83,40 @@ public extension HTMLElementAttribute {
                 case "prompt": self = .prompt(string())
                 case "put": self = .put(string())
                 case "replaceURL": self = .replaceURL(URL(rawValue: literal())!)
-                //case "request": self = .request(js: Bool, timeout: Int, credentials: Bool, noHeaders: Bool) // TODO: fix
+                case "request":
+                    let string:String = literal(), values:[Substring] = string.split(separator: ",")
+                    var timeout_string:Substring = values[1][values[1].index(after: values[1].firstIndex(of: ":")!)...]
+                    while timeout_string.first?.isWhitespace ?? false {
+                        timeout_string.removeFirst()
+                    }
+                    let javascript:Bool = values[0].split(separator: ":")[1].hasSuffix("true")
+                    let timeout:String?
+                    if timeout_string.first == "\"" {
+                        timeout_string.removeFirst()
+                        timeout = String(timeout_string[timeout_string.startIndex..<timeout_string.index(before: timeout_string.endIndex)])
+                    } else {
+                        timeout = nil
+                    }
+                    var credentials:String? = nil
+                    var credentials_string:Substring = values[2][values[2].index(after: values[2].firstIndex(of: ":")!)...]
+                    if !credentials_string.hasSuffix("nil") {
+                        while (credentials_string.first?.isWhitespace ?? false) || credentials_string.first == "\"" {
+                            credentials_string.removeFirst()
+                        }
+                        credentials_string.removeLast()
+                        credentials = String(credentials_string)
+                    }
+                    var noHeaders:String? = nil
+                    if !string.hasSuffix("nil") {
+                        var value:Substring = values[3][values[3].index(after: values[3].firstIndex(of: ":")!)...]
+                        while (value.first?.isWhitespace ?? false) || value.first == "\"" {
+                            value.removeFirst()
+                        }
+                        value.removeLast()
+                        noHeaders = (javascript ? "js:" : "") + value
+                    }
+                    self = .request(js: javascript, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
+                    break
                 //case "sync": self = .sync(String, strategy: SyncStrategy?) // TODO: fix
                 case "validate": self = .validate(enumeration())
 
@@ -126,7 +159,7 @@ public extension HTMLElementAttribute {
                 case .confirm(_): return "confirm"
                 case .delete(_): return "delete"
                 case .disable(_): return "disable"
-                case .disabledElt(_): return "disable-elt"
+                case .disabledElt(_): return "disabled-elt"
                 case .disinherit(_): return "disinherit"
                 case .encoding(_): return "encoding"
                 case .ext(_): return "ext"
@@ -173,8 +206,8 @@ public extension HTMLElementAttribute {
                 case .disinherit(let value): return value
                 case .encoding(let value): return value
                 case .ext(let value): return value
-                case .headers(let js, let headers): // TODO: fix
-                    return js ? "" : "{" + headers.map({ "\\\"" + $0.key + "\\\":\\\"" + $0.value + "\\\"" }).joined(separator: ",") + "}"
+                case .headers(let js, let headers):
+                    return (js ? "js:" : "") + "{" + headers.map({ "\\\"" + $0.key + "\\\":\\\"" + $0.value + "\\\"" }).joined(separator: ",") + "}"
                 case .history(let value): return value.rawValue
                 case .historyElt(_): return ""
                 case .include(let value): return value
@@ -187,7 +220,15 @@ public extension HTMLElementAttribute {
                 case .put(let value): return value
                 case .replaceURL(let url): return url.htmlValue
                 case .request(let js, let timeout, let credentials, let noHeaders):
-                    return "" // TODO: fix
+                    if let timeout:String = timeout {
+                        return js ? "js: timeout:\(timeout)" : "{\\\"timeout\\\":\(timeout)}"
+                    } else if let credentials:String = credentials {
+                        return js ? "js: credentials:\(credentials)" : "{\\\"credentials\\\":\(credentials)}"
+                    } else if let noHeaders:String = noHeaders {
+                        return js ? "js: noHeaders:\(noHeaders)" : "{\\\"noHeaders\\\":\(noHeaders)}"
+                    } else {
+                        return ""
+                    }
                 case .sync(let selector, let strategy):
                     return selector + (strategy == nil ? "" : ":" + strategy!.htmlValue)
                 case .validate(let value): return value.rawValue

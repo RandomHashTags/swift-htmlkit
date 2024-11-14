@@ -9,6 +9,14 @@ import Testing
 import HTMLKit
 
 struct HTMXTests {
+    @Test func boost() {
+        var string:StaticString = #div(attributes: [.htmx(.boost(.true))])
+        #expect(string == "<div hx-boost=\"true\"></div>")
+
+        string = #div(attributes: [.htmx(.boost(.false))])
+        #expect(string == "<div hx-boost=\"false\"></div>")
+    }
+
     // MARK: get
     @Test func get() {
         let string:StaticString = #div(attributes: [.htmx(.get("/test"))])
@@ -46,6 +54,21 @@ struct HTMXTests {
 
         string = #div(attributes: [.htmx(.replaceURL(.url("https://litleagues.com")))])
         #expect(string == "<div hx-replace-url=\"https://litleagues.com\"></div>")
+    }
+
+    // MARK: request
+    @Test func request() {
+        var string:StaticString = #div(attributes: [.htmx(.request(js: false, timeout: "5", credentials: nil, noHeaders: nil))])
+        #expect(string == "<div hx-request='{\"timeout\":5}'></div>")
+
+        string = #div(attributes: [.htmx(.request(js: true, timeout: "getTimeout()", credentials: nil, noHeaders: nil))])
+        #expect(string == "<div hx-request='js: timeout:getTimeout()'></div>")
+
+        string = #div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))])
+        #expect(string == "<div hx-request='{\"credentials\":true}'></div>")
+
+        string = #div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: nil, noHeaders: "true"))])
+        #expect(string == "<div hx-request='{\"noHeaders\":true}'></div>")
     }
 
     // MARK: ws
