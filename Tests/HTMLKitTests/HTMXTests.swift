@@ -9,6 +9,7 @@ import Testing
 import HTMLKit
 
 struct HTMXTests {
+    // MARK: boost
     @Test func boost() {
         var string:StaticString = #div(attributes: [.htmx(.boost(.true))])
         #expect(string == "<div hx-boost=\"true\"></div>")
@@ -17,10 +18,22 @@ struct HTMXTests {
         #expect(string == "<div hx-boost=\"false\"></div>")
     }
 
+    // MARK: disable
+    @Test func disable() {
+        var string:StaticString = #div(attributes: [.htmx(.disable(true))])
+        #expect(string == "<div hx-disable></div>")
+
+        string = #div(attributes: [.htmx(.disable(false))])
+        #expect(string == "<div></div>")
+    }
+
     // MARK: get
     @Test func get() {
-        let string:StaticString = #div(attributes: [.htmx(.get("/test"))])
+        var string:StaticString = #div(attributes: [.htmx(.get("/test"))])
         #expect(string == "<div hx-get=\"/test\"></div>")
+
+        string = #div(attributes: [.htmx(.get(""))])
+        #expect(string == "<div hx-get=\"\"></div>")
     }
 
     // MARK: headers
@@ -66,6 +79,15 @@ struct HTMXTests {
         return set
     }
 
+    // MARK: history-elt
+    @Test func historyElt() {
+        var string:StaticString = #div(attributes: [.htmx(.historyElt(true))])
+        #expect(string == "<div hx-history-elt></div>")
+
+        string = #div(attributes: [.htmx(.historyElt(false))])
+        #expect(string == "<div></div>")
+    }
+
     // MARK: on
     @Test func on() {
         var string:StaticString = #div(attributes: [.htmx(.on(.abort, "bruh"))])
@@ -88,6 +110,15 @@ struct HTMXTests {
     @Test func post() {
         let string:StaticString = #div(attributes: [.htmx(.post("https://github.com/RandomHashTags"))])
         #expect(string == "<div hx-post=\"https://github.com/RandomHashTags\"></div>")
+    }
+
+    // MARK: preserve
+    @Test func preserve() {
+        var string:StaticString = #div(attributes: [.htmx(.preserve(true))])
+        #expect(string == "<div hx-preserve></div>")
+
+        string = #div(attributes: [.htmx(.preserve(false))])
+        #expect(string == "<div></div>")
     }
 
     // MARK: replaceURL
@@ -125,10 +156,13 @@ struct HTMXTests {
 
     // MARK: ws
     @Test func ws() {
-        var string:StaticString = #div(attributes: [.htmx(.ws(.connect("https://paradigm-app.com")))])
-        #expect(string == "<div ws-connect=\"https://paradigm-app.com\"></div>")
+        var string:StaticString = #div(attributes: [.htmx(.ws(.connect("/chatroom")))])
+        #expect(string == "<div ws-connect=\"/chatroom\"></div>")
 
-        string = #div(attributes: [.htmx(.ext("ws")), .htmx(.ws(.send("https://linktr.ee/anderson_evan")))])
-        #expect(string == "<div hx-ext=\"ws\" ws-send=\"https://linktr.ee/anderson_evan\"></div>")
+        string = #div(attributes: [.htmx(.ext("ws")), .htmx(.ws(.send(true)))])
+        #expect(string == "<div hx-ext=\"ws\" ws-send></div>")
+
+        string = #div(attributes: [.htmx(.ext("ws")), .htmx(.ws(.send(false)))])
+        #expect(string == "<div hx-ext=\"ws\"></div>")
     }
 }

@@ -103,16 +103,16 @@ Using String Interpolation.
 > You will get a compiler warning saying *interpolation may introduce raw HTML*.
 > 
 > Its up to you whether or not to suppress this warning or escape the HTML at runtime using an method described above.
+> 
+> Swift HTMLKit tries to [replace](https://github.com/RandomHashTags/swift-htmlkit/blob/94793984763308ef5275dd9f71ea0b5e83fea417/Sources/HTMLKitMacros/HTMLElement.swift#L423) known interpolation at compile time with a compile time equivalent for the best performance. It is currently limited due to macro expansions being sandboxed and lexical contexts/AST not being available for macro arguments. This means referencing content known at compile time in a html macro won't get replaced by its literal contents. [Read more about this limitation](https://forums.swift.org/t/swift-lexical-lookup-for-referenced-stuff-located-outside-scope-current-file/75776/6).
 
 #### Example
 ```swift
-let string:String = "any string value", integer:Int = -69, float:Float = 3.14159
+let string:String = "any string value", integer:Int = -69, float:Float = 3.141592
 
-// ✅ DO
 let _:String = #p("\(string); \(integer); \(float)")
 let _:String = #p("\(string)", "; ", String(describing: integer), "; ", float.description)
-
-// ❌ DON'T; compiler error: String Interpolation required
+// the below also works
 let integer_string:String = String(describing: integer), float_string:String = String(describing: float)
 let _:String = #p(string, "; ", integer_string, "; ", float_string)
 
@@ -185,6 +185,46 @@ Use a different html macro. Currently supported types (more to come with new lan
 - `#htmlByteBuffer()` -> `NIOCore.ByteBuffer`
 
 </details>
+
+### HTMX
+
+<details>
+
+<summary>How do I use HTMX?</summary>
+
+Use the `.htmx(<htmx attribute>)` global attribute. All HTMX 2.0 attributes are supported (including web socket).
+
+#### Examples
+```swift
+
+// <div hx-boost="true"></div>
+var string:StaticString = #div(attributes: [.htmx(.boost(.true))])
+
+// <div hx-get="/test"></div>
+string = #div(attributes: [.htmx(.get("/test"))])
+
+// <div hx-on::abort="bruh()"></div>
+string = #div(attributes: [.htmx(.on(.abort, "bruh()"))])
+
+// <div hx-on::after-on-load="test()"></div>
+string = #div(attributes: [.htmx(.on(.afterOnLoad, "test()"))])
+
+// <div hx-on:click="thing()"></div>
+string = #div(attributes: [.htmx(.onevent(.click, "thing()"))])
+
+// <div hx-preserve></div>
+string = #div(attributes: [.htmx(.preserve(true))])
+
+// <div ws-connect="/chatroom"></div>
+string = #div(attributes: [.htmx(.ws(.connect("/chatroom")))])
+
+// <div hx-ext="ws" ws-send></div>
+string = #div(attributes: [.htmx(.ext("ws")), .htmx(.ws(.send(true)))])
+
+```
+
+</details>
+
 
 ## Benchmarks
 - Libraries tested

@@ -510,7 +510,7 @@ public extension HTMLElementAttribute.HTMX {
 public extension HTMLElementAttribute.HTMX {
     enum WebSocket {
         case connect(String)
-        case send(String)
+        case send(Bool)
 
         public init?(rawValue: String) {
             guard rawValue.last == ")" else { return nil }
@@ -519,9 +519,12 @@ public extension HTMLElementAttribute.HTMX {
             func string() -> String {
                 return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
             }
+            func boolean() -> Bool {
+                return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
+            }
             switch key {
                 case "connect": self = .connect(string())
-                case "send": self = .send(string())
+                case "send": self = .send(boolean())
                 default: return nil
             }
         }
@@ -536,7 +539,7 @@ public extension HTMLElementAttribute.HTMX {
         public var htmlValue : String {
             switch self {
                 case .connect(let value): return value
-                case .send(let value): return value
+                case .send(_): return ""
             }
         }
 

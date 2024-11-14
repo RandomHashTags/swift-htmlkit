@@ -186,18 +186,40 @@ private extension HTMLElement {
                             if let htmx:HTMLElementAttribute.HTMX = HTMLElementAttribute.HTMX(rawValue: string) {
                                 key = "hx-" + htmx.key
                                 let htmlValue:String = htmx.htmlValue
-                                var delimiter:String = "\\\""
+                                var delimiter:String = "\\\"", isBoolean:Bool = false
+                                func check_boolean(_ boolean: Bool) {
+                                    isBoolean = true
+                                    if !boolean {
+                                        value = ""
+                                    }
+                                }
                                 switch htmx {
+                                    case .disable(let boolean),
+                                            .historyElt(let boolean),
+                                            .preserve(let boolean):
+                                        check_boolean(boolean)
+                                        break
                                     case .request(_, _, _, _), .headers(_, _):
                                         delimiter = "'"
                                         break
-                                    case .ws(let value):
-                                        key = "ws-" + value.key
+                                    case .ws(let ws_value):
+                                        key = "ws-" + ws_value.key
+                                        switch ws_value {
+                                            case .send(let boolean):
+                                                check_boolean(boolean)
+                                                break
+                                            default:
+                                                break
+                                        }
                                         break
                                     default:
                                         break
                                 }
-                                value = key + (htmlValue.isEmpty ? "" : "=" + delimiter + htmlValue + delimiter)
+                                if isBoolean {
+                                    value = value == nil || !value.isEmpty ? key : nil // only allow the value to be added if the boolean value is true
+                                } else {
+                                    value = key + "=" + delimiter + htmlValue + delimiter
+                                }
                             }
                         } else if let string:String = parse_attribute(context: context, elementType: elementType, key: key, expression: first_expression, lookupFiles: lookupFiles) {
                             value = string
