@@ -24,7 +24,20 @@ Write HTML using Swift Macros. Supports HTMX via global attributes.
 <details>
 <summary>How do I use this library?</summary>
 
-Syntax: `#<html element>(attributes: [], <element specific attributes>: V?, _ innerHTML: ExpressibleByStringLiteral...)`
+#### Syntax
+
+```swift
+
+#<html element>(
+  attributes: [<global attribute>],
+  <element specific attribute>: <element specific attribute value>?,
+  _ innerHTML: ExpressibleByStringLiteral...
+)
+
+```
+
+- all parameters are optional by default
+
 #### Examples
 
 ```swift
@@ -104,7 +117,7 @@ Using String Interpolation.
 
 > You will get a compiler warning saying *interpolation may introduce raw HTML*.
 > 
-> Its up to you whether or not to suppress this warning or escape the HTML at runtime using an method described above.
+> Its up to you whether or not to suppress this warning or escape the HTML at runtime using a method described above.
 > 
 > Swift HTMLKit tries to [replace](https://github.com/RandomHashTags/swift-htmlkit/blob/94793984763308ef5275dd9f71ea0b5e83fea417/Sources/HTMLKitMacros/HTMLElement.swift#L423) known interpolation at compile time with a compile time equivalent for the best performance. It is currently limited due to macro expansions being sandboxed and lexical contexts/AST not being available for macro arguments. This means referencing content known at compile time in a html macro won't get replaced by its literal contents. [Read more about this limitation](https://forums.swift.org/t/swift-lexical-lookup-for-referenced-stuff-located-outside-scope-current-file/75776/6).
 
@@ -112,11 +125,17 @@ Using String Interpolation.
 ```swift
 let string:String = "any string value", integer:Int = -69, float:Float = 3.141592
 
+// ✅ DO
 let _:String = #p("\(string); \(integer); \(float)")
 let _:String = #p("\(string)", "; ", String(describing: integer), "; ", float.description)
-// the below also works
+
 let integer_string:String = String(describing: integer), float_string:String = String(describing: float)
 let _:String = #p(string, "; ", integer_string, "; ", float_string)
+
+// ❌ DON'T; compiler error; compile time value cannot contain interpolation
+let _:StaticString = #p("\(string); \(integer); \(float)")
+let _:StaticString = #p("\(string)", "; ", String(describing: integer), "; ", float.description)
+let _:StaticString = #p(string, "; ", integer_string, "; ", float_string)
 
 ```
 
@@ -194,7 +213,7 @@ Use a different html macro. Currently supported types (more to come with new lan
 
 <summary>How do I use HTMX?</summary>
 
-Use the `.htmx(<htmx attribute>)` global attribute. All HTMX 2.0 attributes are supported (including web socket).
+Use the `.htmx(<htmx attribute>)` global attribute. All HTMX 2.0 attributes are supported (including Server Sent Events & Web Sockets).
 
 #### Examples
 ```swift
@@ -216,6 +235,9 @@ string = #div(attributes: [.htmx(.onevent(.click, "thing()"))])
 
 // <div hx-preserve></div>
 string = #div(attributes: [.htmx(.preserve(true))])
+
+// <div sse-connect="/connect"></div>
+string = #div(attributes: [.htmx(.sse(.connect("/connect")))])
 
 // <div ws-connect="/chatroom"></div>
 string = #div(attributes: [.htmx(.ws(.connect("/chatroom")))])

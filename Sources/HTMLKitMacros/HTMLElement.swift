@@ -202,6 +202,9 @@ private extension HTMLElement {
                                     case .request(_, _, _, _), .headers(_, _):
                                         delimiter = "'"
                                         break
+                                    case .sse(let sse_value):
+                                        key = "sse-" + sse_value.key
+                                        break
                                     case .ws(let ws_value):
                                         key = "ws-" + ws_value.key
                                         switch ws_value {

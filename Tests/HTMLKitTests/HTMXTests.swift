@@ -154,6 +154,24 @@ struct HTMXTests {
         #expect(string == "<div hx-sync=\"#submit-button:queue first\"></div>")
     }
 
+    // MARK: sse
+    @Test func sse() {
+        var string:StaticString = #div(attributes: [.htmx(.sse(.connect("/connect")))])
+        #expect(string == "<div sse-connect=\"/connect\"></div>")
+
+        string = #div(attributes: [.htmx(.sse(.swap("message")))])
+        #expect(string == "<div sse-swap=\"message\"></div>")
+
+        string = #div(attributes: [.htmx(.sse(.close("message")))])
+        #expect(string == "<div sse-close=\"message\"></div>")
+    }
+
+    // MARK: trigger
+    @Test func trigger() {
+        let string:StaticString = #div(attributes: [.htmx(.trigger("sse:chatter"))])
+        #expect(string == "<div hx-trigger=\"sse:chatter\"></div>")
+    }
+
     // MARK: ws
     @Test func ws() {
         var string:StaticString = #div(attributes: [.htmx(.ws(.connect("/chatroom")))])

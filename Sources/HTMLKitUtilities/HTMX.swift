@@ -44,6 +44,7 @@ public extension HTMLElementAttribute {
         case trigger(String)
         case vals(String)
 
+        case sse(ServerSentEvents)
         case ws(WebSocket)
 
         public init?(rawValue: String) {
@@ -182,6 +183,7 @@ public extension HTMLElementAttribute {
                 case "trigger": self = .trigger(string())
                 case "vals": self = .vals(string())
 
+                case "sse": self = .sse(ServerSentEvents(rawValue: literal())!)
                 case "ws": self = .ws(WebSocket(rawValue: literal())!)
                 default: return nil
             }
@@ -226,6 +228,7 @@ public extension HTMLElementAttribute {
                 case .trigger(_): return "trigger"
                 case .vals(_): return "vals"
 
+                case .sse(let event): return "sse-" + event.key
                 case .ws(let value): return "ws-" + value.key
             }
         }
@@ -280,6 +283,7 @@ public extension HTMLElementAttribute {
                 case .trigger(let value): return value
                 case .vals(let value): return value
 
+                case .sse(let value): return value.htmlValue
                 case .ws(let value): return value.htmlValue
             }
         }
@@ -501,6 +505,47 @@ public extension HTMLElementAttribute.HTMX {
                 case .true: return "true"
                 case .false: return "false"
                 case .url(let url): return url.hasPrefix("http://") || url.hasPrefix("https://") ? url : (url.first == "/" ? "" : "/") + url
+            }
+        }
+    }
+}
+
+// MARK: Server Sent Events
+public extension HTMLElementAttribute.HTMX {
+    enum ServerSentEvents {
+        case connect(String)
+        case swap(String)
+        case close(String)
+
+        public init?(rawValue: String) {
+            guard rawValue.last == ")" else { return nil }
+            let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
+            let key:Substring = rawValue.split(separator: "(")[0]
+            func string() -> String {
+                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
+            }
+            switch key {
+                case "connect": self = .connect(string())
+                case "swap": self = .swap(string())
+                case "close": self = .close(string())
+                default: return nil
+            }
+        }
+
+        public var key : String {
+            switch self {
+                case .connect(_): return "connect"
+                case .swap(_): return "swap"
+                case .close(_): return "close"
+            }
+        }
+
+        public var htmlValue : String {
+            switch self {
+                case .connect(let value),
+                        .swap(let value),
+                        .close(let value):
+                    return value
             }
         }
     }
