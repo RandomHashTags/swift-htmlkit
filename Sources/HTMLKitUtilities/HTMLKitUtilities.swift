@@ -80,41 +80,196 @@ public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/css
     static func percent(_ value: Float) -> Self        { Self() }
 }
 
+
+// MARK: HTMLElementType
+package enum HTMLElementType : String, CaseIterable {
+    case escapeHTML
+    case custom
+
+    case html, htmlUTF8Bytes, htmlUTF16Bytes, htmlUTF8CString
+    
+    #if canImport(Foundation)
+    case htmlData
+    #endif
+
+    case htmlByteBuffer
+    
+    case a
+    case abbr
+    case address
+    case area
+    case article
+    case aside
+    case audio
+
+    case b
+    case base
+    case bdi
+    case bdo
+    case blockquote
+    case body
+    case br
+    case button
+
+    case canvas
+    case caption
+    case cite
+    case code
+    case col
+    case colgroup
+
+    case data
+    case datalist
+    case dd
+    case del
+    case details
+    case dfn
+    case dialog
+    case div
+    case dl
+    case dt
+
+    case em
+    case embed
+
+    case fencedframe
+    case fieldset
+    case figcaption
+    case figure
+    case footer
+    case form
+    case frame
+    case frameset
+
+    case h1, h2, h3, h4, h5, h6
+    case head
+    case header
+    case hgroup
+    case hr
+    
+    case i
+    case iframe
+    case img
+    case input
+    case ins
+
+    case kbd
+
+    case label
+    case legend
+    case li
+    case link
+
+    case main
+    case map
+    case mark
+    case menu
+    case meta
+    case meter
+
+    case nav
+    case noscript
+
+    case object
+    case ol
+    case optgroup
+    case option
+    case output
+
+    case p
+    case picture
+    case portal
+    case pre
+    case progress
+
+    case q
+
+    case rp
+    case rt
+    case ruby
+    
+    case s
+    case samp
+    case script
+    case search
+    case section
+    case select
+    case slot
+    case small
+    case source
+    case span
+    case strong
+    case style
+    case sub
+    case summary
+    case sup
+
+    case table
+    case tbody
+    case td
+    case template
+    case textarea
+    case tfoot
+    case th
+    case thead
+    case time
+    case title
+    case tr
+    case track
+
+    case u
+    case ul
+
+    case `var`
+    case video
+
+    case wbr
+
+    package var isVoid : Bool {
+        switch self {
+        case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 // MARK: HTMLElement Attributes
 public enum HTMLElementAttribute {
-    case accesskey((any ExpressibleByStringLiteral)? = nil)
+    case accesskey(String? = nil)
 
     case ariaattribute(Extra.ariaattribute? = nil)
     case role(Extra.ariarole? = nil)
 
     case autocapitalize(Extra.autocapitalize? = nil)
     case autofocus(Bool = false)
-    case `class`([any ExpressibleByStringLiteral] = [])
+    case `class`([String] = [])
     case contenteditable(Extra.contenteditable? = nil)
-    case data(_ id: any ExpressibleByStringLiteral, _ value: (any ExpressibleByStringLiteral)? = nil)
+    case data(_ id: String, _ value: String? = nil)
     case dir(Extra.dir? = nil)
     case draggable(Extra.draggable? = nil)
     case enterkeyhint(Extra.enterkeyhint? = nil)
-    case exportparts([any ExpressibleByStringLiteral] = [])
+    case exportparts([String] = [])
     case hidden(Extra.hidden? = nil)
-    case id((any ExpressibleByStringLiteral)? = nil)
+    case id(String? = nil)
     case inert(Bool = false)
     case inputmode(Extra.inputmode? = nil)
-    case `is`((any ExpressibleByStringLiteral)? = nil)
-    case itemid((any ExpressibleByStringLiteral)? = nil)
-    case itemprop((any ExpressibleByStringLiteral)? = nil)
-    case itemref((any ExpressibleByStringLiteral)? = nil)
+    case `is`(String? = nil)
+    case itemid(String? = nil)
+    case itemprop(String? = nil)
+    case itemref(String? = nil)
     case itemscope(Bool = false)
-    case itemtype((any ExpressibleByStringLiteral)? = nil)
-    case lang((any ExpressibleByStringLiteral)? = nil)
-    case nonce((any ExpressibleByStringLiteral)? = nil)
-    case part([(any ExpressibleByStringLiteral)] = [])
+    case itemtype(String? = nil)
+    case lang(String? = nil)
+    case nonce(String? = nil)
+    case part([(String)] = [])
     case popover(Extra.popover? = nil)
-    case slot((any ExpressibleByStringLiteral)? = nil)
+    case slot(String? = nil)
     case spellcheck(Extra.spellcheck? = nil)
-    case style((any ExpressibleByStringLiteral)? = nil)
+    case style(String? = nil)
     case tabindex(Int? = nil)
-    case title((any ExpressibleByStringLiteral)? = nil)
+    case title(String? = nil)
     case translate(Extra.translate? = nil)
     case virtualkeyboardpolicy(Extra.virtualkeyboardpolicy? = nil)
     case writingsuggestions(Extra.writingsuggestions? = nil)
@@ -126,15 +281,96 @@ public enum HTMLElementAttribute {
 
     case htmx(_ attribute: HTMLElementAttribute.HTMX)
 
-    case custom(_ id: any ExpressibleByStringLiteral, _ value: (any ExpressibleByStringLiteral)?)
+    case custom(_ id: String, _ value: String?)
 
     @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
-    case event(Extra.event, _ value: (any ExpressibleByStringLiteral)? = nil)
+    case event(Extra.event, _ value: String? = nil)
+
+    public var key : String {
+        switch self {
+            case .accesskey(_):             return "accesskey"
+            case .ariaattribute(_):         return "aria-attribute"
+            case .role(_):                  return "role"
+            case .autocapitalize(_):        return "autocapitalize"
+            case .autofocus(_):             return "autofocus"
+            case .class(_):                 return "class"
+            case .contenteditable(_):       return "contenteditable"
+            case .data(let id, _):          return "data-" + id
+            case .dir(_):                   return "dir"
+            case .draggable(_):             return "draggable"
+            case .enterkeyhint(_):          return "enterkeyhint"
+            case .exportparts(_):           return "exportparts"
+            case .hidden(_):                return "hidden"
+            case .id(_):                    return "id"
+            case .inert(_):                 return "inert"
+            case .inputmode(_):             return "inputmode"
+            case .is(_):                    return "is"
+            case .itemid(_):                return "itemid"
+            case .itemprop(_):              return "itemprop"
+            case .itemref(_):               return "itemref"
+            case .itemscope(_):             return "itemscope"
+            case .itemtype(_):              return "itemtype"
+            case .lang(_):                  return "lang"
+            case .nonce(_):                 return "nonce"
+            case .part(_):                  return "part"
+            case .popover(_):               return "popover"
+            case .slot(_):                  return "slot"
+            case .spellcheck(_):            return "spellcheck"
+            case .style(_):                 return "style"
+            case .tabindex(_):              return "tabindex"
+            case .title(_):                 return "title"
+            case .translate(_):             return "translate"
+            case .virtualkeyboardpolicy(_): return "virtualkeyboardpolicy"
+            case .writingsuggestions(_):    return "writingsuggestions"
+
+            case .trailingSlash:            return ""
+
+            case .htmx(let htmx):           return "htmx-" + htmx.key
+            case .custom(let id, _):        return id
+            case .event(let event, _):      return "on" + event.rawValue
+        }
+    }
 }
 // MARK: Extra attributes 
-public extension HTMLElementAttribute {
-    enum Extra {
+extension HTMLElementAttribute {
+    public enum Extra {
     }
+
+    static func literal(key: Substring, rawValue: String) -> String {
+        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
+        return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end])
+    }
+    static func string(key: Substring, rawValue: String) -> String {
+        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
+        return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
+    }
+    static func boolean(key: Substring, rawValue: String) -> Bool {
+        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
+        return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
+    }
+    static func enumeration<T : RawRepresentable>(key: Substring, rawValue: String) -> T where T.RawValue == String {
+        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
+        return T(rawValue: String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end]))!
+    }
+    static func int(key: Substring, rawValue: String) -> Int {
+        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
+        return Int(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
+    }
+    static func array_string(key: Substring, rawValue: String) -> [String] {
+        let string:String = string(key: key, rawValue: rawValue)
+        let ranges:[Range<String.Index>] = try! string.ranges(of: Regex("\"([^\"]+)\"")) // TODO: fix? (doesn't parse correctly if the string contains escaped quotation marks)
+        return ranges.map({
+            let item:String = String(string[$0])
+            return String(item[item.index(after: item.startIndex)..<item.index(before: item.endIndex)])
+        })
+    }
+    static func float(key: Substring, rawValue: String) -> Float {
+        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
+        return Float(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
+    }
+}
+public protocol HTMLInitializable {
+    init?(rawValue: String)
 }
 public extension HTMLElementAttribute.Extra {
     typealias height = HTMLElementAttribute.CSSUnit
@@ -142,7 +378,7 @@ public extension HTMLElementAttribute.Extra {
 
     // MARK: aria attributes (states and properties)
     // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes
-    enum ariaattribute {
+    enum ariaattribute : HTMLInitializable {
         case activedescendant(String)
         case atomic(Bool)
         case autocomplete(Autocomplete)
@@ -216,31 +452,13 @@ public extension HTMLElementAttribute.Extra {
 
         public init?(rawValue: String) {
             guard rawValue.last == ")" else { return nil }
-            let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
             let key:Substring = rawValue.split(separator: "(")[0]
-            func string() -> String {
-                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
-            }
-            func boolean() -> Bool {
-                return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
-            }
-            func enumeration<T : RawRepresentable>() -> T where T.RawValue == String {
-                return T(rawValue: String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end]))!
-            }
-            func int() -> Int {
-                return Int(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
-            }
-            func array_string() -> [String] {
-                let string:String = string()
-                let ranges:[Range<String.Index>] = try! string.ranges(of: Regex("\"([^\"]+)\"")) // TODO: fix? (doesn't parse correctly if the string contains escaped quotation marks)
-                return ranges.map({
-                    let item:String = String(string[$0])
-                    return String(item[item.index(after: item.startIndex)..<item.index(before: item.endIndex)])
-                })
-            }
-            func float() -> Float {
-                return Float(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
-            }
+            func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
+            func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
+            func enumeration<T : RawRepresentable>() -> T where T.RawValue == String { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
+            func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
+            func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
+            func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
             switch key {
                 case "activedescendant":       self = .activedescendant(string())
                 case "atomic":                 self = .atomic(boolean())
@@ -416,7 +634,7 @@ public extension HTMLElementAttribute.Extra {
     /// It is also important to test your authored ARIA with actual assistive technology. This is because browser emulators and simulators are not really effective for testing full support. Similarly, proxy assistive technology solutions are not sufficient to fully guarantee functionality.
     ///
     /// Learn more at https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA .
-    enum ariarole : String {
+    enum ariarole : String, HTMLInitializable {
         case alert, alertdialog
         case application
         case article
@@ -519,44 +737,44 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: as
-    enum `as` : String {
+    enum `as` : String, HTMLInitializable {
         case audio, document, embed, fetch, font, image, object, script, style, track, video, worker
     }
 
     // MARK: autocapitalize
-    enum autocapitalize : String {
+    enum autocapitalize : String, HTMLInitializable {
         case on, off
         case none
         case sentences, words, characters
     }
 
     // MARK: autocomplete
-    enum autocomplete : String {
+    enum autocomplete : String, HTMLInitializable {
         case off, on
     }
 
     // MARK: autocorrect
-    enum autocorrect : String {
+    enum autocorrect : String, HTMLInitializable {
         case off, on
     }
 
     // MARK: blocking
-    enum blocking : String {
+    enum blocking : String, HTMLInitializable {
         case render
     }
 
     // MARK: buttontype
-    enum buttontype : String {
+    enum buttontype : String, HTMLInitializable {
         case submit, reset, button
     }
 
     // MARK: capture
-    enum capture : String {
+    enum capture : String, HTMLInitializable{
         case user, environment
     }
 
     // MARK: command
-    enum command {
+    enum command : HTMLInitializable {
         case showModal
         case close
         case showPopover
@@ -594,7 +812,7 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: contenteditable
-    enum contenteditable : String {
+    enum contenteditable : String, HTMLInitializable {
         case `true`, `false`
         case plaintextOnly
 
@@ -607,12 +825,12 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: controlslist
-    enum controlslist : String {
+    enum controlslist : String, HTMLInitializable {
         case nodownload, nofullscreen, noremoteplayback
     }
 
     // MARK: crossorigin
-    enum crossorigin : String {
+    enum crossorigin : String, HTMLInitializable {
         case anonymous
         case useCredentials
 
@@ -625,27 +843,27 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: decoding
-    enum decoding : String {
+    enum decoding : String, HTMLInitializable {
         case sync, async, auto
     }
 
     // MARK: dir
-    enum dir : String {
+    enum dir : String, HTMLInitializable {
         case auto, ltr, rtl
     }
 
     // MARK: dirname
-    enum dirname : String {
+    enum dirname : String, HTMLInitializable {
         case ltr, rtl
     }
 
     // MARK: draggable
-    enum draggable : String {
+    enum draggable : String, HTMLInitializable {
         case `true`, `false`
     }
 
     // MARK: download
-    enum download {
+    enum download : HTMLInitializable {
         case empty
         case filename(String)
 
@@ -671,12 +889,12 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: enterkeyhint
-    enum enterkeyhint : String {
+    enum enterkeyhint : String, HTMLInitializable {
         case enter, done, go, next, previous, search, send
     }
 
     // MARK: event
-    enum event : String {
+    enum event : String, HTMLInitializable {
         case accept, afterprint, animationend, animationiteration, animationstart
         case beforeprint, beforeunload, blur
         case canplay, canplaythrough, change, click, contextmenu, copy, cut
@@ -699,12 +917,12 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: fetchpriority
-    enum fetchpriority : String {
+    enum fetchpriority : String, HTMLInitializable {
         case high, low, auto
     }
 
     // MARK: formenctype
-    enum formenctype : String {
+    enum formenctype : String, HTMLInitializable {
         case applicationXWWWFormURLEncoded
         case multipartFormData
         case textPlain
@@ -719,17 +937,17 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: formmethod
-    enum formmethod : String {
+    enum formmethod : String, HTMLInitializable {
         case get, post, dialog
     }
 
     // MARK: formtarget
-    enum formtarget : String {
+    enum formtarget : String, HTMLInitializable {
         case _self, _blank, _parent, _top
     }
 
     // MARK: hidden
-    enum hidden : String {
+    enum hidden : String, HTMLInitializable {
         case `true`
         case untilFound
 
@@ -742,7 +960,7 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: httpequiv
-    enum httpequiv : String {
+    enum httpequiv : String, HTMLInitializable {
         case contentSecurityPolicy
         case contentType
         case defaultStyle
@@ -761,12 +979,12 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: inputmode
-    enum inputmode : String {
+    enum inputmode : String, HTMLInitializable {
         case none, text, decimal, numeric, tel, search, email, url
     }
     
     // MARK: inputtype
-    enum inputtype : String {
+    enum inputtype : String, HTMLInitializable {
         case button, checkbox, color, date
         case datetimeLocal
         case email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week
@@ -780,17 +998,17 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: kind
-    enum kind : String {
+    enum kind : String, HTMLInitializable {
         case subtitles, captions, chapters, metadata
     }
 
     // MARK: loading
-    enum loading : String {
+    enum loading : String, HTMLInitializable {
         case eager, lazy
     }
 
     // MARK: numberingtype
-    enum numberingtype : String {
+    enum numberingtype : String, HTMLInitializable {
         case a, A, i, I, one
 
         public var htmlValue : String {
@@ -802,22 +1020,22 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: popover
-    enum popover : String {
+    enum popover : String, HTMLInitializable {
         case auto, manual
     }
 
     // MARK: popovertargetaction
-    enum popovertargetaction : String {
+    enum popovertargetaction : String, HTMLInitializable {
         case hide, show, toggle
     }
 
     // MARK: preload
-    enum preload : String {
+    enum preload : String, HTMLInitializable {
         case none, metadata, auto
     }
 
     // MARK: referrerpolicy
-    enum referrerpolicy : String {
+    enum referrerpolicy : String, HTMLInitializable {
         case noReferrer
         case noReferrerWhenDowngrade
         case origin
@@ -841,7 +1059,7 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: rel
-    enum rel : String {
+    enum rel : String, HTMLInitializable {
         case alternate, author, bookmark, canonical
         case dnsPrefetch
         case external, expect, help, icon, license
@@ -862,7 +1080,7 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: sandbox
-    enum sandbox : String {
+    enum sandbox : String, HTMLInitializable {
         case allowDownloads
         case allowForms
         case allowModals
@@ -899,57 +1117,57 @@ public extension HTMLElementAttribute.Extra {
     }
 
     // MARK: scripttype
-    enum scripttype : String {
+    enum scripttype : String, HTMLInitializable {
         case importmap, module, speculationrules
     }
 
     // MARK: scope
-    enum scope : String {
+    enum scope : String, HTMLInitializable {
         case row, col, rowgroup, colgroup
     }
 
     // MARK: shadowrootmode
-    enum shadowrootmode : String {
+    enum shadowrootmode : String, HTMLInitializable {
         case open, closed
     }
 
     // MARK: shadowrootclonable
-    enum shadowrootclonable : String {
+    enum shadowrootclonable : String, HTMLInitializable {
         case `true`, `false`
     }
 
     // MARK: shape
-    enum shape : String {
+    enum shape : String, HTMLInitializable {
         case rect, circle, poly, `default`
     }
 
     // MARK: spellcheck
-    enum spellcheck : String {
+    enum spellcheck : String, HTMLInitializable {
         case `true`, `false`
     }
 
     // MARK: target
-    enum target : String {
+    enum target : String, HTMLInitializable {
         case _self, _blank, _parent, _top, _unfencedTop
     }
 
     // MARK: translate
-    enum translate : String {
+    enum translate : String, HTMLInitializable {
         case yes, no
     }
 
     // MARK: virtualkeyboardpolicy
-    enum virtualkeyboardpolicy : String {
+    enum virtualkeyboardpolicy : String, HTMLInitializable {
         case auto, manual
     }
 
     // MARK: wrap
-    enum wrap : String {
+    enum wrap : String, HTMLInitializable {
         case hard, soft
     }
 
     // MARK: writingsuggestions
-    enum writingsuggestions : String {
+    enum writingsuggestions : String, HTMLInitializable {
         case `true`, `false`
     }
 }

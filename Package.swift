@@ -20,9 +20,19 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio", from: "2.75.0")
     ],
     targets: [
+        .macro(
+            name: "HTMLKitUtilityMacros",
+            dependencies: [
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
+            ]
+        ),
         .target(
             name: "HTMLKitUtilities",
             dependencies: [
+                "HTMLKitUtilityMacros",
                 .product(name: "NIOCore", package: "swift-nio")
             ]
         ),

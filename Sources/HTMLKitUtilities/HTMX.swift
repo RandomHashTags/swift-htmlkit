@@ -49,20 +49,14 @@ public extension HTMLElementAttribute {
 
         public init?(rawValue: String) {
             guard rawValue.last == ")" else { return nil }
-            let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
             let key:Substring = rawValue.split(separator: "(")[0]
-            func literal() -> String {
-                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end])
-            }
-            func string() -> String {
-                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
-            }
-            func boolean() -> Bool {
-                return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
-            }
-            func enumeration<T : RawRepresentable>() -> T where T.RawValue == String {
-                return T(rawValue: String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end]))!
-            }
+            func literal() -> String        { HTMLElementAttribute.literal(key: key, rawValue: rawValue) }
+            func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
+            func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
+            func enumeration<T : RawRepresentable>() -> T where T.RawValue == String { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
+            func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
+            func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
+            func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
             switch key {
                 case "boost": self = .boost(enumeration())
                 case "confirm": self = .confirm(string())
@@ -488,14 +482,10 @@ public extension HTMLElementAttribute.HTMX {
 
         public init?(rawValue: String) {
             let key:Substring = rawValue.split(separator: "(")[0]
-            let end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
-            func string() -> String {
-                return String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count + 2)..<end_minus_one])
-            }
             switch key {
                 case "true": self = .true
                 case "false": self = .false
-                case "url": self = .url(string())
+                case "url": self = .url(HTMLElementAttribute.string(key: key, rawValue: rawValue))
                 default: return nil
             }
         }
@@ -519,11 +509,8 @@ public extension HTMLElementAttribute.HTMX {
 
         public init?(rawValue: String) {
             guard rawValue.last == ")" else { return nil }
-            let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
             let key:Substring = rawValue.split(separator: "(")[0]
-            func string() -> String {
-                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
-            }
+            func string() -> String { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
             switch key {
                 case "connect": self = .connect(string())
                 case "swap": self = .swap(string())
@@ -559,14 +546,9 @@ public extension HTMLElementAttribute.HTMX {
 
         public init?(rawValue: String) {
             guard rawValue.last == ")" else { return nil }
-            let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
             let key:Substring = rawValue.split(separator: "(")[0]
-            func string() -> String {
-                return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
-            }
-            func boolean() -> Bool {
-                return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
-            }
+            func string() -> String { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
+            func boolean() -> Bool  { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
             switch key {
                 case "connect": self = .connect(string())
                 case "send": self = .send(boolean())
