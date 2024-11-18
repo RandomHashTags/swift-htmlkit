@@ -9,9 +9,9 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-enum HTMLElements : MemberMacro {
-    static func expansion(of node: AttributeSyntax, providingMembersOf declaration: some DeclGroupSyntax, conformingTo protocols: [TypeSyntax], in context: some MacroExpansionContext) throws -> [DeclSyntax] {
-        let dictionary:DictionaryElementListSyntax = node.arguments!.children(viewMode: .all).first!.as(LabeledExprSyntax.self)!.expression.as(DictionaryExprSyntax.self)!.content.as(DictionaryElementListSyntax.self)!
+enum HTMLElements : DeclarationMacro {
+    static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> [DeclSyntax] {
+        let dictionary:DictionaryElementListSyntax = node.arguments.children(viewMode: .all).first!.as(LabeledExprSyntax.self)!.expression.as(DictionaryExprSyntax.self)!.content.as(DictionaryElementListSyntax.self)!
         
         var items:[DeclSyntax] = []
         items.reserveCapacity(dictionary.count)
@@ -19,151 +19,146 @@ enum HTMLElements : MemberMacro {
         var tags:[String] = []
         tags.reserveCapacity(dictionary.count)
 
-        var initializer:String = "public init?(rawValue: String) {\n"
-        initializer += "let key:Substring = rawValue.split(separator: \"(\")[0]\n"
-        initializer += "var range:Substring = rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count+1)..<rawValue.index(rawValue.endIndex, offsetBy: -1)]\n"
-        initializer += consume()
-        initializer += cString()
-        initializer += cBool()
-        initializer += cFloat()
-        initializer += cAttribute()
-        initializer += "switch key {\n"
+        
+
+        func separator(key: String) -> String {
+            switch key {
+                case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
+                    return ","
+                case "allow":
+                    return ";"
+                default:
+                    return " "
+            }
+        }
 
         for item in dictionary {
             var element:String = item.key.as(MemberAccessExprSyntax.self)!.declName.baseName.text
             element = element == "var" ? "`var`" : element
-            var string:String = "case \(element)(\n"
-            string += "attributes: [HTMLElementAttribute] = []"
+            let is_void:Bool = HTMLElementType(rawValue: element)!.isVoid
+            var string:String = "/// MARK: \(element)\n/// The `\(element)` HTML element.\npublic struct \(element) : HTMLElement {\n"
+            string += "public private(set) var tag:String = \"\(element)\"\n"
+            string += "public private(set) var isVoid:Bool = \(is_void)\n"
+            string += "public var attributes:[HTMLElementAttribute]\n"
 
-            initializer += "case \"\(element)\": self = .\(element)("
-
+            var initializers:String = ""
             tags.append(element)
             //string += "public let isVoid:Bool = false\npublic var attributes:[HTMLElementAttribute] = []"
-            var attributes:String = ""
-            if let test = item.value.as(FunctionCallExprSyntax.self)?.arguments.first?.expression.as(ArrayExprSyntax.self)?.elements {
+            var attribute_declarations:String = ""
+            var attributes:[(String, String, String)] = []
+            if let test = item.value.as(ArrayExprSyntax.self)?.elements {
+                initializers += "public init?(rawValue: String) {\n"
+                initializers += "guard let key:Substring = rawValue.split(separator: \"(\").first else { return nil }\n"
+                initializers += "guard String(key) == tag else { return nil }\n"
+                initializers += "var range:Substring = rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count+1)..<rawValue.index(rawValue.endIndex, offsetBy: -1)]\n"
+                initializers += "self = .init("
+                attributes.reserveCapacity(test.count)
                 for element in test {
                     var key:String = ""
-                    for attribute_element in element.expression.as(FunctionCallExprSyntax.self)!.arguments.children(viewMode: .all) {
-                        let label:LabeledExprSyntax = attribute_element.as(LabeledExprSyntax.self)!
+                    let tuple = element.expression.as(TupleExprSyntax.self)!
+                    for attribute_element in tuple.elements {
+                        let label:LabeledExprSyntax = attribute_element
                         if let key_element = label.expression.as(StringLiteralExprSyntax.self) {
                             key = "\(key_element)"
                             key.removeFirst()
                             key.removeLast()
+                            switch key {
+                                case "for", "default", "defer", "as":
+                                    key = "`\(key)`"
+                                default:
+                                    break
+                            }
                         } else {
                             var isArray:Bool = false
-                            let value_type:String = parse_value_type(isArray: &isArray, key: key, label.expression)
+                            let (value_type, default_value):(String, String) = parse_value_type(isArray: &isArray, key: key, label.expression)
                             let init_type:String
-                            if value_type.hasPrefix("String") {
-                                init_type = "cString()"
-                            } else if value_type.hasPrefix("Bool") {
-                                init_type = "cBool()"
-                            } else if value_type.hasPrefix("Float") {
-                                init_type = "cFloat()"
-                            } else if value_type.hasPrefix("HTMLElementAttribute.Extra.") {
-                                init_type = "cAttribute()"
-                            } else if value_type.first == "[" {
-                                init_type = "[]"
-                            } else {
-                                init_type = "nil"
+                            switch value_type {
+                                case "String": init_type = "HTMLElementValueType.cString(&range)"
+                                case "Bool":   init_type = "HTMLElementValueType.cBool(&range)"
+                                case "Float":  init_type = "HTMLElementValueType.cFloat(&range)"
+                                default:
+                                    if value_type.hasPrefix("HTMLElementAttribute.Extra.") {
+                                        init_type = "HTMLElementValueType.cAttribute(&range)"
+                                    } else if value_type.first == "[" {
+                                        init_type = "[]"
+                                    } else {
+                                        init_type = "nil"
+                                    }
                             }
-                            attributes += ",\n\(key): \(value_type)"
-                            initializer += "\n" + key + ": " + init_type + ","
+                            attribute_declarations += "\npublic var \(key):\(value_type)\(default_value.split(separator: "=", omittingEmptySubsequences: false)[0])"
+                            attributes.append((key, value_type, default_value))
+                            initializers += "\n" + key + ": " + init_type + ","
                         }
                     }
                 }
             }
-            if initializer.last == "," {
-                initializer.removeLast()
+            if initializers.last == "," {
+                initializers.removeLast()
             }
-            initializer += ")\n"
-            //print("test=" + test.debugDescription)
-            string += attributes
+            initializers += "\n)\n}\n"
+
+            string += attribute_declarations
+            string += "\npublic var innerHTML:[CustomStringConvertible]\n"
+
+            initializers += "\npublic init(\n"
+            initializers += "attributes: [HTMLElementAttribute] = [],\n"
+            for (key, value_type, default_value) in attributes {
+                initializers += key + ": " + value_type + default_value + ",\n"
+            }
+            initializers += "_ innerHTML: CustomStringConvertible...\n) {\n"
+            initializers += "self.attributes = attributes\n"
+            for (key, _, _) in attributes {
+                initializers += "self.\(key) = \(key)\n"
+            }
+            initializers += "self.innerHTML = innerHTML\n}\n"
+            string += initializers
+
+            var render:String = "\npublic var description : String {\n"
+            var attributes_func:String = "func attributes() -> String {\n"
+            attributes_func += (attributes.isEmpty ? "let" : "var") + " items:[String] = self.attributes.map({ \"\\($0.key)\" })"
+            for (key, value_type, _) in attributes {
+                var key_literal:String = key
+                if key_literal.first == "`" {
+                    key_literal.removeFirst()
+                    key_literal.removeLast()
+                }
+                if value_type == "Bool" {
+                    attributes_func += "\nif \(key) { items.append(\"\(key_literal)\") }"
+                } else if value_type.first == "[" {
+                    attributes_func += "\nif !\(key).isEmpty {\nlet string:String = "
+                    let separator:String = separator(key: key)
+                    switch value_type {
+                        case "[String]":
+                            attributes_func += "\(key)"
+                            break
+                        case "[Int]", "[Float]":
+                            attributes_func += "\(key).map({ \"\\($0)\" })"
+                            break
+                        default:
+                            attributes_func += "\(key).compactMap({ attr in\nguard let value:String = attr.htmlValue else { return nil }\nreturn attr.key + (value.isEmpty ? \"\" : \"=\\\"\" + value + \"\\\"\") })"
+                            break
+                    }
+                    attributes_func += ".joined(separator: \"\(separator)\")\n"
+                    attributes_func += "items.append(\"\(key_literal)=\\\"\" + string + \"\\\"\")\n}"
+                } else {
+                    attributes_func += "\nif let \(key) { items.append(\"\(key_literal)=\\\"\\(\(key))\\\"\") }"
+                }
+            }
+            attributes_func += "\nreturn (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"
+            render += attributes_func
+            render += "let string:String = innerHTML.map({ $0.description }).joined()\n"
+            render += "return \"\(element == "html" ? "<!DOCTYPE html>" : "")<\(element)\" + attributes() + \">\" + string" + (is_void ? "" : " + \"</\(element)>\"")
+            render += "}"
+
+            string += render
             //string += "\npublic var innerHTML:[HTML] = []\n}"
-            string += ",\n_ innerHTML: [HTML] = []\n)"
+            string += "\n}"
             items.append("\(raw: string)")
         }
-        initializer += "\ndefault: return nil\n}\n}"
-        items.append("\(raw: initializer)")
         return items
     }
-    // MARK: consume
-    static func consume() -> String {
-        return """
-            func consume(_ length: Int) -> String {
-                let slice:Substring = range[range.startIndex..<range.index(range.endIndex, offsetBy: length)]
-                range = range[range.index(range.startIndex, offsetBy: length)...]
-                while (range.first?.isWhitespace ?? false) || range.first == "," {
-                    range.removeFirst()
-                }
-                return String(slice)
-            }\n
-        """
-    }
-    // MARK: cString
-    static func cString() -> String {
-        return """
-            func cString() -> String? {
-                guard range.first == "\\\"" else { return nil }
-                range.removeFirst()
-                let index:Substring.Index = range.firstIndex(of: "\\\"")!
-                return consume(range.distance(from: range.startIndex, to: index))
-            }\n
-        """
-    }
-    // MARK: cBool
-    static func cBool() -> String {
-        return """
-            func cBool() -> Bool {
-                if range.hasPrefix("true") {
-                    _ = consume(4)
-                    return true
-                }
-                if range.hasPrefix("false") {
-                    _ = consume(5)
-                    return false
-                }
-                return false
-            }\n
-        """
-    }
-    // MARK: cFloat
-    static func cFloat() -> String {
-        return """
-            func cFloat() -> Float? {
-                guard range.first?.isNumber ?? false else { return nil }
-                var string:String = ""
-                while (range.first?.isNumber ?? false) || range.first == "." || range.first == "_" {
-                    string.append(range.removeFirst())
-                }
-                return Float(string)!
-            }\n
-        """
-    }
-    // MARK: cAttribute
-    static func cAttribute() -> String {
-        return """
-            func cAttribute<T: HTMLInitializable>() -> T? {
-                guard range.first == "." else { return nil }
-                range.removeFirst()
-                var string:String = "", depth:Int = 1
-                while let char:Character = range.first {
-                    if char == "(" {
-                        depth += 1
-                    } else if char == ")" {
-                        depth -= 1
-                    }
-                    if depth == 0 {
-                        break
-                    }
-                    string.append(range.removeFirst())
-                }
-                string += ")"
-                return T(rawValue: string)
-            }\n
-        """
-    }
     // MARK: parse value type
-    static func parse_value_type(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> String {
+    static func parse_value_type(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> (value_type: String, default_value: String) {
         let value_type_key:String
         if let member:MemberAccessExprSyntax = expr.as(MemberAccessExprSyntax.self) {
             value_type_key = member.declName.baseName.text
@@ -173,30 +168,175 @@ enum HTMLElements : MemberMacro {
         switch value_type_key {
             case "array":
                 isArray = true
-                let of_type:String = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
-                return "[" + of_type + "] = []"
+                let (of_type, _):(String, String) = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
+                return ("[" + of_type + "]", "= []")
             case "attribute":
-                return "HTMLElementAttribute.Extra.\(key)" + (isArray ? "" : "? = nil")
+                return ("HTMLElementAttribute.Extra.\(key)", isArray ? "" : "? = nil")
             case "otherAttribute":
                 var string:String = "\(expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(StringLiteralExprSyntax.self)!)"
                 string.removeFirst()
                 string.removeLast()
-                return "HTMLElementAttribute.Extra." + string + (isArray ? "" : "? = nil")
+                return ("HTMLElementAttribute.Extra." + string, isArray ? "" : "? = nil")
             case "string":
-                return "String" + (isArray ? "" : "? = nil")
+                return ("String", isArray ? "" : "? = nil")
             case "int":
-                return "Int" + (isArray ? "" : "? = nil")
+                return ("Int", isArray ? "" : "? = nil")
             case "float":
-                return "Float" + (isArray ? "" : "? = nil")
+                return ("Float", isArray ? "" : "? = nil")
             case "bool":
-                return "Bool" + (isArray ? "" : " = false")
+                return ("Bool", isArray ? "" : " = false")
             case "booleanDefaultValue":
                 let value:Bool = expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
-                return "Bool = \(value)"
+                return ("Bool", "= \(value)")
             case "cssUnit":
-                return "HTMLElementAttribute.CSSUnit" + (isArray ? "" : "? = nil")
+                return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil")
             default:
-                return "Float"
+                return ("Float", "? = nil")
+        }
+    }
+}
+
+// MARK: HTMLElementType
+package enum HTMLElementType : String, CaseIterable {
+    case html
+
+    case a
+    case abbr
+    case address
+    case area
+    case article
+    case aside
+    case audio
+
+    case b
+    case base
+    case bdi
+    case bdo
+    case blockquote
+    case body
+    case br
+    case button
+
+    case canvas
+    case caption
+    case cite
+    case code
+    case col
+    case colgroup
+
+    case data
+    case datalist
+    case dd
+    case del
+    case details
+    case dfn
+    case dialog
+    case div
+    case dl
+    case dt
+
+    case em
+    case embed
+
+    case fencedframe
+    case fieldset
+    case figcaption
+    case figure
+    case footer
+    case form
+    case frame
+    case frameset
+
+    case h1, h2, h3, h4, h5, h6
+    case head
+    case header
+    case hgroup
+    case hr
+    
+    case i
+    case iframe
+    case img
+    case input
+    case ins
+
+    case kbd
+
+    case label
+    case legend
+    case li
+    case link
+
+    case main
+    case map
+    case mark
+    case menu
+    case meta
+    case meter
+
+    case nav
+    case noscript
+
+    case object
+    case ol
+    case optgroup
+    case option
+    case output
+
+    case p
+    case picture
+    case portal
+    case pre
+    case progress
+
+    case q
+
+    case rp
+    case rt
+    case ruby
+    
+    case s
+    case samp
+    case script
+    case search
+    case section
+    case select
+    case slot
+    case small
+    case source
+    case span
+    case strong
+    case style
+    case sub
+    case summary
+    case sup
+
+    case table
+    case tbody
+    case td
+    case template
+    case textarea
+    case tfoot
+    case th
+    case thead
+    case time
+    case title
+    case tr
+    case track
+
+    case u
+    case ul
+
+    case `var`
+    case video
+
+    case wbr
+
+    package var isVoid : Bool {
+        switch self {
+        case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
+            return true
+        default:
+            return false
         }
     }
 }

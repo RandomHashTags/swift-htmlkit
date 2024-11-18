@@ -10,54 +10,56 @@ import HTMLKit
 
 struct AttributeTests {
     @Test func ariarole() {
-        let string:StaticString = #div(attributes: [.role(.widget)])
+        //let array:String = HTMLElementType.allCases.map({ "case \"\($0)\": return \($0)(rawValue: rawValue)" }).joined(separator: "\n")
+        //print(array)
+        let string:StaticString = #html(div(attributes: [.role(.widget)]))
         #expect(string == "<div role=\"widget\"></div>")
     }
     @Test func ariaattribute() {
-        var string:StaticString = #div(attributes: [.ariaattribute(.atomic(true))])
+        var string:StaticString = #html(div(attributes: [.ariaattribute(.atomic(true))]))
         #expect(string == "<div aria-atomic=\"true\"></div>")
 
-        string = #div(attributes: [.ariaattribute(.activedescendant("mario-and-luigi"))])
+        string = #html(div(attributes: [.ariaattribute(.activedescendant("mario-and-luigi"))]))
         #expect(string == "<div aria-activedescendant=\"mario-and-luigi\"></div>")
 
-        string = #div(attributes: [.ariaattribute(.autocomplete(.list))])
+        string = #html(div(attributes: [.ariaattribute(.autocomplete(.list))]))
         #expect(string == "<div aria-autocomplete=\"list\"></div>")
 
-        string = #div(attributes: [.ariaattribute(.controls(["testing", "123", "yup"]))])
+        string = #html(div(attributes: [.ariaattribute(.controls(["testing", "123", "yup"]))]))
         #expect(string == "<div aria-controls=\"testing 123 yup\"></div>")
     }
     @Test func attributionsrc() {
-        var string:StaticString = #a(attributionsrc: [])
+        var string:StaticString = #html(a(attributionsrc: []))
         #expect(string == "<a attributionsrc></a>")
 
-        string = #a(attributionsrc: ["https://github.com/RandomHashTags", "https://litleagues.com"])
+        string = #html(a(attributionsrc: ["https://github.com/RandomHashTags", "https://litleagues.com"]))
         #expect(string == "<a attributionsrc=\"https://github.com/RandomHashTags https://litleagues.com\"></a>")
     }
     @Test func data() {
-        let string:StaticString = #div(attributes: [.data("id", "5")])
+        let string:StaticString = #html(div(attributes: [.data("id", "5")]))
         #expect(string == "<div data-id=\"5\"></div>")
     }
     @Test func hidden() {
-        var string:StaticString = #div(attributes: [.hidden(.true)])
+        var string:StaticString = #html(div(attributes: [.hidden(.true)]))
         #expect(string == "<div hidden></div>")
 
-        string = #div(attributes: [.hidden(.untilFound)])
+        string = #html(div(attributes: [.hidden(.untilFound)]))
         #expect(string == "<div hidden=\"until-found\"></div>")
     }
 
     @Test func custom() {
-        var string:StaticString = #div(attributes: [.custom("potofgold", "north")])
+        var string:StaticString = #html(div(attributes: [.custom("potofgold", "north")]))
         #expect(string == "<div potofgold=\"north\"></div>")
         
-        string = #div(attributes: [.custom("potofgold", "\(1)")])
+        string = #html(div(attributes: [.custom("potofgold", "\(1)")]))
         #expect(string == "<div potofgold=\"1\"></div>")
 
-        string = #div(attributes: [.custom("potofgold1", "\(1)"), .custom("potofgold2", "2")])
+        string = #html(div(attributes: [.custom("potofgold1", "\(1)"), .custom("potofgold2", "2")]))
         #expect(string == "<div potofgold1=\"1\" potofgold2=\"2\"></div>")
     }
 
     @Test func trailingSlash() {
-        var string:StaticString = #meta(attributes: [.trailingSlash])
+        var string:StaticString = #html(meta(attributes: [.trailingSlash]))
         #expect(string == "<meta />")
 
         string = #custom(tag: "slash", isVoid: true, attributes: [.trailingSlash])

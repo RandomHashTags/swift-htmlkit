@@ -31,3 +31,6 @@ XmlRender.*
 InterpolationLookup.d
 InterpolationLookup.o
 InterpolationLookup.swiftdeps*
+LiteralElements.d
+LiteralElements.o
+LiteralElements.swiftdeps*

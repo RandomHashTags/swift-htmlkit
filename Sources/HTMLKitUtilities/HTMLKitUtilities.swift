@@ -138,8 +138,6 @@ package enum HTMLElementType : String, CaseIterable {
     case figure
     case footer
     case form
-    case frame
-    case frameset
 
     case h1, h2, h3, h4, h5, h6
     case head
@@ -232,6 +230,70 @@ package enum HTMLElementType : String, CaseIterable {
         default:
             return false
         }
+    }
+}
+// MARK: HTMLElementValueType
+indirect enum HTMLElementValueType {
+    case string
+    case int
+    case float
+    case bool
+    case booleanDefaultValue(Bool)
+    case attribute
+    case otherAttribute(String)
+    case cssUnit
+    case array(of: HTMLElementValueType)
+
+    static func consume(_ range: inout Substring, length: Int) -> String {
+        let slice:Substring = range[range.startIndex..<range.index(range.endIndex, offsetBy: length)]
+        range = range[range.index(range.startIndex, offsetBy: length)...]
+        while (range.first?.isWhitespace ?? false) || range.first == "," {
+            range.removeFirst()
+        }
+        return String(slice)
+    }
+    static func cString(_ range: inout Substring) -> String? {
+        guard range.first == "\"" else { return nil }
+        range.removeFirst()
+        guard let index:Substring.Index = range.firstIndex(of: "\"") else { return nil }
+        return consume(&range, length: range.distance(from: range.startIndex, to: index))
+    }
+    static func cBool(_ range: inout Substring) -> Bool {
+        if range.hasPrefix("true") {
+            _ = consume(&range, length: 4)
+            return true
+        }
+        if range.hasPrefix("false") {
+            _ = consume(&range, length: 5)
+            return false
+        }
+        return false
+    }
+    static func cFloat(_ range: inout Substring) -> Float? {
+        guard range.first?.isNumber ?? false else { return nil }
+        var string:String = ""
+        while (range.first?.isNumber ?? false) || range.first == "." || range.first == "_" {
+            string.append(range.removeFirst())
+        }
+        return Float(string)!
+    }
+    static func cAttribute<T: HTMLInitializable>(_ range: inout Substring) -> T? {
+        guard range.first == "." else { return nil }
+        range.removeFirst()
+        var string:String = "", depth:Int = 1
+        while let char:Character = range.first {
+            if char == "(" {
+                depth += 1
+            } else if char == ")" {
+                depth -= 1
+            }
+            if depth == 0 {
+                break
+            }
+            string.append(range.removeFirst())
+        }
+        string += ")"
+        return T(rawValue: string)
     }
 }
 
@@ -330,6 +392,51 @@ public enum HTMLElementAttribute {
             case .event(let event, _):      return "on" + event.rawValue
         }
     }
+
+    public var htmlValue : String? {
+        switch self {
+            case .accesskey(let value):             return value
+            case .ariaattribute(let value):         return value?.htmlValue
+            case .role(let value):                  return value?.rawValue
+            case .autocapitalize(let value):        return value?.rawValue
+            case .autofocus(let value):             return value ? "" : nil
+            case .class(let value):                 return value.joined(separator: " ")
+            case .contenteditable(let value):       return value?.htmlValue
+            case .data(_, let value):          return value
+            case .dir(let value):                   return value?.rawValue
+            case .draggable(let value):             return value?.rawValue
+            case .enterkeyhint(let value):          return value?.rawValue
+            case .exportparts(let value):           return value.joined(separator: ",")
+            case .hidden(let value):                return value?.htmlValue
+            case .id(let value):                    return value
+            case .inert(let value):                 return value ? "" : nil
+            case .inputmode(let value):             return value?.rawValue
+            case .is(let value):                    return value
+            case .itemid(let value):                return value
+            case .itemprop(let value):              return value
+            case .itemref(let value):               return value
+            case .itemscope(let value):             return value ? "" : nil
+            case .itemtype(let value):              return value
+            case .lang(let value):                  return value
+            case .nonce(let value):                 return value
+            case .part(let value):                  return value.joined(separator: " ")
+            case .popover(let value):               return value?.rawValue
+            case .slot(let value):                  return value
+            case .spellcheck(let value):            return value?.rawValue
+            case .style(let value):                 return value
+            case .tabindex(let value):              return value?.description
+            case .title(let value):                 return value
+            case .translate(let value):             return value?.rawValue
+            case .virtualkeyboardpolicy(let value): return value?.rawValue
+            case .writingsuggestions(let value):    return value?.rawValue
+
+            case .trailingSlash:            return nil
+
+            case .htmx(let htmx):           return htmx.htmlValue
+            case .custom(_, let value):        return value
+            case .event(_, let value):      return value
+        }
+    }
 }
 // MARK: Extra attributes 
 extension HTMLElementAttribute {
@@ -371,6 +478,13 @@ extension HTMLElementAttribute {
 }
 public protocol HTMLInitializable {
     init?(rawValue: String)
+
+    var key : String { get }
+    var htmlValue : String? { get }
+}
+public extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
+    var key : String { rawValue }
+    var htmlValue : String? { rawValue }
 }
 public extension HTMLElementAttribute.Extra {
     typealias height = HTMLElementAttribute.CSSUnit
@@ -517,7 +631,65 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
-        public var htmlValue : String {
+        public var key : String {
+            switch self {
+                case .activedescendant(_): return "activedescendant"
+                case .atomic(_): return "atomic"
+                case .autocomplete(_): return "autocomplete"
+                case .braillelabel(_): return "braillelabel"
+                case .brailleroledescription(_): return "brailleroledescription"
+                case .busy(_): return "busy"
+                case .checked(_): return "checked"
+                case .colcount(_): return "colcount"
+                case .colindex(_): return "colindex"
+                case .colindextext(_): return "colindextext"
+                case .colspan(_): return "colspan"
+                case .controls(_): return "controls"
+                case .current(_): return "current"
+                case .describedby(_): return "describedby"
+                case .description(_): return "description"
+                case .details(_): return "details"
+                case .disabled(_): return "disabled"
+                case .dropeffect(_): return "dropeffect"
+                case .errormessage(_): return "errormessage"
+                case .expanded(_): return "expanded"
+                case .flowto(_): return "flowto"
+                case .grabbed(_): return "grabbed"
+                case .haspopup(_): return "haspopup"
+                case .hidden(_): return "hidden"
+                case .invalid(_): return "invalid"
+                case .keyshortcuts(_): return "keyshortcuts"
+                case .label(_): return "label"
+                case .labelledby(_): return "labelledby"
+                case .level(_): return "level"
+                case .live(_): return "live"
+                case .modal(_): return "modal"
+                case .multiline(_): return "multiline"
+                case .multiselectable(_): return "multiselectable"
+                case .orientation(_): return "orientation"
+                case .owns(_): return "owns"
+                case .placeholder(_): return "placeholder"
+                case .posinset(_): return "posinset"
+                case .pressed(_): return "pressed"
+                case .readonly(_): return "readonly"
+                case .relevant(_): return "relevant"
+                case .required(_): return "required"
+                case .roledescription(_): return "roledescription"
+                case .rowcount(_): return "rowcount"
+                case .rowindex(_): return "rowindex"
+                case .rowindextext(_): return "rowindextext"
+                case .rowspan(_): return "rowspan"
+                case .selected(_): return "selected"
+                case .setsize(_): return "setsize"
+                case .sort(_): return "sort"
+                case .valuemax(_): return "valuemax"
+                case .valuemin(_): return "valuemin"
+                case .valuenow(_): return "valuenow"
+                case .valuetext(_): return "valuetext"
+            }
+        }
+
+        public var htmlValue : String? {
             switch self {
                 case .activedescendant(let value): return value
                 case .atomic(let value): return "\(value)"
@@ -799,7 +971,18 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
-        public var htmlValue : String {
+        public var key : String {
+            switch self {
+                case .showModal:          return "showModal"
+                case .close:              return "close"
+                case .showPopover:        return "showPopover"
+                case .hidePopover:        return "hidePopover"
+                case .togglePopover:      return "togglePopover"
+                case .custom(_):          return "custom"
+            }
+        }
+
+        public var htmlValue : String? {
             switch self {
                 case .showModal:          return "show-modal"
                 case .close:              return "close"
@@ -816,7 +999,7 @@ public extension HTMLElementAttribute.Extra {
         case `true`, `false`
         case plaintextOnly
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .plaintextOnly: return "plaintext-only"
                 default:             return rawValue
@@ -834,7 +1017,7 @@ public extension HTMLElementAttribute.Extra {
         case anonymous
         case useCredentials
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .useCredentials: return "use-credentials"
                 default:              return rawValue
@@ -880,7 +1063,14 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
-        public var htmlValue : String {
+        public var key : String {
+            switch self {
+                case .empty:       return "empty"
+                case .filename(_): return "filename"
+            }
+        }
+
+        public var htmlValue : String? {
             switch self {
                 case .empty: return ""
                 case .filename(let value): return value
@@ -927,7 +1117,7 @@ public extension HTMLElementAttribute.Extra {
         case multipartFormData
         case textPlain
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .applicationXWWWFormURLEncoded: return "application/x-www-form-urlencoded"
                 case .multipartFormData:             return "multipart/form-data"
@@ -951,7 +1141,7 @@ public extension HTMLElementAttribute.Extra {
         case `true`
         case untilFound
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .true: return ""
                 case .untilFound: return "until-found"
@@ -967,7 +1157,7 @@ public extension HTMLElementAttribute.Extra {
         case xUACompatible
         case refresh
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .contentSecurityPolicy: return "content-security-policy"
                 case .contentType:           return "content-type"
@@ -989,7 +1179,7 @@ public extension HTMLElementAttribute.Extra {
         case datetimeLocal
         case email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .datetimeLocal: return "datetime-local"
                 default: return rawValue
@@ -1011,7 +1201,7 @@ public extension HTMLElementAttribute.Extra {
     enum numberingtype : String, HTMLInitializable {
         case a, A, i, I, one
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .one: return "1"
                 default:   return rawValue
@@ -1045,7 +1235,7 @@ public extension HTMLElementAttribute.Extra {
         case strictOriginWhenCrossOrigin
         case unsafeURL
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .noReferrer:                  return "no-referrer"
                 case .noReferrerWhenDowngrade:     return "no-referrer-when-downgrade"
@@ -1069,7 +1259,7 @@ public extension HTMLElementAttribute.Extra {
         case search, stylesheet, tag
         case termsOfService
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .dnsPrefetch:    return "dns-prefetch"
                 case .privacyPolicy:  return "privacy-policy"
@@ -1096,7 +1286,7 @@ public extension HTMLElementAttribute.Extra {
         case allowTopNavigationByUserActivation
         case allowTopNavigationToCustomProtocols
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .allowDownloads:                      return "allow-downloads"
                 case .allowForms:                          return "allow-forms"

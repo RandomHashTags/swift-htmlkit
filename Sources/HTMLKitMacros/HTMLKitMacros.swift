@@ -29,6 +29,6 @@ extension DiagnosticMsg : FixItMessage {
 @main
 struct HTMLKitMacros : CompilerPlugin {
     let providingMacros:[any Macro.Type] = [
-        HTMLElement.self
+        HTMLElementMacro.self
     ]
 }

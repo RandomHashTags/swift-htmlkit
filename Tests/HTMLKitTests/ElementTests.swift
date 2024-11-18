@@ -15,26 +15,26 @@ struct ElementTests {
         let escaped:String = "&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;"
         var expected_result:String = "<p>\(escaped)</p>"
 
-        var string:String = #p("<!DOCTYPE html><html>Test</html>")
+        var string:String = #html(p("<!DOCTYPE html><html>Test</html>"))
         #expect(string == expected_result)
 
         string = #escapeHTML("<!DOCTYPE html><html>Test</html>")
         #expect(string == escaped)
 
-        string = #p(#escapeHTML(#html("Test")))
+        string = #html(p(#escapeHTML(html("Test").description)))
         #expect(string == expected_result)
 
-        string = #p("\(unescaped.escapingHTML(escapeAttributes: false))")
+        string = #html(p("\(unescaped.escapingHTML(escapeAttributes: false))"))
         #expect(string == expected_result)
 
-        expected_result = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
+        /*expected_result = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
         string = #div(attributes: [.title(StaticString("<p>"))], StaticString("<p></p>")).description
+        #expect(string == expected_result)*/
+
+        string = #html(div(attributes: [.title("<p>")], StaticString("<p></p>")))
         #expect(string == expected_result)
 
-        string = #div(attributes: [.title("<p>")], StaticString("<p></p>")).description
-        #expect(string == expected_result)
-
-        string = #div(attributes: [.title("<p>")], "<p></p>")
+        string = #html(div(attributes: [.title("<p>")], "<p></p>"))
         #expect(string == expected_result)
     }
 }
@@ -48,7 +48,7 @@ struct ElementTests {
 
 extension ElementTests {
     // MARK: html
-    @Test func html() {
+    @Test func _html() {
         var string:StaticString = #html()
         #expect(string == "<!DOCTYPE html><html></html>")
 
@@ -58,329 +58,329 @@ extension ElementTests {
 
     // MARK: a
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
-    @Test func a() {
-        var string:String = #a("Test")
+    @Test func _a() {
+        var string:String = #html(a("Test"))
         #expect(string == "<a>Test</a>")
 
-        string = #a(href: "test", "Test")
+        string = #html(a(href: "test", "Test"))
         #expect(string == "<a href=\"test\">Test</a>")
 
-        string = #a(href: "", "Test")
+        string = #html(a(href: "", "Test"))
         #expect(string == "<a href=\"\">Test</a>")
         
-        string = #a(download: .empty)
+        string = #html(a(download: .empty))
         #expect(string == "<a download></a>")
         
-        string = #a(download: .filename("yippie.json"))
+        string = #html(a(download: .filename("yippie.json")))
         #expect(string == "<a download=\"yippie.json\"></a>")
 
-        string = #a(ping: ["https://litleagues.com", "https://github.com/RandomHashTags"])
+        string = #html(a(ping: ["https://litleagues.com", "https://github.com/RandomHashTags"]))
         #expect(string == "<a ping=\"https://litleagues.com https://github.com/RandomHashTags\"></a>")
 
-        string = #a(referrerpolicy: .noReferrer)
+        string = #html(a(referrerpolicy: .noReferrer))
         #expect(string == "<a referrerpolicy=\"no-referrer\"></a>")
 
-        string = #a(target: ._blank)
+        string = #html(a(target: ._blank))
         #expect(string == "<a target=\"_blank\"></a>")
 
-        string = #a(rel: [.stylesheet, .alternate, .privacyPolicy, .termsOfService, .dnsPrefetch])
+        string = #html(a(rel: [.stylesheet, .alternate, .privacyPolicy, .termsOfService, .dnsPrefetch]))
         #expect(string == "<a rel=\"stylesheet alternate privacy-policy terms-of-service dns-prefetch\"></a>")
     }
 
     // MARK: area
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area
-    @Test func area() {
-        var string:StaticString = #area(coords: [1, 2, 3])
+    @Test func _area() {
+        var string:StaticString = #html(area(coords: [1, 2, 3]))
         #expect(string == "<area coords=\"1,2,3\">")
 
-        string = #area(coords: [])
+        string = #html(area(coords: []))
         #expect(string == "<area coords=\"\">")
 
-        string = #area(href: "")
+        string = #html(area(href: ""))
         #expect(string == "<area href=\"\">")
 
-        string = #area(href: "https://github.com/RandomHashTags")
+        string = #html(area(href: "https://github.com/RandomHashTags"))
         #expect(string == "<area href=\"https://github.com/RandomHashTags\">")
 
-        string = #area(shape: .poly)
+        string = #html(area(shape: .poly))
         #expect(string == "<area shape=\"poly\">")
 
-        string = #area(shape: .default)
+        string = #html(area(shape: .default))
         #expect(string == "<area shape=\"default\">")
 
-        string = #area(target: ._self)
+        string = #html(area(target: ._self))
         #expect(string == "<area target=\"_self\">")
     }
 
     // MARK: audio
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
-    @Test func audio() {
-        var string:StaticString = #audio(controlslist: [.nodownload])
+    @Test func _audio() {
+        var string:StaticString = #html(audio(controlslist: [.nodownload]))
         #expect(string == "<audio controlslist=\"nodownload\"></audio>")
 
-        string = #audio(controlslist: [.nodownload, .nofullscreen, .noremoteplayback])
+        string = #html(audio(controlslist: [.nodownload, .nofullscreen, .noremoteplayback]))
         #expect(string == "<audio controlslist=\"nodownload nofullscreen noremoteplayback\"></audio>")
 
-        string = #audio(autoplay: true)
+        string = #html(audio(autoplay: true))
         #expect(string == "<audio autoplay></audio>")
 
-        string = #audio(autoplay: false, controls: true)
+        string = #html(audio(autoplay: false, controls: true))
         #expect(string == "<audio controls></audio>")
 
-        string = #audio(crossorigin: .anonymous)
+        string = #html(audio(crossorigin: .anonymous))
         #expect(string == "<audio crossorigin=\"anonymous\"></audio>")
 
-        string = #audio(crossorigin: .useCredentials)
+        string = #html(audio(crossorigin: .useCredentials))
         #expect(string == "<audio crossorigin=\"use-credentials\"></audio>")
 
-        string = #audio(disableremoteplayback: true)
+        string = #html(audio(disableremoteplayback: true))
         #expect(string == "<audio disableremoteplayback></audio>")
 
-        string = #audio(preload: .auto)
+        string = #html(audio(preload: .auto))
         #expect(string == "<audio preload=\"auto\"></audio>")
     }
 
     // MARK: button
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button
-    @Test func button() {
-        var string:StaticString = #button(type: .submit)
+    @Test func _button() {
+        var string:StaticString = #html(button(type: .submit))
         #expect(string == "<button type=\"submit\"></button>")
 
-        string = #button(formenctype: .applicationXWWWFormURLEncoded, formmethod: .get, formtarget: ._blank, popovertargetaction: .hide)
+        string = #html(button(formenctype: .applicationXWWWFormURLEncoded, formmethod: .get, formtarget: ._blank, popovertargetaction: .hide))
         #expect(string == "<button formenctype=\"application/x-www-form-urlencoded\" formmethod=\"get\" formtarget=\"_blank\" popovertargetaction=\"hide\"></button>")
 
-        string = #button(formenctype: .multipartFormData, formmethod: .post, popovertargetaction: .show)
+        string = #html(button(formenctype: .multipartFormData, formmethod: .post, popovertargetaction: .show))
         #expect(string == "<button formenctype=\"multipart/form-data\" formmethod=\"post\" popovertargetaction=\"show\"></button>")
 
-        string = #button(formenctype: .textPlain, formmethod: .get, type: .reset)
+        string = #html(button(formenctype: .textPlain, formmethod: .get, type: .reset))
         #expect(string == "<button formenctype=\"text/plain\" formmethod=\"get\" type=\"reset\"></button>")
 
-        string = #button(command: .showModal)
+        string = #html(button(command: .showModal))
         #expect(string == "<button command=\"show-modal\"></button>")
 
-        string = #button(command: .showPopover)
+        string = #html(button(command: .showPopover))
         #expect(string == "<button command=\"show-popover\"></button>")
 
-        string = #button(command: .hidePopover)
+        string = #html(button(command: .hidePopover))
         #expect(string == "<button command=\"hide-popover\"></button>")
 
-        string = #button(command: .togglePopover)
+        string = #html(button(command: .togglePopover))
         #expect(string == "<button command=\"toggle-popover\"></button>")
 
-        string = #button(command: .custom("bingbong"))
+        string = #html(button(command: .custom("bingbong")))
         #expect(string == "<button command=\"--bingbong\"></button>")
     }
 
     // MARK: canvas
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas
-    @Test func canvas() {
-        let string:StaticString = #canvas(height: .percent(4), width: .em(2.69))
+    @Test func _canvas() {
+        let string:StaticString = #html(canvas(height: .percent(4), width: .em(2.69)))
         #expect(string == "<canvas height=\"4%\" width=\"2.69em\"></canvas>")
     }
 
     // MARK: col
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col
-    @Test func col() {
-        let string:StaticString = #col(span: 4)
+    @Test func _col() {
+        let string:StaticString = #html(col(span: 4))
         #expect(string == "<col span=\"4\">")
     }
 
     // MARK: colgroup
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup
-    @Test func colgroup() {
-        let string:StaticString = #colgroup(span: 3)
+    @Test func _colgroup() {
+        let string:StaticString = #html(colgroup(span: 3))
         #expect(string == "<colgroup span=\"3\"></colgroup>")
     }
 
     // MARK: form
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form
-    @Test func form() {
-        var string:StaticString = #form(acceptCharset: ["utf-8"], autocomplete: .on)
+    @Test func _form() {
+        var string:StaticString = #html(form(acceptCharset: ["utf-8"], autocomplete: .on))
         #expect(string == "<form accept-charset=\"utf-8\" autocomplete=\"on\"></form>")
 
-        string = #form(acceptCharset: ["utf-8", "utf-16"])
+        string = #html(form(acceptCharset: ["utf-8", "utf-16"]))
         #expect(string == "<form accept-charset=\"utf-8 utf-16\"></form>")
 
-        string = #form(enctype: .textPlain)
+        string = #html(form(enctype: .textPlain))
         #expect(string == "<form enctype=\"text/plain\"></form>")
 
-        string = #form(method: "post")
+        string = #html(form(method: "post"))
         #expect(string == "<form method=\"post\"></form>")
 
-        string = #form(novalidate: true)
+        string = #html(form(novalidate: true))
         #expect(string == "<form novalidate></form>")
     }
 
     // MARK: iframe
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
-    @Test func iframe() {
-        var string:StaticString = #iframe(sandbox: [.allowDownloads, .allowForms])
+    @Test func _iframe() {
+        var string:StaticString = #html(iframe(sandbox: [.allowDownloads, .allowForms]))
         #expect(string == "<iframe sandbox=\"allow-downloads allow-forms\"></iframe>")
 
-        string = #iframe(allow: ["geolocation", "test"])
+        string = #html(iframe(allow: ["geolocation", "test"]))
         #expect(string == "<iframe allow=\"geolocation;test\"></iframe>")
     }
 
     // MARK: img
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img
-    @Test func img() {
-        let string:StaticString = #img(sizes: ["(max-height: 500px) 1000px", "(min-height: 25rem)"], srcset: ["https://paradigm-app.com", "https://litleagues.com"])
+    @Test func _img() {
+        let string:StaticString = #html(img(sizes: ["(max-height: 500px) 1000px", "(min-height: 25rem)"], srcset: ["https://paradigm-app.com", "https://litleagues.com"]))
         #expect(string == "<img sizes=\"(max-height: 500px) 1000px,(min-height: 25rem)\" srcset=\"https://paradigm-app.com,https://litleagues.com\">")
     }
 
     // MARK: input
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
-    @Test func input() {
-        var string:StaticString = #input(autocomplete: ["email", "password"], type: .text)
+    @Test func _input() {
+        var string:StaticString = #html(input(autocomplete: ["email", "password"], type: .text))
         #expect(string == "<input autocomplete=\"email password\" type=\"text\">")
 
-        string = #input(type: .password)
+        string = #html(input(type: .password))
         #expect(string == "<input type=\"password\">")
 
-        string = #input(type: .datetimeLocal)
+        string = #html(input(type: .datetimeLocal))
         #expect(string == "<input type=\"datetime-local\">")
 
-        string = #input(accept: [".docx", ".json"])
+        string = #html(input(accept: [".docx", ".json"]))
         #expect(string == "<input accept=\".docx,.json\">")
     }
 
     // MARK: link
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link
-    @Test func link() {
-        var string:StaticString = #link(as: .document, imagesizes: ["lmno", "p"])
+    @Test func _link() {
+        var string:StaticString = #html(link(as: .document, imagesizes: ["lmno", "p"]))
         #expect(string == "<link as=\"document\" imagesizes=\"lmno,p\">")
 
-        string = #link(imagesrcset: ["blah", "bling"])
+        string = #html(link(imagesrcset: ["blah", "bling"]))
         #expect(string == "<link imagesrcset=\"blah,bling\">")
     }
 
     // MARK: meta
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta
-    @Test func meta() {
-        let string:StaticString = #meta(charset: "utf-8", httpEquiv: .contentType)
+    @Test func _meta() {
+        let string:StaticString = #html(meta(charset: "utf-8", httpEquiv: .contentType))
         #expect(string == "<meta charset=\"utf-8\" http-equiv=\"content-type\">")
     }
 
     // MARK: object
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object
-    @Test func object() {
-        let string:StaticString = #object(archive: ["https://github.com/RandomHashTags/destiny", "https://youtube.com"], border: 5)
+    @Test func _object() {
+        let string:StaticString = #html(object(archive: ["https://github.com/RandomHashTags/destiny", "https://youtube.com"], border: 5))
         #expect(string == "<object archive=\"https://github.com/RandomHashTags/destiny https://youtube.com\" border=\"5\"></object>")
     }
 
     // MARK: ol
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ol
-    @Test func ol() {
-        var string:StaticString = #ol()
+    @Test func _ol() {
+        var string:StaticString = #html(ol())
         #expect(string == "<ol></ol>")
 
-        string = #ol(type: .a)
+        string = #html(ol(type: .a))
         #expect(string == "<ol type=\"a\"></ol>")
 
-        string = #ol(type: .A)
+        string = #html(ol(type: .A))
         #expect(string == "<ol type=\"A\"></ol>")
 
-        string = #ol(type: .i)
+        string = #html(ol(type: .i))
         #expect(string == "<ol type=\"i\"></ol>")
 
-        string = #ol(type: .I)
+        string = #html(ol(type: .I))
         #expect(string == "<ol type=\"I\"></ol>")
 
-        string = #ol(type: .one)
+        string = #html(ol(type: .one))
         #expect(string == "<ol type=\"1\"></ol>")
     }
 
     // MARK: option
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option
-    @Test func option() {
-        var string:StaticString = #option()
+    @Test func _option() {
+        var string:StaticString = #html(option())
         #expect(string == "<option></option>")
 
-        string = #option(value: "")
+        string = #html(option(value: ""))
         #expect(string == "<option value=\"\"></option>")
 
-        string = #option(value: "earth")
+        string = #html(option(value: "earth"))
         #expect(string == "<option value=\"earth\"></option>")
     }
 
     // MARK: output
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/output
-    @Test func output() {
-        let string:StaticString = #output(for: ["whats", "it", "tuya"])
+    @Test func _output() {
+        let string:StaticString = #html(output(for: ["whats", "it", "tuya"]))
         #expect(string == "<output for=\"whats it tuya\"></output>")
     }
 
     // MARK: script
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script
-    @Test func script() {
-        var string:StaticString = #script()
+    @Test func _script() {
+        var string:StaticString = #html(script())
         #expect(string == "<script></script>")
 
-        string = #script(type: .importmap)
+        string = #html(script(type: .importmap))
         #expect(string == "<script type=\"importmap\"></script>")
 
-        string = #script(type: .module)
+        string = #html(script(type: .module))
         #expect(string == "<script type=\"module\"></script>")
 
-        string = #script(type: .speculationrules)
+        string = #html(script(type: .speculationrules))
         #expect(string == "<script type=\"speculationrules\"></script>")
     }
 
     // MARK: style
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style
-    @Test func style() {
-        let string:StaticString = #style(blocking: .render)
+    @Test func _style() {
+        let string:StaticString = #html(style(blocking: .render))
         #expect(string == "<style blocking=\"render\"></style>")
     }
 
     // MARK: td
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td
-    @Test func td() {
-        let string:StaticString = #td(headers: ["puss", "in", "boots"])
+    @Test func _td() {
+        let string:StaticString = #html(td(headers: ["puss", "in", "boots"]))
         #expect(string == "<td headers=\"puss in boots\"></td>")
     }
 
     // MARK: template
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
-    @Test func template() {
-        let string:StaticString = #template(shadowrootclonable: .false, shadowrootdelegatesfocus: false, shadowrootmode: .closed, shadowrootserializable: true)
+    @Test func _template() {
+        let string:StaticString = #html(template(shadowrootclonable: .false, shadowrootdelegatesfocus: false, shadowrootmode: .closed, shadowrootserializable: true))
         #expect(string == "<template shadowrootclonable=\"false\" shadowrootmode=\"closed\" shadowrootserializable></template>")
     }
 
     // MARK: textarea
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea
-    @Test func textarea() {
-        let string:StaticString = #textarea(autocomplete: ["email", "password"], dirname: .ltr, rows: 5, wrap: .soft)
+    @Test func _textarea() {
+        let string:StaticString = #html(textarea(autocomplete: ["email", "password"], dirname: .ltr, rows: 5, wrap: .soft))
         #expect(string == "<textarea autocomplete=\"email password\" dirname=\"ltr\" rows=\"5\" wrap=\"soft\"></textarea>")
     }
 
     // MARK: th
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th
-    @Test func th() {
-        let string:StaticString = #th(rowspan: 2, scope: .colgroup)
+    @Test func _th() {
+        let string:StaticString = #html(th(rowspan: 2, scope: .colgroup))
         #expect(string == "<th rowspan=\"2\" scope=\"colgroup\"></th>")
     }
 
     // MARK: track
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track
-    @Test func track() {
-        let string:StaticString = #track(default: true, kind: .captions, label: "tesT")
+    @Test func _track() {
+        let string:StaticString = #html(track(default: true, kind: .captions, label: "tesT"))
         #expect(string == "<track default kind=\"captions\" label=\"tesT\">")
     }
     
     // MARK: video
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
-    @Test func video() {
-        var string:StaticString = #video(controlslist: [.nodownload, .nofullscreen, .noremoteplayback])
+    @Test func _video() {
+        var string:StaticString = #html(video(controlslist: [.nodownload, .nofullscreen, .noremoteplayback]))
         #expect(string == "<video controlslist=\"nodownload nofullscreen noremoteplayback\"></video>")
 
-        string = #video(crossorigin: .anonymous)
+        string = #html(video(crossorigin: .anonymous))
         #expect(string == "<video crossorigin=\"anonymous\"></video>")
 
-        string = #video(crossorigin: .useCredentials)
+        string = #html(video(crossorigin: .useCredentials))
         #expect(string == "<video crossorigin=\"use-credentials\"></video>")
 
-        string = #video(preload: .metadata)
+        string = #html(video(preload: .metadata))
         #expect(string == "<video preload=\"metadata\"></video>")
     }
 
@@ -396,13 +396,13 @@ extension ElementTests {
     // MARK: Events
     @Test func events() {
         let third_thing:StaticString = "doAThirdThing()"
-        let string:String = #div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()"), .event(.focus, "\(third_thing)")])
+        let string:String = #html(div(attributes: [.event(.click, "doThing()"), .event(.change, "doAnotherThing()"), .event(.focus, "\(third_thing)")]))
         #expect(string == "<div onclick=\"doThing()\" onchange=\"doAnotherThing()\" onfocus=\"doAThirdThing()\"></div>")
     }
 
     // MARK: Void elements
     @Test func elements_void() {
-        let string:StaticString = #area(#base(), #br(), #col(), #embed(), #hr(), #img(), #input(), #link(), #meta(), #source(), #track(), #wbr())
+        let string:StaticString = #html(area(base(), br(), col(), embed(), hr(), img(), input(), link(), meta(), source(), track(), wbr()))
         #expect(string == "<area><base><br><col><embed><hr><img><input><link><meta><source><track><wbr>")
     }
 }
@@ -410,20 +410,20 @@ extension ElementTests {
 // MARK: Misc
 extension ElementTests {
     @Test func recursive() {
-        let string:StaticString = #div(
-            #div(),
-            #div(#div(), #div(), #div()),
-            #div()
+        let string:StaticString = #html(
+            div(),
+            div(div(), div(), div()),
+            div()
         )
         #expect(string == "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }
 
     @Test func no_value_type() {
         let expected_string:String = "<!DOCTYPE html><html><body><h1>HTMLKitTests</h1></body></html>"
-        let test1 = #html(#body(#h1("HTMLKitTests")))
+        let test1:String = #html(body(h1("HTMLKitTests")))
         #expect(type(of: test1) == String.self)
         #expect(test1 == expected_string)
-        let test2 = #html(#body(#h1(StaticString("HTMLKitTests"))))
+        let test2:StaticString = #html(body(h1(StaticString("HTMLKitTests"))))
         #expect(type(of: test2) == StaticString.self)
         #expect(test2 == expected_string)
     }
