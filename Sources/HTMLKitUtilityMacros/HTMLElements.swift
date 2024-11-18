@@ -54,7 +54,7 @@ enum HTMLElements : DeclarationMacro {
                 initializers += "self = .init("
                 attributes.reserveCapacity(test.count)
                 for element in test {
-                    var key:String = ""
+                    var key:String = "", key_literal:String = ""
                     let tuple = element.expression.as(TupleExprSyntax.self)!
                     for attribute_element in tuple.elements {
                         let label:LabeledExprSyntax = attribute_element
@@ -62,6 +62,7 @@ enum HTMLElements : DeclarationMacro {
                             key = "\(key_element)"
                             key.removeFirst()
                             key.removeLast()
+                            key_literal = key
                             switch key {
                                 case "for", "default", "defer", "as":
                                     key = "`\(key)`"
@@ -73,12 +74,12 @@ enum HTMLElements : DeclarationMacro {
                             let (value_type, default_value):(String, String) = parse_value_type(isArray: &isArray, key: key, label.expression)
                             let init_type:String
                             switch value_type {
-                                case "String": init_type = "HTMLElementValueType.cString(&range)"
+                                case "String": init_type = "HTMLElementValueType.cString(key: \"\(key_literal)\", &range)"
                                 case "Bool":   init_type = "HTMLElementValueType.cBool(&range)"
                                 case "Float":  init_type = "HTMLElementValueType.cFloat(&range)"
                                 default:
                                     if value_type.hasPrefix("HTMLElementAttribute.Extra.") {
-                                        init_type = "HTMLElementValueType.cAttribute(&range)"
+                                        init_type = "HTMLElementValueType.cAttribute(key: \"\(key_literal)\", &range)"
                                     } else if value_type.first == "[" {
                                         init_type = "[]"
                                     } else {
@@ -140,8 +141,12 @@ enum HTMLElements : DeclarationMacro {
                     }
                     attributes_func += ".joined(separator: \"\(separator)\")\n"
                     attributes_func += "items.append(\"\(key_literal)=\\\"\" + string + \"\\\"\")\n}"
+                } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
+                    attributes_func += "\n"
+                    attributes_func += #"if let \#(key) { items.append("\#(key_literal)=\\\"\(\#(key))\\\"") }"#
                 } else {
-                    attributes_func += "\nif let \(key) { items.append(\"\(key_literal)=\\\"\\(\(key))\\\"\") }"
+                    attributes_func += "\n"
+                    attributes_func += #"if let \#(key), let v:String = \#(key).htmlValue { items.append("\#(key_literal)=\\\"\(v)\\\"") }"#
                 }
             }
             attributes_func += "\nreturn (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"
@@ -151,7 +156,6 @@ enum HTMLElements : DeclarationMacro {
             render += "}"
 
             string += render
-            //string += "\npublic var innerHTML:[HTML] = []\n}"
             string += "\n}"
             items.append("\(raw: string)")
         }

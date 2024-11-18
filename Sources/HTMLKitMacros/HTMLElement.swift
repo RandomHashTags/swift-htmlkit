@@ -84,6 +84,8 @@ private extension HTMLElementMacro {
             children = childs.prefix(childs.count)
         }
         let (attributes, innerHTML, trailingSlash):(String, String, Bool) = parse_arguments(context: context, elementType: elementType, children: children)
+        return innerHTML
+
         var string:String = (tag == "html" ? "<!DOCTYPE html>" : "") + "<" + tag + attributes
         if trailingSlash {
             if isVoid {
@@ -265,6 +267,8 @@ private extension HTMLElementMacro {
                 string.escapeHTML(escapeAttributes: false)
             }
             return string
+        } else if let string:String = parse_element(expr: child.expression) {
+            return string
         } else if var string:String = parse_literal_value(context: context, elementType: elementType, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value {
             string.escapeHTML(escapeAttributes: false)
             return string
@@ -328,6 +332,16 @@ private extension HTMLElementMacro {
         }
         return nil
     }
+    // MARK: Parse element
+    static func parse_element(expr: ExprSyntax) -> String? {
+        guard let function:FunctionCallExprSyntax = expr.as(FunctionCallExprSyntax.self) else { return nil }
+        var string:String = "\(function)"
+        while string.first?.isWhitespace ?? false {
+            string.removeFirst()
+        }
+        guard let element:HTMLElement = parse(rawValue: string) else { return nil }
+        return element.description
+    }
     // MARK: Parse Literal Value
     static func parse_literal_value(
         context: some MacroExpansionContext,
@@ -388,9 +402,14 @@ private extension HTMLElementMacro {
                 if let decl:String = function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text {
                     switch decl {
                         case "StaticString":
-                            return (function.arguments.first!.expression.stringLiteral!.string, .string)
+                            var string:String = function.arguments.first!.expression.stringLiteral!.string
+                            return (string, .string)
                         default:
-                            if let element:HTMLElement = parse(rawValue: "\(function.calledExpression)") {
+                            var string:String = "\(function)"
+                            while string.first?.isWhitespace ?? false {
+                                string.removeFirst()
+                            }
+                            if let element:HTMLElement = parse(rawValue: string) {
                                 let string:String = element.description
                                 return (string, string.contains("\\(") ? .interpolation : .string)
                             }

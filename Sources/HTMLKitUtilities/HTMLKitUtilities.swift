@@ -44,40 +44,45 @@ public extension String {
 // MARK: CSSUnit
 public extension HTMLElementAttribute {
     struct CSSUnit {
+        public let htmlValue:String?
+
+        private init(_ value: Float) {
+            htmlValue = value.description
+        }
     }
 }
 public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/cssref/css_units.php
     // absolute
-    static func centimeters(_ value: Float) -> Self { Self() }
-    static func millimeters(_ value: Float) -> Self { Self() }
+    static func centimeters(_ value: Float) -> Self { Self(value) }
+    static func millimeters(_ value: Float) -> Self { Self(value) }
     /// 1 inch = 96px = 2.54cm
-    static func inches(_ value: Float) -> Self      { Self() }
+    static func inches(_ value: Float) -> Self      { Self(value) }
     /// 1 pixel = 1/96th of 1inch
-    static func pixels(_ value: Float) -> Self      { Self() }
+    static func pixels(_ value: Float) -> Self      { Self(value) }
     /// 1 point = 1/72 of 1inch
-    static func points(_ value: Float) -> Self      { Self() }
+    static func points(_ value: Float) -> Self      { Self(value) }
     /// 1 pica = 12 points
-    static func picas(_ value: Float) -> Self       { Self() }
+    static func picas(_ value: Float) -> Self       { Self(value) }
     
     // relative
     /// Relative to the font-size of the element (2em means 2 times the size of the current font)
-    static func em(_ value: Float) -> Self             { Self() }
+    static func em(_ value: Float) -> Self             { Self(value) }
     /// Relative to the x-height of the current font (rarely used)
-    static func ex(_ value: Float) -> Self             { Self() }
+    static func ex(_ value: Float) -> Self             { Self(value) }
     /// Relative to the width of the "0" (zero)
-    static func ch(_ value: Float) -> Self             { Self() }
+    static func ch(_ value: Float) -> Self             { Self(value) }
     /// Relative to font-size of the root element
-    static func rem(_ value: Float) -> Self            { Self() }
+    static func rem(_ value: Float) -> Self            { Self(value) }
     /// Relative to 1% of the width of the viewport
-    static func viewportWidth(_ value: Float) -> Self  { Self() }
+    static func viewportWidth(_ value: Float) -> Self  { Self(value) }
     /// Relative to 1% of the height of the viewport
-    static func viewportHeight(_ value: Float) -> Self { Self() }
+    static func viewportHeight(_ value: Float) -> Self { Self(value) }
     /// Relative to 1% of viewport's smaller dimension
-    static func viewportMin(_ value: Float) -> Self    { Self() }
+    static func viewportMin(_ value: Float) -> Self    { Self(value) }
     /// Relative to 1% of viewport's larger dimension
-    static func viewportMax(_ value: Float) -> Self    { Self() }
+    static func viewportMax(_ value: Float) -> Self    { Self(value) }
     /// Relative to the parent element
-    static func percent(_ value: Float) -> Self        { Self() }
+    static func percent(_ value: Float) -> Self        { Self(value) }
 }
 
 
@@ -244,16 +249,23 @@ indirect enum HTMLElementValueType {
     case cssUnit
     case array(of: HTMLElementValueType)
 
-    static func consume(_ range: inout Substring, length: Int) -> String {
-        let slice:Substring = range[range.startIndex..<range.index(range.endIndex, offsetBy: length)]
-        range = range[range.index(range.startIndex, offsetBy: length)...]
+    private static func cleanup(_ range: inout Substring) {
         while (range.first?.isWhitespace ?? false) || range.first == "," {
             range.removeFirst()
         }
+    }
+    static func consume(_ range: inout Substring, length: Int) -> String {
+        let slice:Substring = range[range.startIndex..<range.index(range.endIndex, offsetBy: length)]
+        range = range[range.index(range.startIndex, offsetBy: length)...]
+        cleanup(&range)
         return String(slice)
     }
-    static func cString(_ range: inout Substring) -> String? {
-        guard range.first == "\"" else { return nil }
+    static func cString(key: String, _ range: inout Substring) -> String? {
+        guard range.hasPrefix(key + ":") else { return nil }
+        range.removeFirst(key.count + 1)
+        while range.first != "\"" {
+            range.removeFirst()
+        }
         range.removeFirst()
         guard let index:Substring.Index = range.firstIndex(of: "\"") else { return nil }
         return consume(&range, length: range.distance(from: range.startIndex, to: index))
@@ -275,11 +287,15 @@ indirect enum HTMLElementValueType {
         while (range.first?.isNumber ?? false) || range.first == "." || range.first == "_" {
             string.append(range.removeFirst())
         }
+        cleanup(&range)
         return Float(string)!
     }
-    static func cAttribute<T: HTMLInitializable>(_ range: inout Substring) -> T? {
-        guard range.first == "." else { return nil }
-        range.removeFirst()
+    static func cAttribute<T: HTMLInitializable>(key: String, _ range: inout Substring) -> T? {
+        guard range.hasPrefix(key + ":") else { return nil }
+        range.removeFirst(key.count + 1)
+        while (range.first?.isWhitespace ?? false) || range.first == "." {
+            range.removeFirst()
+        }
         var string:String = "", depth:Int = 1
         while let char:Character = range.first {
             if char == "(" {
@@ -289,11 +305,14 @@ indirect enum HTMLElementValueType {
             }
             if depth == 0 {
                 break
+            } else if depth == 1 && char == "," {
+                break
             }
             string.append(range.removeFirst())
         }
-        string += ")"
-        return T(rawValue: string)
+        guard let value:T = T(rawValue: string) else { return nil }
+        cleanup(&range)
+        return value
     }
 }
 
