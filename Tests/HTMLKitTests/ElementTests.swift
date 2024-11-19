@@ -411,9 +411,11 @@ extension ElementTests {
 extension ElementTests {
     @Test func recursive() {
         let string:StaticString = #html(
-            div(),
-            div(div(), div(), div()),
-            div()
+            div(
+                div(),
+                div(div(), div(), div()),
+                div()
+            )
         )
         #expect(string == "<div><div></div><div><div></div><div></div><div></div></div><div></div></div>")
     }

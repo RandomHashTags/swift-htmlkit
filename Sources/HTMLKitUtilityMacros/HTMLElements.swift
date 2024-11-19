@@ -19,8 +19,6 @@ enum HTMLElements : DeclarationMacro {
         var tags:[String] = []
         tags.reserveCapacity(dictionary.count)
 
-        
-
         func separator(key: String) -> String {
             switch key {
                 case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
@@ -75,28 +73,30 @@ enum HTMLElements : DeclarationMacro {
                             let init_type:String
                             switch value_type {
                                 case "String": init_type = "HTMLElementValueType.cString(key: \"\(key_literal)\", &range)"
-                                case "Bool":   init_type = "HTMLElementValueType.cBool(&range)"
-                                case "Float":  init_type = "HTMLElementValueType.cFloat(&range)"
+                                case "Bool":   init_type = "HTMLElementValueType.cBool(key: \"\(key_literal)\", &range)"
+                                case "Int":    init_type = "HTMLElementValueType.cInt(key: \"\(key_literal)\", &range)"
+                                case "Float":  init_type = "HTMLElementValueType.cFloat(key: \"\(key_literal)\", &range)"
                                 default:
                                     if value_type.hasPrefix("HTMLElementAttribute.Extra.") {
                                         init_type = "HTMLElementValueType.cAttribute(key: \"\(key_literal)\", &range)"
                                     } else if value_type.first == "[" {
-                                        init_type = "[]"
+                                        if value_type == "[String]" {
+                                            init_type = "HTMLElementValueType.cArrayString(key: \"\(key_literal)\", &range)"
+                                        } else {
+                                            init_type = "[]"
+                                        }
                                     } else {
                                         init_type = "nil"
                                     }
                             }
                             attribute_declarations += "\npublic var \(key):\(value_type)\(default_value.split(separator: "=", omittingEmptySubsequences: false)[0])"
                             attributes.append((key, value_type, default_value))
-                            initializers += "\n" + key + ": " + init_type + ","
+                            initializers += "\n" + key_literal + ": " + init_type + ","
                         }
                     }
                 }
             }
-            if initializers.last == "," {
-                initializers.removeLast()
-            }
-            initializers += "\n)\n}\n"
+            initializers += "\nHTMLElementValueType.cInnerHTML(&range)\n)\n}\n"
 
             string += attribute_declarations
             string += "\npublic var innerHTML:[CustomStringConvertible]\n"
@@ -109,7 +109,12 @@ enum HTMLElements : DeclarationMacro {
             initializers += "_ innerHTML: CustomStringConvertible...\n) {\n"
             initializers += "self.attributes = attributes\n"
             for (key, _, _) in attributes {
-                initializers += "self.\(key) = \(key)\n"
+                var key_literal:String = key
+                if key_literal.first == "`" {
+                    key_literal.removeFirst()
+                    key_literal.removeLast()
+                }
+                initializers += "self.\(key_literal) = \(key)\n"
             }
             initializers += "self.innerHTML = innerHTML\n}\n"
             string += initializers
@@ -151,7 +156,7 @@ enum HTMLElements : DeclarationMacro {
             }
             attributes_func += "\nreturn (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"
             render += attributes_func
-            render += "let string:String = innerHTML.map({ $0.description }).joined()\n"
+            render += "let string:String = innerHTML.map({ String(describing: $0) }).joined()\n"
             render += "return \"\(element == "html" ? "<!DOCTYPE html>" : "")<\(element)\" + attributes() + \">\" + string" + (is_void ? "" : " + \"</\(element)>\"")
             render += "}"
 

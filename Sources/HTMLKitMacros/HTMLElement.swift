@@ -334,12 +334,12 @@ private extension HTMLElementMacro {
     }
     // MARK: Parse element
     static func parse_element(expr: ExprSyntax) -> String? {
-        guard let function:FunctionCallExprSyntax = expr.as(FunctionCallExprSyntax.self) else { return nil }
-        var string:String = "\(function)"
+        guard expr.is(FunctionCallExprSyntax.self) else { return nil }
+        var string:String = "\(expr)"
         while string.first?.isWhitespace ?? false {
             string.removeFirst()
         }
-        guard let element:HTMLElement = parse(rawValue: string) else { return nil }
+        guard let element:HTMLElement = HTMLElementValueType.parse_element(rawValue: string) else { return nil }
         return element.description
     }
     // MARK: Parse Literal Value
@@ -409,7 +409,7 @@ private extension HTMLElementMacro {
                             while string.first?.isWhitespace ?? false {
                                 string.removeFirst()
                             }
-                            if let element:HTMLElement = parse(rawValue: string) {
+                            if let element:HTMLElement = HTMLElementValueType.parse_element(rawValue: string) {
                                 let string:String = element.description
                                 return (string, string.contains("\\(") ? .interpolation : .string)
                             }
@@ -617,129 +617,6 @@ extension HTMLElementAttribute.Extra {
             case .viewportMax:    return "vmax"
             case .percent:        return "%"
             }
-        }
-    }
-}
-
-// MARK: Parse from rawValue
-extension HTMLElementMacro {
-    static func parse(rawValue: String) -> HTMLElement? {
-        guard let key:Substring = rawValue.split(separator: "(").first else { return nil }
-        switch key {
-            case "a": return a(rawValue: rawValue)
-            case "abbr": return abbr(rawValue: rawValue)
-            case "address": return address(rawValue: rawValue)
-            case "area": return area(rawValue: rawValue)
-            case "article": return article(rawValue: rawValue)
-            case "aside": return aside(rawValue: rawValue)
-            case "audio": return audio(rawValue: rawValue)
-            case "b": return b(rawValue: rawValue)
-            case "base": return base(rawValue: rawValue)
-            case "bdi": return bdi(rawValue: rawValue)
-            case "bdo": return bdo(rawValue: rawValue)
-            case "blockquote": return blockquote(rawValue: rawValue)
-            case "body": return body(rawValue: rawValue)
-            case "br": return br(rawValue: rawValue)
-            case "button": return button(rawValue: rawValue)
-            case "canvas": return canvas(rawValue: rawValue)
-            case "caption": return caption(rawValue: rawValue)
-            case "cite": return cite(rawValue: rawValue)
-            case "code": return code(rawValue: rawValue)
-            case "col": return col(rawValue: rawValue)
-            case "colgroup": return colgroup(rawValue: rawValue)
-            case "data": return data(rawValue: rawValue)
-            case "datalist": return datalist(rawValue: rawValue)
-            case "dd": return dd(rawValue: rawValue)
-            case "del": return del(rawValue: rawValue)
-            case "details": return details(rawValue: rawValue)
-            case "dfn": return dfn(rawValue: rawValue)
-            case "dialog": return dialog(rawValue: rawValue)
-            case "div": return div(rawValue: rawValue)
-            case "dl": return dl(rawValue: rawValue)
-            case "dt": return dt(rawValue: rawValue)
-            case "em": return em(rawValue: rawValue)
-            case "embed": return embed(rawValue: rawValue)
-            case "fencedframe": return fencedframe(rawValue: rawValue)
-            case "fieldset": return fieldset(rawValue: rawValue)
-            case "figcaption": return figcaption(rawValue: rawValue)
-            case "figure": return figure(rawValue: rawValue)
-            case "footer": return footer(rawValue: rawValue)
-            case "form": return form(rawValue: rawValue)
-            case "h1": return h1(rawValue: rawValue)
-            case "h2": return h2(rawValue: rawValue)
-            case "h3": return h3(rawValue: rawValue)
-            case "h4": return h4(rawValue: rawValue)
-            case "h5": return h5(rawValue: rawValue)
-            case "h6": return h6(rawValue: rawValue)
-            case "head": return head(rawValue: rawValue)
-            case "header": return header(rawValue: rawValue)
-            case "hgroup": return hgroup(rawValue: rawValue)
-            case "hr": return hr(rawValue: rawValue)
-            case "i": return i(rawValue: rawValue)
-            case "iframe": return iframe(rawValue: rawValue)
-            case "img": return img(rawValue: rawValue)
-            case "input": return input(rawValue: rawValue)
-            case "ins": return ins(rawValue: rawValue)
-            case "kbd": return kbd(rawValue: rawValue)
-            case "label": return label(rawValue: rawValue)
-            case "legend": return legend(rawValue: rawValue)
-            case "li": return li(rawValue: rawValue)
-            case "link": return link(rawValue: rawValue)
-            case "main": return main(rawValue: rawValue)
-            case "map": return map(rawValue: rawValue)
-            case "mark": return mark(rawValue: rawValue)
-            case "menu": return menu(rawValue: rawValue)
-            case "meta": return meta(rawValue: rawValue)
-            case "meter": return meter(rawValue: rawValue)
-            case "nav": return nav(rawValue: rawValue)
-            case "noscript": return noscript(rawValue: rawValue)
-            case "object": return object(rawValue: rawValue)
-            case "ol": return ol(rawValue: rawValue)
-            case "optgroup": return optgroup(rawValue: rawValue)
-            case "option": return option(rawValue: rawValue)
-            case "output": return output(rawValue: rawValue)
-            case "p": return p(rawValue: rawValue)
-            case "picture": return picture(rawValue: rawValue)
-            case "portal": return portal(rawValue: rawValue)
-            case "pre": return pre(rawValue: rawValue)
-            case "progress": return progress(rawValue: rawValue)
-            case "q": return q(rawValue: rawValue)
-            case "rp": return rp(rawValue: rawValue)
-            case "rt": return rt(rawValue: rawValue)
-            case "ruby": return ruby(rawValue: rawValue)
-            case "s": return s(rawValue: rawValue)
-            case "samp": return samp(rawValue: rawValue)
-            case "script": return script(rawValue: rawValue)
-            case "search": return search(rawValue: rawValue)
-            case "section": return section(rawValue: rawValue)
-            case "select": return select(rawValue: rawValue)
-            case "slot": return slot(rawValue: rawValue)
-            case "small": return small(rawValue: rawValue)
-            case "source": return source(rawValue: rawValue)
-            case "span": return span(rawValue: rawValue)
-            case "strong": return strong(rawValue: rawValue)
-            case "style": return style(rawValue: rawValue)
-            case "sub": return sub(rawValue: rawValue)
-            case "summary": return summary(rawValue: rawValue)
-            case "sup": return sup(rawValue: rawValue)
-            case "table": return table(rawValue: rawValue)
-            case "tbody": return tbody(rawValue: rawValue)
-            case "td": return td(rawValue: rawValue)
-            case "template": return template(rawValue: rawValue)
-            case "textarea": return textarea(rawValue: rawValue)
-            case "tfoot": return tfoot(rawValue: rawValue)
-            case "th": return th(rawValue: rawValue)
-            case "thead": return thead(rawValue: rawValue)
-            case "time": return time(rawValue: rawValue)
-            case "title": return title(rawValue: rawValue)
-            case "tr": return tr(rawValue: rawValue)
-            case "track": return track(rawValue: rawValue)
-            case "u": return u(rawValue: rawValue)
-            case "ul": return ul(rawValue: rawValue)
-            //case "var": return var(rawValue: rawValue)
-            case "video": return video(rawValue: rawValue)
-            case "wbr": return wbr(rawValue: rawValue)
-            default:        return nil
         }
     }
 }
