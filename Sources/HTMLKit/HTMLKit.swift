@@ -52,8 +52,3 @@ public macro htmlData<T: ExpressibleByStringLiteral>(lookupFiles: [StaticString]
 
 @freestanding(expression)
 public macro htmlByteBuffer<T: ExpressibleByStringLiteral>(lookupFiles: [StaticString] = [], attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> ByteBuffer = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
-
-// MARK: Elements
-
-@freestanding(expression)
-public macro custom<T: ExpressibleByStringLiteral>(tag: String, isVoid: Bool, attributes: [HTMLElementAttribute] = [], _ innerHTML: T...) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")

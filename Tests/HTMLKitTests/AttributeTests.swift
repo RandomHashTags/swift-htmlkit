@@ -47,7 +47,7 @@ struct AttributeTests {
         #expect(string == "<div hidden=\"until-found\"></div>")
     }
 
-    @Test func custom() {
+    @Test func _custom() {
         var string:StaticString = #html(div(attributes: [.custom("potofgold", "north")]))
         #expect(string == "<div potofgold=\"north\"></div>")
         
@@ -62,7 +62,7 @@ struct AttributeTests {
         var string:StaticString = #html(meta(attributes: [.trailingSlash]))
         #expect(string == "<meta />")
 
-        string = #custom(tag: "slash", isVoid: true, attributes: [.trailingSlash])
+        string = #html(custom(tag: "slash", isVoid: true, attributes: [.trailingSlash]))
         #expect(string == "<slash />")
     }
 }

@@ -137,6 +137,36 @@ public protocol HTMLElement : CustomStringConvertible {
     var innerHTML : [CustomStringConvertible] { get }
 }
 
+/// A custom HTML element.
+public struct custom : HTMLElement {
+    public var tag:String
+    public var isVoid:Bool
+    public var attributes:[HTMLElementAttribute]
+    public var innerHTML:[CustomStringConvertible]
+
+    public init?(rawValue: String) {
+        tag = ""
+        isVoid = false
+        attributes = []
+        innerHTML = []
+    }
+    public init(
+        tag: String,
+        isVoid: Bool,
+        attributes: [HTMLElementAttribute] = [],
+        _ innerHTML: CustomStringConvertible...
+    ) {
+        self.tag = tag
+        self.isVoid = isVoid
+        self.attributes = attributes
+        self.innerHTML = innerHTML
+    }
+
+    public var description : String {
+        return "<" + tag + ">" + (isVoid ? "" : "</" + tag + ">")
+    }
+}
+
 #HTMLElements([
     // MARK: A
     .a : [

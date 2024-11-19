@@ -16,9 +16,6 @@ enum HTMLElements : DeclarationMacro {
         var items:[DeclSyntax] = []
         items.reserveCapacity(dictionary.count)
 
-        var tags:[String] = []
-        tags.reserveCapacity(dictionary.count)
-
         func separator(key: String) -> String {
             switch key {
                 case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
@@ -32,15 +29,16 @@ enum HTMLElements : DeclarationMacro {
 
         for item in dictionary {
             var element:String = item.key.as(MemberAccessExprSyntax.self)!.declName.baseName.text
-            element = element == "var" ? "`var`" : element
             let is_void:Bool = HTMLElementType(rawValue: element)!.isVoid
+            if element == "var" {
+                element = "`var`"
+            }
             var string:String = "/// MARK: \(element)\n/// The `\(element)` HTML element.\npublic struct \(element) : HTMLElement {\n"
             string += "public private(set) var tag:String = \"\(element)\"\n"
             string += "public private(set) var isVoid:Bool = \(is_void)\n"
             string += "public var attributes:[HTMLElementAttribute]\n"
 
             var initializers:String = ""
-            tags.append(element)
             //string += "public let isVoid:Bool = false\npublic var attributes:[HTMLElementAttribute] = []"
             var attribute_declarations:String = ""
             var attributes:[(String, String, String)] = []
@@ -69,7 +67,7 @@ enum HTMLElements : DeclarationMacro {
                             }
                         } else {
                             var isArray:Bool = false
-                            let (value_type, default_value):(String, String) = parse_value_type(isArray: &isArray, key: key, label.expression)
+                            let (value_type, default_value, value_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, label.expression)
                             let init_type:String
                             switch value_type {
                                 case "String": init_type = "HTMLElementValueType.cString(key: \"\(key_literal)\", &range)"
@@ -80,11 +78,21 @@ enum HTMLElements : DeclarationMacro {
                                     if value_type.hasPrefix("HTMLElementAttribute.Extra.") {
                                         init_type = "HTMLElementValueType.cAttribute(key: \"\(key_literal)\", &range)"
                                     } else if value_type.first == "[" {
-                                        if value_type == "[String]" {
-                                            init_type = "HTMLElementValueType.cArrayString(key: \"\(key_literal)\", &range)"
-                                        } else {
-                                            init_type = "[]"
+                                        func initValueType() -> String {
+                                            switch value_type_literal {
+                                                case .array(of: .string):
+                                                    return "var s:String = $0\ns.removeFirst()\ns.removeLast()\nreturn s"
+                                                case .array(of: .int): return "Int($0)"
+                                                case .array(of: .float): return "Float($0)"
+                                                case .array(of: .bool): return "$0 == \"true\""
+                                                case .array(of: .attribute):
+                                                    return "var s:String = $0\ns.removeFirst()\nreturn HTMLElementAttribute.Extra.\(key_literal)(rawValue: s)"
+                                                case .array(of: .otherAttribute(let value)):
+                                                    return "var s:String = $0\ns.removeFirst()\nreturn HTMLElementAttribute.Extra.\(value)(rawValue: s)"
+                                                default: return "$0"
+                                            }
                                         }
+                                        init_type = "HTMLElementValueType.cArray(key: \"\(key_literal)\", &range, parse: { \(initValueType()) })"
                                     } else {
                                         init_type = "nil"
                                     }
@@ -141,11 +149,12 @@ enum HTMLElements : DeclarationMacro {
                             attributes_func += "\(key).map({ \"\\($0)\" })"
                             break
                         default:
-                            attributes_func += "\(key).compactMap({ attr in\nguard let value:String = attr.htmlValue else { return nil }\nreturn attr.key + (value.isEmpty ? \"\" : \"=\\\"\" + value + \"\\\"\") })"
+                            attributes_func += "\(key).compactMap({ return $0.htmlValue })"
                             break
                     }
                     attributes_func += ".joined(separator: \"\(separator)\")\n"
-                    attributes_func += "items.append(\"\(key_literal)=\\\"\" + string + \"\\\"\")\n}"
+                    attributes_func += #"items.append("\#(key_literal)=\\\"" + string + "\\\"")}"#
+                    attributes_func += "\n"
                 } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
                     attributes_func += "\n"
                     attributes_func += #"if let \#(key) { items.append("\#(key_literal)=\\\"\(\#(key))\\\"") }"#
@@ -167,7 +176,7 @@ enum HTMLElements : DeclarationMacro {
         return items
     }
     // MARK: parse value type
-    static func parse_value_type(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> (value_type: String, default_value: String) {
+    static func parse_value_type(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> (value_type: String, default_value: String, value_type_literal: HTMLElementValueType) {
         let value_type_key:String
         if let member:MemberAccessExprSyntax = expr.as(MemberAccessExprSyntax.self) {
             value_type_key = member.declName.baseName.text
@@ -177,36 +186,49 @@ enum HTMLElements : DeclarationMacro {
         switch value_type_key {
             case "array":
                 isArray = true
-                let (of_type, _):(String, String) = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
-                return ("[" + of_type + "]", "= []")
+                let (of_type, _, of_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
+                return ("[" + of_type + "]", "= []", .array(of: of_type_literal))
             case "attribute":
-                return ("HTMLElementAttribute.Extra.\(key)", isArray ? "" : "? = nil")
+                return ("HTMLElementAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)
             case "otherAttribute":
                 var string:String = "\(expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(StringLiteralExprSyntax.self)!)"
                 string.removeFirst()
                 string.removeLast()
-                return ("HTMLElementAttribute.Extra." + string, isArray ? "" : "? = nil")
+                return ("HTMLElementAttribute.Extra." + string, isArray ? "" : "? = nil", .otherAttribute(string))
             case "string":
-                return ("String", isArray ? "" : "? = nil")
+                return ("String", isArray ? "" : "? = nil", .string)
             case "int":
-                return ("Int", isArray ? "" : "? = nil")
+                return ("Int", isArray ? "" : "? = nil", .int)
             case "float":
-                return ("Float", isArray ? "" : "? = nil")
+                return ("Float", isArray ? "" : "? = nil", .float)
             case "bool":
-                return ("Bool", isArray ? "" : " = false")
+                return ("Bool", isArray ? "" : " = false", .bool)
             case "booleanDefaultValue":
                 let value:Bool = expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
-                return ("Bool", "= \(value)")
+                return ("Bool", "= \(value)", .booleanDefaultValue(value))
             case "cssUnit":
-                return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil")
+                return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil", .string)
             default:
-                return ("Float", "? = nil")
+                return ("Float", "? = nil", .float)
         }
     }
 }
 
+indirect enum HTMLElementValueType {
+    case string
+    case int
+    case float
+    case bool
+    case booleanDefaultValue(Bool)
+    case attribute
+    case otherAttribute(String)
+    case cssUnit
+    case array(of: HTMLElementValueType)
+}
+
+
 // MARK: HTMLElementType
-package enum HTMLElementType : String, CaseIterable {
+enum HTMLElementType : String, CaseIterable {
     case html
 
     case a

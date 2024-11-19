@@ -89,7 +89,6 @@ public extension HTMLElementAttribute.CSSUnit { // https://www.w3schools.com/css
 // MARK: HTMLElementType
 package enum HTMLElementType : String, CaseIterable {
     case escapeHTML
-    case custom
 
     case html, htmlUTF8Bytes, htmlUTF16Bytes, htmlUTF8CString
     
@@ -274,9 +273,12 @@ package indirect enum HTMLElementValueType {
         }
         guard !range.isEmpty else { return "" }
         range.removeFirst() // "
-        guard let index:Substring.Index = range.firstIndex(of: "\"") else { return nil }
-        let string:String = String(range[range.startIndex..<index])
+        guard let index:Substring.Index = range.firstIndex(of: ",") ?? range.firstIndex(of: ")") else { return nil }
+        var string:String = String(range[range.startIndex..<index])
         range.removeFirst(string.count + 1)
+        if string.last == "\"" {
+            string.removeLast()
+        }
         cleanup(&range)
         return string
     }
@@ -334,20 +336,35 @@ package indirect enum HTMLElementValueType {
         cleanup(&range)
         return value
     }
-    static func cArrayString(key: String, _ range: inout Substring) -> [String] {
-        guard consumable(key: key, range: &range) else { return [] }
-        var values:[String] = []
-        if range.first == "[" {
-            if let ends:Substring.Index = range.firstIndex(of: "]") {
-                let string:Substring = range[range.startIndex..<ends]
-                range = range[range.index(after: ends)...]
-                cleanup(&range)
+    static func cArray<T>(key: String, _ range: inout Substring, parse: (String) -> T?) -> [T] {
+        guard consumable(key: key, range: &range), range.first == "[" else { return [] }
+        range.removeFirst()
+        var string:String = "", depth:Int = 1
+        while let char:Character = range.first {
+            if char == "[" {
+                depth += 1
+            } else if char == "]" {
+                depth -= 1
+                if depth == 0 {
+                    range.removeFirst()
+                    break
+                }
+            }
+            string.append(range.removeFirst())
+        }
+        var values:[T] = []
+        for var ss in string.split(separator: ",") {
+            while ss.first?.isWhitespace ?? false {
+                ss.removeFirst()
+            }
+            if let value:T = parse(String(ss)) {
+                values.append(value)
             }
         }
+        cleanup(&range)
         return values
     }
     static func cInnerHTML(_ range: inout Substring) -> String {
-        //print("HTMLKitUtilities;cInnerHTML;range=\(range)")
         cleanup(&range)
         var values:[String] = []
         while let char:Character = range.first {
@@ -360,7 +377,7 @@ package indirect enum HTMLElementValueType {
                 }
             } else if let parenth:Substring.Index = range.firstIndex(of: "(") {
                 let key:String = String(range[range.startIndex..<parenth])
-                if let element_type:HTMLElementType = HTMLElementType(rawValue: key) {
+                if HTMLElementType(rawValue: key) != nil || key == "custom" {
                     var depth:Int = 0
                     var string:String = ""
                     while let character:Character = range.first {
@@ -501,9 +518,11 @@ package indirect enum HTMLElementValueType {
             case "track": return track(rawValue: rawValue)
             case "u": return u(rawValue: rawValue)
             case "ul": return ul(rawValue: rawValue)
-            //case "var": return var(rawValue: rawValue)
+            //case "var": return `var`(rawValue: rawValue)
             case "video": return video(rawValue: rawValue)
             case "wbr": return wbr(rawValue: rawValue)
+
+            case "custom": return custom(rawValue: rawValue)
             default:        return nil
         }
     }

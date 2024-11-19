@@ -71,35 +71,9 @@ private extension HTMLElementMacro {
                 return parse_inner_html(context: context, elementType: elementType, child: child, lookupFiles: [])
             }).joined()
         }
-        let tag:String, isVoid:Bool
-        var children:Slice<SyntaxChildren>
-        if elementType == .custom {
-            tag = childs.first(where: { $0.labeled?.label?.text == "tag" })!.labeled!.expression.stringLiteral!.string
-            isVoid = childs.first(where: { $0.labeled?.label?.text == "isVoid" })!.labeled!.expression.booleanLiteral!.literal.text == "true"
-            children = childs.dropFirst() // tag
-            children.removeFirst() // isVoid
-        } else {
-            tag = elementType.rawValue.starts(with: "html") ? "html" : elementType.rawValue
-            isVoid = elementType.isVoid
-            children = childs.prefix(childs.count)
-        }
+        let children:Slice<SyntaxChildren> = childs.prefix(childs.count)
         let (attributes, innerHTML, trailingSlash):(String, String, Bool) = parse_arguments(context: context, elementType: elementType, children: children)
         return innerHTML
-
-        var string:String = (tag == "html" ? "<!DOCTYPE html>" : "") + "<" + tag + attributes
-        if trailingSlash {
-            if isVoid {
-                string += " /"
-            } else {
-                context.diagnose(Diagnostic(node: macro, message: DiagnosticMsg(id: "trailingSlashGlobalAttributeMisused", message: "Trailing Slash global attribute can only be applied to void elements.")))
-                return ""
-            }
-        }
-        string += ">" + innerHTML
-        if !isVoid {
-            string += "</" + tag + ">"
-        }
-        return string
     }
     // MARK: Parse Arguments
     static func parse_arguments(
@@ -261,13 +235,7 @@ private extension HTMLElementMacro {
         child: LabeledExprSyntax,
         lookupFiles: Set<String>
     ) -> String? {
-        if let macro:MacroExpansionExprSyntax = child.expression.macroExpansion {
-            var string:String = expand_macro(context: context, macro: macro)
-            if elementType == .escapeHTML {
-                string.escapeHTML(escapeAttributes: false)
-            }
-            return string
-        } else if let string:String = parse_element(expr: child.expression) {
+        if let string:String = parse_element(expr: child.expression) {
             return string
         } else if var string:String = parse_literal_value(context: context, elementType: elementType, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value {
             string.escapeHTML(escapeAttributes: false)
@@ -286,22 +254,6 @@ private extension HTMLElementMacro {
                 )
             ])
         ]))
-    }
-    
-    static func enumName(elementType: HTMLElementType, key: String) -> String {
-        switch elementType.rawValue + key {
-        case "buttontype":     return "buttontype"
-        case "formenctype":    return "formenctype"
-        case "inputtype":      return "inputtype"
-        case "metahttp-equiv": return "httpequiv"
-        case "oltype":         return "numberingtype"
-        case "scripttype":     return "scripttype"
-        default:
-            if key.hasPrefix("aria-") {
-                return "ariaattribute"
-            }
-            return key
-        }
     }
     
     // MARK: Parse Attribute
@@ -325,10 +277,6 @@ private extension HTMLElementMacro {
             case .interpolation:
                 return key + "=\\\"" + string + "\\\""
             }
-        }
-        if let function:FunctionCallExprSyntax = expression.functionCall {
-            let string:String = "\(function)"
-            return HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: String(string[string.index(after: string.startIndex)...]))
         }
         return nil
     }
@@ -394,10 +342,7 @@ private extension HTMLElementMacro {
         if let function:FunctionCallExprSyntax = expression.functionCall {
             let enums:Set<String> = ["command", "download", "height", "width"]
             if enums.contains(key) || key.hasPrefix("aria-") {
-                var value:String = "\(function)"
-                value = String(value[value.index(after: value.startIndex)...])
-                value = HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: value)
-                return (value, .enumCase)
+                return ("", .enumCase)
             } else {
                 if let decl:String = function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text {
                     switch decl {
@@ -420,10 +365,7 @@ private extension HTMLElementMacro {
             }
         }
         if let member:MemberAccessExprSyntax = expression.memberAccess {
-            if let _:ExprSyntax = member.base {
-                return ("\(member)", .interpolation)
-            }
-            return (HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: member.declName.baseName.text), .enumCase)
+            return ("\(member)", .interpolation)
         }
         if let array:ArrayExprSyntax = expression.array {
             let separator:Character, separator_string:String
@@ -450,9 +392,6 @@ private extension HTMLElementMacro {
                 }
                 if let string:String = element.expression.integerLiteral?.literal.text ?? element.expression.floatLiteral?.literal.text {
                     result += string + separator_string
-                }
-                if let string:String = element.expression.memberAccess?.declName.baseName.text {
-                    result += HTMLElementAttribute.Extra.htmlValue(enumName: enumName(elementType: elementType, key: key), for: string) + separator_string
                 }
             }
             if !result.isEmpty {
@@ -558,28 +497,6 @@ extension StringLiteralExprSyntax {
 }
 
 extension HTMLElementAttribute.Extra {
-    static func htmlValue(enumName: String, for enumCase: String) -> String { // only need to check the ones where the htmlValue is different from the rawValue
-        switch enumName {
-        case "ariaattribute":   return ariaattribute(rawValue: enumCase)?.htmlValue ?? "???"
-        case "command":         return command(rawValue: enumCase)!.htmlValue!
-        case "contenteditable": return contenteditable(rawValue: enumCase)!.htmlValue!
-        case "crossorigin":     return crossorigin(rawValue: enumCase)!.htmlValue!
-        case "download":        return download(rawValue: enumCase)!.htmlValue!
-        case "formenctype":     return formenctype(rawValue: enumCase)!.htmlValue!
-        case "hidden":          return hidden(rawValue: enumCase)!.htmlValue!
-        case "httpequiv":       return httpequiv(rawValue: enumCase)!.htmlValue!
-        case "inputtype":       return inputtype(rawValue: enumCase)!.htmlValue!
-        case "numberingtype":   return numberingtype(rawValue: enumCase)!.htmlValue!
-        case "referrerpolicy":  return referrerpolicy(rawValue: enumCase)!.htmlValue!
-        case "rel":             return rel(rawValue: enumCase)!.htmlValue!
-        case "sandbox":         return sandbox(rawValue: enumCase)!.htmlValue!
-        case "height", "width":
-            let values:[Substring] = enumCase.split(separator: "("), key:String = String(values[0]), value:String = String(values[1])
-            return value[value.startIndex..<value.index(before: value.endIndex)] + CSSUnitType(rawValue: key)!.suffix
-        default:                return enumCase
-        }
-    }
-    
     enum CSSUnitType : String {
         case centimeters
         case millimeters

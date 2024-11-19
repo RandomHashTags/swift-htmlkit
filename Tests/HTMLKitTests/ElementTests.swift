@@ -385,11 +385,11 @@ extension ElementTests {
     }
 
     // MARK: custom
-    @Test func custom() {
-        var bro:StaticString = #custom(tag: "bro", isVoid: false)
+    @Test func _custom() {
+        var bro:StaticString = #html(custom(tag: "bro", isVoid: false))
         #expect(bro == "<bro></bro>")
 
-        bro = #custom(tag: "bro", isVoid: true)
+        bro = #html(custom(tag: "bro", isVoid: true))
         #expect(bro == "<bro>")
     }
 
@@ -469,6 +469,6 @@ extension ElementTests {
         let _:String = #div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")])
 
         let _:StaticString = #div(attributes: [.trailingSlash])
-        let _:StaticString = #custom(tag: "slash", isVoid: false, attributes: [.trailingSlash])
+        let _:StaticString = #html(custom(tag: "slash", isVoid: false, attributes: [.trailingSlash]))
     }*/
 }
