@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/19/24.
 //
 
+import SwiftSyntax
+
 public extension HTMLElementAttribute.HTMX {
     // MARK: TrueOrFalse
     enum TrueOrFalse : String, HTMLInitializable {
@@ -119,16 +121,9 @@ public extension HTMLElementAttribute.HTMX {
         case not([String])
         case list([String])
 
-        public init?(rawValue: String) {
-            let key:Substring = rawValue.split(separator: "(")[0]
-            func array_string() -> [String] {
-                let string:String = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count + 2)..<rawValue.index(before: rawValue.endIndex)])
-                let ranges:[Range<String.Index>] = try! string.ranges(of: Regex("\"([^\"]+)\"")) // TODO: fix? (doesn't parse correctly if the string contains escaped quotation marks)
-                return ranges.map({
-                    let item:String = String(string[$0])
-                    return String(item[item.index(after: item.startIndex)..<item.index(before: item.endIndex)])
-                })
-            }
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            let expression:ExprSyntax = arguments.first!.expression
+            func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
             switch key {
                 case "all":  self = .all
                 case "none": self = .none
@@ -171,22 +166,23 @@ public extension HTMLElementAttribute.HTMX {
         case drop, abort, replace
         case queue(Queue)
 
-        public init?(rawValue: String) {
-            let values:[Substring] = rawValue.split(separator: "(")
-            switch values[0] {
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            switch key {
                 case "drop":    self = .drop
                 case "abort":   self = .abort
                 case "replace": self = .replace
                 case "queue":
-                    guard let value_index:Substring.Index = values[1].firstIndex(where: { $0.isLetter }) else { return nil }
-                    let value:Substring = rawValue[value_index..<values[1].index(before: values[1].endIndex)]
-                    self = .queue(Queue(rawValue: String(value))!)
+                    func enumeration<T : HTMLInitializable>() -> T {
+                        let function:FunctionCallExprSyntax = arguments.first!.expression.functionCall!
+                        return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
+                    }
+                    self = .queue(enumeration())
                     break
                 default:        return nil
             }
         }
 
-        public enum Queue : String {
+        public enum Queue : String, HTMLInitializable {
             case first, last, all
         }
 
@@ -214,12 +210,11 @@ public extension HTMLElementAttribute.HTMX {
         case `true`, `false`
         case url(String)
 
-        public init?(rawValue: String) {
-            let key:Substring = rawValue.split(separator: "(")[0]
+        public init?(key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "true": self = .true
                 case "false": self = .false
-                case "url": self = .url(HTMLElementAttribute.string(key: key, rawValue: rawValue))
+                case "url": self = .url(arguments.first!.expression.stringLiteral!.string)
                 default: return nil
             }
         }
@@ -249,10 +244,8 @@ public extension HTMLElementAttribute.HTMX {
         case swap(String)
         case close(String)
 
-        public init?(rawValue: String) {
-            guard rawValue.last == ")" else { return nil }
-            let key:Substring = rawValue.split(separator: "(")[0]
-            func string() -> String { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            func string() -> String { arguments.first!.expression.stringLiteral!.string }
             switch key {
                 case "connect": self = .connect(string())
                 case "swap": self = .swap(string())
@@ -286,11 +279,10 @@ public extension HTMLElementAttribute.HTMX {
         case connect(String)
         case send(Bool)
 
-        public init?(rawValue: String) {
-            guard rawValue.last == ")" else { return nil }
-            let key:Substring = rawValue.split(separator: "(")[0]
-            func string() -> String { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
-            func boolean() -> Bool  { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            let expression:ExprSyntax = arguments.first!.expression
+            func string() -> String { expression.stringLiteral!.string }
+            func boolean() -> Bool  { expression.booleanLiteral!.literal.text == "true" }
             switch key {
                 case "connect": self = .connect(string())
                 case "send": self = .send(boolean())

@@ -89,8 +89,8 @@ enum HTMLElements : DeclarationMacro {
             }
             initializers += "self.innerHTML = innerHTML\n}\n"
 
-            initializers += "public init?(context: some MacroExpansionContext, _ function: FunctionCallExprSyntax) {\n"
-            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: function.arguments.children(viewMode: .all))\n"
+            initializers += "public init?(context: some MacroExpansionContext, _ children: SyntaxChildren) {\n"
+            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children)\n"
             initializers += "self.attributes = data.globalAttributes\n"
             for (key, value_type, _) in attributes {
                 var value:String = "as? \(value_type)"
@@ -145,7 +145,8 @@ enum HTMLElements : DeclarationMacro {
                 } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
                     attributes_func += "\n"
                     let value:String = value_type == "String" ? key : "String(describing: \(key))"
-                    attributes_func += "if let \(key) { items.append(\(value)) }"
+                    attributes_func += #"if let \#(key) { items.append("\#(key)=\\\"" + \#(value) + "\\\"") }"#
+                    attributes_func += "\n"
                 } else {
                     attributes_func += "\n"
                     attributes_func += #"if let v:String = \#(key)?.htmlValue { items.append("\#(key_literal)=\\\"\(v)\\\"") }"#

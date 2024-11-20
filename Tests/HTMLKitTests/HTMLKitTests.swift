@@ -57,38 +57,40 @@ struct HTMLKitTests {
 
 // MARK: StaticString Example
 extension HTMLKitTests {
-    /*@Test func example_1() {
+    @Test func example_1() {
         let test:StaticString = #html(
-            body(
-                div(
-                    attributes: [
-                        .class(["dark-mode", "row"]),
-                        .draggable(.false),
-                        .hidden(.true),
-                        .inputmode(.email),
-                        .title("Hey, you're pretty cool")
-                    ],
-                    "Random text",
-                    div(),
-                    a(
-                        div(
-                            abbr()
+            html(
+                body(
+                    div(
+                        attributes: [
+                            .class(["dark-mode", "row"]),
+                            .draggable(.false),
+                            .hidden(.true),
+                            .inputmode(.email),
+                            .title("Hey, you're pretty cool")
+                        ],
+                        "Random text",
+                        div(),
+                        a(
+                            div(
+                                abbr()
+                            ),
+                            address()
                         ),
-                        address()
-                    ),
-                    div(),
-                    button(disabled: true),
-                    video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1))
+                        div(),
+                        button(disabled: true),
+                        video(autoplay: true, controls: false, preload: .auto, src: "https://github.com/RandomHashTags/litleagues", width: .centimeters(1))
+                    )
                 )
             )
         )
         #expect(test == "<!DOCTYPE html><html><body><div class=\"dark-mode row\" draggable=\"false\" hidden inputmode=\"email\" title=\"Hey, you&#39re pretty cool\">Random text<div></div><a><div><abbr></abbr></div><address></address></a><div></div><button disabled></button><video autoplay preload=\"auto\" src=\"https://github.com/RandomHashTags/litleagues\" width=\"1cm\"></video></div></body></html>")
-    }*/
+    }
 }
 
 // MARK: Dynamic test
 extension HTMLKitTests {
-    /*@Test func dynamic() {
+    @Test func dynamic() {
         let charset:String = "utf-8", title_literal:String = "Dynamic"
         var qualities:String = ""
         for quality in ["one", "two", "three", "four"] {
@@ -112,7 +114,7 @@ extension HTMLKitTests {
             )
         )
         #expect(string == "<!DOCTYPE html><html><head><meta charset=\"\(charset)\"><title>\(title_literal)</title><meta content=\"description \(title_literal)\" name=\"description\"><meta content=\"keywords\" name=\"keywords\"></head><body><h1>Heading</h1><div id=\"desc\"><p>bro</p></div><h2>Details</h2><h3>Qualities</h3><ul id=\"user-qualities\">\(qualities)</ul></body></html>")
-    }*/
+    }
 }
 
 // MARK: Example2

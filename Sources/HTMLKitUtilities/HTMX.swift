@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/12/24.
 //
 
+import SwiftSyntax
+
 public extension HTMLElementAttribute {
     enum HTMX : HTMLInitializable {
         case boost(TrueOrFalse)
@@ -47,19 +49,18 @@ public extension HTMLElementAttribute {
         case sse(ServerSentEvents)
         case ws(WebSocket)
 
-        public init?(rawValue: String) {
-            guard rawValue.last == ")" else { return nil }
-            var key:Substring = rawValue.split(separator: "(")[0]
-            if key.hasPrefix("hx-") {
-                key.removeFirst(3)
+        // MARK: init
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            let expression:ExprSyntax = arguments.first!.expression
+            func string() -> String         { expression.stringLiteral!.string }
+            func boolean() -> Bool          { expression.booleanLiteral!.literal.text == "true" }
+            func enumeration<T : HTMLInitializable>() -> T {
+                let function:FunctionCallExprSyntax = expression.functionCall!
+                return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
             }
-            func literal() -> String        { HTMLElementAttribute.literal(key: key, rawValue: rawValue) }
-            func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
-            func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
-            func enumeration<T : HTMLInitializable>() -> T { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
-            func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
-            func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
-            func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
+            func int() -> Int               { Int(expression.integerLiteral!.literal.text) ?? -1 }
+            func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
+            func float() -> Float           { Float(expression.floatLiteral!.literal.text) ?? -1 }
             switch key {
                 case "boost": self = .boost(enumeration())
                 case "confirm": self = .confirm(string())
@@ -69,25 +70,10 @@ public extension HTMLElementAttribute {
                 case "disinherit": self = .disinherit(string())
                 case "encoding": self = .encoding(string())
                 case "ext": self = .ext(string())
-                case "headers":
-                    let values:[Substring] = rawValue.split(separator: ",")
-                    let js:Bool = values[0].hasSuffix("true")
-                    var headers_string:Substring = rawValue[rawValue.firstIndex(of: "[")!...]
-                    headers_string.removeLast() // )
-                    let regex:Regex = try! Regex("(\"[^\"]+\")")
-                    let matches:[Range<Substring.Index>] = headers_string.ranges(of: regex)
+                case "headers": // TODO: fix
+                    //let dictionary = expression.dictionary!
+                    var js:Bool = false
                     var headers:[String:String] = [:]
-                    var header_key:Substring = ""
-                    for i in 0..<matches.count {
-                        var value:Substring = headers_string[matches[i]]
-                        value.removeFirst() // "
-                        value.removeLast() // "
-                        if i % 2 == 0 {
-                            header_key = value
-                        } else {
-                            headers[String(header_key)] = String(value)
-                        }
-                    }
                     self = .headers(js: js, headers)
                     break
                 case "history": self = .history(enumeration())
@@ -95,13 +81,15 @@ public extension HTMLElementAttribute {
                 case "include": self = .include(string())
                 case "indicator": self = .indicator(string())
                 case "inherit": self = .inherit(string())
-                case "params": self = .params(Params(rawValue: literal())!)
+                case "params": self = .params(enumeration())
                 case "patch": self = .patch(string())
                 case "preserve": self = .preserve(boolean())
                 case "prompt": self = .prompt(string())
                 case "put": self = .put(string())
-                case "replaceURL": self = .replaceURL(URL(rawValue: literal())!)
-                case "request":
+                case "replaceURL": self = .replaceURL(enumeration())
+                case "request": // TODO: fix
+                    return nil
+                    /*
                     let string:String = literal(), values:[Substring] = string.split(separator: ",")
                     var timeout_string:Substring = values[1][values[1].index(after: values[1].firstIndex(of: ":")!)...]
                     while timeout_string.first?.isWhitespace ?? false {
@@ -134,8 +122,10 @@ public extension HTMLElementAttribute {
                         noHeaders = (javascript ? "js:" : "") + value
                     }
                     self = .request(js: javascript, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
-                    break
-                case "sync":
+                    break*/
+                case "sync": // TODO: fix
+                    return nil
+                    /*
                     let string:String = literal()
                     let values:[Substring] = string.split(separator: ",")
                     var key:Substring = values[0]
@@ -149,12 +139,14 @@ public extension HTMLElementAttribute {
                         strategy = SyncStrategy(rawValue: String(strategy_string))
                     }
                     self = .sync(String(key), strategy: strategy)
-                    break
+                    break*/
                 case "validate": self = .validate(enumeration())
 
                 case "get": self = .get(string())
                 case "post": self = .post(string())
-                case "on", "onevent":
+                case "on", "onevent": // TODO: fix
+                    return nil
+                    /*
                     let string:String = literal()
                     let values:[Substring] = string.split(separator: ",")
                     let event_string:String = String(values[0])
@@ -170,8 +162,8 @@ public extension HTMLElementAttribute {
                         let event:HTMLElementAttribute.Extra.event = .init(rawValue: event_string)!
                         self = .onevent(event, value)
                     }
-                    break
-                case "pushURL": self = .pushURL(URL(rawValue: string())!)
+                    break*/
+                case "pushURL": self = .pushURL(enumeration())
                 case "select": self = .select(string())
                 case "selectOOB": self = .selectOOB(string())
                 case "swap": self = .swap(enumeration())
@@ -180,12 +172,13 @@ public extension HTMLElementAttribute {
                 case "trigger": self = .trigger(string())
                 case "vals": self = .vals(string())
 
-                case "sse": self = .sse(ServerSentEvents(rawValue: literal())!)
-                case "ws": self = .ws(WebSocket(rawValue: literal())!)
+                case "sse": self = .sse(enumeration())
+                case "ws": self = .ws(enumeration())
                 default: return nil
             }
         }
 
+        // MARK: key
         public var key : String {
             switch self {
                 case .boost(_): return "boost"
@@ -230,6 +223,7 @@ public extension HTMLElementAttribute {
             }
         }
 
+        //  MARK: htmlValue
         public var htmlValue : String? {
             switch self {
                 case .boost(let value): return value.rawValue

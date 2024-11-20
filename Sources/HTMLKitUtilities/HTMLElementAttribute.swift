@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/19/24.
 //
 
+import SwiftSyntax
+
 public enum HTMLElementAttribute : Hashable {
     case accesskey(String? = nil)
 
@@ -55,15 +57,18 @@ public enum HTMLElementAttribute : Hashable {
     @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
     case event(Extra.event, _ value: String? = nil)
 
-    public init?(rawValue: String) {
-        guard rawValue.last == ")" else { return nil }
-        let key:Substring = rawValue.split(separator: "(")[0]
-        func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
-        func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
-        func enumeration<T : HTMLInitializable>() -> T { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
-        func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
-        func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
-        func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
+    // MARK: init rawValue
+    public init?(key: String, _ function: FunctionCallExprSyntax) {
+        let expression:ExprSyntax = function.arguments.first!.expression
+        func string() -> String         { expression.stringLiteral!.string }
+        func boolean() -> Bool          { expression.booleanLiteral!.literal.text == "true" }
+        func enumeration<T : HTMLInitializable>() -> T {
+            let function:FunctionCallExprSyntax = expression.functionCall!
+            return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
+        }
+        func int() -> Int               { Int(expression.integerLiteral!.literal.text) ?? -1 }
+        func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
+        func float() -> Float           { Float(expression.floatLiteral!.literal.text) ?? -1 }
         switch key {
             case "accesskey":             self = .accesskey(string())
             case "ariaattribute":         self = .ariaattribute(enumeration())
@@ -107,6 +112,7 @@ public enum HTMLElementAttribute : Hashable {
         }
     }
 
+    // MARK: key
     public var key : String {
         switch self {
             case .accesskey(_):             return "accesskey"
@@ -162,6 +168,7 @@ public enum HTMLElementAttribute : Hashable {
         }
     }
 
+    // MARK: htmlValue
     public var htmlValue : String? {
         switch self {
             case .accesskey(let value):             return value
@@ -211,42 +218,9 @@ public enum HTMLElementAttribute : Hashable {
 extension HTMLElementAttribute {
     public enum Extra {
     }
-
-    static func literal(key: Substring, rawValue: String) -> String {
-        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
-        return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end])
-    }
-    static func string(key: Substring, rawValue: String) -> String {
-        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex), end_minus_one:String.Index = rawValue.index(before: end)
-        return String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end_minus_one])
-    }
-    static func boolean(key: Substring, rawValue: String) -> Bool {
-        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
-        return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
-    }
-    static func enumeration<T : HTMLInitializable>(key: Substring, rawValue: String) -> T {
-        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
-        return T(rawValue: String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end]))!
-    }
-    static func int(key: Substring, rawValue: String) -> Int {
-        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
-        return Int(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
-    }
-    static func array_string(key: Substring, rawValue: String) -> [String] {
-        let string:String = string(key: key, rawValue: rawValue)
-        let ranges:[Range<String.Index>] = try! string.ranges(of: Regex("\"([^\"]+)\"")) // TODO: fix? (doesn't parse correctly if the string contains escaped quotation marks)
-        return ranges.map({
-            let item:String = String(string[$0])
-            return String(item[item.index(after: item.startIndex)..<item.index(before: item.endIndex)])
-        })
-    }
-    static func float(key: Substring, rawValue: String) -> Float {
-        let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
-        return Float(rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end])!
-    }
 }
 public protocol HTMLInitializable : Hashable {
-    init?(rawValue: String)
+    init?(key: String, arguments: LabeledExprListSyntax)
 
     var key : String { get }
     var htmlValue : String? { get }
@@ -254,12 +228,17 @@ public protocol HTMLInitializable : Hashable {
 public extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
     var key : String { rawValue }
     var htmlValue : String? { rawValue }
+
+    init?(key: String, arguments: LabeledExprListSyntax) {
+        guard let value:Self = .init(rawValue: key) else { return nil }
+        self = value
+    }
 }
 public extension HTMLElementAttribute.Extra {
     typealias height = HTMLElementAttribute.CSSUnit
     typealias width = HTMLElementAttribute.CSSUnit
 
-    // MARK: aria attributes (states and properties)
+    // MARK: aria attributes
     // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes
     enum ariaattribute : HTMLInitializable {
         case activedescendant(String)
@@ -333,15 +312,17 @@ public extension HTMLElementAttribute.Extra {
         case valuenow(Float)
         case valuetext(String)
 
-        public init?(rawValue: String) {
-            guard rawValue.last == ")" else { return nil }
-            let key:Substring = rawValue.split(separator: "(")[0]
-            func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
-            func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
-            func enumeration<T : HTMLInitializable>() -> T { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
-            func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
-            func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
-            func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            let expression:ExprSyntax = arguments.first!.expression
+            func string() -> String         { expression.stringLiteral!.string }
+            func boolean() -> Bool          { expression.booleanLiteral!.literal.text == "true" }
+            func enumeration<T : HTMLInitializable>() -> T {
+                let function:FunctionCallExprSyntax = expression.functionCall!
+                return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
+            }
+            func int() -> Int               { Int(expression.integerLiteral!.literal.text) ?? -1 }
+            func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
+            func float() -> Float           { Float(expression.floatLiteral!.literal.text) ?? -1 }
             switch key {
                 case "activedescendant":       self = .activedescendant(string())
                 case "atomic":                 self = .atomic(boolean())
@@ -723,20 +704,15 @@ public extension HTMLElementAttribute.Extra {
         case togglePopover
         case custom(String)
 
-        public init?(rawValue: String) {
-            switch rawValue {
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            switch key {
                 case "showModal":     self = .showModal
                 case "close":         self = .close
                 case "showPopover":   self = .showPopover
                 case "hidePopover":   self = .hidePopover
                 case "togglePopover": self = .togglePopover
-                default:
-                    if rawValue.starts(with: "custom(\"") && rawValue.hasSuffix("\")") {
-                        let value:String = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: 8)..<rawValue.index(rawValue.endIndex, offsetBy: -2)])
-                        self = .custom(value)
-                    } else {
-                        return nil
-                    }
+                case "custom":        self = .custom(arguments.first!.expression.stringLiteral!.string)
+                default:              return nil
             }
         }
 
@@ -819,16 +795,11 @@ public extension HTMLElementAttribute.Extra {
         case empty
         case filename(String)
 
-        public init?(rawValue: String) {
-            if rawValue == "empty" {
-                self = .empty
-            } else {
-                if rawValue.starts(with: "filename(\"") && rawValue.hasSuffix("\")") {
-                    let value:String = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: 10)..<rawValue.index(rawValue.endIndex, offsetBy: -2)])
-                    self = .filename(value)
-                } else {
-                    return nil
-                }
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            switch key {
+                case "empty":    self = .empty
+                case "filename": self = .filename(arguments.first!.expression.stringLiteral!.string)
+                default:         return nil
             }
         }
 
