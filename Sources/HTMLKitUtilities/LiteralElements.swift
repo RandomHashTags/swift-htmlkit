@@ -5,6 +5,9 @@
 //  Created by Evan Anderson on 11/16/24.
 //
 
+import SwiftSyntax
+import SwiftSyntaxMacros
+
 @freestanding(
     declaration,
     names:
@@ -144,15 +147,12 @@ public struct custom : HTMLElement {
     public var attributes:[HTMLElementAttribute]
     public var innerHTML:[CustomStringConvertible]
 
-    public init?(rawValue: String) { // TODO: fix
-        guard let key:Substring = rawValue.split(separator: "(").first, String(key) == "custom" else {
-            return nil
-        }
-        var range:Substring = rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count + 1) ..< rawValue.index(rawValue.endIndex, offsetBy: -1)]
-        tag = ""
-        isVoid = false
-        attributes = []
-        innerHTML = []
+    public init(context: some MacroExpansionContext, _ function: FunctionCallExprSyntax) { // TODO: fix
+        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: function.arguments.children(viewMode: .all))
+        tag = data.attributes["tag"] as? String ?? ""
+        isVoid = data.attributes["isVoid"] as? Bool ?? false
+        attributes = data.globalAttributes
+        innerHTML = data.innerHTML
     }
     public init(
         tag: String,

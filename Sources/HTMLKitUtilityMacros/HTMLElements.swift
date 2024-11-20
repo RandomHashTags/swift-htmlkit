@@ -43,13 +43,9 @@ enum HTMLElements : DeclarationMacro {
             var attribute_declarations:String = ""
             var attributes:[(String, String, String)] = []
             if let test = item.value.as(ArrayExprSyntax.self)?.elements {
-                initializers += "public init?(rawValue: String) {\n"
-                initializers += "guard let key:Substring = rawValue.split(separator: \"(\").first, String(key) == tag else { return nil }\n"
-                initializers += "var range:Substring = rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count+1)..<rawValue.index(rawValue.endIndex, offsetBy: -1)]\n"
-                initializers += "self = .init(\nattributes: HTMLElementValueType.cGlobalAttributes(key: \"attributes\", &range),"
                 attributes.reserveCapacity(test.count)
                 for element in test {
-                    var key:String = "", key_literal:String = ""
+                    var key:String = ""
                     let tuple = element.expression.as(TupleExprSyntax.self)!
                     for attribute_element in tuple.elements {
                         let label:LabeledExprSyntax = attribute_element
@@ -57,7 +53,6 @@ enum HTMLElements : DeclarationMacro {
                             key = "\(key_element)"
                             key.removeFirst()
                             key.removeLast()
-                            key_literal = key
                             switch key {
                                 case "for", "default", "defer", "as":
                                     key = "`\(key)`"
@@ -67,43 +62,12 @@ enum HTMLElements : DeclarationMacro {
                         } else {
                             var isArray:Bool = false
                             let (value_type, default_value, value_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, label.expression)
-                            let init_type:String
-                            switch value_type {
-                                case "String": init_type = "HTMLElementValueType.cString(key: \"\(key_literal)\", &range)"
-                                case "Bool":   init_type = "HTMLElementValueType.cBool(key: \"\(key_literal)\", &range)"
-                                case "Int":    init_type = "HTMLElementValueType.cInt(key: \"\(key_literal)\", &range)"
-                                case "Float":  init_type = "HTMLElementValueType.cFloat(key: \"\(key_literal)\", &range)"
-                                default:
-                                    if value_type.hasPrefix("HTMLElementAttribute.Extra.") {
-                                        init_type = "HTMLElementValueType.cAttribute(key: \"\(key_literal)\", &range)"
-                                    } else if value_type.first == "[" {
-                                        func initValueType() -> String {
-                                            switch value_type_literal {
-                                                case .array(of: .string):
-                                                    return "var s:String = $0\ns.removeFirst()\ns.removeLast()\nreturn s"
-                                                case .array(of: .int): return "Int($0)"
-                                                case .array(of: .float): return "Float($0)"
-                                                case .array(of: .bool): return "$0 == \"true\""
-                                                case .array(of: .attribute):
-                                                    return "var s:String = $0\ns.removeFirst()\nreturn HTMLElementAttribute.Extra.\(key_literal)(rawValue: s)"
-                                                case .array(of: .otherAttribute(let value)):
-                                                    return "var s:String = $0\ns.removeFirst()\nreturn HTMLElementAttribute.Extra.\(value)(rawValue: s)"
-                                                default: return "$0"
-                                            }
-                                        }
-                                        init_type = "HTMLElementValueType.cArray(key: \"\(key_literal)\", &range, parse: { \(initValueType()) })"
-                                    } else {
-                                        init_type = "nil"
-                                    }
-                            }
                             attribute_declarations += "\npublic var \(key):\(value_type)\(default_value.split(separator: "=", omittingEmptySubsequences: false)[0])"
                             attributes.append((key, value_type, default_value))
-                            initializers += "\n" + key_literal + ": " + init_type + ","
                         }
                     }
                 }
             }
-            initializers += "\nHTMLElementValueType.cInnerHTML(&range)\n)\n}\n"
 
             string += attribute_declarations
             string += "\npublic var innerHTML:[CustomStringConvertible]\n"
@@ -124,6 +88,25 @@ enum HTMLElements : DeclarationMacro {
                 initializers += "self.\(key_literal) = \(key)\n"
             }
             initializers += "self.innerHTML = innerHTML\n}\n"
+
+            initializers += "public init?(context: some MacroExpansionContext, _ function: FunctionCallExprSyntax) {\n"
+            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: function.arguments.children(viewMode: .all))\n"
+            initializers += "self.attributes = data.globalAttributes\n"
+            for (key, value_type, _) in attributes {
+                var value:String = "as? \(value_type)"
+                switch value_type {
+                    case "Bool":
+                        value += " ?? false"
+                    default:
+                        if value_type.first == "[" {
+                            value += " ?? []"
+                        }
+                        break
+                }
+                initializers += "self.\(key) = data.attributes[\"\(key)\"] " + value + "\n"
+            }
+            initializers += "self.innerHTML = data.innerHTML\n"
+            initializers += "\n}"
             string += initializers
 
             var render:String = "\npublic var description : String {\n"
@@ -134,6 +117,11 @@ enum HTMLElements : DeclarationMacro {
                 if key_literal.first == "`" {
                     key_literal.removeFirst()
                     key_literal.removeLast()
+                }
+                if key_literal == "httpEquiv" {
+                    key_literal = "http-equiv"
+                } else if key_literal == "acceptCharset" {
+                    key_literal = "accept-charset"
                 }
                 if value_type == "Bool" {
                     attributes_func += "\nif \(key) { items.append(\"\(key_literal)\") }"
@@ -156,10 +144,11 @@ enum HTMLElements : DeclarationMacro {
                     attributes_func += "\n"
                 } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
                     attributes_func += "\n"
-                    attributes_func += #"if let \#(key) { items.append("\#(key_literal)=\\\"\(\#(key))\\\"") }"#
+                    let value:String = value_type == "String" ? key : "String(describing: \(key))"
+                    attributes_func += "if let \(key) { items.append(\(value)) }"
                 } else {
                     attributes_func += "\n"
-                    attributes_func += #"if let \#(key), let v:String = \#(key).htmlValue { items.append("\#(key_literal)=\\\"\(v)\\\"") }"#
+                    attributes_func += #"if let v:String = \#(key)?.htmlValue { items.append("\#(key_literal)=\\\"\(v)\\\"") }"#
                 }
             }
             attributes_func += "\nreturn (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"
@@ -227,7 +216,7 @@ indirect enum HTMLElementValueType {
 
 
 // MARK: HTMLElementType
-enum HTMLElementType : String, CaseIterable {
+package enum HTMLElementType : String, CaseIterable {
     case html
 
     case a
