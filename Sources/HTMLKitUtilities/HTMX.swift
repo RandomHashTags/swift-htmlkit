@@ -6,7 +6,7 @@
 //
 
 public extension HTMLElementAttribute {
-    enum HTMX {
+    enum HTMX : HTMLInitializable {
         case boost(TrueOrFalse)
         case confirm(String)
         case delete(String)
@@ -53,7 +53,7 @@ public extension HTMLElementAttribute {
             func literal() -> String        { HTMLElementAttribute.literal(key: key, rawValue: rawValue) }
             func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
             func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
-            func enumeration<T : RawRepresentable>() -> T where T.RawValue == String { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
+            func enumeration<T : HTMLInitializable>() -> T { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
             func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
             func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
             func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
@@ -227,7 +227,7 @@ public extension HTMLElementAttribute {
             }
         }
 
-        public var htmlValue : String {
+        public var htmlValue : String? {
             switch self {
                 case .boost(let value): return value.rawValue
                 case .confirm(let value): return value
@@ -291,7 +291,7 @@ public extension HTMLElementAttribute {
 
 public extension HTMLElementAttribute.HTMX {
     // MARK: Boost
-    enum TrueOrFalse : String {
+    enum TrueOrFalse : String, HTMLInitializable {
         case `true`, `false`
     }
 
@@ -433,7 +433,7 @@ public extension HTMLElementAttribute.HTMX {
     }
 
     // MARK: Swap
-    enum Swap : String {
+    enum Swap : String, HTMLInitializable {
         case innerHTML, outerHTML
         case textContent
         case beforebegin, afterbegin

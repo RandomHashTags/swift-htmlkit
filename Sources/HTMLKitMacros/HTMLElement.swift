@@ -160,7 +160,7 @@ private extension HTMLElementMacro {
                             string = String(string[string.index(after: string.startIndex)...])
                             if let htmx:HTMLElementAttribute.HTMX = HTMLElementAttribute.HTMX(rawValue: string) {
                                 key = "hx-" + htmx.key
-                                let htmlValue:String = htmx.htmlValue
+                                let htmlValue:String = htmx.htmlValue!
                                 var delimiter:String = "\\\"", isBoolean:Bool = false
                                 func check_boolean(_ boolean: Bool) {
                                     isBoolean = true

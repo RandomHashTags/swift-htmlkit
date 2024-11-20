@@ -265,6 +265,60 @@ package indirect enum HTMLElementValueType {
         cleanup(&range)
         return String(slice)
     }
+    static func cGlobalAttributes(key: String, _ range: inout Substring) -> [HTMLElementAttribute] {
+        guard consumable(key: key, range: &range), range.first == "[" else { return [] }
+        range.removeFirst()
+        cleanup(&range)
+        var attributes:[HTMLElementAttribute] = []
+        var string:String = "", depth:Int = 1, attribute_depth:Int = 0
+        func parse_attribute() {
+            if string.first == "." {
+                string.removeFirst()
+            }
+            //print("HTMLKitUtilities;cGlobalAttributes;parse_attribute;string=\(string)")
+            if let attribute:HTMLElementAttribute = HTMLElementAttribute(rawValue: string) {
+                attributes.append(attribute)
+            }
+            cleanup(&range)
+        }
+        loop: while let char:Character = range.first {
+            switch char {
+                case "[":
+                    depth += 1
+                    break
+                case "]":
+                    depth -= 1
+                    if depth == 0 {
+                        range.removeFirst()
+                        parse_attribute()
+                        break loop
+                    }
+                    break
+                case "(":
+                    attribute_depth += 1
+                    break
+                case ")":
+                    attribute_depth -= 1
+                    break
+                default:
+                    if attribute_depth != 0 {
+                        break
+                    } else if depth == 1 {
+                        switch char {
+                            case ",":
+                                parse_attribute()
+                                string = ""
+                                continue
+                            default:
+                                break
+                        }
+                    }
+                    break
+            }
+            string.append(range.removeFirst())
+        }
+        return attributes
+    }
     static func cString(key: String, _ range: inout Substring) -> String? {
         guard consumable(key: key, range: &range) else { return nil }
         guard !range.isEmpty else { return "" }
@@ -457,6 +511,7 @@ package indirect enum HTMLElementValueType {
             case "header": return header(rawValue: rawValue)
             case "hgroup": return hgroup(rawValue: rawValue)
             case "hr": return hr(rawValue: rawValue)
+            case "html": return html(rawValue: rawValue)
             case "i": return i(rawValue: rawValue)
             case "iframe": return iframe(rawValue: rawValue)
             case "img": return img(rawValue: rawValue)
@@ -556,7 +611,7 @@ public enum HTMLElementAttribute {
     case itemtype(String? = nil)
     case lang(String? = nil)
     case nonce(String? = nil)
-    case part([(String)] = [])
+    case part([String] = [])
     case popover(Extra.popover? = nil)
     case slot(String? = nil)
     case spellcheck(Extra.spellcheck? = nil)
@@ -578,6 +633,58 @@ public enum HTMLElementAttribute {
 
     @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
     case event(Extra.event, _ value: String? = nil)
+
+    public init?(rawValue: String) {
+        guard rawValue.last == ")" else { return nil }
+        let key:Substring = rawValue.split(separator: "(")[0]
+        func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
+        func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
+        func enumeration<T : HTMLInitializable>() -> T { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
+        func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
+        func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
+        func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
+        switch key {
+            case "accesskey":             self = .accesskey(string())
+            case "ariaattribute":         self = .ariaattribute(enumeration())
+            case "role":                  self = .role(enumeration())
+            case "autocapitalize":        self = .autocapitalize(enumeration())
+            case "autofocus":             self = .autofocus(boolean())
+            case "class":                 self = .class(array_string())
+            case "contenteditable":       self = .contenteditable(enumeration())
+            case "data":                  self = .data("", "") // TODO: fix
+            case "dir":                   self = .dir(enumeration())
+            case "draggable":             self = .draggable(enumeration())
+            case "enterkeyhint":          self = .enterkeyhint(enumeration())
+            case "exportparts":           self = .exportparts(array_string())
+            case "hidden":                self = .hidden(enumeration())
+            case "id":                    self = .id(string())
+            case "inert":                 self = .inert(boolean())
+            case "inputmode":             self = .inputmode(enumeration())
+            case "is":                    self = .is(string())
+            case "itemid":                self = .itemid(string())
+            case "itemprop":              self = .itemprop(string())
+            case "itemref":               self = .itemref(string())
+            case "itemscope":             self = .itemscope(boolean())
+            case "itemtype":              self = .itemtype(string())
+            case "lang":                  self = .lang(string())
+            case "nonce":                 self = .nonce(string())
+            case "part":                  self = .part(array_string())
+            case "popover":               self = .popover(enumeration())
+            case "slot":                  self = .slot(string())
+            case "spellcheck":            self = .spellcheck(enumeration())
+            case "style":                 self = .style(string())
+            case "tabindex":              self = .tabindex(int())
+            case "title":                 self = .title(string())
+            case "translate":             self = .translate(enumeration())
+            case "virtualkeyboardpolicy": self = .virtualkeyboardpolicy(enumeration())
+            case "writingsuggestions":    self = .writingsuggestions(enumeration())
+            case "trailingSlash":         self = .trailingSlash
+            case "htmx":                  self = .htmx(enumeration())
+            case "custom":                self = .custom("", "") // TODO: fix
+            case "event":                 self = .event(.click, "") // TODO: fix
+            default: return nil
+        }
+    }
 
     public var key : String {
         switch self {
@@ -618,7 +725,15 @@ public enum HTMLElementAttribute {
 
             case .trailingSlash:            return ""
 
-            case .htmx(let htmx):           return "htmx-" + htmx.key
+            case .htmx(let htmx):
+                switch htmx {
+                    case .ws(let value):
+                        return "ws-" + value.key
+                    case .sse(let value):
+                        return "sse-" + value.key
+                    default:
+                        return "hx-" + htmx.key
+                }
             case .custom(let id, _):        return id
             case .event(let event, _):      return "on" + event.rawValue
         }
@@ -686,7 +801,7 @@ extension HTMLElementAttribute {
         let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
         return rawValue[rawValue.index(start, offsetBy: key.count + 1)..<end] == "true"
     }
-    static func enumeration<T : RawRepresentable>(key: Substring, rawValue: String) -> T where T.RawValue == String {
+    static func enumeration<T : HTMLInitializable>(key: Substring, rawValue: String) -> T {
         let start:String.Index = rawValue.startIndex, end:String.Index = rawValue.index(before: rawValue.endIndex)
         return T(rawValue: String(rawValue[rawValue.index(start, offsetBy: key.count + 2)..<end]))!
     }
@@ -800,7 +915,7 @@ public extension HTMLElementAttribute.Extra {
             let key:Substring = rawValue.split(separator: "(")[0]
             func string() -> String         { HTMLElementAttribute.string(key: key, rawValue: rawValue) }
             func boolean() -> Bool          { HTMLElementAttribute.boolean(key: key, rawValue: rawValue) }
-            func enumeration<T : RawRepresentable>() -> T where T.RawValue == String { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
+            func enumeration<T : HTMLInitializable>() -> T { HTMLElementAttribute.enumeration(key: key, rawValue: rawValue) }
             func int() -> Int               { HTMLElementAttribute.int(key: key, rawValue: rawValue) }
             func array_string() -> [String] { HTMLElementAttribute.array_string(key: key, rawValue: rawValue) }
             func float() -> Float           { HTMLElementAttribute.float(key: key, rawValue: rawValue) }
@@ -978,49 +1093,49 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
-        public enum Autocomplete : String {
+        public enum Autocomplete : String, HTMLInitializable {
             case none, inline, list, both
         }
-        public enum Checked : String {
+        public enum Checked : String, HTMLInitializable {
             case `false`, `true`, mixed, undefined
         }
-        public enum Current : String {
+        public enum Current : String, HTMLInitializable {
             case page, step, location, date, time, `true`, `false`
         }
-        public enum DropEffect : String {
+        public enum DropEffect : String, HTMLInitializable {
             case copy, execute, link, move, none, popup
         }
-        public enum Expanded : String {
+        public enum Expanded : String, HTMLInitializable {
             case `false`, `true`, undefined
         }
-        public enum Grabbed : String {
+        public enum Grabbed : String, HTMLInitializable {
             case `true`, `false`, undefined
         }
-        public enum HasPopup : String {
+        public enum HasPopup : String, HTMLInitializable {
             case `false`, `true`, menu, listbox, tree, grid, dialog
         }
-        public enum Hidden : String {
+        public enum Hidden : String, HTMLInitializable {
             case `false`, `true`, undefined
         }
-        public enum Invalid : String {
+        public enum Invalid : String, HTMLInitializable {
             case grammar, `false`, spelling, `true`
         }
-        public enum Live : String {
+        public enum Live : String, HTMLInitializable {
             case assertive, off, polite
         }
-        public enum Orientation : String {
+        public enum Orientation : String, HTMLInitializable {
             case horizontal, undefined, vertical
         }
-        public enum Pressed : String {
+        public enum Pressed : String, HTMLInitializable {
             case `false`, mixed, `true`, undefined
         }
-        public enum Relevant : String {
+        public enum Relevant : String, HTMLInitializable {
             case additions, all, removals, text
         }
-        public enum Selected : String {
+        public enum Selected : String, HTMLInitializable {
             case `true`, `false`, undefined
         }
-        public enum Sort : String {
+        public enum Sort : String, HTMLInitializable {
             case ascending, descending, none, other
         }
     }

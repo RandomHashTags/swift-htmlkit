@@ -31,8 +31,6 @@ public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T =
 @freestanding(expression)
 public macro html<T: ExpressibleByStringLiteral>(
     lookupFiles: [StaticString] = [],
-    attributes: [HTMLElementAttribute] = [],
-    xmlns: T? = nil,
     _ innerHTML: HTMLElement...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 

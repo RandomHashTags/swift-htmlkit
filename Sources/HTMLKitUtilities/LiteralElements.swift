@@ -144,7 +144,11 @@ public struct custom : HTMLElement {
     public var attributes:[HTMLElementAttribute]
     public var innerHTML:[CustomStringConvertible]
 
-    public init?(rawValue: String) {
+    public init?(rawValue: String) { // TODO: fix
+        guard let key:Substring = rawValue.split(separator: "(").first, String(key) == "custom" else {
+            return nil
+        }
+        var range:Substring = rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count + 1) ..< rawValue.index(rawValue.endIndex, offsetBy: -1)]
         tag = ""
         isVoid = false
         attributes = []

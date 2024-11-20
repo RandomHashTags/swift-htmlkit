@@ -44,10 +44,9 @@ enum HTMLElements : DeclarationMacro {
             var attributes:[(String, String, String)] = []
             if let test = item.value.as(ArrayExprSyntax.self)?.elements {
                 initializers += "public init?(rawValue: String) {\n"
-                initializers += "guard let key:Substring = rawValue.split(separator: \"(\").first else { return nil }\n"
-                initializers += "guard String(key) == tag else { return nil }\n"
+                initializers += "guard let key:Substring = rawValue.split(separator: \"(\").first, String(key) == tag else { return nil }\n"
                 initializers += "var range:Substring = rawValue[rawValue.index(rawValue.startIndex, offsetBy: key.count+1)..<rawValue.index(rawValue.endIndex, offsetBy: -1)]\n"
-                initializers += "self = .init("
+                initializers += "self = .init(\nattributes: HTMLElementValueType.cGlobalAttributes(key: \"attributes\", &range),"
                 attributes.reserveCapacity(test.count)
                 for element in test {
                     var key:String = "", key_literal:String = ""

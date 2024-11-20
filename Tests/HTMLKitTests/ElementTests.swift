@@ -49,10 +49,10 @@ struct ElementTests {
 extension ElementTests {
     // MARK: html
     @Test func _html() {
-        var string:StaticString = #html()
+        var string:StaticString = #html(html())
         #expect(string == "<!DOCTYPE html><html></html>")
 
-        string = #html(xmlns: "test")
+        string = #html(html(xmlns: "test"))
         #expect(string == "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
 
@@ -421,7 +421,7 @@ extension ElementTests {
     }
 
     @Test func no_value_type() {
-        let expected_string:String = "<!DOCTYPE html><html><body><h1>HTMLKitTests</h1></body></html>"
+        let expected_string:String = "<body><h1>HTMLKitTests</h1></body>"
         let test1:String = #html(body(h1("HTMLKitTests")))
         #expect(type(of: test1) == String.self)
         #expect(test1 == expected_string)
