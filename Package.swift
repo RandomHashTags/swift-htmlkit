@@ -16,8 +16,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
-        .package(url: "https://github.com/apple/swift-nio", from: "2.75.0")
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1")
     ],
     targets: [
         .macro(
@@ -35,8 +34,7 @@ let package = Package(
                 "HTMLKitUtilityMacros",
                 .product(name: "SwiftDiagnostics", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-                .product(name: "NIOCore", package: "swift-nio")
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
         ),
         .macro(

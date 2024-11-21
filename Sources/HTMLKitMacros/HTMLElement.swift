@@ -14,13 +14,9 @@ import SwiftSyntaxMacros
 import struct Foundation.Data
 #endif
 
-import struct NIOCore.ByteBuffer
-
 enum HTMLElementMacro : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        let string:String = expand_macro(context: context, macro: node.macroExpansion!)
-        let encoding:HTMLEncoding = HTMLEncoding.string
-
+        let (string, encoding):(String, HTMLEncoding) = expand_macro(context: context, macro: node.macroExpansion!)
         func has_no_interpolation() -> Bool {
             let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !has_interpolation else {
@@ -52,15 +48,17 @@ enum HTMLElementMacro : ExpressionMacro {
 
             case .string:
                 return "\"\(raw: string)\""
+            case .custom(let encoded):
+                return "\(raw: encoded.replacingOccurrences(of: "$0", with: string))"
         }
     }
 }
 
 private extension HTMLElementMacro {
     // MARK: Expand Macro
-    static func expand_macro(context: some MacroExpansionContext, macro: MacroExpansionExprSyntax) -> String {
+    static func expand_macro(context: some MacroExpansionContext, macro: MacroExpansionExprSyntax) -> (String, HTMLEncoding) {
         guard let elementType:HTMLElementType = HTMLElementType(rawValue: macro.macroName.text) else {
-            return "\(macro)"
+            return ("\(macro)", .string)
         }
         let children:SyntaxChildren = macro.arguments.children(viewMode: .all)
         /*if elementType == .escapeHTML {
@@ -71,6 +69,6 @@ private extension HTMLElementMacro {
             return array.map({ String(describing: $0) }).joined()
         }*/
         let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children)
-        return data.innerHTML.map({ String(describing: $0) }).joined()
+        return (data.innerHTML.map({ String(describing: $0) }).joined(), data.encoding)
     }
 }

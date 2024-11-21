@@ -12,47 +12,46 @@ import HTMLKit
 import struct Foundation.Data
 #endif
 
-import struct NIOCore.ByteBuffer
-
 // MARK: Representations
 struct HTMLKitTests {
     func representations() {
         let _:StaticString = #html()
+        let _:StaticString = #html(encoding: .string)
         let _:String = #html()
-        let _:[UInt8] = #htmlUTF8Bytes("")
-        let _:[UInt16] = #htmlUTF16Bytes("")
-        let _:ContiguousArray<CChar> = #htmlUTF8CString("")
+        let _:String = #html(encoding: .string)
+        let _:[UInt8] = #html(encoding: .utf8Bytes, p())
+        let _:[UInt16] = #html(encoding: .utf16Bytes, p())
+        let _:ContiguousArray<CChar> = #html(encoding: .utf8CString, p())
         #if canImport(Foundation)
-        let _:Data = #htmlData("")
+        let _:Data = #html(encoding: .foundationData, p())
         #endif
-        let _:ByteBuffer = #htmlByteBuffer("")
-
-        //let bro:String = ""
-        //let _:[UInt8] = #htmlUTF8Bytes("\(bro)")
+        //let _:ByteBuffer = #html(encoding: .byteBuffer, "")
+        let _:String = #html(encoding: .custom(#"String("$0")"#), p(5))
     }
     func representation1() -> StaticString {
-        #html()
+        #html(p(123))
     }
     func representation2() -> String {
-        #html()
+        #html(p(123))
     }
     func representation3() -> [UInt8] {
-        #htmlUTF8Bytes("")
+        #html(encoding: .utf8Bytes, p(123))
     }
     func representation4() -> [UInt16] {
-        #htmlUTF16Bytes("")
+        #html(encoding: .utf16Bytes, p(123))
     }
     func representation5() -> ContiguousArray<CChar> {
-        #htmlUTF8CString("")
+        #html(encoding: .utf8CString, p(123))
     }
     #if canImport(Foundation)
     func representation5() -> Data {
-        #htmlData("")
+        #html(encoding: .foundationData, p(123))
     }
     #endif
+    /*
     func representation6() -> ByteBuffer {
         #htmlByteBuffer("")
-    }
+    }*/
 }
 
 // MARK: StaticString Example

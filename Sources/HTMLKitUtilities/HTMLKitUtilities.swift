@@ -8,17 +8,20 @@
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
     public struct ElementData {
+        public let encoding:HTMLEncoding
         public let globalAttributes:[HTMLElementAttribute]
         public let attributes:[String:Any]
         public let innerHTML:[CustomStringConvertible]
         public let trailingSlash:Bool
 
         init(
+            _ encoding: HTMLEncoding,
             _ globalAttributes: [HTMLElementAttribute],
             _ attributes: [String:Any],
             _ innerHTML: [CustomStringConvertible],
             _ trailingSlash: Bool
         ) {
+            self.encoding = encoding
             self.globalAttributes = globalAttributes
             self.attributes = attributes
             self.innerHTML = innerHTML

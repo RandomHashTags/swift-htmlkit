@@ -11,8 +11,6 @@
 import struct Foundation.Data
 #endif
 
-import struct NIOCore.ByteBuffer
-
 // MARK: StaticString equality
 public extension StaticString {
     static func == (left: Self, right: Self) -> Bool { left.description == right.description }
@@ -29,8 +27,8 @@ public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T =
 
 // MARK: HTML Representation
 @freestanding(expression)
-public macro html<T: ExpressibleByStringLiteral>(
+public macro html<T: CustomStringConvertible>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible...
+    _ innerHTML: HTMLElement...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")

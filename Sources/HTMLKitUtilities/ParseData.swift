@@ -15,6 +15,7 @@ public extension HTMLKitUtilities {
         context: some MacroExpansionContext,
         children: SyntaxChildren
     ) -> ElementData {
+        var encoding:HTMLEncoding = HTMLEncoding.string
         var global_attributes:[HTMLElementAttribute] = []
         var attributes:[String:Any] = [:]
         var innerHTML:[CustomStringConvertible] = []
@@ -23,7 +24,20 @@ public extension HTMLKitUtilities {
         for element in children {
             if let child:LabeledExprSyntax = element.labeled {
                 if var key:String = child.label?.text {
-                    if key == "lookupFiles" {
+                    if key == "encoding" {
+                        if let key:String = child.expression.memberAccess?.declName.baseName.text {
+                            switch key {
+                                case "string": encoding = .string
+                                case "utf8Bytes": encoding = .utf8Bytes
+                                case "utf16Bytes": encoding = .utf16Bytes
+                                case "foundationData": encoding = .foundationData
+                                case "byteBuffer": encoding = .byteBuffer
+                                default: break
+                            }
+                        } else if let custom:FunctionCallExprSyntax = child.expression.functionCall {
+                            encoding = .custom(custom.arguments.first!.expression.stringLiteral!.string)
+                        }
+                    } else if key == "lookupFiles" {
                         lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string }))
                     } else if key == "attributes" {
                         (global_attributes, trailingSlash) = parse_global_attributes(context: context, array: child.expression.array!.elements, lookupFiles: lookupFiles)
@@ -43,7 +57,7 @@ public extension HTMLKitUtilities {
                 }
             }
         }
-        return ElementData(global_attributes, attributes, innerHTML, trailingSlash)
+        return ElementData(encoding, global_attributes, attributes, innerHTML, trailingSlash)
     }
     // MARK: Parse Global Attributes
     static func parse_global_attributes(
@@ -144,7 +158,7 @@ public extension HTMLKitUtilities {
             default: break
         }
         for expr in interpolation {
-            string.replace("\(expr)", with: flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
+            string.replace("\(expr)", with: promote_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
         }
         if remaining_interpolation > 0 {
             warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
@@ -232,15 +246,15 @@ public extension HTMLKitUtilities {
         }
         return nil
     }
-    // MARK: Flatten Interpolation
-    static func flatten_interpolation(
+    // MARK: Promote Interpolation
+    static func promote_interpolation(
         context: some MacroExpansionContext,
         remaining_interpolation: inout Int,
         expr: ExpressionSegmentSyntax,
         lookupFiles: Set<String>
     ) -> String {
-        let expression:ExprSyntax = expr.expressions.first!.expression
         var string:String = "\(expr)"
+        guard let expression:ExprSyntax = expr.expressions.first?.expression else { return string }
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
             let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
             if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
@@ -252,13 +266,13 @@ public extension HTMLKitUtilities {
                     if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
                         string += literal
                     } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                        let flattened:String = flatten_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
-                        if "\(interpolation)" == flattened {
-                            //string += "\\(\"\(flattened)\".escapingHTML(escapeAttributes: true))"
-                            string += "\(flattened)"
+                        let promoted:String = promote_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
+                        if "\(interpolation)" == promoted {
+                            //string += "\\(\"\(promoted)\".escapingHTML(escapeAttributes: true))"
+                            string += "\(promoted)"
                             warn_interpolation(context: context, node: interpolation, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
                         } else {
-                            string += flattened
+                            string += promoted
                         }
                     } else {
                         //string += "\\(\"\(segment)\".escapingHTML(escapeAttributes: true))"
