@@ -55,6 +55,7 @@ public enum HTMLEncoding {
     /// Use `$0` for the compiled HTML.
     /// - Parameters:
     ///   - logic: The encoding logic, represented as a string.
+    /// - Warning: The custom type needs to conform to `CustomStringConvertible` to be returned by the html macro!
     /// ### Example Usage
     /// ```swift
     /// let _:String = #html(encoding: .custom(#"String("$0")"#), p(5)) // String("<p>5</p>")

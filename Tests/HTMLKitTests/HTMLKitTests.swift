@@ -96,20 +96,22 @@ extension HTMLKitTests {
             qualities += li(quality).description
         }
         let string:String = #html(
-            head(
-                meta(charset: charset),
-                title(title_literal),
-                meta(content: "\("description \(title_literal)")", name: "description"),
-                meta(content: "\("keywords")", name: "keywords")
-            ),
-            body(
-                h1("\("Heading")"),
-                div(attributes: [.id("desc")],
-                    p("\("bro")")
+            html(
+                head(
+                    meta(charset: charset),
+                    title(title_literal),
+                    meta(content: "\("description \(title_literal)")", name: "description"),
+                    meta(content: "\("keywords")", name: "keywords")
                 ),
-                h2("\("Details")"),
-                h3("\("Qualities")"),
-                ul(attributes: [.id("user-qualities")], String(describing: qualities))
+                body(
+                    h1("\("Heading")"),
+                    div(attributes: [.id("desc")],
+                        p("\("bro")")
+                    ),
+                    h2("\("Details")"),
+                    h3("\("Qualities")"),
+                    ul(attributes: [.id("user-qualities")], String(describing: qualities))
+                )
             )
         )
         #expect(string == "<!DOCTYPE html><html><head><meta charset=\"\(charset)\"><title>\(title_literal)</title><meta content=\"description \(title_literal)\" name=\"description\"><meta content=\"keywords\" name=\"keywords\"></head><body><h1>Heading</h1><div id=\"desc\"><p>bro</p></div><h2>Details</h2><h3>Qualities</h3><ul id=\"user-qualities\">\(qualities)</ul></body></html>")
@@ -141,6 +143,6 @@ extension HTMLKitTests {
             self.array_string = array.map({ "\($0)" }).joined()
         }
 
-        var html : String { p(name, array_string).description }
+        var html : String { #html(p(name, array_string)) }
     }
 }

@@ -44,11 +44,17 @@ public extension HTMLKitUtilities {
                     } else {
                         if key == "acceptCharset" {
                             key = "accept-charset"
-                        } else if key == "httpEquiv" {
-                            key = "http-equiv"
                         }
-                        if let string:String = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles)?.value(key: key) {
-                            attributes[key] = string
+                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(key: key, expr: child.expression) {
+                            attributes[key] = test
+                        } else if let string:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
+                            switch string {
+                                case .boolean(let b): attributes[key] = b
+                                case .string(let s), .interpolation(let s): attributes[key] = s
+                                case .int(let i): attributes[key] = i
+                                case .float(let f): attributes[key] = f
+                                case .array(let values): attributes[key] = values
+                            }
                         }
                     }
                 // inner html
@@ -140,8 +146,11 @@ public extension HTMLKitUtilities {
         if let boolean:String = expression.booleanLiteral?.literal.text {
             return .boolean(boolean == "true")
         }
-        if let string:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
-            return .string(string)
+        if let string:String = expression.integerLiteral?.literal.text {
+            return .int(Int(string)!)
+        }
+        if let string:String = expression.floatLiteral?.literal.text {
+            return .float(Float(string)!)
         }
         guard var returnType:LiteralReturnType = extract_literal(context: context, key: key, expression: expression, lookupFiles: lookupFiles) else {
             //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
@@ -183,22 +192,17 @@ public extension HTMLKitUtilities {
             return stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 ? .string(string) : .interpolation(string)
         }
         if let function:FunctionCallExprSyntax = expression.functionCall {
-            let enums:Set<String> = ["command", "download", "height", "width"]
-            if enums.contains(key) || key.hasPrefix("aria-") {
-                return .enumCase("")
-            } else {
-                if let decl:String = function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text {
-                    switch decl {
-                        case "StaticString":
-                            var string:String = function.arguments.first!.expression.stringLiteral!.string
-                            return .string(string)
-                        default:
-                            if let element:HTMLElement = HTMLElementValueType.parse_element(context: context, function) {
-                                let string:String = element.description
-                                return string.contains("\\(") ? .interpolation(string) : .string(string)
-                            }
-                            break
-                    }
+            if let decl:String = function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text {
+                switch decl {
+                    case "StaticString":
+                        let string:String = function.arguments.first!.expression.stringLiteral!.string
+                        return .string(string)
+                    default:
+                        if let element:HTMLElement = HTMLElementValueType.parse_element(context: context, function) {
+                            let string:String = element.description
+                            return string.contains("\\(") ? .interpolation(string) : .string(string)
+                        }
+                        break
                 }
                 return .interpolation("\(function)")
             }
@@ -219,7 +223,7 @@ public extension HTMLKitUtilities {
                     separator = " "
                     break
             }
-            var results:[String] = []
+            var results:[Any] = []
             for element in array.elements {
                 if let string:String = element.expression.stringLiteral?.string {
                     if string.contains(separator) {
@@ -227,13 +231,15 @@ public extension HTMLKitUtilities {
                         return nil
                     }
                     results.append(string)
-                }
-                if let string:String = element.expression.integerLiteral?.literal.text ?? element.expression.floatLiteral?.literal.text {
-                    results.append(string)
+                } else if let string:String = element.expression.integerLiteral?.literal.text {
+                    results.append(Int(string)!)
+                } else if let string:String = element.expression.floatLiteral?.literal.text {
+                    results.append(Float(string)!)
+                } else if let attribute:any HTMLInitializable = HTMLElementAttribute.Extra.parse(key: key, expr: element.expression) {
+                    results.append(attribute)
                 }
             }
-            let result:String = results.joined(separator: separator)
-            return .array(of: .string(result))
+            return .array(results)
         }
         if let _:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
             var string:String = "\(expression)", remaining_interpolation:Int = 1

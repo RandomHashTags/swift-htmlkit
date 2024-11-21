@@ -112,7 +112,7 @@ enum HTMLElements : DeclarationMacro {
             var render:String = "\npublic var description : String {\n"
             var attributes_func:String = "func attributes() -> String {\n"
             attributes_func += (attributes.isEmpty ? "let" : "var") + " items:[String] = self.attributes.compactMap({\n"
-            attributes_func += "guard let v:String = $0.htmlValue else { return nil }\n"
+            attributes_func += "guard let v:String = $0.htmlValue?.escapingHTML(escapeAttributes: true) else { return nil }\n"
             attributes_func += #"return "\($0.key)" + (v.isEmpty ? "" : "=\\\"\(v)\\\"")"#
             attributes_func += "\n})"
             for (key, value_type, _) in attributes {
@@ -133,13 +133,13 @@ enum HTMLElements : DeclarationMacro {
                     let separator:String = separator(key: key)
                     switch value_type {
                         case "[String]":
-                            attributes_func += "\(key)"
+                            attributes_func += "\(key).map({ $0.escapingHTML(escapeAttributes: true) })"
                             break
                         case "[Int]", "[Float]":
                             attributes_func += "\(key).map({ \"\\($0)\" })"
                             break
                         default:
-                            attributes_func += "\(key).compactMap({ return $0.htmlValue })"
+                            attributes_func += "\(key).compactMap({ return $0.htmlValue?.escapingHTML(escapeAttributes: true) })"
                             break
                     }
                     attributes_func += ".joined(separator: \"\(separator)\")\n"
@@ -147,12 +147,12 @@ enum HTMLElements : DeclarationMacro {
                     attributes_func += "\n"
                 } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
                     attributes_func += "\n"
-                    let value:String = value_type == "String" ? key : "String(describing: \(key))"
+                    let value:String = value_type == "String" ? key + ".escapingHTML(escapeAttributes: true)" : "String(describing: \(key))"
                     attributes_func += #"if let \#(key) { items.append("\#(key)=\\\"" + \#(value) + "\\\"") }"#
                     attributes_func += "\n"
                 } else {
                     attributes_func += "\n"
-                    attributes_func += #"if let v:String = \#(key)?.htmlValue { items.append("\#(key_literal)=\\\"\(v)\\\"") }"#
+                    attributes_func += #"if let v:String = \#(key)?.htmlValue { items.append("\#(key_literal)=\\\"" + v + "\\\"") }"#
                 }
             }
             attributes_func += "\nreturn (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"

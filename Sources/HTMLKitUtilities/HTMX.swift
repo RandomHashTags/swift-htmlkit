@@ -67,7 +67,7 @@ public extension HTMLElementAttribute {
                 guard let s:String = expression.integerLiteral?.literal.text else { return nil }
                 return Int(s)
             }
-            func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
+            func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
             func float() -> Float? {
                 guard let s:String = expression.floatLiteral?.literal.text else { return nil }
                 return Float(s)

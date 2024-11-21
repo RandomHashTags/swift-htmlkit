@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 9/19/24.
 //
 
+import SwiftSyntax
+
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
     public struct ElementData {
@@ -68,40 +70,87 @@ public extension String {
 
 // MARK: CSSUnit
 public extension HTMLElementAttribute {
-    enum CSSUnit { // https://www.w3schools.com/cssref/css_units.php
+    enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/css_units.php
         // absolute
-        case centimeters(_ value: Float)
-        case millimeters(_ value: Float)
+        case centimeters(_ value: Float?)
+        case millimeters(_ value: Float?)
         /// 1 inch = 96px = 2.54cm
-        case inches(_ value: Float)
+        case inches(_ value: Float?)
         /// 1 pixel = 1/96th of 1inch
-        case pixels(_ value: Float)
+        case pixels(_ value: Float?)
         /// 1 point = 1/72 of 1inch
-        case points(_ value: Float)
+        case points(_ value: Float?)
         /// 1 pica = 12 points
-        case picas(_ value: Float)
+        case picas(_ value: Float?)
         
         // relative
         /// Relative to the font-size of the element (2em means 2 times the size of the current font)
-        case em(_ value: Float)
+        case em(_ value: Float?)
         /// Relative to the x-height of the current font (rarely used)
-        case ex(_ value: Float)
+        case ex(_ value: Float?)
         /// Relative to the width of the "0" (zero)
-        case ch(_ value: Float)
+        case ch(_ value: Float?)
         /// Relative to font-size of the root element
-        case rem(_ value: Float)
+        case rem(_ value: Float?)
         /// Relative to 1% of the width of the viewport
-        case viewportWidth(_ value: Float)
+        case viewportWidth(_ value: Float?)
         /// Relative to 1% of the height of the viewport
-        case viewportHeight(_ value: Float)
+        case viewportHeight(_ value: Float?)
         /// Relative to 1% of viewport's smaller dimension
-        case viewportMin(_ value: Float)
+        case viewportMin(_ value: Float?)
         /// Relative to 1% of viewport's larger dimension
-        case viewportMax(_ value: Float)
+        case viewportMax(_ value: Float?)
         /// Relative to the parent element
-        case percent(_ value: Float)
+        case percent(_ value: Float?)
 
-        public var htmlValue : String {
+        public init?(key: String, arguments: LabeledExprListSyntax) {
+            func float() -> Float? {
+                guard let s:String = arguments.first!.expression.floatLiteral?.literal.text else { return nil }
+                return Float(s)
+            }
+            switch key {
+                case "centimeters": self = .centimeters(float())
+                case "millimeters": self = .millimeters(float())
+                case "inches": self = .inches(float())
+                case "pixels": self = .pixels(float())
+                case "points": self = .points(float())
+                case "picas": self = .picas(float())
+
+                case "em": self = .em(float())
+                case "ex": self = .ex(float())
+                case "ch": self = .ch(float())
+                case "rem": self = .rem(float())
+                case "viewportWidth": self = .viewportWidth(float())
+                case "viewportHeight": self = .viewportHeight(float())
+                case "viewportMin": self = .viewportMin(float())
+                case "viewportMax": self = .viewportMax(float())
+                case "percent": self = .percent(float())
+                default: return nil
+            }
+        }
+
+        public var key : String {
+            switch self {
+                case .centimeters(_):    return "centimeters"
+                case .millimeters(_):    return "millimeters"
+                case .inches(_):         return "inches"
+                case .pixels(_):         return "pixels"
+                case .points(_):         return "points"
+                case .picas(_):          return "picas"
+
+                case .em(_):             return "em"
+                case .ex(_):             return "ex"
+                case .ch(_):             return "ch"
+                case .rem(_):            return "rem"
+                case .viewportWidth(_):  return "viewportWidth"
+                case .viewportHeight(_): return "viewportHeight"
+                case .viewportMin(_):    return "viewportMin"
+                case .viewportMax(_):    return "viewportMax"
+                case .percent(_):        return "percent"
+            }
+        }
+
+        public var htmlValue : String? {
             switch self {
                 case .centimeters(let v),
                         .millimeters(let v),
@@ -147,12 +196,13 @@ public extension HTMLElementAttribute {
 }
 
 // MARK: LiteralReturnType
-public indirect enum LiteralReturnType {
+public enum LiteralReturnType {
     case boolean(Bool)
     case string(String)
-    case enumCase(String)
+    case int(Int)
+    case float(Float)
     case interpolation(String)
-    case array(of: LiteralReturnType)
+    case array([Any])
 
     public var isInterpolation : Bool {
         switch self {
@@ -166,26 +216,24 @@ public indirect enum LiteralReturnType {
             default: return false
         }
     }
-    public var isEnumCase : Bool {
-        switch self {
-            case .enumCase(_): return true
-            default: return false
-        }
-    }
 
     public func value(key: String) -> String? {
         switch self {
             case .boolean(let b): return b ? key : nil
-            case .string(var string), .enumCase(var string):
-                if string.isEmpty && (isEnumCase || isString && key == "attributionsrc") {
+            case .string(var string):
+                if string.isEmpty && key == "attributionsrc" {
                     return ""
                 }
                 string.escapeHTML(escapeAttributes: true)
                 return string
+            case .int(let int):
+                return String(describing: int)
+            case .float(let float):
+                return String(describing: float)
             case .interpolation(let string):
                 return string
-            case .array(let value):
-                return ""
+            case .array(_):
+                return nil
         }
     }
 }

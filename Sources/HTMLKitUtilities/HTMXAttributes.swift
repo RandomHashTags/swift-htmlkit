@@ -123,7 +123,7 @@ public extension HTMLElementAttribute.HTMX {
 
         public init?(key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
+            func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
             switch key {
                 case "all":  self = .all
                 case "none": self = .none
