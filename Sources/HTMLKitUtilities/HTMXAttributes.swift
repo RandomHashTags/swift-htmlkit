@@ -172,17 +172,17 @@ public extension HTMLElementAttribute.HTMX {
                 case "abort":   self = .abort
                 case "replace": self = .replace
                 case "queue":
+                    let expression:ExprSyntax = arguments.first!.expression
                     func enumeration<T : HTMLInitializable>() -> T? {
-                        guard let function:FunctionCallExprSyntax = arguments.first!.expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess else {
-                            if let member:MemberAccessExprSyntax = arguments.first!.expression.memberAccess {
-                                return T(key: member.declName.baseName.text, arguments: arguments) 
-                            }
-                            return nil
+                        if let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
+                            return T(key: member.declName.baseName.text, arguments: function.arguments)
                         }
-                        return T(key: member.declName.baseName.text, arguments: function.arguments)
+                        if let member:MemberAccessExprSyntax = expression.memberAccess {
+                            return T(key: member.declName.baseName.text, arguments: arguments)
+                        }
+                        return nil
                     }
                     self = .queue(enumeration())
-                    break
                 default:        return nil
             }
         }

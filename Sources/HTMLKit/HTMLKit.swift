@@ -30,23 +30,7 @@ public macro escapeHTML<T: ExpressibleByStringLiteral>(_ innerHTML: T...) -> T =
 // MARK: HTML Representation
 @freestanding(expression)
 public macro html<T: ExpressibleByStringLiteral>(
+    encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: HTMLElement...
+    _ innerHTML: CustomStringConvertible...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
-
-@freestanding(expression)
-public macro htmlUTF8Bytes<T: ExpressibleByStringLiteral>(lookupFiles: [StaticString] = [], attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> [UInt8] = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
-
-@freestanding(expression)
-public macro htmlUTF16Bytes<T: ExpressibleByStringLiteral>(lookupFiles: [StaticString] = [], attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> [UInt16] = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
-
-@freestanding(expression)
-public macro htmlUTF8CString<T: ExpressibleByStringLiteral>(lookupFiles: [StaticString] = [], attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> ContiguousArray<CChar> = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
-
-#if canImport(Foundation)
-@freestanding(expression)
-public macro htmlData<T: ExpressibleByStringLiteral>(lookupFiles: [StaticString] = [], attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> Data = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
-#endif
-
-@freestanding(expression)
-public macro htmlByteBuffer<T: ExpressibleByStringLiteral>(lookupFiles: [StaticString] = [], attributes: [HTMLElementAttribute] = [], xmlns: T? = nil, _ innerHTML: T...) -> ByteBuffer = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")

@@ -55,13 +55,13 @@ public extension HTMLElementAttribute {
             func string() -> String?        { expression.stringLiteral?.string }
             func boolean() -> Bool?         { expression.booleanLiteral?.literal.text == "true" }
             func enumeration<T : HTMLInitializable>() -> T? {
-                guard let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess else {
-                    if let member:MemberAccessExprSyntax = expression.memberAccess {
-                        return T(key: member.declName.baseName.text, arguments: arguments) 
-                    }
-                    return nil
+                if let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
+                    return T(key: member.declName.baseName.text, arguments: function.arguments)
                 }
-                return T(key: member.declName.baseName.text, arguments: function.arguments)
+                if let member:MemberAccessExprSyntax = expression.memberAccess {
+                    return T(key: member.declName.baseName.text, arguments: arguments)
+                }
+                return nil
             }
             func int() -> Int? {
                 guard let s:String = expression.integerLiteral?.literal.text else { return nil }
