@@ -111,7 +111,10 @@ enum HTMLElements : DeclarationMacro {
 
             var render:String = "\npublic var description : String {\n"
             var attributes_func:String = "func attributes() -> String {\n"
-            attributes_func += (attributes.isEmpty ? "let" : "var") + " items:[String] = self.attributes.map({ \"\\($0.key)\" })"
+            attributes_func += (attributes.isEmpty ? "let" : "var") + " items:[String] = self.attributes.compactMap({\n"
+            attributes_func += "guard let v:String = $0.htmlValue else { return nil }\n"
+            attributes_func += #"return "\($0.key)" + (v.isEmpty ? "" : "=\\\"\(v)\\\"")"#
+            attributes_func += "\n})"
             for (key, value_type, _) in attributes {
                 var key_literal:String = key
                 if key_literal.first == "`" {

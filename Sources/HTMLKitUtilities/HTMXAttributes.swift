@@ -164,7 +164,7 @@ public extension HTMLElementAttribute.HTMX {
     // MARK: Sync
     enum SyncStrategy : HTMLInitializable {
         case drop, abort, replace
-        case queue(Queue)
+        case queue(Queue?)
 
         public init?(key: String, arguments: LabeledExprListSyntax) {
             switch key {
@@ -172,9 +172,14 @@ public extension HTMLElementAttribute.HTMX {
                 case "abort":   self = .abort
                 case "replace": self = .replace
                 case "queue":
-                    func enumeration<T : HTMLInitializable>() -> T {
-                        let function:FunctionCallExprSyntax = arguments.first!.expression.functionCall!
-                        return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
+                    func enumeration<T : HTMLInitializable>() -> T? {
+                        guard let function:FunctionCallExprSyntax = arguments.first!.expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess else {
+                            if let member:MemberAccessExprSyntax = arguments.first!.expression.memberAccess {
+                                return T(key: member.declName.baseName.text, arguments: arguments) 
+                            }
+                            return nil
+                        }
+                        return T(key: member.declName.baseName.text, arguments: function.arguments)
                     }
                     self = .queue(enumeration())
                     break
@@ -200,7 +205,7 @@ public extension HTMLElementAttribute.HTMX {
                 case .drop:             return "drop"
                 case .abort:            return "abort"
                 case .replace:          return "replace"
-                case .queue(let queue): return "queue " + queue.rawValue
+                case .queue(let queue): return (queue != nil ? "queue " + queue!.rawValue : nil)
             }
         }
     }

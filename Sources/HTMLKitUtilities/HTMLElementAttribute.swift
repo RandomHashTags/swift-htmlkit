@@ -14,7 +14,7 @@ public enum HTMLElementAttribute : Hashable {
     case role(Extra.ariarole? = nil)
 
     case autocapitalize(Extra.autocapitalize? = nil)
-    case autofocus(Bool = false)
+    case autofocus(Bool? = false)
     case `class`([String] = [])
     case contenteditable(Extra.contenteditable? = nil)
     case data(_ id: String, _ value: String? = nil)
@@ -24,13 +24,13 @@ public enum HTMLElementAttribute : Hashable {
     case exportparts([String] = [])
     case hidden(Extra.hidden? = nil)
     case id(String? = nil)
-    case inert(Bool = false)
+    case inert(Bool? = false)
     case inputmode(Extra.inputmode? = nil)
     case `is`(String? = nil)
     case itemid(String? = nil)
     case itemprop(String? = nil)
     case itemref(String? = nil)
-    case itemscope(Bool = false)
+    case itemscope(Bool? = false)
     case itemtype(String? = nil)
     case lang(String? = nil)
     case nonce(String? = nil)
@@ -50,7 +50,7 @@ public enum HTMLElementAttribute : Hashable {
     /// Usually only used if certain browsers need it for compatibility.
     case trailingSlash
 
-    case htmx(_ attribute: HTMLElementAttribute.HTMX)
+    case htmx(_ attribute: HTMLElementAttribute.HTMX? = nil)
 
     case custom(_ id: String, _ value: String?)
 
@@ -60,15 +60,26 @@ public enum HTMLElementAttribute : Hashable {
     // MARK: init rawValue
     public init?(key: String, _ function: FunctionCallExprSyntax) {
         let expression:ExprSyntax = function.arguments.first!.expression
-        func string() -> String         { expression.stringLiteral!.string }
-        func boolean() -> Bool          { expression.booleanLiteral!.literal.text == "true" }
-        func enumeration<T : HTMLInitializable>() -> T {
-            let function:FunctionCallExprSyntax = expression.functionCall!
-            return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
+        func string() -> String?        { expression.stringLiteral?.string }
+        func boolean() -> Bool?         { expression.booleanLiteral?.literal.text == "true" }
+        func enumeration<T : HTMLInitializable>() -> T? {
+            guard let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess else {
+                if let member:MemberAccessExprSyntax = expression.memberAccess {
+                    return T(key: member.declName.baseName.text, arguments: function.arguments) 
+                }
+                return nil
+            }
+            return T(key: member.declName.baseName.text, arguments: function.arguments)
         }
-        func int() -> Int               { Int(expression.integerLiteral!.literal.text) ?? -1 }
+        func int() -> Int? {
+            guard let s:String = expression.integerLiteral?.literal.text else { return nil }
+            return Int(s)
+        }
         func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
-        func float() -> Float           { Float(expression.floatLiteral!.literal.text) ?? -1 }
+        func float() -> Float? {
+            guard let s:String = expression.floatLiteral?.literal.text else { return nil }
+            return Float(s)
+        }
         switch key {
             case "accesskey":             self = .accesskey(string())
             case "ariaattribute":         self = .ariaattribute(enumeration())
@@ -157,11 +168,11 @@ public enum HTMLElementAttribute : Hashable {
             case .htmx(let htmx):
                 switch htmx {
                     case .ws(let value):
-                        return "ws-" + value.key
+                        return (value != nil ? "ws-" + value!.key : "")
                     case .sse(let value):
-                        return "sse-" + value.key
+                        return (value != nil ? "sse-" + value!.key : "")
                     default:
-                        return "hx-" + htmx.key
+                        return (htmx != nil ? "hx-" + htmx!.key : "")
                 }
             case .custom(let id, _):        return id
             case .event(let event, _):      return "on" + event.rawValue
@@ -175,7 +186,7 @@ public enum HTMLElementAttribute : Hashable {
             case .ariaattribute(let value):         return value?.htmlValue
             case .role(let value):                  return value?.rawValue
             case .autocapitalize(let value):        return value?.rawValue
-            case .autofocus(let value):             return value ? "" : nil
+            case .autofocus(let value):             return value == true ? "" : nil
             case .class(let value):                 return value.joined(separator: " ")
             case .contenteditable(let value):       return value?.htmlValue
             case .data(_, let value):          return value
@@ -185,13 +196,13 @@ public enum HTMLElementAttribute : Hashable {
             case .exportparts(let value):           return value.joined(separator: ",")
             case .hidden(let value):                return value?.htmlValue
             case .id(let value):                    return value
-            case .inert(let value):                 return value ? "" : nil
+            case .inert(let value):                 return value == true ? "" : nil
             case .inputmode(let value):             return value?.rawValue
             case .is(let value):                    return value
             case .itemid(let value):                return value
             case .itemprop(let value):              return value
             case .itemref(let value):               return value
-            case .itemscope(let value):             return value ? "" : nil
+            case .itemscope(let value):             return value == true ? "" : nil
             case .itemtype(let value):              return value
             case .lang(let value):                  return value
             case .nonce(let value):                 return value
@@ -208,7 +219,7 @@ public enum HTMLElementAttribute : Hashable {
 
             case .trailingSlash:            return nil
 
-            case .htmx(let htmx):           return htmx.htmlValue
+            case .htmx(let htmx):           return htmx?.htmlValue
             case .custom(_, let value):        return value
             case .event(_, let value):      return value
         }
@@ -241,88 +252,99 @@ public extension HTMLElementAttribute.Extra {
     // MARK: aria attributes
     // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes
     enum ariaattribute : HTMLInitializable {
-        case activedescendant(String)
-        case atomic(Bool)
-        case autocomplete(Autocomplete)
+        case activedescendant(String?)
+        case atomic(Bool?)
+        case autocomplete(Autocomplete?)
 
-        case braillelabel(String)
-        case brailleroledescription(String)
-        case busy(Bool)
+        case braillelabel(String?)
+        case brailleroledescription(String?)
+        case busy(Bool?)
         
-        case checked(Checked)
-        case colcount(Int)
-        case colindex(Int)
-        case colindextext(String)
-        case colspan(Int)
+        case checked(Checked?)
+        case colcount(Int?)
+        case colindex(Int?)
+        case colindextext(String?)
+        case colspan(Int?)
         case controls([String])
-        case current(Current)
+        case current(Current?)
 
         case describedby([String])
-        case description(String)
+        case description(String?)
         case details([String])
-        case disabled(Bool)
-        case dropeffect(DropEffect)
+        case disabled(Bool?)
+        case dropeffect(DropEffect?)
 
-        case errormessage(String)
-        case expanded(Expanded)
+        case errormessage(String?)
+        case expanded(Expanded?)
         
         case flowto([String])
         
-        case grabbed(Grabbed)
+        case grabbed(Grabbed?)
 
-        case haspopup(HasPopup)
-        case hidden(Hidden)
+        case haspopup(HasPopup?)
+        case hidden(Hidden?)
 
-        case invalid(Invalid)
+        case invalid(Invalid?)
 
-        case keyshortcuts(String)
+        case keyshortcuts(String?)
 
-        case label(String)
+        case label(String?)
         case labelledby([String])
-        case level(Int)
-        case live(Live)
+        case level(Int?)
+        case live(Live?)
 
-        case modal(Bool)
-        case multiline(Bool)
-        case multiselectable(Bool)
+        case modal(Bool?)
+        case multiline(Bool?)
+        case multiselectable(Bool?)
 
-        case orientation(Orientation)
+        case orientation(Orientation?)
         case owns([String])
 
-        case placeholder(String)
-        case posinset(Int)
-        case pressed(Pressed)
+        case placeholder(String?)
+        case posinset(Int?)
+        case pressed(Pressed?)
 
-        case readonly(Bool)
+        case readonly(Bool?)
 
-        case relevant(Relevant)
-        case required(Bool)
-        case roledescription(String)
-        case rowcount(Int)
-        case rowindex(Int)
-        case rowindextext(String)
-        case rowspan(Int)
+        case relevant(Relevant?)
+        case required(Bool?)
+        case roledescription(String?)
+        case rowcount(Int?)
+        case rowindex(Int?)
+        case rowindextext(String?)
+        case rowspan(Int?)
 
-        case selected(Selected)
-        case setsize(Int)
-        case sort(Sort)
+        case selected(Selected?)
+        case setsize(Int?)
+        case sort(Sort?)
 
-        case valuemax(Float)
-        case valuemin(Float)
-        case valuenow(Float)
-        case valuetext(String)
+        case valuemax(Float?)
+        case valuemin(Float?)
+        case valuenow(Float?)
+        case valuetext(String?)
 
         public init?(key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String         { expression.stringLiteral!.string }
-            func boolean() -> Bool          { expression.booleanLiteral!.literal.text == "true" }
-            func enumeration<T : HTMLInitializable>() -> T {
-                let function:FunctionCallExprSyntax = expression.functionCall!
-                return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
+            func string() -> String?        { expression.stringLiteral?.string }
+            func boolean() -> Bool?         { expression.booleanLiteral?.literal.text == "true" }
+            func enumeration<T : HTMLInitializable>() -> T? {
+                guard let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess else {
+                    if let member:MemberAccessExprSyntax = expression.memberAccess {
+                        return T(key: member.declName.baseName.text, arguments: arguments) 
+                    }
+                    return nil
+                }
+                return T(key: member.declName.baseName.text, arguments: function.arguments)
             }
-            func int() -> Int               { Int(expression.integerLiteral!.literal.text) ?? -1 }
+            func int() -> Int? {
+                guard let s:String = expression.integerLiteral?.literal.text else { return nil }
+                return Int(s)
+            }
             func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
-            func float() -> Float           { Float(expression.floatLiteral!.literal.text) ?? -1 }
+            func float() -> Float? {
+                guard let s:String = expression.floatLiteral?.literal.text else { return nil }
+                return Float(s)
+            }
             switch key {
                 case "activedescendant":       self = .activedescendant(string())
                 case "atomic":                 self = .atomic(boolean())
@@ -440,59 +462,63 @@ public extension HTMLElementAttribute.Extra {
         }
 
         public var htmlValue : String? {
+            func unwrap<T>(_ value: T?) -> String? {
+                guard let value:T = value else { return nil }
+                return "\(value)"
+            }
             switch self {
                 case .activedescendant(let value): return value
-                case .atomic(let value): return "\(value)"
-                case .autocomplete(let value): return value.rawValue
+                case .atomic(let value): return unwrap(value)
+                case .autocomplete(let value): return value?.rawValue
                 case .braillelabel(let value): return value
                 case .brailleroledescription(let value): return value
-                case .busy(let value): return "\(value)"
-                case .checked(let value): return value.rawValue
-                case .colcount(let value): return "\(value)"
-                case .colindex(let value): return "\(value)"
+                case .busy(let value): return unwrap(value)
+                case .checked(let value): return value?.rawValue
+                case .colcount(let value): return unwrap(value)
+                case .colindex(let value): return unwrap(value)
                 case .colindextext(let value): return value
-                case .colspan(let value): return "\(value)"
+                case .colspan(let value): return unwrap(value)
                 case .controls(let value): return value.joined(separator: " ")
-                case .current(let value): return value.rawValue
+                case .current(let value): return value?.rawValue
                 case .describedby(let value): return value.joined(separator: " ")
                 case .description(let value): return value
                 case .details(let value): return value.joined(separator: " ")
-                case .disabled(let value): return "\(value)"
-                case .dropeffect(let value): return value.rawValue
+                case .disabled(let value): return unwrap(value)
+                case .dropeffect(let value): return value?.rawValue
                 case .errormessage(let value): return value
-                case .expanded(let value): return value.rawValue
+                case .expanded(let value): return value?.rawValue
                 case .flowto(let value): return value.joined(separator: " ")
-                case .grabbed(let value): return value.rawValue
-                case .haspopup(let value): return value.rawValue
-                case .hidden(let value): return value.rawValue
-                case .invalid(let value): return value.rawValue
+                case .grabbed(let value): return value?.rawValue
+                case .haspopup(let value): return value?.rawValue
+                case .hidden(let value): return value?.rawValue
+                case .invalid(let value): return value?.rawValue
                 case .keyshortcuts(let value): return value
                 case .label(let value): return value
                 case .labelledby(let value): return value.joined(separator: " ")
-                case .level(let value): return "\(value)"
-                case .live(let value): return value.rawValue
-                case .modal(let value): return "\(value)"
-                case .multiline(let value): return "\(value)"
-                case .multiselectable(let value): return "\(value)"
-                case .orientation(let value): return value.rawValue
+                case .level(let value): return unwrap(value)
+                case .live(let value): return value?.rawValue
+                case .modal(let value): return unwrap(value)
+                case .multiline(let value): return unwrap(value)
+                case .multiselectable(let value): return unwrap(value)
+                case .orientation(let value): return value?.rawValue
                 case .owns(let value): return value.joined(separator: " ")
                 case .placeholder(let value): return value
-                case .posinset(let value): return "\(value)"
-                case .pressed(let value): return value.rawValue
-                case .readonly(let value): return "\(value)"
-                case .relevant(let value): return value.rawValue
-                case .required(let value): return "\(value)"
+                case .posinset(let value): return unwrap(value)
+                case .pressed(let value): return value?.rawValue
+                case .readonly(let value): return unwrap(value)
+                case .relevant(let value): return value?.rawValue
+                case .required(let value): return unwrap(value)
                 case .roledescription(let value): return value
-                case .rowcount(let value): return "\(value)"
-                case .rowindex(let value): return "\(value)"
+                case .rowcount(let value): return unwrap(value)
+                case .rowindex(let value): return unwrap(value)
                 case .rowindextext(let value): return value
-                case .rowspan(let value): return "\(value)"
-                case .selected(let value): return value.rawValue
-                case .setsize(let value): return "\(value)"
-                case .sort(let value): return value.rawValue
-                case .valuemax(let value): return "\(value)"
-                case .valuemin(let value): return "\(value)"
-                case .valuenow(let value): return "\(value)"
+                case .rowspan(let value): return unwrap(value)
+                case .selected(let value): return value?.rawValue
+                case .setsize(let value): return unwrap(value)
+                case .sort(let value): return value?.rawValue
+                case .valuemax(let value): return unwrap(value)
+                case .valuemin(let value): return unwrap(value)
+                case .valuenow(let value): return unwrap(value)
                 case .valuetext(let value): return value
             }
         }

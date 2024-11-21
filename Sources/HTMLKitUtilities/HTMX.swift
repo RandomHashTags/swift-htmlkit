@@ -9,58 +9,69 @@ import SwiftSyntax
 
 public extension HTMLElementAttribute {
     enum HTMX : HTMLInitializable {
-        case boost(TrueOrFalse)
-        case confirm(String)
-        case delete(String)
-        case disable(Bool)
-        case disabledElt(String)
-        case disinherit(String)
-        case encoding(String)
-        case ext(String)
+        case boost(TrueOrFalse?)
+        case confirm(String?)
+        case delete(String?)
+        case disable(Bool?)
+        case disabledElt(String?)
+        case disinherit(String?)
+        case encoding(String?)
+        case ext(String?)
         case headers(js: Bool, [String:String])
-        case history(TrueOrFalse)
-        case historyElt(Bool)
-        case include(String)
-        case indicator(String)
-        case inherit(String)
-        case params(Params)
-        case patch(String)
-        case preserve(Bool)
-        case prompt(String)
-        case put(String)
-        case replaceURL(URL)
+        case history(TrueOrFalse?)
+        case historyElt(Bool?)
+        case include(String?)
+        case indicator(String?)
+        case inherit(String?)
+        case params(Params?)
+        case patch(String?)
+        case preserve(Bool?)
+        case prompt(String?)
+        case put(String?)
+        case replaceURL(URL?)
         case request(js: Bool, timeout: String?, credentials: String?, noHeaders: String?)
         case sync(String, strategy: SyncStrategy?)
-        case validate(TrueOrFalse)
+        case validate(TrueOrFalse?)
 
-        case get(String)
-        case post(String)
-        case on(Event, String)
-        case onevent(HTMLElementAttribute.Extra.event, String)
-        case pushURL(URL)
-        case select(String)
-        case selectOOB(String)
-        case swap(Swap)
-        case swapOOB(String)
-        case target(String)
-        case trigger(String)
-        case vals(String)
+        case get(String?)
+        case post(String?)
+        case on(Event?, String)
+        case onevent(HTMLElementAttribute.Extra.event?, String)
+        case pushURL(URL?)
+        case select(String?)
+        case selectOOB(String?)
+        case swap(Swap?)
+        case swapOOB(String?)
+        case target(String?)
+        case trigger(String?)
+        case vals(String?)
 
-        case sse(ServerSentEvents)
-        case ws(WebSocket)
+        case sse(ServerSentEvents?)
+        case ws(WebSocket?)
 
         // MARK: init
         public init?(key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String         { expression.stringLiteral!.string }
-            func boolean() -> Bool          { expression.booleanLiteral!.literal.text == "true" }
-            func enumeration<T : HTMLInitializable>() -> T {
-                let function:FunctionCallExprSyntax = expression.functionCall!
-                return T(key: function.calledExpression.memberAccess!.declName.baseName.text, arguments: function.arguments)!
+            func string() -> String?        { expression.stringLiteral?.string }
+            func boolean() -> Bool?         { expression.booleanLiteral?.literal.text == "true" }
+            func enumeration<T : HTMLInitializable>() -> T? {
+                guard let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess else {
+                    if let member:MemberAccessExprSyntax = expression.memberAccess {
+                        return T(key: member.declName.baseName.text, arguments: arguments) 
+                    }
+                    return nil
+                }
+                return T(key: member.declName.baseName.text, arguments: function.arguments)
             }
-            func int() -> Int               { Int(expression.integerLiteral!.literal.text) ?? -1 }
+            func int() -> Int? {
+                guard let s:String = expression.integerLiteral?.literal.text else { return nil }
+                return Int(s)
+            }
             func array_string() -> [String] { expression.array!.elements.map({ $0.expression.stringLiteral!.string }) }
-            func float() -> Float           { Float(expression.floatLiteral!.literal.text) ?? -1 }
+            func float() -> Float? {
+                guard let s:String = expression.floatLiteral?.literal.text else { return nil }
+                return Float(s)
+            }
             switch key {
                 case "boost": self = .boost(enumeration())
                 case "confirm": self = .confirm(string())
@@ -207,8 +218,8 @@ public extension HTMLElementAttribute {
 
                 case .get(_): return "get"
                 case .post(_): return "post"
-                case .on(let event, _): return "on:" + event.key
-                case .onevent(let event, _): return "on:" + event.rawValue
+                case .on(let event, _): return (event != nil ? "on:" + event!.key : "")
+                case .onevent(let event, _): return (event != nil ? "on:" + event!.rawValue : "")
                 case .pushURL(_): return "push-url"
                 case .select(_): return "select"
                 case .selectOOB(_): return "select-oob"
@@ -218,15 +229,15 @@ public extension HTMLElementAttribute {
                 case .trigger(_): return "trigger"
                 case .vals(_): return "vals"
 
-                case .sse(let event): return "sse-" + event.key
-                case .ws(let value): return "ws-" + value.key
+                case .sse(let event): return (event != nil ? "sse-" + event!.key : "")
+                case .ws(let value): return (value != nil ? "ws-" + value!.key : "")
             }
         }
 
         //  MARK: htmlValue
         public var htmlValue : String? {
             switch self {
-                case .boost(let value): return value.rawValue
+                case .boost(let value): return value?.rawValue
                 case .confirm(let value): return value
                 case .delete(let value): return value
                 case .disable(_): return ""
@@ -236,17 +247,17 @@ public extension HTMLElementAttribute {
                 case .ext(let value): return value
                 case .headers(let js, let headers):
                     return (js ? "js:" : "") + "{" + headers.map({ "\\\"" + $0.key + "\\\":\\\"" + $0.value + "\\\"" }).joined(separator: ",") + "}"
-                case .history(let value): return value.rawValue
+                case .history(let value): return value?.rawValue
                 case .historyElt(_): return ""
                 case .include(let value): return value
                 case .indicator(let value): return value
                 case .inherit(let value): return value
-                case .params(let params): return params.htmlValue
+                case .params(let params): return params?.htmlValue
                 case .patch(let value): return value
                 case .preserve(_): return ""
                 case .prompt(let value): return value
                 case .put(let value): return value
-                case .replaceURL(let url): return url.htmlValue
+                case .replaceURL(let url): return url?.htmlValue
                 case .request(let js, let timeout, let credentials, let noHeaders):
                     if let timeout:String = timeout {
                         return js ? "js: timeout:\(timeout)" : "{\\\"timeout\\\":\(timeout)}"
@@ -259,23 +270,23 @@ public extension HTMLElementAttribute {
                     }
                 case .sync(let selector, let strategy):
                     return selector + (strategy == nil ? "" : ":" + strategy!.htmlValue!)
-                case .validate(let value): return value.rawValue
+                case .validate(let value): return value?.rawValue
                 
                 case .get(let value):  return value
                 case .post(let value): return value
                 case .on(_, let value): return value
                 case .onevent(_, let value): return value
-                case .pushURL(let url): return url.htmlValue
+                case .pushURL(let url): return url?.htmlValue
                 case .select(let value): return value
                 case .selectOOB(let value): return value
-                case .swap(let swap): return swap.rawValue
+                case .swap(let swap): return swap?.rawValue
                 case .swapOOB(let value): return value
                 case .target(let value): return value
                 case .trigger(let value): return value
                 case .vals(let value): return value
 
-                case .sse(let value): return value.htmlValue
-                case .ws(let value): return value.htmlValue
+                case .sse(let value): return value?.htmlValue
+                case .ws(let value): return value?.htmlValue
             }
         }
     }
