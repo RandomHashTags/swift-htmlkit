@@ -65,12 +65,7 @@ public extension HTMLElementAttribute {
                 case "disinherit": self = .disinherit(string())
                 case "encoding": self = .encoding(string())
                 case "ext": self = .ext(string())
-                case "headers": // TODO: fix
-                    //let dictionary = expression.dictionary!
-                    var js:Bool = false
-                    var headers:[String:String] = [:]
-                    self = .headers(js: js, headers)
-                    break
+                case "headers": self = .headers(js: boolean() ?? false, arguments.last!.expression.dictionary_string_string(context: context, key: key))
                 case "history": self = .history(enumeration())
                 case "historyElt": self = .historyElt(boolean())
                 case "include": self = .include(string())
@@ -118,46 +113,20 @@ public extension HTMLElementAttribute {
                     }
                     self = .request(js: javascript, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
                     break*/
-                case "sync": // TODO: fix
-                    return nil
-                    /*
-                    let string:String = literal()
-                    let values:[Substring] = string.split(separator: ",")
-                    var key:Substring = values[0]
-                    key.removeLast() // "
-                    var strategy:SyncStrategy? = nil
-                    var strategy_string:Substring = values[1].split(separator: ":")[1]
-                    if !strategy_string.hasSuffix("nil") {
-                        while (strategy_string.first?.isWhitespace ?? false) || strategy_string.first == "." {
-                            strategy_string.removeFirst()
-                        }
-                        strategy = SyncStrategy(rawValue: String(strategy_string))
-                    }
-                    self = .sync(String(key), strategy: strategy)
-                    break*/
+                case "sync":
+                    guard let s:String = string() else { return nil }
+                    self = .sync(s, strategy: arguments.last!.expression.enumeration(context: context, key: key, arguments: arguments))
                 case "validate": self = .validate(enumeration())
 
                 case "get": self = .get(string())
                 case "post": self = .post(string())
-                case "on", "onevent": // TODO: fix
-                    return nil
-                    /*
-                    let string:String = literal()
-                    let values:[Substring] = string.split(separator: ",")
-                    let event_string:String = String(values[0])
-                    var value:String = String(string[values[1].startIndex...])
-                    while (value.first?.isWhitespace ?? false) || value.first == "\"" {
-                        value.removeFirst()
-                    }
-                    value.removeLast()
+                case "on", "onevent":
+                    guard let s:String = arguments.last!.expression.string(context: context, key: key) else { return nil }
                     if key == "on" {
-                        let event:Event = Event(rawValue: event_string)!
-                        self = .on(event, value)
+                        self = .on(enumeration(), s)
                     } else {
-                        let event:HTMLElementAttribute.Extra.event = .init(rawValue: event_string)!
-                        self = .onevent(event, value)
+                        self = .onevent(enumeration(), s)
                     }
-                    break*/
                 case "pushURL": self = .pushURL(enumeration())
                 case "select": self = .select(string())
                 case "selectOOB": self = .selectOOB(string())
@@ -230,7 +199,7 @@ public extension HTMLElementAttribute {
                 case .encoding(let value): return value
                 case .ext(let value): return value
                 case .headers(let js, let headers):
-                    return (js ? "js:" : "") + "{" + headers.map({ "\\\"" + $0.key + "\\\":\\\"" + $0.value + "\\\"" }).joined(separator: ",") + "}"
+                    return (js ? "js:" : "") + "{" + headers.map({ item in #"\"\#(item.key)\":\"\#(item.value)\""# }).joined(separator: ",") + "}"
                 case .history(let value): return value?.rawValue
                 case .historyElt(let value): return value ?? false ? "" : nil
                 case .include(let value): return value
@@ -271,6 +240,20 @@ public extension HTMLElementAttribute {
 
                 case .sse(let value): return value?.htmlValue
                 case .ws(let value): return value?.htmlValue
+            }
+        }
+
+        public var htmlValueIsVoidable : Bool {
+            switch self {
+                case .disable(_), .historyElt(_), .preserve(_):
+                    return true
+                case .ws(let value):
+                    switch value {
+                        case .send(_): return true
+                        default: return false
+                    }
+                default:
+                    return false
             }
         }
     }

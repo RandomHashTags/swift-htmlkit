@@ -106,10 +106,9 @@ public extension HTMLKitUtilities {
     ) -> CustomStringConvertible? {
         if let expansion:MacroExpansionExprSyntax = child.expression.macroExpansion {
             return "" // TODO: fix?
-        } else if let string:HTMLElement = parse_element(context: context, expr: child.expression) {
-            return string
-        } else if var string:String = parse_literal_value(context: context, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value(key: "") {
-            string.escapeHTML(escapeAttributes: false)
+        } else if let element:HTMLElement = parse_element(context: context, expr: child.expression) {
+            return element
+        } else if let string:String = parse_literal_value(context: context, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value(key: "") {
             return string
         } else {
             unallowed_expression(context: context, node: child)
@@ -203,8 +202,8 @@ public extension HTMLKitUtilities {
                         }
                         break
                 }
-                return .interpolation("\(function)")
             }
+            return .interpolation("\(function)")
         }
         if let member:MemberAccessExprSyntax = expression.memberAccess {
             return .interpolation("\(member)")
@@ -325,6 +324,7 @@ package extension SyntaxProtocol {
     var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
     var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
     var array : ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
+    var dictionary : DictionaryExprSyntax? { self.as(DictionaryExprSyntax.self) }
     var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
     var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
     var functionCall : FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
@@ -358,6 +358,17 @@ package extension ExprSyntax {
     }
     func array_string(context: some MacroExpansionContext, key: String) -> [String] {
         array?.elements.compactMap({ $0.expression.string(context: context, key: key) }) ?? []
+    }
+    func dictionary_string_string(context: some MacroExpansionContext, key: String) -> [String:String] {
+        var d:[String:String] = [:]
+        if let elements:DictionaryElementListSyntax = dictionary?.content.as(DictionaryElementListSyntax.self) {
+            for element in elements {
+                if let key:String = element.key.string(context: context, key: key), let value:String = element.value.string(context: context, key: key) {
+                    d[key] = value
+                }
+            }
+        }
+        return d
     }
     func float(context: some MacroExpansionContext, key: String) -> Float? {
         guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }

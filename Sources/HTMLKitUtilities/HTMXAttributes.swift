@@ -151,6 +151,8 @@ public extension HTMLElementAttribute.HTMX {
                 case .list(let list): return list.joined(separator: ",")
             }
         }
+
+        public var htmlValueIsVoidable : Bool { false }
     }
 
     // MARK: Swap
@@ -201,6 +203,8 @@ public extension HTMLElementAttribute.HTMX {
                 case .queue(let queue): return (queue != nil ? "queue " + queue!.rawValue : nil)
             }
         }
+
+        public var htmlValueIsVoidable : Bool { false }
     }
 
     // MARK: URL
@@ -232,6 +236,8 @@ public extension HTMLElementAttribute.HTMX {
                 case .url(let url): return url.hasPrefix("http://") || url.hasPrefix("https://") ? url : (url.first == "/" ? "" : "/") + url
             }
         }
+
+        public var htmlValueIsVoidable : Bool { false }
     }
 }
 
@@ -268,6 +274,8 @@ public extension HTMLElementAttribute.HTMX {
                     return value
             }
         }
+
+        public var htmlValueIsVoidable : Bool { false }
     }
 }
 
@@ -299,6 +307,13 @@ public extension HTMLElementAttribute.HTMX {
             switch self {
                 case .connect(let value): return value
                 case .send(let value): return value ?? false ? "" : nil
+            }
+        }
+
+        public var htmlValueIsVoidable : Bool {
+            switch self {
+                case .send(_): return true
+                default: return false
             }
         }
 

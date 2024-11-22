@@ -221,4 +221,15 @@ public enum HTMLElementAttribute : Hashable {
             case .event(_, let value):      return value
         }
     }
+
+    public var htmlValueIsVoidable : Bool {
+        switch self {
+            case .autofocus(_), .hidden(_), .inert(_), .itemscope(_):
+                return true
+            case .htmx(let value):
+                return value?.htmlValueIsVoidable ?? false
+            default:
+                return false
+        }
+    }
 }

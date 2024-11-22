@@ -14,10 +14,12 @@ public protocol HTMLInitializable : Hashable {
 
     var key : String { get }
     var htmlValue : String? { get }
+    var htmlValueIsVoidable : Bool { get }
 }
 public extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
     var key : String { rawValue }
     var htmlValue : String? { rawValue }
+    var htmlValueIsVoidable : Bool { false }
 
     init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
         guard let value:Self = .init(rawValue: key) else { return nil }
@@ -362,6 +364,8 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
+        public var htmlValueIsVoidable : Bool { false }
+
         public enum Autocomplete : String, HTMLInitializable {
             case none, inline, list, both
         }
@@ -602,6 +606,8 @@ public extension HTMLElementAttribute.Extra {
                 case .custom(let value): return "--" + value
             }
         }
+
+        public var htmlValueIsVoidable : Bool { false }
     }
 
     // MARK: contenteditable
@@ -679,6 +685,13 @@ public extension HTMLElementAttribute.Extra {
             switch self {
                 case .empty: return ""
                 case .filename(let value): return value
+            }
+        }
+
+        public var htmlValueIsVoidable : Bool {
+            switch self {
+                case .empty: return true
+                default: return false
             }
         }
     }
