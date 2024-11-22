@@ -62,8 +62,8 @@ extension InterpolationTests {
 
 extension InterpolationTests {
     static let spongebob:String = "Spongebob Squarepants"
-    static let patrick:StaticString = "Patrick Star"
-    static func spongebobCharacter(_ string: String) -> StaticString {
+    static let patrick:String = "Patrick Star"
+    static func spongebobCharacter(_ string: String) -> String {
         switch string {
         case "spongebob": return "Spongebob Squarepants"
         case "patrick":   return "Patrick Star"
@@ -71,14 +71,14 @@ extension InterpolationTests {
         }
     }
     
-    /*@Test func third_party_literal() {
+    @Test func third_party_literal() {
         var string:String = #html(div(attributes: [.title(InterpolationTests.spongebob)]))
         #expect(string == "<div title=\"Spongebob Squarepants\"></div>")
 
         string = #html(div(attributes: [.title(InterpolationTests.patrick)]))
         #expect(string == "<div title=\"Patrick Star\"></div>")
 
-        var static_string:StaticString = #html(div(attributes: [.title(StaticString("Mr. Crabs"))]))
+        var static_string:StaticString = #html(div(attributes: [.title("Mr. Crabs")]))
         #expect(static_string == "<div title=\"Mr. Crabs\"></div>")
 
         static_string = #html(div(attributes: [.title("Mr. Crabs")]))
@@ -87,5 +87,5 @@ extension InterpolationTests {
     @Test func third_party_func() {
         let string:String = #html(div(attributes: [.title(InterpolationTests.spongebobCharacter("patrick"))]))
         #expect(string == "<div title=\"Patrick Star\"></div>")
-    }*/
+    }
 }

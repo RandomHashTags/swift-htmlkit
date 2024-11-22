@@ -147,7 +147,7 @@ public struct custom : HTMLElement {
     public var attributes:[HTMLElementAttribute]
     public var innerHTML:[CustomStringConvertible]
 
-    public init(context: some MacroExpansionContext, _ children: SyntaxChildren) { // TODO: fix
+    public init(context: some MacroExpansionContext, _ children: SyntaxChildren) {
         let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children)
         tag = data.attributes["tag"] as? String ?? ""
         isVoid = data.attributes["isVoid"] as? Bool ?? false

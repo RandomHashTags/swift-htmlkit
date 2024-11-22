@@ -77,7 +77,7 @@ public enum HTMLElementAttribute : Hashable {
         }
         func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
         func float() -> Float? {
-            guard let s:String = expression.floatLiteral?.literal.text else { return nil }
+            guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
             return Float(s)
         }
         switch key {
@@ -88,7 +88,15 @@ public enum HTMLElementAttribute : Hashable {
             case "autofocus":             self = .autofocus(boolean())
             case "class":                 self = .class(array_string())
             case "contenteditable":       self = .contenteditable(enumeration())
-            case "data":                  self = .data("", "") // TODO: fix
+            case "data", "custom":
+                guard let id:String = string(), let value:String = function.arguments.last?.expression.stringLiteral?.string else {
+                    return nil
+                }
+                if key == "data" {
+                    self = .data(id, value)
+                } else {
+                    self = .custom(id, value)
+                }
             case "dir":                   self = .dir(enumeration())
             case "draggable":             self = .draggable(enumeration())
             case "enterkeyhint":          self = .enterkeyhint(enumeration())
@@ -117,8 +125,11 @@ public enum HTMLElementAttribute : Hashable {
             case "writingsuggestions":    self = .writingsuggestions(enumeration())
             case "trailingSlash":         self = .trailingSlash
             case "htmx":                  self = .htmx(enumeration())
-            case "custom":                self = .custom("", "") // TODO: fix
-            case "event":                 self = .event(.click, "") // TODO: fix
+            case "event":
+                guard let event:HTMLElementAttribute.Extra.event = enumeration(), let value:String = function.arguments.last?.expression.stringLiteral?.string else {
+                    return nil
+                }
+                self = .event(event, value)
             default: return nil
         }
     }

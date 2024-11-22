@@ -10,7 +10,7 @@
 /// ### Interpolation Promotion
 /// Swift HTMLKit tries to [promote](https://github.com/RandomHashTags/swift-htmlkit/blob/94793984763308ef5275dd9f71ea0b5e83fea417/Sources/HTMLKitMacros/HTMLElement.swift#L423) known interpolation at compile time with an equivalent string literal for the best performance, regardless of encoding.
 /// It is currently limited due to macro expansions being sandboxed and lexical contexts/AST not being available for macro arguments.
-/// This means referencing content known at compile time in a html macro won't get promoted to its expected value.
+/// This means referencing content in an html macro won't get promoted to its expected value.
 /// [Read more about this limitation](https://forums.swift.org/t/swift-lexical-lookup-for-referenced-stuff-located-outside-scope-current-file/75776/6).
 /// 
 /// #### Promotion Example
@@ -26,7 +26,7 @@
 /// ```swift
 /// let string:StaticString = "Test"
 /// let _:StaticString = #html(div(string)) // ❌ promotion cannot be applied; StaticString not allowed
-/// let _:String = #html(div(string)) // ⚠️ promotion cannot be applied; compiled as "<div>\(string)</div>"
+/// let _:String = #html(div(string)) // ⚠️ promotion cannot be applied; compiles to "<div>\(string)</div>"
 /// ```
 /// 
 public enum HTMLEncoding {
@@ -62,4 +62,16 @@ public enum HTMLEncoding {
     /// ```
     /// 
     case custom(_ logic: String)
+
+    public init?(rawValue: String) {
+        switch rawValue {
+            case "string": self = .string
+            case "utf8Bytes": self = .utf8Bytes
+            case "utf8CString": self = .utf8CString
+            case "utf16Bytes": self = .utf16Bytes
+            case "foundationData": self = .foundationData
+            case "byteBuffer": self = .byteBuffer
+            default: return nil
+        }
+    }
 }

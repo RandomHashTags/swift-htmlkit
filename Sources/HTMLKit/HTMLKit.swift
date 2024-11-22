@@ -7,10 +7,6 @@
 
 @_exported import HTMLKitUtilities
 
-#if canImport(Foundation)
-import struct Foundation.Data
-#endif
-
 // MARK: StaticString equality
 public extension StaticString {
     static func == (left: Self, right: Self) -> Bool { left.description == right.description }

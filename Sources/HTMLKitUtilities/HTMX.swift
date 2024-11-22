@@ -69,7 +69,7 @@ public extension HTMLElementAttribute {
             }
             func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
             func float() -> Float? {
-                guard let s:String = expression.floatLiteral?.literal.text else { return nil }
+                guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
                 return Float(s)
             }
             switch key {
@@ -240,7 +240,7 @@ public extension HTMLElementAttribute {
                 case .boost(let value): return value?.rawValue
                 case .confirm(let value): return value
                 case .delete(let value): return value
-                case .disable(_): return ""
+                case .disable(let value): return value ?? false ? "" : nil
                 case .disabledElt(let value): return value
                 case .disinherit(let value): return value
                 case .encoding(let value): return value
@@ -248,13 +248,13 @@ public extension HTMLElementAttribute {
                 case .headers(let js, let headers):
                     return (js ? "js:" : "") + "{" + headers.map({ "\\\"" + $0.key + "\\\":\\\"" + $0.value + "\\\"" }).joined(separator: ",") + "}"
                 case .history(let value): return value?.rawValue
-                case .historyElt(_): return ""
+                case .historyElt(let value): return value ?? false ? "" : nil
                 case .include(let value): return value
                 case .indicator(let value): return value
                 case .inherit(let value): return value
                 case .params(let params): return params?.htmlValue
                 case .patch(let value): return value
-                case .preserve(_): return ""
+                case .preserve(let value): return value ?? false ? "" : nil
                 case .prompt(let value): return value
                 case .put(let value): return value
                 case .replaceURL(let url): return url?.htmlValue

@@ -27,10 +27,7 @@ struct ElementTests {
         string = #html(p("\(unescaped.escapingHTML(escapeAttributes: false))"))
         #expect(string == expected_result)
 
-        /*expected_result = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
-        string = #div(attributes: [.title(StaticString("<p>"))], StaticString("<p></p>")).description
-        #expect(string == expected_result)*/
-
+        expected_result = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
         string = #html(div(attributes: [.title("<p>")], StaticString("<p></p>")))
         #expect(string == expected_result)
 

@@ -42,6 +42,7 @@ enum HTMLElements : DeclarationMacro {
             //string += "public let isVoid:Bool = false\npublic var attributes:[HTMLElementAttribute] = []"
             var attribute_declarations:String = ""
             var attributes:[(String, String, String)] = []
+            var other_attributes:[(String, String)] = []
             if let test = item.value.as(ArrayExprSyntax.self)?.elements {
                 attributes.reserveCapacity(test.count)
                 for element in test {
@@ -62,6 +63,13 @@ enum HTMLElements : DeclarationMacro {
                         } else {
                             var isArray:Bool = false
                             let (value_type, default_value, value_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, label.expression)
+                            switch value_type_literal {
+                                case .otherAttribute(let other):
+                                    other_attributes.append((key, other))
+                                    break
+                                default:
+                                    break
+                            }
                             attribute_declarations += "\npublic var \(key):\(value_type)\(default_value.split(separator: "=", omittingEmptySubsequences: false)[0])"
                             attributes.append((key, value_type, default_value))
                         }
@@ -90,7 +98,8 @@ enum HTMLElements : DeclarationMacro {
             initializers += "self.innerHTML = innerHTML\n}\n"
 
             initializers += "public init?(context: some MacroExpansionContext, _ children: SyntaxChildren) {\n"
-            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children)\n"
+            let other_attributes_string:String = other_attributes.isEmpty ? "" : ", otherAttributes: [" + other_attributes.map({ "\"" + $0.0 + "\":\"" + $0.1 + "\"" }).joined(separator: ",") + "]"
+            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children\(other_attributes_string))\n"
             initializers += "self.attributes = data.globalAttributes\n"
             for (key, value_type, _) in attributes {
                 var value:String = "as? \(value_type)"
@@ -199,7 +208,7 @@ enum HTMLElements : DeclarationMacro {
                 let value:Bool = expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
                 return ("Bool", "= \(value)", .booleanDefaultValue(value))
             case "cssUnit":
-                return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil", .string)
+                return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil", .cssUnit)
             default:
                 return ("Float", "? = nil", .float)
         }

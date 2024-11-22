@@ -104,8 +104,9 @@ public extension HTMLElementAttribute {
         case percent(_ value: Float?)
 
         public init?(key: String, arguments: LabeledExprListSyntax) {
+            let expression:ExprSyntax = arguments.first!.expression
             func float() -> Float? {
-                guard let s:String = arguments.first!.expression.floatLiteral?.literal.text else { return nil }
+                guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
                 return Float(s)
             }
             switch key {
@@ -168,7 +169,8 @@ public extension HTMLElementAttribute {
                         .viewportMin(let v),
                         .viewportMax(let v),
                         .percent(let v):
-                    return String(describing: v)
+                    guard let v:Float = v else { return nil }
+                    return String(describing: v) + suffix
             }
         }
 

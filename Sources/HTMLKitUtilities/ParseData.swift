@@ -13,7 +13,8 @@ public extension HTMLKitUtilities {
     // MARK: Parse Arguments
     static func parse_arguments(
         context: some MacroExpansionContext,
-        children: SyntaxChildren
+        children: SyntaxChildren,
+        otherAttributes: [String:String] = [:]
     ) -> ElementData {
         var encoding:HTMLEncoding = HTMLEncoding.string
         var global_attributes:[HTMLElementAttribute] = []
@@ -26,14 +27,7 @@ public extension HTMLKitUtilities {
                 if var key:String = child.label?.text {
                     if key == "encoding" {
                         if let key:String = child.expression.memberAccess?.declName.baseName.text {
-                            switch key {
-                                case "string": encoding = .string
-                                case "utf8Bytes": encoding = .utf8Bytes
-                                case "utf16Bytes": encoding = .utf16Bytes
-                                case "foundationData": encoding = .foundationData
-                                case "byteBuffer": encoding = .byteBuffer
-                                default: break
-                            }
+                            encoding = HTMLEncoding(rawValue: key) ?? .string
                         } else if let custom:FunctionCallExprSyntax = child.expression.functionCall {
                             encoding = .custom(custom.arguments.first!.expression.stringLiteral!.string)
                         }
@@ -42,10 +36,13 @@ public extension HTMLKitUtilities {
                     } else if key == "attributes" {
                         (global_attributes, trailingSlash) = parse_global_attributes(context: context, array: child.expression.array!.elements, lookupFiles: lookupFiles)
                     } else {
+                        var target_key:String = key
                         if key == "acceptCharset" {
                             key = "accept-charset"
+                        } else if let target:String = otherAttributes[key] {
+                            target_key = target
                         }
-                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(key: key, expr: child.expression) {
+                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(key: target_key, expr: child.expression) {
                             attributes[key] = test
                         } else if let string:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             switch string {
@@ -77,13 +74,14 @@ public extension HTMLKitUtilities {
         for element in array {
             if let function:FunctionCallExprSyntax = element.expression.functionCall {
                 let first_expression:ExprSyntax = function.arguments.first!.expression
-                let key:String = function.calledExpression.memberAccess!.declName.baseName.text
+                var key:String = function.calledExpression.memberAccess!.declName.baseName.text
                 if key.contains(" ") {
                     context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
                 } else if keys.contains(key) {
                     global_attribute_already_defined(context: context, attribute: key, node: first_expression)
                 } else if let attr:HTMLElementAttribute = HTMLElementAttribute.init(key: key, function) {
                     attributes.append(attr)
+                    key = attr.key
                     keys.insert(key)
                 }
             } else if let member:String = element.expression.memberAccess?.declName.baseName.text, member == "trailingSlash" {
@@ -98,8 +96,7 @@ public extension HTMLKitUtilities {
         return (attributes, trailingSlash)
     }
     static func global_attribute_already_defined(context: some MacroExpansionContext, attribute: String, node: some SyntaxProtocol) {
-        // TODO: reenable
-        //context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + attribute + "\" is already defined.")))
+        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + attribute + "\" is already defined.")))
     }
     // MARK: Parse innerHTML
     static func parse_inner_html(

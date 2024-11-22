@@ -66,7 +66,7 @@ extension HTMLElementAttribute {
                 case "formmethod": return get(formmethod.self)
                 case "formtarget": return get(formtarget.self)
                 case "hidden": return get(hidden.self)
-                case "httpEquiv": return get(httpequiv.self)
+                case "httpequiv": return get(httpequiv.self)
                 case "inputmode": return get(inputmode.self)
                 case "inputtype": return get(inputtype.self)
                 case "kind": return get(kind.self)
@@ -89,6 +89,9 @@ extension HTMLElementAttribute {
                 case "virtualkeyboardpolicy": return get(virtualkeyboardpolicy.self)
                 case "wrap": return get(wrap.self)
                 case "writingsuggestions": return get(writingsuggestions.self)
+
+                case "width": return get(width.self)
+                case "height": return get(height.self)
                 default: return nil
             }
         }
@@ -191,7 +194,7 @@ public extension HTMLElementAttribute.Extra {
             }
             func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
             func float() -> Float? {
-                guard let s:String = expression.floatLiteral?.literal.text else { return nil }
+                guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
                 return Float(s)
             }
             switch key {
