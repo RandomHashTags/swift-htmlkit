@@ -6,6 +6,7 @@
 //
 
 import SwiftSyntax
+import SwiftSyntaxMacros
 
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
@@ -103,7 +104,7 @@ public extension HTMLElementAttribute {
         /// Relative to the parent element
         case percent(_ value: Float?)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
             func float() -> Float? {
                 guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }

@@ -6,6 +6,7 @@
 //
 
 import SwiftSyntax
+import SwiftSyntaxMacros
 
 public extension HTMLElementAttribute {
     enum HTMX : HTMLInitializable {
@@ -50,28 +51,11 @@ public extension HTMLElementAttribute {
         case ws(WebSocket?)
 
         // MARK: init
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String?        { expression.stringLiteral?.string }
-            func boolean() -> Bool?         { expression.booleanLiteral?.literal.text == "true" }
-            func enumeration<T : HTMLInitializable>() -> T? {
-                if let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
-                    return T(key: member.declName.baseName.text, arguments: function.arguments)
-                }
-                if let member:MemberAccessExprSyntax = expression.memberAccess {
-                    return T(key: member.declName.baseName.text, arguments: arguments)
-                }
-                return nil
-            }
-            func int() -> Int? {
-                guard let s:String = expression.integerLiteral?.literal.text else { return nil }
-                return Int(s)
-            }
-            func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
-            func float() -> Float? {
-                guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
-                return Float(s)
-            }
+            func string() -> String?        { expression.string(context: context, key: key) }
+            func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
+            func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
             switch key {
                 case "boost": self = .boost(enumeration())
                 case "confirm": self = .confirm(string())

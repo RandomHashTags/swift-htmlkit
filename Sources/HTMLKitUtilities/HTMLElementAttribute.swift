@@ -6,6 +6,7 @@
 //
 
 import SwiftSyntax
+import SwiftSyntaxMacros
 
 public enum HTMLElementAttribute : Hashable {
     case accesskey(String? = nil)
@@ -58,28 +59,13 @@ public enum HTMLElementAttribute : Hashable {
     case event(Extra.event, _ value: String? = nil)
 
     // MARK: init rawValue
-    public init?(key: String, _ function: FunctionCallExprSyntax) {
+    public init?(context: some MacroExpansionContext, key: String, _ function: FunctionCallExprSyntax) {
         let expression:ExprSyntax = function.arguments.first!.expression
-        func string() -> String?        { expression.stringLiteral?.string }
-        func boolean() -> Bool?         { expression.booleanLiteral?.literal.text == "true" }
-        func enumeration<T : HTMLInitializable>() -> T? {
-            if let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
-                return T(key: member.declName.baseName.text, arguments: function.arguments)
-            }
-            if let member:MemberAccessExprSyntax = expression.memberAccess {
-                return T(key: member.declName.baseName.text, arguments: function.arguments)
-            }
-            return nil
-        }
-        func int() -> Int? {
-            guard let s:String = expression.integerLiteral?.literal.text else { return nil }
-            return Int(s)
-        }
-        func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
-        func float() -> Float? {
-            guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
-            return Float(s)
-        }
+        func string() -> String?        { expression.string(context: context, key: key) }
+        func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
+        func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: function.arguments) }
+        func int() -> Int? { expression.int(context: context, key: key) }
+        func array_string() -> [String] { expression.array_string(context: context, key: key) }
         switch key {
             case "accesskey":             self = .accesskey(string())
             case "ariaattribute":         self = .ariaattribute(enumeration())
@@ -89,7 +75,7 @@ public enum HTMLElementAttribute : Hashable {
             case "class":                 self = .class(array_string())
             case "contenteditable":       self = .contenteditable(enumeration())
             case "data", "custom":
-                guard let id:String = string(), let value:String = function.arguments.last?.expression.stringLiteral?.string else {
+                guard let id:String = string(), let value:String = function.arguments.last?.expression.string(context: context, key: key) else {
                     return nil
                 }
                 if key == "data" {
@@ -126,7 +112,7 @@ public enum HTMLElementAttribute : Hashable {
             case "trailingSlash":         self = .trailingSlash
             case "htmx":                  self = .htmx(enumeration())
             case "event":
-                guard let event:HTMLElementAttribute.Extra.event = enumeration(), let value:String = function.arguments.last?.expression.stringLiteral?.string else {
+                guard let event:HTMLElementAttribute.Extra.event = enumeration(), let value:String = function.arguments.last?.expression.string(context: context, key: key) else {
                     return nil
                 }
                 self = .event(event, value)

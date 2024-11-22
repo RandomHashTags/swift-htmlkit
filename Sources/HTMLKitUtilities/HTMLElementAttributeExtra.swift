@@ -6,10 +6,11 @@
 //
 
 import SwiftSyntax
+import SwiftSyntaxMacros
 
 // MARK: HTMLInitializable
 public protocol HTMLInitializable : Hashable {
-    init?(key: String, arguments: LabeledExprListSyntax)
+    init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax)
 
     var key : String { get }
     var htmlValue : String? { get }
@@ -18,7 +19,7 @@ public extension HTMLInitializable where Self: RawRepresentable, RawValue == Str
     var key : String { rawValue }
     var htmlValue : String? { rawValue }
 
-    init?(key: String, arguments: LabeledExprListSyntax) {
+    init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
         guard let value:Self = .init(rawValue: key) else { return nil }
         self = value
     }
@@ -28,7 +29,7 @@ public extension HTMLInitializable where Self: RawRepresentable, RawValue == Str
 extension HTMLElementAttribute {
     public enum Extra {
 
-        public static func parse(key: String, expr: ExprSyntax) -> (any HTMLInitializable)? {
+        public static func parse(context: some MacroExpansionContext, key: String, expr: ExprSyntax) -> (any HTMLInitializable)? {
             func get<T : HTMLInitializable>(_ type: T.Type) -> T? {
                 let inner_key:String, arguments:LabeledExprListSyntax
                 if let function:FunctionCallExprSyntax = expr.functionCall {
@@ -40,7 +41,7 @@ extension HTMLElementAttribute {
                 } else {
                     return nil
                 }
-                return T(key: inner_key, arguments: arguments)
+                return T(context: context, key: inner_key, arguments: arguments)
             }
             switch key {
                 case "as": return get(`as`.self)
@@ -175,28 +176,14 @@ public extension HTMLElementAttribute.Extra {
         case valuenow(Float?)
         case valuetext(String?)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String?        { expression.stringLiteral?.string }
-            func boolean() -> Bool?         { expression.booleanLiteral?.literal.text == "true" }
-            func enumeration<T : HTMLInitializable>() -> T? {
-                if let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
-                    return T(key: member.declName.baseName.text, arguments: function.arguments)
-                }
-                if let member:MemberAccessExprSyntax = expression.memberAccess {
-                    return T(key: member.declName.baseName.text, arguments: arguments)
-                }
-                return nil
-            }
-            func int() -> Int? {
-                guard let s:String = expression.integerLiteral?.literal.text else { return nil }
-                return Int(s)
-            }
-            func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
-            func float() -> Float? {
-                guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
-                return Float(s)
-            }
+            func string() -> String?        { expression.string(context: context, key: key) }
+            func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
+            func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
+            func int() -> Int? { expression.int(context: context, key: key) }
+            func array_string() -> [String] { expression.array_string(context: context, key: key) }
+            func float() -> Float? { expression.float(context: context, key: key) }
             switch key {
                 case "activedescendant":       self = .activedescendant(string())
                 case "atomic":                 self = .atomic(boolean())
@@ -582,7 +569,7 @@ public extension HTMLElementAttribute.Extra {
         case togglePopover
         case custom(String)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "showModal":     self = .showModal
                 case "close":         self = .close
@@ -673,7 +660,7 @@ public extension HTMLElementAttribute.Extra {
         case empty
         case filename(String)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "empty":    self = .empty
                 case "filename": self = .filename(arguments.first!.expression.stringLiteral!.string)

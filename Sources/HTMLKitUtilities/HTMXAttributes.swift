@@ -6,6 +6,7 @@
 //
 
 import SwiftSyntax
+import SwiftSyntaxMacros
 
 public extension HTMLElementAttribute.HTMX {
     // MARK: TrueOrFalse
@@ -121,9 +122,9 @@ public extension HTMLElementAttribute.HTMX {
         case not([String])
         case list([String])
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func array_string() -> [String] { expression.array?.elements.compactMap({ $0.expression.stringLiteral?.string }) ?? [] }
+            func array_string() -> [String] { expression.array_string(context: context, key: key) }
             switch key {
                 case "all":  self = .all
                 case "none": self = .none
@@ -166,22 +167,14 @@ public extension HTMLElementAttribute.HTMX {
         case drop, abort, replace
         case queue(Queue?)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "drop":    self = .drop
                 case "abort":   self = .abort
                 case "replace": self = .replace
                 case "queue":
                     let expression:ExprSyntax = arguments.first!.expression
-                    func enumeration<T : HTMLInitializable>() -> T? {
-                        if let function:FunctionCallExprSyntax = expression.functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
-                            return T(key: member.declName.baseName.text, arguments: function.arguments)
-                        }
-                        if let member:MemberAccessExprSyntax = expression.memberAccess {
-                            return T(key: member.declName.baseName.text, arguments: arguments)
-                        }
-                        return nil
-                    }
+                    func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
                     self = .queue(enumeration())
                 default:        return nil
             }
@@ -215,7 +208,7 @@ public extension HTMLElementAttribute.HTMX {
         case `true`, `false`
         case url(String)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "true": self = .true
                 case "false": self = .false
@@ -245,12 +238,12 @@ public extension HTMLElementAttribute.HTMX {
 // MARK: Server Sent Events
 public extension HTMLElementAttribute.HTMX {
     enum ServerSentEvents : HTMLInitializable {
-        case connect(String)
-        case swap(String)
-        case close(String)
+        case connect(String?)
+        case swap(String?)
+        case close(String?)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
-            func string() -> String { arguments.first!.expression.stringLiteral!.string }
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+            func string() -> String?        { arguments.first!.expression.string(context: context, key: key) }
             switch key {
                 case "connect": self = .connect(string())
                 case "swap": self = .swap(string())
@@ -281,13 +274,13 @@ public extension HTMLElementAttribute.HTMX {
 // MARK: WebSocket
 public extension HTMLElementAttribute.HTMX {
     enum WebSocket : HTMLInitializable {
-        case connect(String)
-        case send(Bool)
+        case connect(String?)
+        case send(Bool?)
 
-        public init?(key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String { expression.stringLiteral!.string }
-            func boolean() -> Bool  { expression.booleanLiteral!.literal.text == "true" }
+            func string() -> String?        { expression.string(context: context, key: key) }
+            func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
             switch key {
                 case "connect": self = .connect(string())
                 case "send": self = .send(boolean())
@@ -305,7 +298,7 @@ public extension HTMLElementAttribute.HTMX {
         public var htmlValue : String? {
             switch self {
                 case .connect(let value): return value
-                case .send(_): return ""
+                case .send(let value): return value ?? false ? "" : nil
             }
         }
 

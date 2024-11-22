@@ -42,7 +42,7 @@ public extension HTMLKitUtilities {
                         } else if let target:String = otherAttributes[key] {
                             target_key = target
                         }
-                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(key: target_key, expr: child.expression) {
+                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, key: target_key, expr: child.expression) {
                             attributes[key] = test
                         } else if let string:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             switch string {
@@ -50,7 +50,7 @@ public extension HTMLKitUtilities {
                                 case .string(let s), .interpolation(let s): attributes[key] = s
                                 case .int(let i): attributes[key] = i
                                 case .float(let f): attributes[key] = f
-                                case .array(let values): attributes[key] = values
+                                case .array(let a): attributes[key] = a
                             }
                         }
                     }
@@ -79,7 +79,7 @@ public extension HTMLKitUtilities {
                     context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
                 } else if keys.contains(key) {
                     global_attribute_already_defined(context: context, attribute: key, node: first_expression)
-                } else if let attr:HTMLElementAttribute = HTMLElementAttribute.init(key: key, function) {
+                } else if let attr:HTMLElementAttribute = HTMLElementAttribute.init(context: context, key: key, function) {
                     attributes.append(attr)
                     key = attr.key
                     keys.insert(key)
@@ -153,15 +153,15 @@ public extension HTMLKitUtilities {
             //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
+        var string:String = ""
+        switch returnType {
+            case .string(let s), .interpolation(let s): string = s
+            default: return returnType
+        }
         var remaining_interpolation:Int = returnType.isInterpolation ? 1 : 0, interpolation:[ExpressionSegmentSyntax] = []
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
             remaining_interpolation = stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) })
             interpolation = stringLiteral.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) })
-        }
-        var string:String = ""
-        switch returnType {
-            case .interpolation(let i): string = i
-            default: break
         }
         for expr in interpolation {
             string.replace("\(expr)", with: promote_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
@@ -174,11 +174,13 @@ public extension HTMLKitUtilities {
         }
         if remaining_interpolation > 0 {
             returnType = .interpolation(string)
+        } else {
+            returnType = .string(string)
         }
         return returnType
     }
     // MARK: Extract literal
-    static func extract_literal(
+    private static func extract_literal(
         context: some MacroExpansionContext,
         key: String,
         expression: ExprSyntax,
@@ -222,18 +224,21 @@ public extension HTMLKitUtilities {
             }
             var results:[Any] = []
             for element in array.elements {
-                if let string:String = element.expression.stringLiteral?.string {
-                    if string.contains(separator) {
-                        context.diagnose(Diagnostic(node: element.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + key + "\".")))
-                        return nil
-                    }
-                    results.append(string)
-                } else if let string:String = element.expression.integerLiteral?.literal.text {
-                    results.append(Int(string)!)
-                } else if let string:String = element.expression.floatLiteral?.literal.text {
-                    results.append(Float(string)!)
-                } else if let attribute:any HTMLInitializable = HTMLElementAttribute.Extra.parse(key: key, expr: element.expression) {
+                if let attribute:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, key: key, expr: element.expression) {
                     results.append(attribute)
+                } else if let literal:LiteralReturnType = parse_literal_value(context: context, key: key, expression: element.expression, lookupFiles: lookupFiles) {
+                    switch literal {
+                        case .string(let string), .interpolation(let string):
+                            if string.contains(separator) {
+                                context.diagnose(Diagnostic(node: element.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + key + "\".")))
+                                return nil
+                            }
+                            results.append(string)
+                        case .int(let i): results.append(i)
+                        case .float(let f): results.append(f)
+                        case .array(let a): results.append(a)
+                        case .boolean(let b): results.append(b)
+                    }
                 }
             }
             return .array(results)
@@ -330,6 +335,34 @@ package extension SyntaxChildren.Element {
 }
 package extension StringLiteralExprSyntax {
     var string : String { "\(segments)" }
+}
+package extension ExprSyntax {
+    func string(context: some MacroExpansionContext, key: String) -> String? {
+        return HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key)
+    }
+    func boolean(context: some MacroExpansionContext, key: String) -> Bool? {
+        booleanLiteral?.literal.text == "true"
+    }
+    func enumeration<T : HTMLInitializable>(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) -> T? {
+        if let function:FunctionCallExprSyntax = functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
+            return T(context: context, key: member.declName.baseName.text, arguments: function.arguments)
+        }
+        if let member:MemberAccessExprSyntax = memberAccess {
+            return T(context: context, key: member.declName.baseName.text, arguments: arguments)
+        }
+        return nil
+    }
+    func int(context: some MacroExpansionContext, key: String) -> Int? {
+        guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }
+        return Int(s)
+    }
+    func array_string(context: some MacroExpansionContext, key: String) -> [String] {
+        array?.elements.compactMap({ $0.expression.string(context: context, key: key) }) ?? []
+    }
+    func float(context: some MacroExpansionContext, key: String) -> Float? {
+        guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }
+        return Float(s)
+    }
 }
 
 // MARK: DiagnosticMsg
