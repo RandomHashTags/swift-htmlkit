@@ -64,11 +64,11 @@ private extension HTMLElementMacro {
         /*if elementType == .escapeHTML {
             let array:[CustomStringConvertible] = children.compactMap({
                 guard let child:LabeledExprSyntax = $0.labeled else { return nil }
-                return HTMLKitUtilities.parse_inner_html(context: context, child: child, lookupFiles: [])
+                return HTMLKitUtilities.parseInnerHTML(context: context, child: child, lookupFiles: [])
             })
             return array.map({ String(describing: $0) }).joined()
         }*/
-        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children)
+        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: children)
         return (data.innerHTML.map({ String(describing: $0) }).joined(), data.encoding)
     }
 }

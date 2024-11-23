@@ -46,9 +46,9 @@ public enum HTMLElementAttribute : Hashable {
     case virtualkeyboardpolicy(Extra.virtualkeyboardpolicy? = nil)
     case writingsuggestions(Extra.writingsuggestions? = nil)
 
-    /// This attribute adds a space and slash (" /") character before closing a void element tag.
-    ///
-    /// Usually only used if certain browsers need it for compatibility.
+    /// This attribute adds a space and forward slash character (" /") before closing a void element tag, and does nothing to a non-void element.
+    /// 
+    /// Usually only used to support foreign content.
     case trailingSlash
 
     case htmx(_ attribute: HTMLElementAttribute.HTMX? = nil)

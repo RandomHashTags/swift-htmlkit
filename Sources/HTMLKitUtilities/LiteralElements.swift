@@ -134,23 +134,26 @@ macro HTMLElements(
 
 // MARK: HTML
 public protocol HTMLElement : CustomStringConvertible {
-    var tag: String { get }
     var isVoid : Bool { get }
+    var trailingSlash : Bool { get }
+    var tag: String { get }
     var attributes : [HTMLElementAttribute] { get }
     var innerHTML : [CustomStringConvertible] { get }
 }
 
 /// A custom HTML element.
 public struct custom : HTMLElement {
-    public var tag:String
     public var isVoid:Bool
+    public var trailingSlash:Bool
+    public var tag:String
     public var attributes:[HTMLElementAttribute]
     public var innerHTML:[CustomStringConvertible]
 
     public init(context: some MacroExpansionContext, _ children: SyntaxChildren) {
-        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children)
+        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: children)
         tag = data.attributes["tag"] as? String ?? ""
         isVoid = data.attributes["isVoid"] as? Bool ?? false
+        trailingSlash = data.trailingSlash
         attributes = data.globalAttributes
         innerHTML = data.innerHTML
     }
@@ -162,12 +165,13 @@ public struct custom : HTMLElement {
     ) {
         self.tag = tag
         self.isVoid = isVoid
+        trailingSlash = attributes.contains(.trailingSlash)
         self.attributes = attributes
         self.innerHTML = innerHTML
     }
 
     public var description : String {
-        return "<" + tag + ">" + (isVoid ? "" : "</" + tag + ">")
+        return "<" + tag + (isVoid && trailingSlash ? " /" : "") + ">" + (isVoid ? "" : "</" + tag + ">")
     }
 }
 

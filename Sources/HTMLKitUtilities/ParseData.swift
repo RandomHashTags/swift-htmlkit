@@ -11,7 +11,7 @@ import SwiftSyntaxMacros
 
 public extension HTMLKitUtilities {
     // MARK: Parse Arguments
-    static func parse_arguments(
+    static func parseArguments(
         context: some MacroExpansionContext,
         children: SyntaxChildren,
         otherAttributes: [String:String] = [:]
@@ -24,7 +24,7 @@ public extension HTMLKitUtilities {
         var lookupFiles:Set<String> = []
         for element in children {
             if let child:LabeledExprSyntax = element.labeled {
-                if var key:String = child.label?.text {
+                if let key:String = child.label?.text {
                     if key == "encoding" {
                         if let key:String = child.expression.memberAccess?.declName.baseName.text {
                             encoding = HTMLEncoding(rawValue: key) ?? .string
@@ -34,12 +34,10 @@ public extension HTMLKitUtilities {
                     } else if key == "lookupFiles" {
                         lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string }))
                     } else if key == "attributes" {
-                        (global_attributes, trailingSlash) = parse_global_attributes(context: context, array: child.expression.array!.elements, lookupFiles: lookupFiles)
+                        (global_attributes, trailingSlash) = parseGlobalAttributes(context: context, array: child.expression.array!.elements, lookupFiles: lookupFiles)
                     } else {
                         var target_key:String = key
-                        if key == "acceptCharset" {
-                            key = "accept-charset"
-                        } else if let target:String = otherAttributes[key] {
+                        if let target:String = otherAttributes[key] {
                             target_key = target
                         }
                         if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, key: target_key, expr: child.expression) {
@@ -55,7 +53,7 @@ public extension HTMLKitUtilities {
                         }
                     }
                 // inner html
-                } else if let inner_html:CustomStringConvertible = parse_inner_html(context: context, child: child, lookupFiles: lookupFiles) {
+                } else if let inner_html:CustomStringConvertible = parseInnerHTML(context: context, child: child, lookupFiles: lookupFiles) {
                     innerHTML.append(inner_html)
                 }
             }
@@ -63,7 +61,7 @@ public extension HTMLKitUtilities {
         return ElementData(encoding, global_attributes, attributes, innerHTML, trailingSlash)
     }
     // MARK: Parse Global Attributes
-    static func parse_global_attributes(
+    static func parseGlobalAttributes(
         context: some MacroExpansionContext,
         array: ArrayElementListSyntax,
         lookupFiles: Set<String>
@@ -95,11 +93,9 @@ public extension HTMLKitUtilities {
         }
         return (attributes, trailingSlash)
     }
-    static func global_attribute_already_defined(context: some MacroExpansionContext, attribute: String, node: some SyntaxProtocol) {
-        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + attribute + "\" is already defined.")))
-    }
+
     // MARK: Parse innerHTML
-    static func parse_inner_html(
+    static func parseInnerHTML(
         context: some MacroExpansionContext,
         child: LabeledExprSyntax,
         lookupFiles: Set<String>
@@ -114,16 +110,6 @@ public extension HTMLKitUtilities {
             unallowed_expression(context: context, node: child)
             return nil
         }
-    }
-    static func unallowed_expression(context: some MacroExpansionContext, node: LabeledExprSyntax) {
-        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unallowedExpression", message: "String Interpolation is required when encoding runtime values."), fixIts: [
-            FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation."), changes: [
-                FixIt.Change.replace(
-                    oldNode: Syntax(node),
-                    newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(node))"))
-                )
-            ])
-        ]))
     }
 
     // MARK: Parse element
@@ -163,7 +149,7 @@ public extension HTMLKitUtilities {
             interpolation = stringLiteral.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) })
         }
         for expr in interpolation {
-            string.replace("\(expr)", with: promote_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
+            string.replace("\(expr)", with: promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
         }
         if remaining_interpolation > 0 {
             warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
@@ -178,8 +164,55 @@ public extension HTMLKitUtilities {
         }
         return returnType
     }
+    // MARK: Promote Interpolation
+    static func promoteInterpolation(
+        context: some MacroExpansionContext,
+        remaining_interpolation: inout Int,
+        expr: ExpressionSegmentSyntax,
+        lookupFiles: Set<String>
+    ) -> String {
+        var string:String = "\(expr)"
+        guard let expression:ExprSyntax = expr.expressions.first?.expression else { return string }
+        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
+            let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
+            if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
+                remaining_interpolation = 0
+                string = segments.map({ $0.as(StringSegmentSyntax.self)!.content.text }).joined()
+            } else {
+                string = ""
+                for segment in segments {
+                    if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
+                        string += literal
+                    } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
+                        let promoted:String = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
+                        if "\(interpolation)" == promoted {
+                            //string += "\\(\"\(promoted)\".escapingHTML(escapeAttributes: true))"
+                            string += "\(promoted)"
+                            warn_interpolation(context: context, node: interpolation, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+                        } else {
+                            string += promoted
+                        }
+                    } else {
+                        //string += "\\(\"\(segment)\".escapingHTML(escapeAttributes: true))"
+                        warn_interpolation(context: context, node: segment, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+                        string += "\(segment)"
+                    }
+                }
+            }
+        } else if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
+            let target:String = "\(expr)"
+            remaining_interpolation -= string.ranges(of: target).count
+            string.replace(target, with: fix)
+        } else {
+            //string = "\\(\"\(string)\".escapingHTML(escapeAttributes: true))"
+            warn_interpolation(context: context, node: expr, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+        }
+        return string
+    }
+}
+extension HTMLKitUtilities {
     // MARK: Extract literal
-    private static func extract_literal(
+    static func extract_literal(
         context: some MacroExpansionContext,
         key: String,
         expression: ExprSyntax,
@@ -253,52 +286,25 @@ public extension HTMLKitUtilities {
         }
         return nil
     }
-    // MARK: Promote Interpolation
-    static func promote_interpolation(
-        context: some MacroExpansionContext,
-        remaining_interpolation: inout Int,
-        expr: ExpressionSegmentSyntax,
-        lookupFiles: Set<String>
-    ) -> String {
-        var string:String = "\(expr)"
-        guard let expression:ExprSyntax = expr.expressions.first?.expression else { return string }
-        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
-            let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
-            if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
-                remaining_interpolation = 0
-                string = segments.map({ $0.as(StringSegmentSyntax.self)!.content.text }).joined()
-            } else {
-                string = ""
-                for segment in segments {
-                    if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
-                        string += literal
-                    } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                        let promoted:String = promote_interpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
-                        if "\(interpolation)" == promoted {
-                            //string += "\\(\"\(promoted)\".escapingHTML(escapeAttributes: true))"
-                            string += "\(promoted)"
-                            warn_interpolation(context: context, node: interpolation, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-                        } else {
-                            string += promoted
-                        }
-                    } else {
-                        //string += "\\(\"\(segment)\".escapingHTML(escapeAttributes: true))"
-                        warn_interpolation(context: context, node: segment, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-                        string += "\(segment)"
-                    }
-                }
-            }
-        } else if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
-            let target:String = "\(expr)"
-            remaining_interpolation -= string.ranges(of: target).count
-            string.replace(target, with: fix)
-        } else {
-            //string = "\\(\"\(string)\".escapingHTML(escapeAttributes: true))"
-            warn_interpolation(context: context, node: expr, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-        }
-        return string
+
+    // MARK: GA Already Defined
+    static func global_attribute_already_defined(context: some MacroExpansionContext, attribute: String, node: some SyntaxProtocol) {
+        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + attribute + "\" is already defined.")))
     }
-    // MARK: warn interpolation
+
+    // MARK: Unallowed Expression
+    static func unallowed_expression(context: some MacroExpansionContext, node: LabeledExprSyntax) {
+        context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unallowedExpression", message: "String Interpolation is required when encoding runtime values."), fixIts: [
+            FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation."), changes: [
+                FixIt.Change.replace(
+                    oldNode: Syntax(node),
+                    newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(node))"))
+                )
+            ])
+        ]))
+    }
+
+    // MARK: Warn Interpolation
     static func warn_interpolation(
         context: some MacroExpansionContext,
         node: some SyntaxProtocol,

@@ -11,11 +11,11 @@ import SwiftSyntaxMacros
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
     public struct ElementData {
+        public let trailingSlash:Bool
         public let encoding:HTMLEncoding
         public let globalAttributes:[HTMLElementAttribute]
         public let attributes:[String:Any]
         public let innerHTML:[CustomStringConvertible]
-        public let trailingSlash:Bool
 
         init(
             _ encoding: HTMLEncoding,

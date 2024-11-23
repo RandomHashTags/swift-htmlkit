@@ -34,8 +34,9 @@ enum HTMLElements : DeclarationMacro {
                 element = "`var`"
             }
             var string:String = "/// MARK: \(element)\n/// The `\(element)` HTML element.\npublic struct \(element) : HTMLElement {\n"
-            string += "public private(set) var tag:String = \"\(element)\"\n"
             string += "public private(set) var isVoid:Bool = \(is_void)\n"
+            string += "public var trailingSlash:Bool = false\n"
+            string += "public private(set) var tag:String = \"\(element)\"\n"
             string += "public var attributes:[HTMLElementAttribute]\n"
 
             var initializers:String = ""
@@ -99,7 +100,10 @@ enum HTMLElements : DeclarationMacro {
 
             initializers += "public init?(context: some MacroExpansionContext, _ children: SyntaxChildren) {\n"
             let other_attributes_string:String = other_attributes.isEmpty ? "" : ", otherAttributes: [" + other_attributes.map({ "\"" + $0.0 + "\":\"" + $0.1 + "\"" }).joined(separator: ",") + "]"
-            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parse_arguments(context: context, children: children\(other_attributes_string))\n"
+            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: children\(other_attributes_string))\n"
+            if is_void {
+                initializers += "self.trailingSlash = data.trailingSlash\n"
+            }
             initializers += "self.attributes = data.globalAttributes\n"
             for (key, value_type, _) in attributes {
                 var key_literal:String = key
@@ -166,15 +170,16 @@ enum HTMLElements : DeclarationMacro {
                 } else {
                     attributes_func += "\n"
                     attributes_func += "if let \(key), let v:String = \(key).htmlValue {\n"
-                    attributes_func += "let s:String = \(key).htmlValueIsVoidable && v.isEmpty ? \"\" : \"=\\\"\" + v + \"\\\"\"\n"
-                    attributes_func += #"items.append("\#(key_literal)" + s)"#
+                    attributes_func += #"let s:String = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=\\\"" + v + "\\\"""#
+                    attributes_func += "\nitems.append(\"\(key_literal)\" + s)"
                     attributes_func += "\n}"
                 }
             }
             attributes_func += "\nreturn (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"
             render += attributes_func
             render += "let string:String = innerHTML.map({ String(describing: $0) }).joined()\n"
-            render += "return \"\(element == "html" ? "<!DOCTYPE html>" : "")<\(element)\" + attributes() + \">\" + string" + (is_void ? "" : " + \"</\(element)>\"")
+            let trailing_slash:String = is_void ? " + (trailingSlash ? \" /\" : \"\")" : ""
+            render += "return \"\(element == "html" ? "<!DOCTYPE html>" : "")<\(element)\" + attributes()\(trailing_slash) + \">\" + string" + (is_void ? "" : " + \"</\(element)>\"")
             render += "}"
 
             string += render
