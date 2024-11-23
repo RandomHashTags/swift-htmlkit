@@ -172,7 +172,14 @@ public extension HTMLElementAttribute {
                         .viewportMax(let v),
                         .percent(let v):
                     guard let v:Float = v else { return nil }
-                    return String(describing: v) + suffix
+                    var s:String = String(describing: v)
+                    while s.last == "0" {
+                        s.removeLast()
+                    }
+                    if s.last == "." {
+                        s.removeLast()
+                    }
+                    return s + suffix
             }
         }
 

@@ -14,6 +14,7 @@ import struct Foundation.Data
 
 // MARK: Representations
 struct HTMLKitTests {
+    @Test
     func representations() {
         let _:StaticString = #html()
         let _:StaticString = #html(encoding: .string)
@@ -28,28 +29,34 @@ struct HTMLKitTests {
         //let _:ByteBuffer = #html(encoding: .byteBuffer, "")
         let _:String = #html(encoding: .custom(#"String("$0")"#), p(5))
     }
+    @Test
     func representation1() -> StaticString {
         #html(p(123))
     }
+    @Test
     func representation2() -> String {
         #html(p(123))
     }
+    @Test
     func representation3() -> [UInt8] {
         #html(encoding: .utf8Bytes, p(123))
     }
+    @Test
     func representation4() -> [UInt16] {
         #html(encoding: .utf16Bytes, p(123))
     }
+    @Test
     func representation5() -> ContiguousArray<CChar> {
         #html(encoding: .utf8CString, p(123))
     }
     #if canImport(Foundation)
-    func representation5() -> Data {
+    @Test
+    func representation6() -> Data {
         #html(encoding: .foundationData, p(123))
     }
     #endif
     /*
-    func representation6() -> ByteBuffer {
+    func representation7() -> ByteBuffer {
         #htmlByteBuffer("")
     }*/
 }
