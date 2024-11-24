@@ -157,7 +157,7 @@ public extension HTMLKitUtilities {
         }
         var string:String = ""
         switch returnType {
-            case .string(let s), .interpolation(let s): string = s
+            case .interpolation(let s): string = s
             default: return returnType
         }
         var remaining_interpolation:Int = returnType.isInterpolation ? 1 : 0, interpolation:[ExpressionSegmentSyntax] = []
@@ -237,17 +237,21 @@ extension HTMLKitUtilities {
     ) -> LiteralReturnType? {
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
             let string:String = stringLiteral.string
-            return stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 ? .string(string) : .interpolation(string)
+            if stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 {
+                return .string(string)
+            } else {
+                return .interpolation(string)
+            }
         }
         if let function:FunctionCallExprSyntax = expression.functionCall {
-            if let decl:String = function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text {
+            if let decl:String = function.calledExpression.declRef?.baseName.text {
                 switch decl {
                     case "StaticString":
                         let string:String = function.arguments.first!.expression.stringLiteral!.string
                         return .string(string)
                     default:
                         if let element:HTMLElement = HTMLElementValueType.parse_element(context: context, function) {
-                            let string:String = element.description
+                            let string:String = String(describing: element)
                             return string.contains("\\(") ? .interpolation(string) : .string(string)
                         }
                         break
@@ -292,8 +296,8 @@ extension HTMLKitUtilities {
             }
             return .array(results)
         }
-        if let _:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
-            var string:String = "\(expression)", remaining_interpolation:Int = 1
+        if let decl:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
+            var string:String = decl.baseName.text, remaining_interpolation:Int = 1
             warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
             if remaining_interpolation > 0 {
                 return .interpolation("\\(" + string + ")")

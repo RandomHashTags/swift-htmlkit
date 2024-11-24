@@ -19,6 +19,17 @@ struct InterpolationTests {
         #expect(string == "<a href=\"\(test)\">Test</a>")
     }
 
+    @Test func multiline_with_interpolation() {
+        let test:String = "again"
+        let string:String = #html(
+            div(
+                "dune ",
+                test
+            )
+        )
+        #expect(string == "<div>dune again</div>")
+    }
+
     @Test func flatten() {
         let title:String = "flattening"
         var string:String = #html(meta(content: "\("interpolation \(title)")", name: "description"))
