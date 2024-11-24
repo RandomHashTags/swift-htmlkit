@@ -14,8 +14,12 @@ public extension HTMLKitUtilities {
     static func escapeHTML(expansion: MacroExpansionExprSyntax, context: some MacroExpansionContext) -> String {
         return expansion.arguments.children(viewMode: .all).compactMap({
             guard let child:LabeledExprSyntax = $0.labeled,
-                    let c:CustomStringConvertible = HTMLKitUtilities.parseInnerHTML(context: context, child: child, lookupFiles: []) else {
+                    var c:CustomStringConvertible = HTMLKitUtilities.parseInnerHTML(context: context, child: child, lookupFiles: []) else {
                 return nil
+            }
+            if var element:HTMLElement = c as? HTMLElement {
+                element.escaped = true
+                c = element
             }
             return String(describing: c)
         }).joined()
@@ -112,7 +116,7 @@ public extension HTMLKitUtilities {
     ) -> CustomStringConvertible? {
         if let expansion:MacroExpansionExprSyntax = child.expression.macroExpansion {
             if expansion.macroName.text == "escapeHTML" {
-                return escapeHTML(expansion: expansion, context: context).escapingHTML(escapeAttributes: true)
+                return escapeHTML(expansion: expansion, context: context)
             }
             return "" // TODO: fix?
         } else if let element:HTMLElement = parse_element(context: context, expr: child.expression) {

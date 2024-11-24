@@ -134,10 +134,17 @@ macro HTMLElements(
 
 // MARK: HTML
 public protocol HTMLElement : CustomStringConvertible {
+    /// Whether or not this element is a void element.
     var isVoid : Bool { get }
+    /// Whether or not this element should include a forward slash in the tag name.
     var trailingSlash : Bool { get }
-    var tag: String { get }
+    /// Whether or not to HTML escape the `<` & `>` characters directly adjacent of the opening and closing tag names when rendering.
+    var escaped : Bool { get set }
+    /// This element's tag name.
+    var tag : String { get }
+    /// The global attributes of this element.
     var attributes : [HTMLElementAttribute] { get }
+    /// The inner HTML content of this element.
     var innerHTML : [CustomStringConvertible] { get }
 }
 
@@ -145,7 +152,8 @@ public protocol HTMLElement : CustomStringConvertible {
 public struct custom : HTMLElement {
     public var isVoid:Bool
     public var trailingSlash:Bool
-    public var tag:String
+    public var escaped:Bool = false
+    public let tag:String
     public var attributes:[HTMLElementAttribute]
     public var innerHTML:[CustomStringConvertible]
 
@@ -171,7 +179,20 @@ public struct custom : HTMLElement {
     }
 
     public var description : String {
-        return "<" + tag + (isVoid && trailingSlash ? " /" : "") + ">" + (isVoid ? "" : "</" + tag + ">")
+        let attributes_string:String = self.attributes.compactMap({
+            guard let v:String = $0.htmlValue else { return nil }
+            let delimiter:String = $0.htmlValueDelimiter
+            return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=\(delimiter)\(v)\(delimiter)")
+        }).joined(separator: " ")
+        let l:String, g:String
+        if escaped {
+            l = "&lt;"
+            g = "&gt;"
+        } else {
+            l = "<"
+            g = ">"
+        }
+        return l + tag + (isVoid && trailingSlash ? " /" : "") + g + (attributes_string.isEmpty ? "" : " " + attributes_string) + (isVoid ? "" : l + "/" + tag + g)
     }
 }
 

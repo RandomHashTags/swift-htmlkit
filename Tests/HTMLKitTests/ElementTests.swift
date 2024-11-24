@@ -21,6 +21,9 @@ struct ElementTests {
         string = #escapeHTML("<!DOCTYPE html><html>Test</html>")
         #expect(string == escaped)
 
+        string = #escapeHTML(html("Test"))
+        #expect(string == escaped)
+
         string = #html(p(#escapeHTML(html("Test"))))
         #expect(string == expected_result)
 

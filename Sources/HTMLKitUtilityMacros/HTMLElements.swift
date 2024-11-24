@@ -36,7 +36,8 @@ enum HTMLElements : DeclarationMacro {
             var string:String = "/// MARK: \(element)\n/// The `\(element)` HTML element.\npublic struct \(element) : HTMLElement {\n"
             string += "public private(set) var isVoid:Bool = \(is_void)\n"
             string += "public var trailingSlash:Bool = false\n"
-            string += "public private(set) var tag:String = \"\(element)\"\n"
+            string += "public var escaped:Bool = false\n"
+            string += "public let tag:String = \"\(element)\"\n"
             string += "public var attributes:[HTMLElementAttribute]\n"
 
             var initializers:String = ""
@@ -180,7 +181,17 @@ enum HTMLElements : DeclarationMacro {
             render += attributes_func
             render += "let string:String = innerHTML.map({ String(describing: $0) }).joined()\n"
             let trailing_slash:String = is_void ? " + (trailingSlash ? \" /\" : \"\")" : ""
-            render += "return \"\(element == "html" ? "<!DOCTYPE html>" : "")<\(element)\" + attributes()\(trailing_slash) + \">\" + string" + (is_void ? "" : " + \"</\(element)>\"")
+            render += """
+            let l:String, g:String
+            if escaped {
+                l = "&lt;"
+                g = "&gt;"
+            } else {
+                l = "<"
+                g = ">"
+            }
+            """
+            render += "return \(element == "html" ? "l + \"!DOCTYPE html\" + g + " : "")l + \"\(element)\" + attributes()\(trailing_slash) + g + string" + (is_void ? "" : " + l + \"/\(element)\" + g")
             render += "}"
 
             string += render
