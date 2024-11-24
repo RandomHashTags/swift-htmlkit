@@ -64,7 +64,6 @@ public extension String {
     }
     /// Escapes all occurrences of source-breaking HTML attribute characters
     mutating func escapeHTMLAttributes() {
-        self.replace("\\\"", with: "&quot;")
         self.replace("\"", with: "&quot;")
         self.replace("'", with: "&#39")
     }
