@@ -20,7 +20,15 @@ package indirect enum HTMLElementValueType {
     case array(of: HTMLElementValueType)
 
     package static func parse_element(context: some MacroExpansionContext, _ function: FunctionCallExprSyntax) -> HTMLElement? {
-        guard let key:String = function.calledExpression.declRef?.baseName.text else { return nil }
+        let called_expression:ExprSyntax = function.calledExpression
+        let key:String
+        if let member:MemberAccessExprSyntax = called_expression.memberAccess, member.base?.declRef?.baseName.text == "HTMLKit" {
+            key = member.declName.baseName.text
+        } else if let ref = called_expression.declRef {
+            key = ref.baseName.text
+        } else {
+            return nil
+        }
         let children:SyntaxChildren = function.arguments.children(viewMode: .all)
         switch key {
             case "a": return a(context: context, children)

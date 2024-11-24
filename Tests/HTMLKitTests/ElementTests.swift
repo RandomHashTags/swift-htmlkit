@@ -56,6 +56,12 @@ extension ElementTests {
         #expect(string == "<!DOCTYPE html><html xmlns=\"test\"></html>")
     }
 
+    // MARK: HTMLKit.element
+    @Test func with_library_decl() {
+        let string:StaticString = #html(html(HTMLKit.body()))
+        #expect(string == "<!DOCTYPE html><html><body></body></html>")
+    }
+
     // MARK: a
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
     @Test func _a() {
