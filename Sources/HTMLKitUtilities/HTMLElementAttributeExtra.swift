@@ -120,19 +120,19 @@ public extension HTMLElementAttribute.Extra {
         case colindex(Int?)
         case colindextext(String?)
         case colspan(Int?)
-        case controls([String])
+        case controls([String]?)
         case current(Current?)
 
-        case describedby([String])
+        case describedby([String]?)
         case description(String?)
-        case details([String])
+        case details([String]?)
         case disabled(Bool?)
         case dropeffect(DropEffect?)
 
         case errormessage(String?)
         case expanded(Expanded?)
         
-        case flowto([String])
+        case flowto([String]?)
         
         case grabbed(Grabbed?)
 
@@ -144,7 +144,7 @@ public extension HTMLElementAttribute.Extra {
         case keyshortcuts(String?)
 
         case label(String?)
-        case labelledby([String])
+        case labelledby([String]?)
         case level(Int?)
         case live(Live?)
 
@@ -153,7 +153,7 @@ public extension HTMLElementAttribute.Extra {
         case multiselectable(Bool?)
 
         case orientation(Orientation?)
-        case owns([String])
+        case owns([String]?)
 
         case placeholder(String?)
         case posinset(Int?)
@@ -184,7 +184,7 @@ public extension HTMLElementAttribute.Extra {
             func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
             func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
             func int() -> Int? { expression.int(context: context, key: key) }
-            func array_string() -> [String] { expression.array_string(context: context, key: key) }
+            func array_string() -> [String]? { expression.array_string(context: context, key: key) }
             func float() -> Float? { expression.float(context: context, key: key) }
             switch key {
                 case "activedescendant":       self = .activedescendant(string())
@@ -319,30 +319,30 @@ public extension HTMLElementAttribute.Extra {
                 case .colindex(let value): return unwrap(value)
                 case .colindextext(let value): return value
                 case .colspan(let value): return unwrap(value)
-                case .controls(let value): return value.joined(separator: " ")
+                case .controls(let value): return value?.joined(separator: " ")
                 case .current(let value): return value?.rawValue
-                case .describedby(let value): return value.joined(separator: " ")
+                case .describedby(let value): return value?.joined(separator: " ")
                 case .description(let value): return value
-                case .details(let value): return value.joined(separator: " ")
+                case .details(let value): return value?.joined(separator: " ")
                 case .disabled(let value): return unwrap(value)
                 case .dropeffect(let value): return value?.rawValue
                 case .errormessage(let value): return value
                 case .expanded(let value): return value?.rawValue
-                case .flowto(let value): return value.joined(separator: " ")
+                case .flowto(let value): return value?.joined(separator: " ")
                 case .grabbed(let value): return value?.rawValue
                 case .haspopup(let value): return value?.rawValue
                 case .hidden(let value): return value?.rawValue
                 case .invalid(let value): return value?.rawValue
                 case .keyshortcuts(let value): return value
                 case .label(let value): return value
-                case .labelledby(let value): return value.joined(separator: " ")
+                case .labelledby(let value): return value?.joined(separator: " ")
                 case .level(let value): return unwrap(value)
                 case .live(let value): return value?.rawValue
                 case .modal(let value): return unwrap(value)
                 case .multiline(let value): return unwrap(value)
                 case .multiselectable(let value): return unwrap(value)
                 case .orientation(let value): return value?.rawValue
-                case .owns(let value): return value.joined(separator: " ")
+                case .owns(let value): return value?.joined(separator: " ")
                 case .placeholder(let value): return value
                 case .posinset(let value): return unwrap(value)
                 case .pressed(let value): return value?.rawValue

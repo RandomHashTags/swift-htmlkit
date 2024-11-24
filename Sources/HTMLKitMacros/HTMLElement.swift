@@ -10,10 +10,6 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-#if canImport(Foundation)
-import struct Foundation.Data
-#endif
-
 enum HTMLElementMacro : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         let (string, encoding):(String, HTMLEncoding) = expand_macro(context: context, macro: node.macroExpansion!)

@@ -77,42 +77,12 @@ public extension HTMLElementAttribute {
                 case "prompt": self = .prompt(string())
                 case "put": self = .put(string())
                 case "replaceURL": self = .replaceURL(enumeration())
-                case "request": // TODO: fix
-                    return nil
-                    /*
-                    let string:String = literal(), values:[Substring] = string.split(separator: ",")
-                    var timeout_string:Substring = values[1][values[1].index(after: values[1].firstIndex(of: ":")!)...]
-                    while timeout_string.first?.isWhitespace ?? false {
-                        timeout_string.removeFirst()
-                    }
-                    let javascript:Bool = values[0].split(separator: ":")[1].hasSuffix("true")
-                    let timeout:String?
-                    if timeout_string.first == "\"" {
-                        timeout_string.removeFirst()
-                        timeout = String(timeout_string[timeout_string.startIndex..<timeout_string.index(before: timeout_string.endIndex)])
-                    } else {
-                        timeout = nil
-                    }
-                    var credentials:String? = nil
-                    var credentials_string:Substring = values[2][values[2].index(after: values[2].firstIndex(of: ":")!)...]
-                    if !credentials_string.hasSuffix("nil") {
-                        while (credentials_string.first?.isWhitespace ?? false) || credentials_string.first == "\"" {
-                            credentials_string.removeFirst()
-                        }
-                        credentials_string.removeLast()
-                        credentials = String(credentials_string)
-                    }
-                    var noHeaders:String? = nil
-                    if !string.hasSuffix("nil") {
-                        var value:Substring = values[3][values[3].index(after: values[3].firstIndex(of: ":")!)...]
-                        while (value.first?.isWhitespace ?? false) || value.first == "\"" {
-                            value.removeFirst()
-                        }
-                        value.removeLast()
-                        noHeaders = (javascript ? "js:" : "") + value
-                    }
-                    self = .request(js: javascript, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
-                    break*/
+                case "request":
+                    guard let js:Bool = boolean() else { return nil }
+                    let timeout:String? = arguments.get(1)?.expression.string(context: context, key: key)
+                    let credentials:String? = arguments.get(2)?.expression.string(context: context, key: key)
+                    let noHeaders:String? = arguments.get(3)?.expression.string(context: context, key: key)
+                    self = .request(js: js, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
                 case "sync":
                     guard let s:String = string() else { return nil }
                     self = .sync(s, strategy: arguments.last!.expression.enumeration(context: context, key: key, arguments: arguments))

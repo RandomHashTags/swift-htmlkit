@@ -11,6 +11,7 @@ import SwiftSyntaxMacros
 @main
 struct HTMLKitMacros : CompilerPlugin {
     let providingMacros:[any Macro.Type] = [
-        HTMLElementMacro.self
+        HTMLElementMacro.self,
+        EscapeHTML.self
     ]
 }

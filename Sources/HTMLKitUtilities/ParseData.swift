@@ -10,6 +10,16 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 
 public extension HTMLKitUtilities {
+    // MARK: Escape HTML
+    static func escapeHTML(expansion: MacroExpansionExprSyntax, context: some MacroExpansionContext) -> String {
+        return expansion.arguments.children(viewMode: .all).compactMap({
+            guard let child:LabeledExprSyntax = $0.labeled,
+                    let c:CustomStringConvertible = HTMLKitUtilities.parseInnerHTML(context: context, child: child, lookupFiles: []) else {
+                return nil
+            }
+            return String(describing: c)
+        }).joined()
+    }
     // MARK: Parse Arguments
     static func parseArguments(
         context: some MacroExpansionContext,
@@ -94,13 +104,16 @@ public extension HTMLKitUtilities {
         return (attributes, trailingSlash)
     }
 
-    // MARK: Parse innerHTML
+    // MARK: Parse Inner HTML
     static func parseInnerHTML(
         context: some MacroExpansionContext,
         child: LabeledExprSyntax,
         lookupFiles: Set<String>
     ) -> CustomStringConvertible? {
         if let expansion:MacroExpansionExprSyntax = child.expression.macroExpansion {
+            if expansion.macroName.text == "escapeHTML" {
+                return escapeHTML(expansion: expansion, context: context).escapingHTML(escapeAttributes: true)
+            }
             return "" // TODO: fix?
         } else if let element:HTMLElement = parse_element(context: context, expr: child.expression) {
             return element
@@ -342,6 +355,11 @@ package extension SyntaxChildren.Element {
 package extension StringLiteralExprSyntax {
     var string : String { "\(segments)" }
 }
+package extension LabeledExprListSyntax {
+    func get(_ index: Int) -> Element? {
+        return index < count ? self[self.index(at: index)] : nil
+    }
+}
 package extension ExprSyntax {
     func string(context: some MacroExpansionContext, key: String) -> String? {
         return HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key)
@@ -362,8 +380,8 @@ package extension ExprSyntax {
         guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }
         return Int(s)
     }
-    func array_string(context: some MacroExpansionContext, key: String) -> [String] {
-        array?.elements.compactMap({ $0.expression.string(context: context, key: key) }) ?? []
+    func array_string(context: some MacroExpansionContext, key: String) -> [String]? {
+        array?.elements.compactMap({ $0.expression.string(context: context, key: key) })
     }
     func dictionary_string_string(context: some MacroExpansionContext, key: String) -> [String:String] {
         var d:[String:String] = [:]

@@ -18,11 +18,11 @@ struct ElementTests {
         var string:String = #html(p("<!DOCTYPE html><html>Test</html>"))
         #expect(string == expected_result)
 
-        /*string = #escapeHTML("<!DOCTYPE html><html>Test</html>")
-        #expect(string == escaped) // TODO: fix; reenable
+        string = #escapeHTML("<!DOCTYPE html><html>Test</html>")
+        #expect(string == escaped)
 
-        string = #html(p(#escapeHTML(html("Test").description)))
-        #expect(string == expected_result)*/
+        string = #html(p(#escapeHTML(html("Test"))))
+        #expect(string == expected_result)
 
         string = #html(p("\(unescaped.escapingHTML(escapeAttributes: false))"))
         #expect(string == expected_result)
@@ -91,7 +91,7 @@ extension ElementTests {
         #expect(string == "<area coords=\"1,2,3\">")
 
         string = #html(area(coords: []))
-        #expect(string == "<area coords=\"\">")
+        #expect(string == "<area coords>")
 
         string = #html(area(href: ""))
         #expect(string == "<area href=\"\">")

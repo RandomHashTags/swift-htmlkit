@@ -119,12 +119,12 @@ public extension HTMLElementAttribute.HTMX {
     enum Params : HTMLInitializable {
         case all
         case none
-        case not([String])
-        case list([String])
+        case not([String]?)
+        case list([String]?)
 
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func array_string() -> [String] { expression.array_string(context: context, key: key) }
+            func array_string() -> [String]? { expression.array_string(context: context, key: key) }
             switch key {
                 case "all":  self = .all
                 case "none": self = .none
@@ -147,8 +147,8 @@ public extension HTMLElementAttribute.HTMX {
             switch self {
                 case .all:             return "*"
                 case .none:            return "none"
-                case .not(let list):  return "not " + list.joined(separator: ",")
-                case .list(let list): return list.joined(separator: ",")
+                case .not(let list):  return "not " + (list?.joined(separator: ",") ?? "")
+                case .list(let list): return list?.joined(separator: ",")
             }
         }
 

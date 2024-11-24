@@ -16,13 +16,13 @@ public enum HTMLElementAttribute : Hashable {
 
     case autocapitalize(Extra.autocapitalize? = nil)
     case autofocus(Bool? = false)
-    case `class`([String] = [])
+    case `class`([String]? = nil)
     case contenteditable(Extra.contenteditable? = nil)
     case data(_ id: String, _ value: String? = nil)
     case dir(Extra.dir? = nil)
     case draggable(Extra.draggable? = nil)
     case enterkeyhint(Extra.enterkeyhint? = nil)
-    case exportparts([String] = [])
+    case exportparts([String]? = nil)
     case hidden(Extra.hidden? = nil)
     case id(String? = nil)
     case inert(Bool? = false)
@@ -35,7 +35,7 @@ public enum HTMLElementAttribute : Hashable {
     case itemtype(String? = nil)
     case lang(String? = nil)
     case nonce(String? = nil)
-    case part([String] = [])
+    case part([String]? = nil)
     case popover(Extra.popover? = nil)
     case slot(String? = nil)
     case spellcheck(Extra.spellcheck? = nil)
@@ -65,7 +65,7 @@ public enum HTMLElementAttribute : Hashable {
         func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
         func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: function.arguments) }
         func int() -> Int? { expression.int(context: context, key: key) }
-        func array_string() -> [String] { expression.array_string(context: context, key: key) }
+        func array_string() -> [String]? { expression.array_string(context: context, key: key) }
         switch key {
             case "accesskey":             self = .accesskey(string())
             case "ariaattribute":         self = .ariaattribute(enumeration())
@@ -184,13 +184,13 @@ public enum HTMLElementAttribute : Hashable {
             case .role(let value):                  return value?.rawValue
             case .autocapitalize(let value):        return value?.rawValue
             case .autofocus(let value):             return value == true ? "" : nil
-            case .class(let value):                 return value.joined(separator: " ")
+            case .class(let value):                 return value?.joined(separator: " ")
             case .contenteditable(let value):       return value?.htmlValue
             case .data(_, let value):          return value
             case .dir(let value):                   return value?.rawValue
             case .draggable(let value):             return value?.rawValue
             case .enterkeyhint(let value):          return value?.rawValue
-            case .exportparts(let value):           return value.joined(separator: ",")
+            case .exportparts(let value):           return value?.joined(separator: ",")
             case .hidden(let value):                return value?.htmlValue
             case .id(let value):                    return value
             case .inert(let value):                 return value == true ? "" : nil
@@ -203,7 +203,7 @@ public enum HTMLElementAttribute : Hashable {
             case .itemtype(let value):              return value
             case .lang(let value):                  return value
             case .nonce(let value):                 return value
-            case .part(let value):                  return value.joined(separator: " ")
+            case .part(let value):                  return value?.joined(separator: " ")
             case .popover(let value):               return value?.rawValue
             case .slot(let value):                  return value
             case .spellcheck(let value):            return value?.rawValue
@@ -222,6 +222,7 @@ public enum HTMLElementAttribute : Hashable {
         }
     }
 
+    // MARK: htmlValueIsVoidable
     public var htmlValueIsVoidable : Bool {
         switch self {
             case .autofocus(_), .hidden(_), .inert(_), .itemscope(_):
@@ -230,6 +231,18 @@ public enum HTMLElementAttribute : Hashable {
                 return value?.htmlValueIsVoidable ?? false
             default:
                 return false
+        }
+    }
+
+    // MARK: htmlValueDelimiter
+    public var htmlValueDelimiter : String {
+        switch self {
+            case .htmx(let v):
+                switch v {
+                    case .request(_, _, _, _), .headers(_, _): return "'"
+                    default: return "\\\""
+                }
+            default: return "\\\""
         }
     }
 }
