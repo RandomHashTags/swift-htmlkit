@@ -14,44 +14,52 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
 
     package func staticHTML() -> String {
         #html(
-            #head(
-                #title("StaticView")
-            ),
-            #body(
-                #h1("Swift HTML Benchmarks")
+            html(
+                head(
+                    title("StaticView")
+                ),
+                body(
+                    h1("Swift HTML Benchmarks")
+                )
             )
         )
     }
 
     package func staticHTMLUTF8Bytes() -> [UInt8] {
-        #htmlUTF8Bytes(
-            #head(
-                #title("StaticView")
-            ),
-            #body(
-                #h1("Swift HTML Benchmarks")
+        #html(encoding: .utf8Bytes,
+            html(
+                head(
+                    title("StaticView")
+                ),
+                body(
+                    h1("Swift HTML Benchmarks")
+                )
             )
         )
     }
 
     package func staticHTMLUTF16Bytes() -> [UInt16] {
-        #htmlUTF16Bytes(
-            #head(
-                #title("StaticView")
-            ),
-            #body(
-                #h1("Swift HTML Benchmarks")
+        #html(encoding: .utf16Bytes,
+            html(
+                head(
+                    title("StaticView")
+                ),
+                body(
+                    h1("Swift HTML Benchmarks")
+                )
             )
         )
     }
 
     package func staticHTMLByteBuffer() -> ByteBuffer {
-        #htmlByteBuffer(
-            #head(
-                #title("StaticView")
-            ),
-            #body(
-                #h1("Swift HTML Benchmarks")
+        #html(encoding: .byteBuffer,
+            html(
+                head(
+                    title("StaticView")
+                ),
+                body(
+                    h1("Swift HTML Benchmarks")
+                )
             )
         )
     }
@@ -65,23 +73,25 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
     package func dynamicHTML(_ context: HTMLContext) -> String {
         var qualities:String = ""
         for quality in context.user.qualities {
-            qualities += #li("\(quality)")
+            qualities += #html(li(quality))
         }
         return #html(
-            #head(
-                #meta(charset: "\(context.charset)"),
-                #title("\(context.title)"),
-                #meta(content: "\(context.meta_description)", name: "description"),
-                #meta(content: "\(context.keywords_string)", name: "keywords")
-            ),
-            #body(
-                #h1("\(context.heading)"),
-                #div(attributes: [.id(context.desc_id)],
-                    #p("\(context.string)")
+            html(
+                head(
+                    meta(charset: "\(context.charset)"),
+                    title("\(context.title)"),
+                    meta(content: "\(context.meta_description)", name: "description"),
+                    meta(content: "\(context.keywords_string)", name: "keywords")
                 ),
-                #h2("\(context.user.details_heading)"),
-                #h3("\(context.user.qualities_heading)"),
-                #ul(attributes: [.id(context.user.qualities_id)], "\(qualities)")
+                body(
+                    h1("\(context.heading)"),
+                    div(attributes: [.id(context.desc_id)],
+                        p("\(context.string)")
+                    ),
+                    h2("\(context.user.details_heading)"),
+                    h3("\(context.user.qualities_heading)"),
+                    ul(attributes: [.id(context.user.qualities_id)], "\(qualities)")
+                )
             )
         )
     }

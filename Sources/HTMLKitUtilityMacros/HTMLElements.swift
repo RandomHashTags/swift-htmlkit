@@ -160,7 +160,7 @@ enum HTMLElements : DeclarationMacro {
                             attributes_func += "\(key)?.compactMap({ return $0.htmlValue })"
                             break
                     }
-                    attributes_func += ".joined(separator: \"\(separator)\")\n{\n"
+                    attributes_func += ".joined(separator: \"\(separator)\") {\n"
                     attributes_func += #"let k:String = _\#(variable_name).isEmpty ? "" : "=\\\"" + _\#(variable_name) + "\\\"""#
                     attributes_func += "\nitems.append(\"\(key_literal)\" + k)"
                     attributes_func += "\n}"
