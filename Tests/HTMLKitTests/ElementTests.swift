@@ -36,6 +36,9 @@ struct ElementTests {
 
         string = #html(div(attributes: [.title("<p>")], "<p></p>"))
         #expect(string == expected_result)
+
+        string = #html(p("What's 9 + 10? \"21\"!"))
+        #expect(string == "<p>What&#39s 9 + 10? &quot;21&quot;!</p>")
     }
 }
 
