@@ -53,18 +53,10 @@ enum HTMLElementMacro : ExpressionMacro {
 private extension HTMLElementMacro {
     // MARK: Expand Macro
     static func expand_macro(context: some MacroExpansionContext, macro: MacroExpansionExprSyntax) -> (String, HTMLEncoding) {
-        guard let elementType:HTMLElementType = HTMLElementType(rawValue: macro.macroName.text) else {
+        guard macro.macroName.text == "html" else {
             return ("\(macro)", .string)
         }
-        let children:SyntaxChildren = macro.arguments.children(viewMode: .all)
-        /*if elementType == .escapeHTML {
-            let array:[CustomStringConvertible] = children.compactMap({
-                guard let child:LabeledExprSyntax = $0.labeled else { return nil }
-                return HTMLKitUtilities.parseInnerHTML(context: context, child: child, lookupFiles: [])
-            })
-            return array.map({ String(describing: $0) }).joined()
-        }*/
-        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: children)
+        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: macro.arguments.children(viewMode: .all))
         return (data.innerHTML.map({ String(describing: $0) }).joined(), data.encoding)
     }
 }

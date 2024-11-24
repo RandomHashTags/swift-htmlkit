@@ -38,7 +38,7 @@ Use the `#html(encoding:attributes:innerHTML:)` macro. All parameters, for the m
   encoding: HTMLEncoding = .string,
   attributes: [<global attribute>] = [],
   <element specific attribute>: <element specific attribute value>? = nil,
-  _ innerHTML: HTMLElement...
+  _ innerHTML: CustomStringConvertible...
 )
 
 ```
@@ -54,7 +54,7 @@ The default initializer for creating an HTML Element follows this syntax:
 <html element name>(
   attributes: [<global attribute>] = [],
   <element specific attribute>: <value>? = nil,
-  _ innerHTML: HTMLElement...
+  _ innerHTML: CustomStringConvertible...
 )
 
 ```

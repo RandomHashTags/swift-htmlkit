@@ -26,5 +26,5 @@ public macro escapeHTML(_ innerHTML: CustomStringConvertible...) -> String = #ex
 public macro html<T: CustomStringConvertible>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: HTMLElement...
+    _ innerHTML: CustomStringConvertible...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
