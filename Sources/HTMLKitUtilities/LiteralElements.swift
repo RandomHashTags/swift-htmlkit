@@ -124,7 +124,7 @@ import SwiftSyntaxMacros
         named(track),
         named(u),
         named(ul),
-        //named(var),
+        named(variable),
         named(video),
         named(wbr)
 )
@@ -650,7 +650,7 @@ public struct custom : HTMLElement {
     .ul : [],
 
     // MARK: V
-    //.var : [],
+    .variable : [],
     .video : [
         ("autoplay", .bool),
         ("controls", .bool),

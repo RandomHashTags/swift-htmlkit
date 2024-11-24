@@ -132,7 +132,7 @@ package enum HTMLElementType : String, CaseIterable {
     case u
     case ul
 
-    case `var`
+    case variable // var
     case video
 
     case wbr

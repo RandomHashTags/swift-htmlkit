@@ -32,16 +32,17 @@ enum HTMLElements : DeclarationMacro {
         ]
 
         for item in dictionary {
-            var element:String = item.key.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+            let element:String = item.key.as(MemberAccessExprSyntax.self)!.declName.baseName.text
             let is_void:Bool = void_elements.contains(element)
-            if element == "var" {
-                element = "`var`"
+            var tag:String = element
+            if element == "variable" {
+                tag = "var"
             }
-            var string:String = "/// MARK: \(element)\n/// The `\(element)` HTML element.\npublic struct \(element) : HTMLElement {\n"
+            var string:String = "/// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element) : HTMLElement {\n"
             string += "public private(set) var isVoid:Bool = \(is_void)\n"
             string += "public var trailingSlash:Bool = false\n"
             string += "public var escaped:Bool = false\n"
-            string += "public let tag:String = \"\(element)\"\n"
+            string += "public let tag:String = \"\(tag)\"\n"
             string += "public var attributes:[HTMLElementAttribute]\n"
 
             var initializers:String = ""
@@ -195,7 +196,7 @@ enum HTMLElements : DeclarationMacro {
                 g = ">"
             }
             """
-            render += "return \(element == "html" ? "l + \"!DOCTYPE html\" + g + " : "")l + \"\(element)\" + attributes()\(trailing_slash) + g + string" + (is_void ? "" : " + l + \"/\(element)\" + g")
+            render += "return \(tag == "html" ? "l + \"!DOCTYPE html\" + g + " : "")l + tag + attributes()\(trailing_slash) + g + string" + (is_void ? "" : " + l + \"/\" + tag + g")
             render += "}"
 
             string += render

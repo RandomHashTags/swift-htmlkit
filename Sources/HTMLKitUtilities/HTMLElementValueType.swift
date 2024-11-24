@@ -142,12 +142,12 @@ package indirect enum HTMLElementValueType {
             case "track": return track(context: context, children)
             case "u": return u(context: context, children)
             case "ul": return ul(context: context, children)
-            //case "var": return `var`(context: context, children)
+            case "variable": return variable(context: context, children)
             case "video": return video(context: context, children)
             case "wbr": return wbr(context: context, children)
 
             case "custom": return custom(context: context, children)
-            default:        return nil
+            default: return nil
         }
     }
 }

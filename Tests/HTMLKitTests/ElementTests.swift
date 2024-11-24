@@ -373,6 +373,13 @@ extension ElementTests {
         let string:StaticString = #html(track(default: true, kind: .captions, label: "tesT"))
         #expect(string == "<track default kind=\"captions\" label=\"tesT\">")
     }
+
+    // MARK: variable
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/var
+    @Test func _var() {
+        let string:StaticString = #html(variable("macros don't like `var` bro"))
+        #expect(string == "<var>macros don&#39t like `var` bro</var>")
+    }
     
     // MARK: video
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
