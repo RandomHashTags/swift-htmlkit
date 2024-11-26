@@ -172,7 +172,7 @@ enum HTMLElements : DeclarationMacro {
                 } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
                     attributes_func += "\n"
                     let value:String = value_type == "String" ? key : "String(describing: \(key))"
-                    attributes_func += #"if let \#(key) { items.append("\#(key)=\\\"" + \#(value) + "\\\"") }"#
+                    attributes_func += #"if let \#(key) { items.append("\#(key_literal)=\\\"" + \#(value) + "\\\"") }"#
                     attributes_func += "\n"
                 } else {
                     attributes_func += "\n"

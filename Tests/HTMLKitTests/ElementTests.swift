@@ -253,6 +253,13 @@ extension ElementTests {
         #expect(string == "<input accept=\".docx,.json\">")
     }
 
+    // MARK: label
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label
+    @Test func _label() {
+        let string:StaticString = #html(label(for: "what_the", "skrrt"))
+        #expect(string == "<label for=\"what_the\">skrrt</label>")
+    }
+
     // MARK: link
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link
     @Test func _link() {
