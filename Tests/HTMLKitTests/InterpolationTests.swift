@@ -19,15 +19,94 @@ struct InterpolationTests {
         #expect(string == "<a href=\"\(test)\">Test</a>")
     }
 
-    @Test func multiline_with_interpolation() {
-        let test:String = "again"
+    @Test func multiline_decl_interpolation() {
+        let test:String = "prophecy"
         let string:String = #html(
             div(
                 "dune ",
                 test
             )
         )
-        #expect(string == "<div>dune again</div>")
+        #expect(string == "<div>dune prophecy</div>")
+    }
+
+    @Test func multiline_func_interpolation() {
+        var string:String = #html(
+            div(
+                "Bikini Bottom: ",
+                InterpolationTests.spongebobCharacter(
+                    "spongebob"
+                ),
+                ", ",
+                InterpolationTests.spongebobCharacter("patrick"
+                ),
+                ", ",
+                InterpolationTests.spongebobCharacter(
+                    "squidward"),
+                ", ",
+                InterpolationTests
+                .spongebobCharacter(
+                    "krabs"
+                ),
+                ", ",
+                InterpolationTests.sandyCheeks (),
+                ", ",
+                InterpolationTests
+                .spongebobCharacter(
+                    "pearl krabs"
+                )
+            )
+        )
+        #expect(string == "<div>Bikini Bottom: Spongebob Squarepants, Patrick Star, Squidward Tentacles, Mr. Krabs, Sandy Cheeks, Pearl Krabs</div>")
+
+        string = #html(
+            div(
+                "Don't forget ",
+                InterpolationTests.BikiniBottom.gary(),
+                "!"
+            )
+        )
+        #expect(string == "<div>Don&#39t forget Gary!</div>")
+
+        string = #html(
+            div(
+                InterpolationTests
+                .spongebob(
+                    isBoob:false,
+                    isSquare:
+                    true,
+                    middleName: Shrek
+                        .isLife
+                        .rawValue,
+                    lastName: InterpolationTests
+                        .sandyCheeks()
+                )
+            )
+        )
+        #expect(string == "<div>Spongeboob</div>")
+    }
+
+    @Test func multiline_member_interpolation() {
+        var string:String = #html(
+            div(
+                "Shrek ",
+                Shrek.isLove.rawValue,
+                ", Shrek ",
+                Shrek
+                .isLife.rawValue
+            )
+        )
+        #expect(string == "<div>Shrek isLove, Shrek isLife</div>")
+
+        string = #html(
+            div(
+                "Shrek ",
+                InterpolationTests.Shrek.isLove.rawValue,
+                ", Shrek ",
+                InterpolationTests.Shrek.isLife.rawValue
+            )
+        )
+        #expect(string == "<div>Shrek isLove, Shrek isLife</div>")
     }
 
     @Test func flatten() {
@@ -72,14 +151,27 @@ extension InterpolationTests {
 }
 
 extension InterpolationTests {
+    enum BikiniBottom {
+        static func gary() -> String { "Gary" }
+    }
     static let spongebob:String = "Spongebob Squarepants"
     static let patrick:String = "Patrick Star"
     static func spongebobCharacter(_ string: String) -> String {
         switch string {
         case "spongebob": return "Spongebob Squarepants"
         case "patrick":   return "Patrick Star"
+        case "squidward": return "Squidward Tentacles"
+        case "krabs":     return "Mr. Krabs"
+        case "pearl krabs": return "Pearl Krabs"
+        case "karen":     return "Karen"
         default:          return "Plankton"
         }
+    }
+    static func sandyCheeks() -> String {
+        return "Sandy Cheeks"
+    }
+    static func spongebob(isBoob: Bool, isSquare: Bool, middleName: String, lastName: String) -> String {
+        return "Spongeboob"
     }
     
     @Test func third_party_literal() {
@@ -89,11 +181,11 @@ extension InterpolationTests {
         string = #html(div(attributes: [.title(InterpolationTests.patrick)]))
         #expect(string == "<div title=\"Patrick Star\"></div>")
 
-        var static_string:StaticString = #html(div(attributes: [.title("Mr. Crabs")]))
-        #expect(static_string == "<div title=\"Mr. Crabs\"></div>")
+        var static_string:StaticString = #html(div(attributes: [.title("Mr. Krabs")]))
+        #expect(static_string == "<div title=\"Mr. Krabs\"></div>")
 
-        static_string = #html(div(attributes: [.title("Mr. Crabs")]))
-        #expect(static_string == "<div title=\"Mr. Crabs\"></div>")
+        static_string = #html(div(attributes: [.title("Mr. Krabs")]))
+        #expect(static_string == "<div title=\"Mr. Krabs\"></div>")
     }
     @Test func third_party_func() {
         let string:String = #html(div(attributes: [.title(InterpolationTests.spongebobCharacter("patrick"))]))

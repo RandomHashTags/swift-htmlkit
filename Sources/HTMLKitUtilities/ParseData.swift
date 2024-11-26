@@ -295,10 +295,10 @@ extension HTMLKitUtilities {
                         break
                 }
             }
-            return .interpolation("\(function)")
+            return .interpolation(merge_func_into_single_line(function))
         }
         if let member:MemberAccessExprSyntax = expression.memberAccess {
-            return .interpolation("\(member)")
+            return .interpolation(merge_member_into_single_line(member))
         }
         if let array:ArrayExprSyntax = expression.array {
             let separator:String
@@ -388,6 +388,53 @@ extension HTMLKitUtilities {
         }
         let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: macro.arguments.children(viewMode: .all))
         return (data.innerHTML.map({ String(describing: $0) }).joined(), data.encoding)
+    }
+
+    // MARK: Merge
+    static func merge_member_into_single_line(_ member: MemberAccessExprSyntax) -> String {
+        var string:String = "\(member)"
+        string.removeAll { $0.isWhitespace }
+        return string
+    }
+    static func merge_func_into_single_line(_ function: FunctionCallExprSyntax) -> String {
+        var string:String = "\(function.calledExpression)"
+        string.removeAll { $0.isWhitespace }
+        var args:String = ""
+        var is_first:Bool = true
+        for argument in function.arguments {
+            var arg:String
+            if let label = argument.label {
+                arg = "\(label)"
+                while arg.first?.isWhitespace ?? false {
+                    arg.removeFirst()
+                }
+                if !is_first {
+                    arg.insert(",", at: arg.startIndex)
+                }
+                arg += ": "
+                var expr:String
+                if let f:FunctionCallExprSyntax = argument.expression.functionCall {
+                    expr = merge_func_into_single_line(f)
+                } else if let m:MemberAccessExprSyntax = argument.expression.memberAccess {
+                    expr = merge_member_into_single_line(m)
+                } else {
+                    expr = "\(argument.expression)"
+                }
+                while expr.first?.isWhitespace ?? false {
+                    expr.removeFirst()
+                }
+                arg += expr
+            } else {
+                arg = "\(argument)"
+                while arg.first?.isWhitespace ?? false {
+                    arg.removeFirst()
+                }
+            }
+            args += arg
+            is_first = false
+        }
+        args = "(" + args + ")"
+        return string + args
     }
 }
 
