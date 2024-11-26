@@ -24,6 +24,44 @@ public extension HTMLKitUtilities {
             return String(describing: c)
         }).joined()
     }
+    // MARK: Expand #html
+    static func expandHTMLMacro(context: some MacroExpansionContext, macroNode: MacroExpansionExprSyntax) throws -> ExprSyntax {
+        let (string, encoding):(String, HTMLEncoding) = expand_macro(context: context, macro: macroNode)
+        func has_no_interpolation() -> Bool {
+            let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
+            guard !has_interpolation else {
+                context.diagnose(Diagnostic(node: macroNode, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
+                return false
+            }
+            return true
+        }
+        func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
+            return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
+        }
+        switch encoding {
+            case .utf8Bytes:
+                guard has_no_interpolation() else { return "" }
+                return "\(raw: bytes([UInt8](string.utf8)))"
+            case .utf16Bytes:
+                guard has_no_interpolation() else { return "" }
+                return "\(raw: bytes([UInt16](string.utf16)))"
+            case .utf8CString:
+                return "\(raw: string.utf8CString)"
+
+            case .foundationData:
+                guard has_no_interpolation() else { return "" }
+                return "Data(\(raw: bytes([UInt8](string.utf8))))"
+
+            case .byteBuffer:
+                guard has_no_interpolation() else { return "" }
+                return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
+
+            case .string:
+                return "\"\(raw: string)\""
+            case .custom(let encoded):
+                return "\(raw: encoded.replacingOccurrences(of: "$0", with: string))"
+        }
+    }
     // MARK: Parse Arguments
     static func parseArguments(
         context: some MacroExpansionContext,
@@ -341,6 +379,15 @@ extension HTMLKitUtilities {
         } else {
             context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
         }
+    }
+
+    // MARK: Expand Macro
+    static func expand_macro(context: some MacroExpansionContext, macro: MacroExpansionExprSyntax) -> (String, HTMLEncoding) {
+        guard macro.macroName.text == "html" else {
+            return ("\(macro)", .string)
+        }
+        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: macro.arguments.children(viewMode: .all))
+        return (data.innerHTML.map({ String(describing: $0) }).joined(), data.encoding)
     }
 }
 
