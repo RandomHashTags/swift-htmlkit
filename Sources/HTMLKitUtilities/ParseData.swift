@@ -14,7 +14,8 @@ public extension HTMLKitUtilities {
     static func escapeHTML(expansion: MacroExpansionExprSyntax, context: some MacroExpansionContext) -> String {
         return expansion.arguments.children(viewMode: .all).compactMap({
             guard let child:LabeledExprSyntax = $0.labeled,
-                    var c:CustomStringConvertible = HTMLKitUtilities.parseInnerHTML(context: context, child: child, lookupFiles: []) else {
+                    // TODO: fix the below encoding?
+                    var c:CustomStringConvertible = HTMLKitUtilities.parseInnerHTML(context: context, encoding: .string, child: child, lookupFiles: []) else {
                 return nil
             }
             if var element:HTMLElement = c as? HTMLElement {
@@ -59,7 +60,7 @@ public extension HTMLKitUtilities {
 
             case .string:
                 return "\"\(raw: string)\""
-            case .custom(let encoded):
+            case .custom(let encoded, _):
                 return "\(raw: encoded.replacingOccurrences(of: "$0", with: string))"
         }
     }
@@ -67,10 +68,11 @@ public extension HTMLKitUtilities {
     // MARK: Parse Arguments
     static func parseArguments(
         context: some MacroExpansionContext,
+        encoding: HTMLEncoding,
         children: SyntaxChildren,
         otherAttributes: [String:String] = [:]
     ) -> ElementData {
-        var encoding:HTMLEncoding = HTMLEncoding.string
+        var encoding:HTMLEncoding = encoding
         var global_attributes:[HTMLElementAttribute] = []
         var attributes:[String:Any] = [:]
         var innerHTML:[CustomStringConvertible] = []
@@ -83,7 +85,12 @@ public extension HTMLKitUtilities {
                         if let key:String = child.expression.memberAccess?.declName.baseName.text {
                             encoding = HTMLEncoding(rawValue: key) ?? .string
                         } else if let custom:FunctionCallExprSyntax = child.expression.functionCall {
-                            encoding = .custom(custom.arguments.first!.expression.stringLiteral!.string)
+                            let logic:String = custom.arguments.first!.expression.stringLiteral!.string
+                            if custom.arguments.count == 1 {
+                                encoding = .custom(logic)
+                            } else {
+                                encoding = .custom(logic, stringDelimiter: custom.arguments.last!.expression.stringLiteral!.string)
+                            }
                         }
                     } else if key == "lookupFiles" {
                         lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string }))
@@ -99,15 +106,20 @@ public extension HTMLKitUtilities {
                         } else if let string:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             switch string {
                                 case .boolean(let b): attributes[key] = b
-                                case .string(let s), .interpolation(let s): attributes[key] = s
+                                case .string(_), .interpolation(_): attributes[key] = string.value(key: key)
                                 case .int(let i): attributes[key] = i
                                 case .float(let f): attributes[key] = f
-                                case .array(let a): attributes[key] = a
+                                case .array(_):
+                                    let escaped:LiteralReturnType = string.escapeArray()
+                                    switch escaped {
+                                        case .array(let a): attributes[key] = a
+                                        default: break
+                                    }
                             }
                         }
                     }
                 // inner html
-                } else if let inner_html:CustomStringConvertible = parseInnerHTML(context: context, child: child, lookupFiles: lookupFiles) {
+                } else if let inner_html:CustomStringConvertible = parseInnerHTML(context: context, encoding: encoding, child: child, lookupFiles: lookupFiles) {
                     innerHTML.append(inner_html)
                 }
             }
@@ -132,7 +144,7 @@ public extension HTMLKitUtilities {
                     context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
                 } else if keys.contains(key) {
                     global_attribute_already_defined(context: context, attribute: key, node: first_expression)
-                } else if let attr:HTMLElementAttribute = HTMLElementAttribute.init(context: context, key: key, function) {
+                } else if let attr:HTMLElementAttribute = HTMLElementAttribute(context: context, key: key, function) {
                     attributes.append(attr)
                     key = attr.key
                     keys.insert(key)
@@ -152,6 +164,7 @@ public extension HTMLKitUtilities {
     // MARK: Parse Inner HTML
     static func parseInnerHTML(
         context: some MacroExpansionContext,
+        encoding: HTMLEncoding,
         child: LabeledExprSyntax,
         lookupFiles: Set<String>
     ) -> CustomStringConvertible? {
@@ -160,7 +173,7 @@ public extension HTMLKitUtilities {
                 return escapeHTML(expansion: expansion, context: context)
             }
             return "" // TODO: fix?
-        } else if let element:HTMLElement = parse_element(context: context, expr: child.expression) {
+        } else if let element:HTMLElement = parse_element(context: context, encoding: encoding, expr: child.expression) {
             return element
         } else if let string:String = parse_literal_value(context: context, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value(key: "") {
             return string
@@ -171,9 +184,9 @@ public extension HTMLKitUtilities {
     }
 
     // MARK: Parse element
-    static func parse_element(context: some MacroExpansionContext, expr: ExprSyntax) -> HTMLElement? {
+    static func parse_element(context: some MacroExpansionContext, encoding: HTMLEncoding, expr: ExprSyntax) -> HTMLElement? {
         guard let function:FunctionCallExprSyntax = expr.functionCall else { return nil }
-        return HTMLElementValueType.parse_element(context: context, function)
+        return HTMLElementValueType.parse_element(context: context, encoding: encoding, function)
     }
 }
 extension HTMLKitUtilities {
@@ -217,7 +230,7 @@ extension HTMLKitUtilities {
         guard macro.macroName.text == "html" else {
             return ("\(macro)", .string)
         }
-        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: macro.arguments.children(viewMode: .all))
+        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, encoding: .string, children: macro.arguments.children(viewMode: .all))
         return (data.innerHTML.map({ String(describing: $0) }).joined(), data.encoding)
     }
 }

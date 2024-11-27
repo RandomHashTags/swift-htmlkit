@@ -39,6 +39,10 @@ struct ElementTests {
 
         string = #html(p("What's 9 + 10? \"21\"!"))
         #expect(string == "<p>What&#39s 9 + 10? &quot;21&quot;!</p>")
+
+        string = #html(option(value: "bad boy <html>"))
+        expected_result = "<option value=\"bad boy &lt;html&gt;\"></option>"
+        #expect(string == expected_result)
     }
 }
 

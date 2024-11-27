@@ -5,6 +5,7 @@
 //  Created by Evan Anderson on 11/2/24.
 //
 
+#if canImport(Foundation)
 import Foundation
 import SwiftDiagnostics
 import SwiftSyntaxMacros
@@ -163,6 +164,7 @@ private extension InterpolationLookup {
         return nil
     }
 }
+#endif
 
 // MARK: Misc
 // copy & paste `HTMLKitTests.swift` into https://swift-ast-explorer.com/ to get this working

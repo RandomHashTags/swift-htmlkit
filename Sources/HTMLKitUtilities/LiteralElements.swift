@@ -154,11 +154,13 @@ public struct custom : HTMLElement {
     public var trailingSlash:Bool
     public var escaped:Bool = false
     public let tag:String
+    private var encoding:HTMLEncoding = .string
     public var attributes:[HTMLElementAttribute]
     public var innerHTML:[CustomStringConvertible]
 
-    public init(context: some MacroExpansionContext, _ children: SyntaxChildren) {
-        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, children: children)
+    public init(_ context: some MacroExpansionContext, _ encoding: HTMLEncoding, _ children: SyntaxChildren) {
+        self.encoding = encoding
+        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, encoding: encoding, children: children)
         tag = data.attributes["tag"] as? String ?? ""
         isVoid = data.attributes["isVoid"] as? Bool ?? false
         trailingSlash = data.trailingSlash
@@ -180,8 +182,8 @@ public struct custom : HTMLElement {
 
     public var description : String {
         let attributes_string:String = self.attributes.compactMap({
-            guard let v:String = $0.htmlValue else { return nil }
-            let delimiter:String = $0.htmlValueDelimiter
+            guard let v:String = $0.htmlValue(encoding) else { return nil }
+            let delimiter:String = $0.htmlValueDelimiter(encoding)
             return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=\(delimiter)\(v)\(delimiter)")
         }).joined(separator: " ")
         let l:String, g:String

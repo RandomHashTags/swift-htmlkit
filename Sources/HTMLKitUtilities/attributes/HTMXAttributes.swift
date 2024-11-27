@@ -143,7 +143,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .all:             return "*"
                 case .none:            return "none"
@@ -195,7 +195,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .drop:             return "drop"
                 case .abort:            return "abort"
@@ -229,7 +229,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .true: return "true"
                 case .false: return "false"
@@ -266,7 +266,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .connect(let value),
                         .swap(let value),
@@ -303,7 +303,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .connect(let value): return value
                 case .send(let value): return value ?? false ? "" : nil

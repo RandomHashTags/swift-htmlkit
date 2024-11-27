@@ -38,11 +38,11 @@ struct HTMXTests {
 
     // MARK: headers
     @Test func headers() {
-        let set:Set<String> = dictionary_json_results(tag: "div", closingTag: true, attribute: "hx-headers", delimiter: "'", ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"])
+        let set:Set<String> = Self.dictionary_json_results(tag: "div", closingTag: true, attribute: "hx-headers", delimiter: "'", ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"])
         let string:StaticString = #html(div(attributes: [.htmx(.headers(js: false, ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]))]))
         #expect(set.contains(string.description), Comment(rawValue: "string=\(string)\nset=\(set)"))
     }
-    func dictionary_json_results(
+    static func dictionary_json_results(
         tag: String,
         closingTag: Bool,
         attribute: String,

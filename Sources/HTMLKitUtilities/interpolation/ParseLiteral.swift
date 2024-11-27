@@ -129,10 +129,6 @@ extension HTMLKitUtilities {
                         let string:String = function.arguments.first!.expression.stringLiteral!.string
                         return .string(string)
                     default:
-                        if let element:HTMLElement = HTMLElementValueType.parse_element(context: context, function) {
-                            let string:String = String(describing: element)
-                            return string.contains("\\(") ? .interpolation(string) : .string(string)
-                        }
                         break
                 }
             }
@@ -279,6 +275,18 @@ public enum LiteralReturnType {
                 return string
             case .array(_):
                 return nil
+        }
+    }
+
+    public func escapeArray() -> LiteralReturnType {
+        switch self {
+            case .array(let a):
+                if let array_string:[String] = a as? [String] {
+                    return .array(array_string.map({ $0.escapingHTML(escapeAttributes: true) }))
+                }
+                return .array(a)
+            default:
+                return self
         }
     }
 }

@@ -13,12 +13,12 @@ public protocol HTMLInitializable : Hashable {
     init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax)
 
     var key : String { get }
-    var htmlValue : String? { get }
+    func htmlValue(_ encoding: HTMLEncoding) -> String?
     var htmlValueIsVoidable : Bool { get }
 }
 public extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
     var key : String { rawValue }
-    var htmlValue : String? { rawValue }
+    func htmlValue(_ encoding: HTMLEncoding) -> String? { rawValue }
     var htmlValueIsVoidable : Bool { false }
 
     init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
@@ -302,7 +302,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             func unwrap<T>(_ value: T?) -> String? {
                 guard let value:T = value else { return nil }
                 return "\(value)"
@@ -596,7 +596,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .showModal:          return "show-modal"
                 case .close:              return "close"
@@ -615,7 +615,7 @@ public extension HTMLElementAttribute.Extra {
         case `true`, `false`
         case plaintextOnly
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .plaintextOnly: return "plaintext-only"
                 default:             return rawValue
@@ -633,7 +633,7 @@ public extension HTMLElementAttribute.Extra {
         case anonymous
         case useCredentials
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .useCredentials: return "use-credentials"
                 default:              return rawValue
@@ -681,7 +681,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .empty: return ""
                 case .filename(let value): return value
@@ -735,7 +735,7 @@ public extension HTMLElementAttribute.Extra {
         case multipartFormData
         case textPlain
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .applicationXWWWFormURLEncoded: return "application/x-www-form-urlencoded"
                 case .multipartFormData:             return "multipart/form-data"
@@ -759,7 +759,7 @@ public extension HTMLElementAttribute.Extra {
         case `true`
         case untilFound
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .true: return ""
                 case .untilFound: return "until-found"
@@ -775,7 +775,7 @@ public extension HTMLElementAttribute.Extra {
         case xUACompatible
         case refresh
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .contentSecurityPolicy: return "content-security-policy"
                 case .contentType:           return "content-type"
@@ -797,7 +797,7 @@ public extension HTMLElementAttribute.Extra {
         case datetimeLocal
         case email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .datetimeLocal: return "datetime-local"
                 default: return rawValue
@@ -819,7 +819,7 @@ public extension HTMLElementAttribute.Extra {
     enum numberingtype : String, HTMLInitializable {
         case a, A, i, I, one
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .one: return "1"
                 default:   return rawValue
@@ -853,7 +853,7 @@ public extension HTMLElementAttribute.Extra {
         case strictOriginWhenCrossOrigin
         case unsafeURL
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .noReferrer:                  return "no-referrer"
                 case .noReferrerWhenDowngrade:     return "no-referrer-when-downgrade"
@@ -877,7 +877,7 @@ public extension HTMLElementAttribute.Extra {
         case search, stylesheet, tag
         case termsOfService
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .dnsPrefetch:    return "dns-prefetch"
                 case .privacyPolicy:  return "privacy-policy"
@@ -904,7 +904,7 @@ public extension HTMLElementAttribute.Extra {
         case allowTopNavigationByUserActivation
         case allowTopNavigationToCustomProtocols
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .allowDownloads:                      return "allow-downloads"
                 case .allowForms:                          return "allow-forms"

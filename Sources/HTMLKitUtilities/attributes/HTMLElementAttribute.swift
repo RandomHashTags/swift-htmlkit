@@ -178,21 +178,21 @@ public enum HTMLElementAttribute : Hashable {
     }
 
     // MARK: htmlValue
-    public var htmlValue : String? {
+    public func htmlValue(_ encoding: HTMLEncoding) -> String? {
         switch self {
             case .accesskey(let value):             return value
-            case .ariaattribute(let value):         return value?.htmlValue
+            case .ariaattribute(let value):         return value?.htmlValue(encoding)
             case .role(let value):                  return value?.rawValue
             case .autocapitalize(let value):        return value?.rawValue
             case .autofocus(let value):             return value == true ? "" : nil
             case .class(let value):                 return value?.joined(separator: " ")
-            case .contenteditable(let value):       return value?.htmlValue
-            case .data(_, let value):          return value
+            case .contenteditable(let value):       return value?.htmlValue(encoding)
+            case .data(_, let value):               return value
             case .dir(let value):                   return value?.rawValue
             case .draggable(let value):             return value?.rawValue
             case .enterkeyhint(let value):          return value?.rawValue
             case .exportparts(let value):           return value?.joined(separator: ",")
-            case .hidden(let value):                return value?.htmlValue
+            case .hidden(let value):                return value?.htmlValue(encoding)
             case .id(let value):                    return value
             case .inert(let value):                 return value == true ? "" : nil
             case .inputmode(let value):             return value?.rawValue
@@ -215,11 +215,11 @@ public enum HTMLElementAttribute : Hashable {
             case .virtualkeyboardpolicy(let value): return value?.rawValue
             case .writingsuggestions(let value):    return value?.rawValue
 
-            case .trailingSlash:            return nil
+            case .trailingSlash:                    return nil
 
-            case .htmx(let htmx):           return htmx?.htmlValue
-            case .custom(_, let value):        return value
-            case .event(_, let value):      return value
+            case .htmx(let htmx):                   return htmx?.htmlValue(encoding)
+            case .custom(_, let value):             return value
+            case .event(_, let value):              return value
         }
     }
 
@@ -236,14 +236,14 @@ public enum HTMLElementAttribute : Hashable {
     }
 
     // MARK: htmlValueDelimiter
-    public var htmlValueDelimiter : String {
+    public func htmlValueDelimiter(_ encoding: HTMLEncoding) -> String {
         switch self {
             case .htmx(let v):
                 switch v {
                     case .request(_, _, _, _), .headers(_, _): return "'"
-                    default: return "\\\""
+                    default: return encoding.stringDelimiter
                 }
-            default: return "\\\""
+            default: return encoding.stringDelimiter
         }
     }
 }
@@ -331,7 +331,7 @@ public extension HTMLElementAttribute {
             }
         }
 
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .centimeters(let v),
                         .millimeters(let v),

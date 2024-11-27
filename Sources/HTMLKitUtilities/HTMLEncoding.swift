@@ -61,7 +61,7 @@ public enum HTMLEncoding {
     /// let _:String = #html(encoding: .custom(#"String("$0")"#), p(5)) // String("<p>5</p>")
     /// ```
     /// 
-    case custom(_ logic: String)
+    case custom(_ logic: String, stringDelimiter: String = "\\\"")
 
     public init?(rawValue: String) {
         switch rawValue {
@@ -72,6 +72,17 @@ public enum HTMLEncoding {
             case "foundationData": self = .foundationData
             case "byteBuffer": self = .byteBuffer
             default: return nil
+        }
+    }
+    
+    public var stringDelimiter : String {
+        switch self {
+            case .string:
+                return "\\\""
+            case .utf8Bytes, .utf16Bytes, .utf8CString, .foundationData, .byteBuffer:
+                return "\""
+            case .custom(_, let delimiter):
+                return delimiter
         }
     }
 }

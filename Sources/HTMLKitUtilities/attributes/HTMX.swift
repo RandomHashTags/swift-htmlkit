@@ -158,7 +158,7 @@ public extension HTMLElementAttribute {
         }
 
         //  MARK: htmlValue
-        public var htmlValue : String? {
+        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
             switch self {
                 case .boost(let value): return value?.rawValue
                 case .confirm(let value): return value
@@ -169,37 +169,42 @@ public extension HTMLElementAttribute {
                 case .encoding(let value): return value
                 case .ext(let value): return value
                 case .headers(let js, let headers):
-                    return (js ? "js:" : "") + "{" + headers.map({ item in #"\"\#(item.key)\":\"\#(item.value)\""# }).joined(separator: ",") + "}"
+                    let delimiter:String = encoding.stringDelimiter
+                    let value:String = headers.map({ item in
+                        delimiter + item.key + delimiter + ":" + delimiter + item.value + delimiter
+                    }).joined(separator: ",")
+                    return (js ? "js:" : "") + "{" + value + "}"
                 case .history(let value): return value?.rawValue
                 case .historyElt(let value): return value ?? false ? "" : nil
                 case .include(let value): return value
                 case .indicator(let value): return value
                 case .inherit(let value): return value
-                case .params(let params): return params?.htmlValue
+                case .params(let params): return params?.htmlValue(encoding)
                 case .patch(let value): return value
                 case .preserve(let value): return value ?? false ? "" : nil
                 case .prompt(let value): return value
                 case .put(let value): return value
-                case .replaceURL(let url): return url?.htmlValue
+                case .replaceURL(let url): return url?.htmlValue(encoding)
                 case .request(let js, let timeout, let credentials, let noHeaders):
+                    let delimiter:String = encoding.stringDelimiter
                     if let timeout:String = timeout {
-                        return js ? "js: timeout:\(timeout)" : "{\\\"timeout\\\":\(timeout)}"
+                        return js ? "js: timeout:\(timeout)" : "{" + delimiter + "timeout" + delimiter + ":\(timeout)}"
                     } else if let credentials:String = credentials {
-                        return js ? "js: credentials:\(credentials)" : "{\\\"credentials\\\":\(credentials)}"
+                        return js ? "js: credentials:\(credentials)" : "{" + delimiter + "credentials" + delimiter + ":\(credentials)}"
                     } else if let noHeaders:String = noHeaders {
-                        return js ? "js: noHeaders:\(noHeaders)" : "{\\\"noHeaders\\\":\(noHeaders)}"
+                        return js ? "js: noHeaders:\(noHeaders)" : "{" + delimiter + "noHeaders" + delimiter + ":\(noHeaders)}"
                     } else {
                         return ""
                     }
                 case .sync(let selector, let strategy):
-                    return selector + (strategy == nil ? "" : ":" + strategy!.htmlValue!)
+                    return selector + (strategy == nil ? "" : ":" + strategy!.htmlValue(encoding)!)
                 case .validate(let value): return value?.rawValue
                 
                 case .get(let value):  return value
                 case .post(let value): return value
                 case .on(_, let value): return value
                 case .onevent(_, let value): return value
-                case .pushURL(let url): return url?.htmlValue
+                case .pushURL(let url): return url?.htmlValue(encoding)
                 case .select(let value): return value
                 case .selectOOB(let value): return value
                 case .swap(let swap): return swap?.rawValue
@@ -208,8 +213,8 @@ public extension HTMLElementAttribute {
                 case .trigger(let value): return value
                 case .vals(let value): return value
 
-                case .sse(let value): return value?.htmlValue
-                case .ws(let value): return value?.htmlValue
+                case .sse(let value): return value?.htmlValue(encoding)
+                case .ws(let value): return value?.htmlValue(encoding)
             }
         }
 

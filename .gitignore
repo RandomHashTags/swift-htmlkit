@@ -15,6 +15,9 @@ DebugRender.*
 DebugXmlRender.*
 Elements.*
 Events.*
+EncodingTests.d
+EncodingTests.o
+EncodingTests.swiftdeps*
 HTMX.d
 HTMX.o
 HTMX.swiftdeps*

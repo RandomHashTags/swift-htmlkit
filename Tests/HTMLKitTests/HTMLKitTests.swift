@@ -27,7 +27,7 @@ struct HTMLKitTests {
         let _:Data = #html(encoding: .foundationData, p())
         #endif
         //let _:ByteBuffer = #html(encoding: .byteBuffer, "")
-        let _:String = #html(encoding: .custom(#"String("$0")"#), p(5))
+        let _:String = #html(encoding: .custom(#""$0""#), p(5))
     }
     @Test
     func representation1() -> StaticString {
