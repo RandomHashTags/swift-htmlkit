@@ -109,6 +109,38 @@ struct InterpolationTests {
         #expect(string == "<div>Shrek isLove, Shrek isLife</div>")
     }
 
+    @Test func inferred_type_interpolation() {
+        var array:[String] = ["toothless", "hiccup"]
+        var string:String = array.map({
+            #html(option(value: $0))
+        }).joined()
+        #expect(string == "<option value=\"toothless\"></option><option value=\"hiccup\"></option>")
+
+        array = ["cloudjumper", "light fury"]
+        string = array.map({ dragon in
+            #html(option(value: dragon))
+        }).joined()
+        #expect(string == "<option value=\"cloudjumper\"></option><option value=\"light fury\"></option>")
+    }
+
+    @Test func force_unwrap_interpolation() {
+        let optionals:[String?] = ["stormfly", "sneaky"]
+        var string:String = optionals.map({
+            #html(option(value: $0!))
+        }).joined()
+        #expect(string == "<option value=\"stormfly\"></option><option value=\"sneaky\"></option>")
+
+        let array:[String] = ["sharpshot", "thornshade"]
+        string = #html(option(value: array.get(0)!))
+        #expect(string == "<option value=\"sharpshot\"></option>")
+
+        string = #html(option(value: array
+        .get(
+            1
+        )!))
+        #expect(string == "<option value=\"thornshade\"></option>")
+    }
+
     @Test func flatten() {
         let title:String = "flattening"
         var string:String = #html(meta(content: "\("interpolation \(title)")", name: "description"))
@@ -133,6 +165,12 @@ struct InterpolationTests {
     @Test func flatten_with_lookup_files() {
         //var string:StaticString = #html(lookupFiles: ["/home/paradigm/Desktop/GitProjects/swift-htmlkit/Tests/HTMLKitTests/InterpolationTests.swift"], attributes: [.title(InterpolationTests.spongebob)])
         //var string:String = #html(lookupFiles: ["/Users/randomhashtags/GitProjects/swift-htmlkit/Tests/HTMLKitTests/InterpolationTests.swift"], attributes: [.title(InterpolationTests.spongebob)])
+    }
+}
+
+fileprivate extension Array {
+    func get(_ index: Index) -> Element? {
+        return index < endIndex ? self[index] : nil
     }
 }
 

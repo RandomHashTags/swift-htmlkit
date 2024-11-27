@@ -259,6 +259,9 @@ public extension HTMLKitUtilities {
             remaining_interpolation -= string.ranges(of: target).count
             string.replace(target, with: fix)
         } else {
+            //if let decl:DeclReferenceExprSyntax = expression.declRef {
+                // TODO: lookup and try to promote | need to wait for swift-syntax to update to access SwiftLexicalLookup
+            //}
             //string = "\\(\"\(string)\".escapingHTML(escapeAttributes: true))"
             warn_interpolation(context: context, node: expr, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
         }
@@ -273,6 +276,9 @@ extension HTMLKitUtilities {
         expression: ExprSyntax,
         lookupFiles: Set<String>
     ) -> LiteralReturnType? {
+        if let _:NilLiteralExprSyntax = expression.as(NilLiteralExprSyntax.self) {
+            return nil
+        }
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
             let string:String = stringLiteral.string
             if stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 {
@@ -343,6 +349,10 @@ extension HTMLKitUtilities {
                 return .string(string)
             }
         }
+        if let unwrap:ForceUnwrapExprSyntax = expression.as(ForceUnwrapExprSyntax.self) {
+            let merged:String = merge_force_unwrap_into_single_line(unwrap)
+            return .interpolation("\\(" + merged + ")")
+        }
         return nil
     }
 
@@ -391,6 +401,20 @@ extension HTMLKitUtilities {
     }
 
     // MARK: Merge
+    static func merge_into_single_line(_ expression: ExprSyntax) -> String {
+        if let function:FunctionCallExprSyntax = expression.functionCall {
+            return merge_func_into_single_line(function)
+        } else if let member:MemberAccessExprSyntax = expression.memberAccess {
+            return merge_member_into_single_line(member)
+        } else if let force_unwrap:ForceUnwrapExprSyntax = expression.as(ForceUnwrapExprSyntax.self) {
+            return merge_force_unwrap_into_single_line(force_unwrap) + "!"
+        } else {
+            return "\(expression)"
+        }
+    }
+    static func merge_force_unwrap_into_single_line(_ force_unwrap: ForceUnwrapExprSyntax) -> String {
+        return merge_into_single_line(force_unwrap.expression) + "!"
+    }
     static func merge_member_into_single_line(_ member: MemberAccessExprSyntax) -> String {
         var string:String = "\(member)"
         string.removeAll { $0.isWhitespace }
@@ -412,14 +436,7 @@ extension HTMLKitUtilities {
                     arg.insert(",", at: arg.startIndex)
                 }
                 arg += ": "
-                var expr:String
-                if let f:FunctionCallExprSyntax = argument.expression.functionCall {
-                    expr = merge_func_into_single_line(f)
-                } else if let m:MemberAccessExprSyntax = argument.expression.memberAccess {
-                    expr = merge_member_into_single_line(m)
-                } else {
-                    expr = "\(argument.expression)"
-                }
+                var expr:String = merge_into_single_line(argument.expression)
                 while expr.first?.isWhitespace ?? false {
                     expr.removeFirst()
                 }
