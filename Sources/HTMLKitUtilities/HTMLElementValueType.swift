@@ -24,7 +24,7 @@ package indirect enum HTMLElementValueType {
         let key:String
         if let member:MemberAccessExprSyntax = called_expression.memberAccess, member.base?.declRef?.baseName.text == "HTMLKit" {
             key = member.declName.baseName.text
-        } else if let ref = called_expression.declRef {
+        } else if let ref:DeclReferenceExprSyntax = called_expression.declRef {
             key = ref.baseName.text
         } else {
             return nil
