@@ -155,11 +155,13 @@ public struct custom : HTMLElement {
     public var escaped:Bool = false
     public let tag:String
     private var encoding:HTMLEncoding = .string
+    private var fromMacro:Bool = false
     public var attributes:[HTMLElementAttribute]
     public var innerHTML:[CustomStringConvertible]
 
     public init(_ context: some MacroExpansionContext, _ encoding: HTMLEncoding, _ children: SyntaxChildren) {
         self.encoding = encoding
+        fromMacro = true
         let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, encoding: encoding, children: children)
         tag = data.attributes["tag"] as? String ?? ""
         isVoid = data.attributes["isVoid"] as? Bool ?? false
@@ -182,8 +184,8 @@ public struct custom : HTMLElement {
 
     public var description : String {
         let attributes_string:String = self.attributes.compactMap({
-            guard let v:String = $0.htmlValue(encoding) else { return nil }
-            let delimiter:String = $0.htmlValueDelimiter(encoding)
+            guard let v:String = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }
+            let delimiter:String = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)
             return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=\(delimiter)\(v)\(delimiter)")
         }).joined(separator: " ")
         let l:String, g:String

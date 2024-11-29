@@ -178,21 +178,21 @@ public enum HTMLElementAttribute : Hashable {
     }
 
     // MARK: htmlValue
-    public func htmlValue(_ encoding: HTMLEncoding) -> String? {
+    public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
         switch self {
             case .accesskey(let value):             return value
-            case .ariaattribute(let value):         return value?.htmlValue(encoding)
+            case .ariaattribute(let value):         return value?.htmlValue(encoding: encoding, forMacro: forMacro)
             case .role(let value):                  return value?.rawValue
             case .autocapitalize(let value):        return value?.rawValue
             case .autofocus(let value):             return value == true ? "" : nil
             case .class(let value):                 return value?.joined(separator: " ")
-            case .contenteditable(let value):       return value?.htmlValue(encoding)
+            case .contenteditable(let value):       return value?.htmlValue(encoding: encoding, forMacro: forMacro)
             case .data(_, let value):               return value
             case .dir(let value):                   return value?.rawValue
             case .draggable(let value):             return value?.rawValue
             case .enterkeyhint(let value):          return value?.rawValue
             case .exportparts(let value):           return value?.joined(separator: ",")
-            case .hidden(let value):                return value?.htmlValue(encoding)
+            case .hidden(let value):                return value?.htmlValue(encoding: encoding, forMacro: forMacro)
             case .id(let value):                    return value
             case .inert(let value):                 return value == true ? "" : nil
             case .inputmode(let value):             return value?.rawValue
@@ -217,7 +217,7 @@ public enum HTMLElementAttribute : Hashable {
 
             case .trailingSlash:                    return nil
 
-            case .htmx(let htmx):                   return htmx?.htmlValue(encoding)
+            case .htmx(let htmx):                   return htmx?.htmlValue(encoding: encoding, forMacro: forMacro)
             case .custom(_, let value):             return value
             case .event(_, let value):              return value
         }
@@ -236,14 +236,14 @@ public enum HTMLElementAttribute : Hashable {
     }
 
     // MARK: htmlValueDelimiter
-    public func htmlValueDelimiter(_ encoding: HTMLEncoding) -> String {
+    public func htmlValueDelimiter(encoding: HTMLEncoding, forMacro: Bool) -> String {
         switch self {
             case .htmx(let v):
                 switch v {
                     case .request(_, _, _, _), .headers(_, _): return "'"
-                    default: return encoding.stringDelimiter
+                    default: return encoding.stringDelimiter(forMacro: forMacro)
                 }
-            default: return encoding.stringDelimiter
+            default: return encoding.stringDelimiter(forMacro: forMacro)
         }
     }
 }
@@ -331,7 +331,7 @@ public extension HTMLElementAttribute {
             }
         }
 
-        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .centimeters(let v),
                         .millimeters(let v),

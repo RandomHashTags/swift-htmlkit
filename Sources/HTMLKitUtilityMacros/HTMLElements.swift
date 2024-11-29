@@ -44,6 +44,7 @@ enum HTMLElements : DeclarationMacro {
             string += "public var escaped:Bool = false\n"
             string += "public let tag:String = \"\(tag)\"\n"
             string += "private var encoding:HTMLEncoding = .string\n"
+            string += "private var fromMacro:Bool = false\n"
             string += "public var attributes:[HTMLElementAttribute]\n"
 
             var initializers:String = ""
@@ -107,6 +108,7 @@ enum HTMLElements : DeclarationMacro {
             initializers += "public init?(_ context: some MacroExpansionContext, _ encoding: HTMLEncoding, _ children: SyntaxChildren) {\n"
             let other_attributes_string:String = other_attributes.isEmpty ? "" : ", otherAttributes: [" + other_attributes.map({ "\"" + $0.0 + "\":\"" + $0.1 + "\"" }).joined(separator: ",") + "]"
             initializers += "self.encoding = encoding\n"
+            initializers += "self.fromMacro = true\n"
             initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, encoding: encoding, children: children\(other_attributes_string))\n"
             if is_void {
                 initializers += "self.trailingSlash = data.trailingSlash\n"
@@ -134,14 +136,14 @@ enum HTMLElements : DeclarationMacro {
             var render:String = "\npublic var description : String {\n"
             var attributes_func:String = "func attributes() -> String {\n"
             if !attributes.isEmpty {
-                attributes_func += "let sd:String = encoding.stringDelimiter\n"
+                attributes_func += "let sd:String = encoding.stringDelimiter(forMacro: fromMacro)\n"
                 attributes_func += "var"
             } else {
                 attributes_func += "let"
             }
             attributes_func += " items:[String] = self.attributes.compactMap({\n"
-            attributes_func += "guard let v:String = $0.htmlValue(encoding) else { return nil }\n"
-            attributes_func += "let d:String = $0.htmlValueDelimiter(encoding)\n"
+            attributes_func += "guard let v:String = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }\n"
+            attributes_func += "let d:String = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)\n"
             attributes_func += #"return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=" + d + v + d)"#
             attributes_func += "\n})\n"
             for (key, value_type, _) in attributes {
@@ -169,7 +171,7 @@ enum HTMLElements : DeclarationMacro {
                             attributes_func += "\(key)?.map({ \"\\($0)\" })"
                             break
                         default:
-                            attributes_func += "\(key)?.compactMap({ return $0.htmlValue(encoding) })"
+                            attributes_func += "\(key)?.compactMap({ return $0.htmlValue(encoding: encoding, forMacro: fromMacro) })"
                             break
                     }
                     attributes_func += ".joined(separator: \"\(separator)\") {\n"
@@ -181,7 +183,7 @@ enum HTMLElements : DeclarationMacro {
                     attributes_func += #"if let \#(key) { items.append("\#(key_literal)=" + sd + \#(value) + sd) }"#
                     attributes_func += "\n"
                 } else {
-                    attributes_func += "if let \(key), let v:String = \(key).htmlValue(encoding) {\n"
+                    attributes_func += "if let \(key), let v:String = \(key).htmlValue(encoding: encoding, forMacro: fromMacro) {\n"
                     attributes_func += #"let s:String = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=" + sd + v + sd"#
                     attributes_func += "\nitems.append(\"\(key_literal)\" + s)"
                     attributes_func += "\n}\n"

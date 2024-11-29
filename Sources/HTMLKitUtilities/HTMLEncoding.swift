@@ -75,10 +75,10 @@ public enum HTMLEncoding {
         }
     }
     
-    public var stringDelimiter : String {
+    public func stringDelimiter(forMacro: Bool) -> String {
         switch self {
             case .string:
-                return "\\\""
+                return forMacro ? "\\\"" : "\""
             case .utf8Bytes, .utf16Bytes, .utf8CString, .foundationData, .byteBuffer:
                 return "\""
             case .custom(_, let delimiter):

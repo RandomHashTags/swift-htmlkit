@@ -93,6 +93,11 @@ struct EscapeHTMLTests {
         value = #html(encoding: .utf8Bytes, option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
         #expect(String(data: Data(value), encoding: .utf8) == expected_result)
         #expect(value.firstIndex(of: backslash) == nil)
+
+        expected_result = #html(div(attributes: [.id("test")]))
+        value = #html(encoding: .utf8Bytes, div(attributes: [.id("test")]))
+        #expect(String(data: Data(value), encoding: .utf8) == expected_result)
+        #expect(value.firstIndex(of: backslash) == nil)
     }
     #endif
 }

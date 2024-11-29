@@ -9,16 +9,53 @@ import Testing
 import HTMLKit
 
 struct InterpolationTests {
+    // MARK: default/static
     @Test func interpolation() {
         var test:String = "again"
-        var string:String = #html(meta(content: test))
-        #expect(string == "<meta content=\"\(test)\">")
+        var expected_result:String = #html(meta(content: test))
+        #expect(expected_result == "<meta content=\"\(test)\">")
 
         test = "test"
-        string = #html(a(href: "\(test)", "Test"))
-        #expect(string == "<a href=\"\(test)\">Test</a>")
+        expected_result = #html(a(href: "\(test)", "Test"))
+        #expect(expected_result == "<a href=\"\(test)\">Test</a>")
+
+        expected_result = #html(div(attributes: [.id("sheesh-dude")], "sheesh-dude"))
+        test = "dude"
+        let result:String = #html(div(attributes:[.id("sheesh-\(test)")], "sheesh-\(test)"))
+        #expect(result == expected_result)
     }
 
+    // MARK: dynamic
+    @Test func dynamic_interpolation() {
+        var expected_result:String = #html(
+            ul(
+                li(attributes: [.id("one")], "one"),
+                li(attributes: [.id("two")], "two"),
+                li(attributes: [.id("three")], "three"))
+        )
+        var interp:String = ""
+        for i in ["one", "two", "three"] {
+            interp += String(describing: li(attributes: [.id(i)], i))
+        }
+        var result:String = #html(ul(interp))
+        #expect(result == expected_result)
+
+        expected_result = #html(
+            ul(
+                li(attributes: [.id("0zero")], "0zero"),
+                li(attributes: [.id("1one")], "1one"),
+                li(attributes: [.id("2two")], "2two")
+            )
+        )
+        interp = ""
+        for (i, s) in ["zero", "one", "two"].enumerated() {
+            interp += li(attributes: [.id("\(i)\(s)")], "\(i)\(s)").description
+        }
+        result = #html(ul(interp))
+        #expect(result == expected_result)
+    }
+
+    // MARK: multi-line decl
     @Test func multiline_decl_interpolation() {
         let test:String = "prophecy"
         let string:String = #html(
@@ -30,6 +67,7 @@ struct InterpolationTests {
         #expect(string == "<div>dune prophecy</div>")
     }
 
+    // MARK: multi-line func
     @Test func multiline_func_interpolation() {
         var string:String = #html(
             div(
@@ -86,6 +124,7 @@ struct InterpolationTests {
         #expect(string == "<div>Spongeboob</div>")
     }
 
+    // MARK: multi-line member
     @Test func multiline_member_interpolation() {
         var string:String = #html(
             div(
@@ -109,6 +148,7 @@ struct InterpolationTests {
         #expect(string == "<div>Shrek isLove, Shrek isLife</div>")
     }
 
+    // MARK: inferred type
     @Test func inferred_type_interpolation() {
         var array:[String] = ["toothless", "hiccup"]
         var string:String = array.map({
@@ -123,6 +163,7 @@ struct InterpolationTests {
         #expect(string == "<option value=\"cloudjumper\"></option><option value=\"light fury\"></option>")
     }
 
+    // MARK: force unwrap
     @Test func force_unwrap_interpolation() {
         let optionals:[String?] = ["stormfly", "sneaky"]
         var string:String = optionals.map({
@@ -141,6 +182,7 @@ struct InterpolationTests {
         #expect(string == "<option value=\"thornshade\"></option>")
     }
 
+    // MARK: promote
     @Test func flatten() {
         let title:String = "flattening"
         var string:String = #html(meta(content: "\("interpolation \(title)")", name: "description"))
@@ -162,6 +204,7 @@ struct InterpolationTests {
         #expect(string == "<meta content=\"flatteninginterpolation\" name=\"description\">")
     }
     
+    // MARK: promote w/lookup files
     @Test func flatten_with_lookup_files() {
         //var string:StaticString = #html(lookupFiles: ["/home/paradigm/Desktop/GitProjects/swift-htmlkit/Tests/HTMLKitTests/InterpolationTests.swift"], attributes: [.title(InterpolationTests.spongebob)])
         //var string:String = #html(lookupFiles: ["/Users/randomhashtags/GitProjects/swift-htmlkit/Tests/HTMLKitTests/InterpolationTests.swift"], attributes: [.title(InterpolationTests.spongebob)])

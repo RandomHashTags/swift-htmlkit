@@ -158,7 +158,7 @@ public extension HTMLElementAttribute {
         }
 
         //  MARK: htmlValue
-        public func htmlValue(_ encoding: HTMLEncoding) -> String? {
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .boost(let value): return value?.rawValue
                 case .confirm(let value): return value
@@ -169,7 +169,7 @@ public extension HTMLElementAttribute {
                 case .encoding(let value): return value
                 case .ext(let value): return value
                 case .headers(let js, let headers):
-                    let delimiter:String = encoding.stringDelimiter
+                    let delimiter:String = encoding.stringDelimiter(forMacro: forMacro)
                     let value:String = headers.map({ item in
                         delimiter + item.key + delimiter + ":" + delimiter + item.value + delimiter
                     }).joined(separator: ",")
@@ -179,14 +179,14 @@ public extension HTMLElementAttribute {
                 case .include(let value): return value
                 case .indicator(let value): return value
                 case .inherit(let value): return value
-                case .params(let params): return params?.htmlValue(encoding)
+                case .params(let params): return params?.htmlValue(encoding: encoding, forMacro: forMacro)
                 case .patch(let value): return value
                 case .preserve(let value): return value ?? false ? "" : nil
                 case .prompt(let value): return value
                 case .put(let value): return value
-                case .replaceURL(let url): return url?.htmlValue(encoding)
+                case .replaceURL(let url): return url?.htmlValue(encoding: encoding, forMacro: forMacro)
                 case .request(let js, let timeout, let credentials, let noHeaders):
-                    let delimiter:String = encoding.stringDelimiter
+                    let delimiter:String = encoding.stringDelimiter(forMacro: forMacro)
                     if let timeout:String = timeout {
                         return js ? "js: timeout:\(timeout)" : "{" + delimiter + "timeout" + delimiter + ":\(timeout)}"
                     } else if let credentials:String = credentials {
@@ -197,14 +197,14 @@ public extension HTMLElementAttribute {
                         return ""
                     }
                 case .sync(let selector, let strategy):
-                    return selector + (strategy == nil ? "" : ":" + strategy!.htmlValue(encoding)!)
+                    return selector + (strategy == nil ? "" : ":" + strategy!.htmlValue(encoding: encoding, forMacro: forMacro)!)
                 case .validate(let value): return value?.rawValue
                 
                 case .get(let value):  return value
                 case .post(let value): return value
                 case .on(_, let value): return value
                 case .onevent(_, let value): return value
-                case .pushURL(let url): return url?.htmlValue(encoding)
+                case .pushURL(let url): return url?.htmlValue(encoding: encoding, forMacro: forMacro)
                 case .select(let value): return value
                 case .selectOOB(let value): return value
                 case .swap(let swap): return swap?.rawValue
@@ -213,8 +213,8 @@ public extension HTMLElementAttribute {
                 case .trigger(let value): return value
                 case .vals(let value): return value
 
-                case .sse(let value): return value?.htmlValue(encoding)
-                case .ws(let value): return value?.htmlValue(encoding)
+                case .sse(let value): return value?.htmlValue(encoding: encoding, forMacro: forMacro)
+                case .ws(let value): return value?.htmlValue(encoding: encoding, forMacro: forMacro)
             }
         }
 
