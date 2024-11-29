@@ -15,33 +15,42 @@ import Testing
 struct EncodingTests {
     let backslash:UInt8 = 92
 
+    private func uint8Array_equals_string(array: [UInt8], string: String) -> Bool {
+        #if canImport(Foundation)
+        return String(data: Data(array), encoding: .utf8) == string
+        #endif
+        return true
+    }
+
+    // MARK: utf8Array
+    @Test func encoding_utf8Array() {
+        var expected_result:String = #html(option(attributes: [.class(["row"])], value: "wh'at?"))
+        var uint8Array:[UInt8] = #html(encoding: .utf8Bytes,
+            option(attributes: [.class(["row"])], value: "wh'at?")
+        )
+        #expect(uint8Array_equals_string(array: uint8Array, string: expected_result))
+        #expect(uint8Array.firstIndex(of: backslash) == nil)
+
+        expected_result = #html(div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))]))
+        uint8Array = #html(encoding: .utf8Bytes,
+            div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))])
+        )
+        #expect(uint8Array_equals_string(array: uint8Array, string: expected_result))
+        #expect(uint8Array.firstIndex(of: backslash) == nil)
+
+        uint8Array = #html(encoding: .utf8Bytes,
+            div(attributes: [.htmx(.headers(js: false, ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]))])
+        )
+        #if canImport(Foundation)
+        let set:Set<Data?> = Set(HTMXTests.dictionary_json_results(tag: "div", closingTag: true, attribute: "hx-headers", delimiter: "'", ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]).map({
+            $0.data(using: .utf8)
+        }))
+        #expect(set.contains(Data(uint8Array)))
+        #endif
+        #expect(uint8Array.firstIndex(of: backslash) == nil)
+    }
+
     #if canImport(Foundation)
-
-        // MARK: utf8Array
-        @Test func encoding_utf8Array() {
-            var expected_result:String = #html(option(attributes: [.class(["row"])], value: "wh'at?"))
-            var uint8Array:[UInt8] = #html(encoding: .utf8Bytes,
-                option(attributes: [.class(["row"])], value: "wh'at?")
-            )
-            #expect(String(data: Data(uint8Array), encoding: .utf8) == expected_result)
-            #expect(uint8Array.firstIndex(of: backslash) == nil)
-
-            expected_result = #html(div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))]))
-            uint8Array = #html(encoding: .utf8Bytes,
-                div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))])
-            )
-            #expect(String(data: Data(uint8Array), encoding: .utf8) == expected_result)
-            #expect(uint8Array.firstIndex(of: backslash) == nil)
-
-            let set:Set<Data?> = Set(HTMXTests.dictionary_json_results(tag: "div", closingTag: true, attribute: "hx-headers", delimiter: "'", ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]).map({
-                $0.data(using: .utf8)
-            }))
-            uint8Array = #html(encoding: .utf8Bytes,
-                div(attributes: [.htmx(.headers(js: false, ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]))])
-            )
-            #expect(set.contains(Data(uint8Array)))
-            #expect(uint8Array.firstIndex(of: backslash) == nil)
-        }
 
         // MARK: foundationData
         @Test func encoding_foundationData() {
