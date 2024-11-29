@@ -11,19 +11,27 @@ import SwiftSyntaxMacros
 
 public extension HTMLKitUtilities {
     // MARK: Escape HTML
-    static func escapeHTML(expansion: MacroExpansionExprSyntax, context: some MacroExpansionContext) -> String {
-        return expansion.arguments.children(viewMode: .all).compactMap({
-            guard let child:LabeledExprSyntax = $0.labeled,
-                    // TODO: fix the below encoding?
-                    var c:CustomStringConvertible = HTMLKitUtilities.parseInnerHTML(context: context, encoding: .string, child: child, lookupFiles: []) else {
-                return nil
+    static func escapeHTML(expansion: MacroExpansionExprSyntax, encoding: HTMLEncoding = .string, context: some MacroExpansionContext) -> String {
+        var encoding:HTMLEncoding = encoding
+        let children:SyntaxChildren = expansion.arguments.children(viewMode: .all)
+        var inner_html:String = ""
+        inner_html.reserveCapacity(children.count)
+        for e in children {
+            if let child:LabeledExprSyntax = e.labeled {
+                if let key:String = child.label?.text {
+                    if key == "encoding" {
+                        encoding = parseEncoding(expression: child.expression) ?? .string
+                    }
+                } else if var c:CustomStringConvertible = HTMLKitUtilities.parseInnerHTML(context: context, encoding: encoding, child: child, lookupFiles: []) {
+                    if var element:HTMLElement = c as? HTMLElement {
+                        element.escaped = true
+                        c = element
+                    }
+                    inner_html += String(describing: c)
+                }
             }
-            if var element:HTMLElement = c as? HTMLElement {
-                element.escaped = true
-                c = element
-            }
-            return String(describing: c)
-        }).joined()
+        }
+        return inner_html
     }
     
     // MARK: Expand #html
@@ -82,16 +90,7 @@ public extension HTMLKitUtilities {
             if let child:LabeledExprSyntax = element.labeled {
                 if let key:String = child.label?.text {
                     if key == "encoding" {
-                        if let key:String = child.expression.memberAccess?.declName.baseName.text {
-                            encoding = HTMLEncoding(rawValue: key) ?? .string
-                        } else if let custom:FunctionCallExprSyntax = child.expression.functionCall {
-                            let logic:String = custom.arguments.first!.expression.stringLiteral!.string
-                            if custom.arguments.count == 1 {
-                                encoding = .custom(logic)
-                            } else {
-                                encoding = .custom(logic, stringDelimiter: custom.arguments.last!.expression.stringLiteral!.string)
-                            }
-                        }
+                        encoding = parseEncoding(expression: child.expression) ?? .string
                     } else if key == "lookupFiles" {
                         lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string }))
                     } else if key == "attributes" {
@@ -125,6 +124,21 @@ public extension HTMLKitUtilities {
             }
         }
         return ElementData(encoding, global_attributes, attributes, innerHTML, trailingSlash)
+    }
+
+    // MARK: Parse Encoding
+    static func parseEncoding(expression: ExprSyntax) -> HTMLEncoding? {
+        if let key:String = expression.memberAccess?.declName.baseName.text {
+            return HTMLEncoding(rawValue: key)
+        } else if let custom:FunctionCallExprSyntax = expression.functionCall {
+            guard let logic:String = custom.arguments.first?.expression.stringLiteral?.string else { return nil }
+            if custom.arguments.count == 1 {
+                return .custom(logic)
+            } else {
+                return .custom(logic, stringDelimiter: custom.arguments.last!.expression.stringLiteral!.string)
+            }
+        }
+        return nil
     }
 
     // MARK: Parse Global Attributes
@@ -170,7 +184,7 @@ public extension HTMLKitUtilities {
     ) -> CustomStringConvertible? {
         if let expansion:MacroExpansionExprSyntax = child.expression.macroExpansion {
             if expansion.macroName.text == "escapeHTML" {
-                return escapeHTML(expansion: expansion, context: context)
+                return escapeHTML(expansion: expansion, encoding: encoding, context: context)
             }
             return "" // TODO: fix?
         } else if let element:HTMLElement = parse_element(context: context, encoding: encoding, expr: child.expression) {

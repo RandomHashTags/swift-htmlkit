@@ -19,7 +19,10 @@ public extension StringProtocol {
 }
 
 @freestanding(expression)
-public macro escapeHTML(_ innerHTML: CustomStringConvertible...) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
+public macro escapeHTML(
+    encoding: HTMLEncoding = .string,
+    _ innerHTML: CustomStringConvertible...
+) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
 // MARK: HTML Representation
 @freestanding(expression)

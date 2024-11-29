@@ -9,40 +9,19 @@ import Testing
 import HTMLKit
 
 struct ElementTests {
-    // MARK: Escape
-    @Test func escape_html() {
-        let unescaped:String = "<!DOCTYPE html><html>Test</html>"
-        let escaped:String = "&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;"
-        var expected_result:String = "<p>\(escaped)</p>"
+    // MARK: html
+    @Test func _html() {
+        var string:StaticString = #html(html())
+        #expect(string == "<!DOCTYPE html><html></html>")
 
-        var string:String = #html(p("<!DOCTYPE html><html>Test</html>"))
-        #expect(string == expected_result)
+        string = #html(html(xmlns: "test"))
+        #expect(string == "<!DOCTYPE html><html xmlns=\"test\"></html>")
+    }
 
-        string = #escapeHTML("<!DOCTYPE html><html>Test</html>")
-        #expect(string == escaped)
-
-        string = #escapeHTML(html("Test"))
-        #expect(string == escaped)
-
-        string = #html(p(#escapeHTML(html("Test"))))
-        #expect(string == expected_result)
-
-        string = #html(p("\(unescaped.escapingHTML(escapeAttributes: false))"))
-        #expect(string == expected_result)
-
-        expected_result = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
-        string = #html(div(attributes: [.title("<p>")], StaticString("<p></p>")))
-        #expect(string == expected_result)
-
-        string = #html(div(attributes: [.title("<p>")], "<p></p>"))
-        #expect(string == expected_result)
-
-        string = #html(p("What's 9 + 10? \"21\"!"))
-        #expect(string == "<p>What&#39s 9 + 10? &quot;21&quot;!</p>")
-
-        string = #html(option(value: "bad boy <html>"))
-        expected_result = "<option value=\"bad boy &lt;html&gt;\"></option>"
-        #expect(string == expected_result)
+    // MARK: HTMLKit.<element>
+    @Test func with_library_decl() {
+        let string:StaticString = #html(html(HTMLKit.body()))
+        #expect(string == "<!DOCTYPE html><html><body></body></html>")
     }
 }
 
@@ -54,21 +33,6 @@ struct ElementTests {
 
 
 extension ElementTests {
-    // MARK: html
-    @Test func _html() {
-        var string:StaticString = #html(html())
-        #expect(string == "<!DOCTYPE html><html></html>")
-
-        string = #html(html(xmlns: "test"))
-        #expect(string == "<!DOCTYPE html><html xmlns=\"test\"></html>")
-    }
-
-    // MARK: HTMLKit.element
-    @Test func with_library_decl() {
-        let string:StaticString = #html(html(HTMLKit.body()))
-        #expect(string == "<!DOCTYPE html><html><body></body></html>")
-    }
-
     // MARK: a
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
     @Test func _a() {
@@ -412,7 +376,7 @@ extension ElementTests {
     }
 
     // MARK: custom
-    @Test func _custom() {
+    @Test func custom_element() {
         var bro:StaticString = #html(custom(tag: "bro", isVoid: false))
         #expect(bro == "<bro></bro>")
 
@@ -475,27 +439,29 @@ extension ElementTests {
     }*/
 
     /*@Test func not_allowed() {
-        let _:StaticString = #div(attributes: [.id("1"), .id("2"), .id("3"), .id("4")])
-        let _:StaticString = #a(
-            attributes: [
-                .class(["lets go"])
-            ],
-            attributionSrc: ["lets go"],
-            ping: ["lets go"]
+        let _:StaticString = #html(div(attributes: [.id("1"), .id("2"), .id("3"), .id("4")]))
+        let _:StaticString = #html(
+            a(
+                attributes: [
+                    .class(["lets go"])
+                ],
+                attributionsrc: ["lets go"],
+                ping: ["lets go"]
+            )
         )
-        let _:StaticString = #input(
-            accept: ["lets,go"],
-            autocomplete: ["lets go"]
+        let _:StaticString = #html(
+            input(
+                accept: ["lets,go"],
+                autocomplete: ["lets go"]
+            )
         )
-        let _:StaticString = #link(
-            imagesizes: ["lets,go"],
-            imagesrcset: ["lets,go"],
-            rel: ["lets go"],
-            sizes: ["lets,go"]
+        let _:StaticString = #html(
+            link(
+                imagesizes: ["lets,go"],
+                imagesrcset: ["lets,go"],
+                rel: .stylesheet,
+                size: "lets,go"
+            )
         )
-        let _:String = #div(attributes: [.custom("potof gold1", "\(1)"), .custom("potof gold2", "2")])
-
-        let _:StaticString = #div(attributes: [.trailingSlash])
-        let _:StaticString = #html(custom(tag: "slash", isVoid: false, attributes: [.trailingSlash]))
     }*/
 }

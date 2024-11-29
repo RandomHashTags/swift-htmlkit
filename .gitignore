@@ -18,6 +18,9 @@ Events.*
 EncodingTests.d
 EncodingTests.o
 EncodingTests.swiftdeps*
+EscapeHTMLTests.d
+EscapeHTMLTests.o
+EscapeHTMLTests.swiftdeps*
 HTMX.d
 HTMX.o
 HTMX.swiftdeps*

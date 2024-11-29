@@ -8,7 +8,7 @@
 #if canImport(Foundation)
 import Foundation
 
-public enum TranslateHTML { // TODO: finish
+private enum TranslateHTML { // TODO: finish
     public static func translate(string: String) -> String {
         var result:String = ""
         result.reserveCapacity(string.count)
@@ -59,4 +59,5 @@ extension TranslateHTML {
         }
     }
 }
+
 #endif
