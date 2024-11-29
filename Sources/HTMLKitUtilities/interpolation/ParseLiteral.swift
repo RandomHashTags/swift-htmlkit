@@ -134,8 +134,8 @@ extension HTMLKitUtilities {
             }
             return .interpolation(to_single_line(function))
         }
-        if let member:MemberAccessExprSyntax = expression.memberAccess {
-            return .interpolation(to_single_line(member))
+        if expression.memberAccess != nil || expression.is(ForceUnwrapExprSyntax.self) {
+            return .interpolation(to_single_line(expression))
         }
         if let array:ArrayExprSyntax = expression.array {
             let separator:String
@@ -171,124 +171,16 @@ extension HTMLKitUtilities {
             }
             return .array(results)
         }
-        if let decl:DeclReferenceExprSyntax = expression.as(DeclReferenceExprSyntax.self) {
+        if let decl:DeclReferenceExprSyntax = expression.declRef {
             var string:String = decl.baseName.text, remaining_interpolation:Int = 1
             warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
             if remaining_interpolation > 0 {
-                return .interpolation("\\(" + string + ")")
+                return .interpolation(string)
             } else {
                 return .string(string)
             }
         }
-        if let unwrap:ForceUnwrapExprSyntax = expression.as(ForceUnwrapExprSyntax.self) {
-            let merged:String = to_single_line(unwrap)
-            return .interpolation("\\(" + merged + ")")
-        }
         return nil
-    }
-
-    // MARK: To Single Line
-    static func to_single_line(_ expression: ExprSyntax) -> String {
-        if let function:FunctionCallExprSyntax = expression.functionCall {
-            return to_single_line(function)
-        } else if let member:MemberAccessExprSyntax = expression.memberAccess {
-            return to_single_line(member)
-        } else if let force_unwrap:ForceUnwrapExprSyntax = expression.as(ForceUnwrapExprSyntax.self) {
-            return to_single_line(force_unwrap) + "!"
-        } else if let closure:ClosureExprSyntax = expression.as(ClosureExprSyntax.self) {
-            return to_single_line(closure)
-        } else {
-            return "\(expression)"
-        }
-    }
-    static func to_single_line(_ force_unwrap: ForceUnwrapExprSyntax) -> String {
-        return to_single_line(force_unwrap.expression) + "!"
-    }
-    static func to_single_line(_ member: MemberAccessExprSyntax) -> String {
-        var string:String = "\(member)"
-        string.removeAll { $0.isWhitespace }
-        return string
-    }
-    static func to_single_line(_ function: FunctionCallExprSyntax) -> String {
-        var string:String = "\(function.calledExpression)"
-        string.removeAll { $0.isWhitespace }
-        var args:String = ""
-        var is_first:Bool = true
-        for argument in function.arguments {
-            var arg:String
-            if let label = argument.label {
-                arg = "\(label)"
-                while arg.first?.isWhitespace ?? false {
-                    arg.removeFirst()
-                }
-                if !is_first {
-                    arg.insert(",", at: arg.startIndex)
-                }
-                arg += ": "
-                var expr:String = to_single_line(argument.expression)
-                while expr.first?.isWhitespace ?? false {
-                    expr.removeFirst()
-                }
-                arg += expr
-            } else {
-                arg = "\(argument)"
-                while arg.first?.isWhitespace ?? false {
-                    arg.removeFirst()
-                }
-            }
-            args += arg
-            is_first = false
-        }
-        if let closure:ClosureExprSyntax = function.trailingClosure {
-            args += to_single_line(closure)
-        }
-        args = "(" + args + ")"
-        return string + args
-    }
-    static func to_single_line(_ decl: DeclSyntax) -> String {
-        return "\(decl)" // TODO: fix?
-    }
-    static func to_single_line(_ statement: StmtSyntax) -> String {
-        return "\(statement)" // TODO: fix?
-    }
-    static func to_single_line(_ closure: ClosureExprSyntax) -> String {
-        var signature:String = "", body:String = ""
-        if let sig:ClosureSignatureSyntax = closure.signature {
-            signature = to_single_line(sig)
-        }
-        var is_first:Bool = true
-        for statement in closure.statements {
-            if !is_first {
-                body += "; "
-            }
-            switch statement.item {
-                case .decl(let decl): body += to_single_line(decl)
-                case .expr(let expression): body += to_single_line(expression)
-                case .stmt(let stmt): body += to_single_line(stmt)
-            }
-            is_first = false
-        }
-        return "{ " + signature + body + " }"
-    }
-    static func to_single_line(_ signature: ClosureSignatureSyntax) -> String {
-        var string:String = ""
-        switch signature.parameterClause {
-            case nil:
-                break
-            case .simpleInput(let list):
-                for i in list {
-                    string += i.name.text
-                }
-                break
-            case .parameterClause(let clause):
-                string += "("
-                for i in clause.parameters {
-                    string += "\(i)"
-                }
-                string += ")"
-                break
-        }
-        return string + " in "
     }
 }
 

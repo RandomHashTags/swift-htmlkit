@@ -129,11 +129,13 @@ struct InterpolationTests {
 
     // MARK: multi-line closure
     @Test func multiline_closure_interpolation() {
-        /*var expected_result:String = "<div>Mrs. Puff</div>"
-        string = #html(div(InterpolationTests.character2 {
-            let test:String = "Mrs. Puff"
+        var expected_result:String = "<div>Mrs. Puff</div>"
+        var string:String = #html(div(InterpolationTests.character2 {
+            let bro = ""
+            let yikes:Bool = true
+            return false ? bro : ""
         } ))
-        #expect(string == expected_result)*/
+        #expect(string == expected_result)
     }
 
     // MARK: multi-line member
