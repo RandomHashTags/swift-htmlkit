@@ -138,6 +138,12 @@ struct InterpolationTests {
                 bro = "bruh"
             } else {
             }
+            switch bro {
+                case "um":
+                    break
+                default:
+                    break
+            }
             return false ? bro : ""
         } ))
         #expect(string == expected_result)

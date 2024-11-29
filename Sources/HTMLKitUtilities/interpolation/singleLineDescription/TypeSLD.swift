@@ -14,7 +14,7 @@ public extension TypeSyntaxProtocol {
             string = identifier.singleLineDescription
         } else {
             string = "\(self)"
-            //print("TypeSLD;TypeSyntaxProtocol;singleLineDescription;self=" + self.debugDescription)
+            //print("TypeSLD;singleLineDescription;self=" + self.debugDescription)
             return ""
         }
         string.stripLeadingAndTrailingWhitespace()

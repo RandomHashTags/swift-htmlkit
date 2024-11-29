@@ -36,6 +36,8 @@ public extension ExprSyntaxProtocol {
             string = member.singleLineDescription
         } else if let string_expr:StringLiteralExprSyntax = stringLiteral {
             string = string_expr.singleLineDescription
+        } else if let switch_expr:SwitchExprSyntax = self.as(SwitchExprSyntax.self) {
+            string = switch_expr.singleLineDescription
         } else if let ternary:TernaryExprSyntax = self.as(TernaryExprSyntax.self) {
             string = ternary.singleLineDescription
         } else if let tuple:TupleExprSyntax = self.as(TupleExprSyntax.self) {
@@ -43,7 +45,7 @@ public extension ExprSyntaxProtocol {
         } else {
             string = "\(self)"
             //string = (self as SyntaxProtocol).singleLineDescription
-            //print("ExprSLD;ExprSyntax;singleLineDescription;self=" + self.debugDescription)
+            //print("ExprSLD;singleLineDescription;self=" + self.debugDescription)
             return ""
         }
         string.stripLeadingAndTrailingWhitespace()
@@ -228,6 +230,17 @@ public extension StringLiteralExprSyntax {
             }
         }
         return "\"" + string + "\""
+    }
+}
+
+// MARK: SwitchExpr
+public extension SwitchExprSyntax {
+    var singleLineDescription : String {
+        var string:String = ""
+        for c in cases {
+            string += c.singleLineDescription
+        }
+        return "switch " + subject.singleLineDescription + " { " + string + " }"
     }
 }
 

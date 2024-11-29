@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "lineLength": 100,
+    "indentation": {
+        "spaces": 2
+    },
+    "indentBlankLines": false,
+    "maximumBlankLines": 1,
+    "respectsExistingLineBreaks": true,
+    "lineBreakBeforeControlFlowKeywords": false,
+    "lineBreakBeforeEachArgument": false,
+    "multiElementCollectionTrailingCommas": true,
+    "spacesAroundRangeFormationOperators": false
+}

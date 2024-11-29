@@ -39,16 +39,35 @@ public extension SyntaxProtocol {
             string = binding.singleLineDescription
         } else if let stmt:StmtSyntax = self.as(StmtSyntax.self) {
             string = stmt.singleLineDescription
+        } else if let s_case:SwitchCaseSyntax = self.as(SwitchCaseSyntax.self) {
+            string = s_case.singleLineDescription
+        } else if let s_case_label:SwitchCaseLabelSyntax = self.as(SwitchCaseLabelSyntax.self) {
+            string = s_case_label.singleLineDescription
+        } else if let s_default:SwitchDefaultLabelSyntax = self.as(SwitchDefaultLabelSyntax.self) {
+            string = s_default.singleLineDescription
+        } else if let s_case_item:SwitchCaseItemSyntax = self.as(SwitchCaseItemSyntax.self) {
+            string = s_case_item.singleLineDescription
         } else if let type:TypeSyntaxProtocol = self.as(TypeSyntax.self) {
             string = type.singleLineDescription
         } else if let annotation:TypeAnnotationSyntax = self.as(TypeAnnotationSyntax.self) {
             string = annotation.singleLineDescription
         } else {
             string = "\(self)"
-            //print("SyntaxSLD;SyntaxProtocol;singleLineDescription;self=" + self.debugDescription)
+            //print("SyntaxSLD;singleLineDescription;self=" + self.debugDescription)
             return ""
         }
         string.stripLeadingAndTrailingWhitespace()
+        return string
+    }
+}
+
+// MARK: CodeBlockItemList
+public extension CodeBlockItemListSyntax {
+    var singleLineDescription : String {
+        var string:String = ""
+        for item in self {
+            string += (string.isEmpty ? "" : "; ") + item.singleLineDescription
+        }
         return string
     }
 }
@@ -75,5 +94,51 @@ public extension ConditionElementSyntax {
 public extension InitializerClauseSyntax {
     var singleLineDescription : String {
         return "= " + value.singleLineDescription
+    }
+}
+
+// MARK: PatternBinding
+public extension PatternBindingSyntax {
+    var singleLineDescription : String {
+        var string:String = pattern.singleLineDescription
+        if let annotation:TypeAnnotationSyntax = typeAnnotation {
+            string += annotation.singleLineDescription
+        }
+        if let initializer:InitializerClauseSyntax = initializer {
+            string += " " + initializer.singleLineDescription
+        }
+        return string
+    }
+}
+
+// MARK: SwitchCase
+public extension SwitchCaseSyntax {
+    var singleLineDescription : String {
+        return label.singleLineDescription + ": " + statements.singleLineDescription + "; "
+    }
+}
+
+// MARK: SwitchCaseItemSyntax
+public extension SwitchCaseItemSyntax {
+    var singleLineDescription : String {
+        return pattern.singleLineDescription
+    }
+}
+
+// MARK: SwitchCaseLabelSyntax
+public extension SwitchCaseLabelSyntax {
+    var singleLineDescription : String {
+        var string:String = ""
+        for item in caseItems {
+            string += (string.isEmpty ? "" : ", ") + item.singleLineDescription
+        }
+        return "case " + string
+    }
+}
+
+// MARK: SwitchDefaultLabelSyntax
+public extension SwitchDefaultLabelSyntax {
+    var singleLineDescription : String {
+        return "default"
     }
 }

@@ -14,7 +14,7 @@ public extension DeclSyntaxProtocol {
             string = variable.singleLineDescription
         } else {
             string = "\(self)"
-            //print("DeclSLD;DeclSyntax;singleLineDescription;self=" + self.debugDescription)
+            //print("DeclSLD;singleLineDescription;self=" + self.debugDescription)
             return ""
         }
         string.stripLeadingAndTrailingWhitespace()

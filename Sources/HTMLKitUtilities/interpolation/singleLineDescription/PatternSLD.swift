@@ -10,11 +10,13 @@ import SwiftSyntax
 public extension PatternSyntaxProtocol {
     var singleLineDescription : String {
         var string:String
-        if let identifier:IdentifierPatternSyntax = self.as(IdentifierPatternSyntax.self) {
+        if let expression:ExpressionPatternSyntax = self.as(ExpressionPatternSyntax.self) {
+            string = expression.singleLineDescription
+        } else if let identifier:IdentifierPatternSyntax = self.as(IdentifierPatternSyntax.self) {
             string = identifier.singleLineDescription
         } else {
             string = "\(self)"
-            //print("PatternSLD;PatternSyntaxProtocol;singleLineDescription;self=" + self.debugDescription)
+            //print("PatternSLD;singleLineDescription;self=" + self.debugDescription)
             return ""
         }
         string.stripLeadingAndTrailingWhitespace()
@@ -29,16 +31,9 @@ public extension IdentifierPatternSyntax {
     }
 }
 
-// MARK: PatternBinding
-public extension PatternBindingSyntax {
+// MARK: ExpressionPattern
+public extension ExpressionPatternSyntax {
     var singleLineDescription : String {
-        var string:String = pattern.singleLineDescription
-        if let annotation:TypeAnnotationSyntax = typeAnnotation {
-            string += annotation.singleLineDescription
-        }
-        if let initializer:InitializerClauseSyntax = initializer {
-            string += " " + initializer.singleLineDescription
-        }
-        return string
+        return expression.singleLineDescription
     }
 }
