@@ -9,7 +9,7 @@
 /// 
 /// ### Interpolation Promotion
 /// Swift HTMLKit tries to [promote](https://github.com/RandomHashTags/swift-htmlkit/blob/94793984763308ef5275dd9f71ea0b5e83fea417/Sources/HTMLKitMacros/HTMLElement.swift#L423) known interpolation at compile time with an equivalent string literal for the best performance, regardless of encoding.
-/// It is currently limited due to macro expansions being sandboxed and lexical contexts/AST not being available for macro arguments.
+/// It is currently limited due to macro expansions being sandboxed and lexical contexts/AST not being available for the macro argument types.
 /// This means referencing content in an html macro won't get promoted to its expected value.
 /// [Read more about this limitation](https://forums.swift.org/t/swift-lexical-lookup-for-referenced-stuff-located-outside-scope-current-file/75776/6).
 /// 
