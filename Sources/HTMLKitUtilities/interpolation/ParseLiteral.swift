@@ -132,10 +132,10 @@ extension HTMLKitUtilities {
                         break
                 }
             }
-            return .interpolation(to_single_line(function))
+            return .interpolation(function.singleLineDescription)
         }
         if expression.memberAccess != nil || expression.is(ForceUnwrapExprSyntax.self) {
-            return .interpolation(to_single_line(expression))
+            return .interpolation(expression.singleLineDescription)
         }
         if let array:ArrayExprSyntax = expression.array {
             let separator:String

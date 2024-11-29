@@ -131,8 +131,13 @@ struct InterpolationTests {
     @Test func multiline_closure_interpolation() {
         var expected_result:String = "<div>Mrs. Puff</div>"
         var string:String = #html(div(InterpolationTests.character2 {
-            let bro = ""
+            var bro = ""
             let yikes:Bool = true
+            if yikes {
+            } else if false {
+                bro = "bruh"
+            } else {
+            }
             return false ? bro : ""
         } ))
         #expect(string == expected_result)
