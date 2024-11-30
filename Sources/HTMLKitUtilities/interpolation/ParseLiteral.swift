@@ -30,25 +30,49 @@ extension HTMLKitUtilities {
             //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
-        var string:String = ""
-        switch returnType {
-            case .interpolation(let s): string = s
-            default: return returnType
-        }
-        var remaining_interpolation:Int = returnType.isInterpolation ? 1 : 0, interpolation:[ExpressionSegmentSyntax] = []
+        guard returnType.isInterpolation else { return returnType }
+        var remaining_interpolation:Int = 1
+        var string:String
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
-            remaining_interpolation = stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) })
-            interpolation = stringLiteral.segments.compactMap({ $0.as(ExpressionSegmentSyntax.self) })
-        }
-        for expr in interpolation {
-            string.replace("\(expr)", with: promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles))
-        }
-        if remaining_interpolation > 0 {
-            warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-            if remaining_interpolation > 0 && !string.contains("\\(") {
-                string = "\\(" + string + ")"
+            remaining_interpolation = 0
+            var interpolation:[ExpressionSegmentSyntax] = []
+            var segments:[any (SyntaxProtocol & SyntaxHashable)] = []
+            for segment in stringLiteral.segments {
+                segments.append(segment)
+                if let expression:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
+                    interpolation.append(expression)
+                }
+                remaining_interpolation += segment.is(StringSegmentSyntax.self) ? 0 : 1
+            }
+            var minimum:Int = 0
+            for expr in interpolation {
+                let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles)
+                for (i, segment) in segments.enumerated() {
+                    if i >= minimum && segment.as(ExpressionSegmentSyntax.self) == expr {
+                        segments.remove(at: i)
+                        segments.insert(contentsOf: promotions, at: i)
+                        minimum += promotions.count
+                        break
+                    }
+                }
+            }
+            string = segments.map({ "\($0)" }).joined()
+        } else {
+            warn_interpolation(context: context, node: expression)
+            var expression_string:String = "\(expression)"
+            while expression_string.first?.isWhitespace ?? false {
+                expression_string.removeFirst()
+            }
+            while expression_string.last?.isWhitespace ?? false {
+                expression_string.removeLast()
+            }
+            if let member:MemberAccessExprSyntax = expression.memberAccess {
+                string = "\\(" + member.singleLineDescription + ")"
+            } else {
+                string = "\" + String(describing: " + expression_string + ") + \""
             }
         }
+        // TODO: promote interpolation via lookupFiles here (remove `warn_interpolation` above and from `promoteInterpolation`)
         if remaining_interpolation > 0 {
             returnType = .interpolation(string)
         } else {
@@ -62,47 +86,51 @@ extension HTMLKitUtilities {
         remaining_interpolation: inout Int,
         expr: ExpressionSegmentSyntax,
         lookupFiles: Set<String>
-    ) -> String {
-        var string:String = "\(expr)"
-        guard let expression:ExprSyntax = expr.expressions.first?.expression else { return string }
-        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
-            let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
-            if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
-                remaining_interpolation = 0
-                string = segments.map({ $0.as(StringSegmentSyntax.self)!.content.text }).joined()
-            } else {
-                string = ""
-                for segment in segments {
-                    if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
-                        string += literal
-                    } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                        let promoted:String = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
-                        if "\(interpolation)" == promoted {
-                            //string += "\\(\"\(promoted)\".escapingHTML(escapeAttributes: true))"
-                            string += "\(promoted)"
-                            warn_interpolation(context: context, node: interpolation, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
+    ) -> [any (SyntaxProtocol & SyntaxHashable)] {
+        func create(_ string: String) -> StringLiteralExprSyntax {
+            var s:StringLiteralExprSyntax = StringLiteralExprSyntax(content: string)
+            s.openingQuote = TokenSyntax(stringLiteral: "")
+            s.closingQuote = TokenSyntax(stringLiteral: "")
+            return s
+        }
+        func interpolate(_ syntax: ExprSyntaxProtocol) -> ExpressionSegmentSyntax {
+            var list:LabeledExprListSyntax = LabeledExprListSyntax()
+            list.append(LabeledExprSyntax(expression: syntax))
+            return ExpressionSegmentSyntax(expressions: list)
+        }
+        var values:[any (SyntaxProtocol & SyntaxHashable)] = []
+        for element in expr.expressions {
+            let expression:ExprSyntax = element.expression
+            if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
+                let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
+                if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
+                    remaining_interpolation -= 1
+                    values.append(create(stringLiteral.string))
+                } else {
+                    for segment in segments {
+                        if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
+                            values.append(create(literal))
+                        } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
+                            let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
+                            values.append(contentsOf: promotions)
                         } else {
-                            string += promoted
+                            context.diagnose(Diagnostic(node: segment, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")")))
+                            return values
                         }
-                    } else {
-                        //string += "\\(\"\(segment)\".escapingHTML(escapeAttributes: true))"
-                        warn_interpolation(context: context, node: segment, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-                        string += "\(segment)"
                     }
                 }
+            } else if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
+                remaining_interpolation -= 1
+                values.append(create(fix))
+            } else {
+                //if let decl:DeclReferenceExprSyntax = expression.declRef {
+                    // TODO: lookup and try to promote | need to wait for swift-syntax to update to access SwiftLexicalLookup
+                //}
+                values.append(interpolate(expression))
+                warn_interpolation(context: context, node: expression)
             }
-        } else if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
-            let target:String = "\(expr)"
-            remaining_interpolation -= string.ranges(of: target).count
-            string.replace(target, with: fix)
-        } else {
-            //if let decl:DeclReferenceExprSyntax = expression.declRef {
-                // TODO: lookup and try to promote | need to wait for swift-syntax to update to access SwiftLexicalLookup
-            //}
-            //string = "\\(\"\(string)\".escapingHTML(escapeAttributes: true))"
-            warn_interpolation(context: context, node: expr, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
         }
-        return string
+        return values
     }
     // MARK: Extract Literal
     static func extract_literal(
@@ -132,10 +160,10 @@ extension HTMLKitUtilities {
                         break
                 }
             }
-            return .interpolation(function.singleLineDescription)
+            return .interpolation("\(function)")
         }
         if expression.memberAccess != nil || expression.is(ForceUnwrapExprSyntax.self) {
-            return .interpolation(expression.singleLineDescription)
+            return .interpolation("\(expression)")
         }
         if let array:ArrayExprSyntax = expression.array {
             let separator:String
@@ -167,18 +195,14 @@ extension HTMLKitUtilities {
                         case .array(let a): results.append(a)
                         case .boolean(let b): results.append(b)
                     }
+                    
                 }
             }
             return .array(results)
         }
         if let decl:DeclReferenceExprSyntax = expression.declRef {
-            var string:String = decl.baseName.text, remaining_interpolation:Int = 1
-            warn_interpolation(context: context, node: expression, string: &string, remaining_interpolation: &remaining_interpolation, lookupFiles: lookupFiles)
-            if remaining_interpolation > 0 {
-                return .interpolation(string)
-            } else {
-                return .string(string)
-            }
+            warn_interpolation(context: context, node: expression)
+            return .interpolation(decl.baseName.text)
         }
         return nil
     }
@@ -230,5 +254,14 @@ public enum LiteralReturnType {
             default:
                 return self
         }
+    }
+}
+
+// MARK: Misc
+extension MemberAccessExprSyntax {
+    var singleLineDescription : String {
+        var string:String = "\(self)"
+        string.removeAll { $0.isWhitespace }
+        return string
     }
 }

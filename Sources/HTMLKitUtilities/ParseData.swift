@@ -224,19 +224,16 @@ extension HTMLKitUtilities {
     // MARK: Warn Interpolation
     static func warn_interpolation(
         context: some MacroExpansionContext,
-        node: some SyntaxProtocol,
-        string: inout String,
-        remaining_interpolation: inout Int,
-        lookupFiles: Set<String>
+        node: some SyntaxProtocol
     ) {
-        if let fix:String = InterpolationLookup.find(context: context, node, files: lookupFiles) {
+        /*if let fix:String = InterpolationLookup.find(context: context, node, files: lookupFiles) {
             let expression:String = "\(node)"
             let ranges:[Range<String.Index>] = string.ranges(of: expression)
             string.replace(expression, with: fix)
             remaining_interpolation -= ranges.count
-        } else {
+        } else {*/
             context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
-        }
+        //}
     }
 
     // MARK: Expand Macro

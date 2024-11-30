@@ -144,7 +144,7 @@ struct InterpolationTests {
                 default:
                     break
             }
-            return false ? bro : ""
+            return false ? bro : "Mrs. Puff"
         } ))
         #expect(string == expected_result)
     }
