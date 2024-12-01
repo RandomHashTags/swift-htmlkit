@@ -27,7 +27,6 @@ extension HTMLKitUtilities {
             return .float(Float(string)!)
         }
         guard var returnType:LiteralReturnType = extract_literal(context: context, key: key, expression: expression, lookupFiles: lookupFiles) else {
-            //context.diagnose(Diagnostic(node: expression, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")", severity: .warning)))
             return nil
         }
         guard returnType.isInterpolation else { return returnType }
@@ -59,16 +58,16 @@ extension HTMLKitUtilities {
             string = segments.map({ "\($0)" }).joined()
         } else {
             warn_interpolation(context: context, node: expression)
-            var expression_string:String = "\(expression)"
-            while expression_string.first?.isWhitespace ?? false {
-                expression_string.removeFirst()
-            }
-            while expression_string.last?.isWhitespace ?? false {
-                expression_string.removeLast()
-            }
             if let member:MemberAccessExprSyntax = expression.memberAccess {
                 string = "\\(" + member.singleLineDescription + ")"
             } else {
+                var expression_string:String = "\(expression)"
+                while expression_string.first?.isWhitespace ?? false {
+                    expression_string.removeFirst()
+                }
+                while expression_string.last?.isWhitespace ?? false {
+                    expression_string.removeLast()
+                }
                 string = "\" + String(describing: " + expression_string + ") + \""
             }
         }
