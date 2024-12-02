@@ -19,7 +19,7 @@ public extension HTMLElementAttribute {
         case aspectRatio
 
         case backdropFilter
-        case backfaceVisibility
+        case backfaceVisibility(BackfaceVisibility?)
         case background(Background?)
         case blockSize
         case border(Border?)
@@ -141,15 +141,145 @@ public extension HTMLElementAttribute.CSS {
         case color(Color?)
         case inherit
         case initial
+        case revert
+        case revertLayer
+        case unset
     }
 }
 
 // MARK: Align
 public extension HTMLElementAttribute.CSS {
-    enum Align : String, HTMLInitializable {
-        case content
-        case items
-        case `self`
+    enum Align {
+        case content(Content?)
+        case items(Items?)
+        case `self`(AlignSelf?)
+    }
+}
+
+// MARK: Align Content
+public extension HTMLElementAttribute.CSS.Align {
+    enum Content : String, HTMLInitializable {
+        case baseline
+        case end
+        case firstBaseline
+        case flexEnd
+        case flexStart
+        case center
+        case inherit
+        case initial
+        case lastBaseline
+        case normal
+        case revert
+        case revertLayer
+        case spaceAround
+        case spaceBetween
+        case spaceEvenly
+        case safeCenter
+        case start
+        case stretch
+        case unsafeCenter
+        case unset
+
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+            switch self {
+                case .firstBaseline: return "first baseline"
+                case .flexEnd: return "flex-end"
+                case .flexStart: return "flex-start"
+                case .lastBaseline: return "last baseline"
+                case .revertLayer: return "revert-layer"
+                case .safeCenter: return "safe center"
+                case .spaceAround: return "space-around"
+                case .spaceBetween: return "space-between"
+                case .spaceEvenly: return "space-evenly"
+                case .unsafeCenter: return "unsafe center"
+                default: return rawValue
+            }
+        }
+    }
+}
+
+// MARK: Align Items
+public extension HTMLElementAttribute.CSS.Align {
+    enum Items : String, HTMLInitializable {
+        case anchorCenter
+        case baseline
+        case center
+        case end
+        case firstBaseline
+        case flexEnd
+        case flexStart
+        case inherit
+        case initial
+        case lastBaseline
+        case normal
+        case revert
+        case revertLayer
+        case safeCenter
+        case selfEnd
+        case selfStart
+        case start
+        case stretch
+        case unsafeCenter
+        case unset
+
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+            switch self {
+                case .anchorCenter: return "anchor-center"
+                case .firstBaseline: return "first baseline"
+                case .flexEnd: return "flex-end"
+                case .flexStart: return "flex-start"
+                case .lastBaseline: return "last baseline"
+                case .revertLayer: return "revert-layer"
+                case .safeCenter: return "safe center"
+                case .selfEnd: return "self-end"
+                case .selfStart: return "self-start"
+                case .unsafeCenter: return "unsafe center"
+                default: return rawValue
+            }
+        }
+    }
+}
+
+// MARK: Align Self
+public extension HTMLElementAttribute.CSS {
+    enum AlignSelf : String, HTMLInitializable {
+        case anchorCenter
+        case auto
+        case baseline
+        case end
+        case firstBaseline
+        case flexEnd
+        case flexStart
+        case center
+        case inherit
+        case initial
+        case lastBaseline
+        case normal
+        case revert
+        case revertLayer
+        case safeCenter
+        case selfEnd
+        case selfStart
+        case start
+        case stretch
+        case unsafeCenter
+        case unset
+
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+            switch self {
+                case .anchorCenter: return "anchor-center"
+                case .firstBaseline: return "first baseline"
+                case .flexEnd: return "flex-end"
+                case .flexStart: return "flex-start"
+                case .lastBaseline: return "last baseline"
+                case .revertLayer: return "revert-layer"
+                case .safeCenter: return "safe center"
+                case .selfEnd: return "self-end"
+                case .selfStart: return "self-start"
+                case .unsafeCenter: return "unsafe center"
+                default: return rawValue
+            }
+        }
     }
 }
 
@@ -166,6 +296,26 @@ public extension HTMLElementAttribute.CSS {
         case timingFunction
 
         case shortcut
+    }
+}
+
+// MARK: Backface Visibility
+public extension HTMLElementAttribute.CSS {
+    enum BackfaceVisibility : String, HTMLInitializable {
+        case hidden
+        case inherit
+        case initial
+        case revert
+        case revertLayer
+        case unset
+        case visible
+
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+            switch self {
+                case .revertLayer: return "revert-layer"
+                default: return rawValue
+            }
+        }
     }
 }
 
@@ -823,6 +973,7 @@ public extension HTMLElementAttribute.CSS {
 public extension HTMLElementAttribute.CSS {
     enum Text {
         case align(Align?)
+        case alignLast(Align.Last?)
         case shorthand
     }
 }
@@ -831,11 +982,50 @@ public extension HTMLElementAttribute.CSS {
 public extension HTMLElementAttribute.CSS.Text {
     enum Align : String, HTMLInitializable {
         case center
+        case end
         case inherit
         case initial
         case justify
         case left
+        case matchParent
+        case revert
+        case revertLayer
         case right
+        case start
+        case unset
+
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+            switch self {
+                case .matchParent: return "match-parent"
+                case .revertLayer: return "revert-layer"
+                default: return rawValue
+            }
+        }
+    }
+}
+
+// MARK: Text Align Last
+public extension HTMLElementAttribute.CSS.Text.Align {
+    enum Last : String, HTMLInitializable {
+        case auto
+        case center
+        case end
+        case inherit
+        case initial
+        case justify
+        case left
+        case revert
+        case revertLayer
+        case right
+        case start
+        case unset
+
+        public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+            switch self {
+                case .revertLayer: return "revert-layer"
+                default: return rawValue
+            }
+        }
     }
 }
 
