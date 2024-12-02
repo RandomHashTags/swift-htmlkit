@@ -364,8 +364,4 @@ This library is the clear leader in performance & efficiency. Static webpages of
 
 ## Contributing
 
-Contributions are always welcome.
-
-Please try to use this library's syntax when creating a PR.
-
-Changes in syntax **must** solve real-word problems to be accepted.
+Contributions are always welcome. See [CONTRIBUTIONS.md](https://github.com/RandomHashTags/swift-htmlkit/blob/main/CONTRIBUTING.md) for best practices.

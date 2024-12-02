@@ -82,8 +82,8 @@ for _ in array {
 }
 
 // Closure parameters
-let _:(Int, String) = { one, two in }
-let _:(Int, String) = { $0; $1 }
+let _:(Int, String) -> Void = { one, two in }
+let _:(Int, String) -> Void = { $0; $1 }
 
 // Unwrapping same name optional
 if let string {
