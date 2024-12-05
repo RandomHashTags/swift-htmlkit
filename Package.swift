@@ -28,6 +28,7 @@ let package = Package(
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
         ),
+
         .target(
             name: "HTMLKitUtilities",
             dependencies: [
@@ -37,6 +38,7 @@ let package = Package(
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
         ),
+
         .macro(
             name: "HTMLKitMacros",
             dependencies: [

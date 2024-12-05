@@ -9,7 +9,7 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 
 // MARK: HTMLElementAttribute
-public enum HTMLElementAttribute : Hashable {
+public enum HTMLElementAttribute : HTMLInitializable {
     case accesskey(String? = nil)
 
     case ariaattribute(Extra.ariaattribute? = nil)
@@ -60,11 +60,11 @@ public enum HTMLElementAttribute : Hashable {
     case event(Extra.event, _ value: String? = nil)
 
     // MARK: init rawValue
-    public init?(context: some MacroExpansionContext, key: String, _ function: FunctionCallExprSyntax) {
-        let expression:ExprSyntax = function.arguments.first!.expression
+    public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        let expression:ExprSyntax = arguments.first!.expression
         func string() -> String?        { expression.string(context: context, key: key) }
         func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-        func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: function.arguments) }
+        func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
         func int() -> Int? { expression.int(context: context, key: key) }
         func array_string() -> [String]? { expression.array_string(context: context, key: key) }
         switch key {
@@ -76,7 +76,7 @@ public enum HTMLElementAttribute : Hashable {
             case "class":                 self = .class(array_string())
             case "contenteditable":       self = .contenteditable(enumeration())
             case "data", "custom":
-                guard let id:String = string(), let value:String = function.arguments.last?.expression.string(context: context, key: key) else {
+                guard let id:String = string(), let value:String = arguments.last?.expression.string(context: context, key: key) else {
                     return nil
                 }
                 if key == "data" {
@@ -113,7 +113,7 @@ public enum HTMLElementAttribute : Hashable {
             case "trailingSlash":         self = .trailingSlash
             case "htmx":                  self = .htmx(enumeration())
             case "event":
-                guard let event:HTMLElementAttribute.Extra.event = enumeration(), let value:String = function.arguments.last?.expression.string(context: context, key: key) else {
+                guard let event:HTMLElementAttribute.Extra.event = enumeration(), let value:String = arguments.last?.expression.string(context: context, key: key) else {
                     return nil
                 }
                 self = .event(event, value)

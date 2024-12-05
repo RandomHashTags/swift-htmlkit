@@ -158,7 +158,7 @@ public extension HTMLKitUtilities {
                     context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
                 } else if keys.contains(key) {
                     global_attribute_already_defined(context: context, attribute: key, node: first_expression)
-                } else if let attr:HTMLElementAttribute = HTMLElementAttribute(context: context, key: key, function) {
+                } else if let attr:HTMLElementAttribute = HTMLElementAttribute(context: context, key: key, arguments: function.arguments) {
                     attributes.append(attr)
                     key = attr.key
                     keys.insert(key)
