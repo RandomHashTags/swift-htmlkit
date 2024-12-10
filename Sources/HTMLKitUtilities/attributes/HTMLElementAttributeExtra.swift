@@ -16,6 +16,12 @@ public protocol HTMLInitializable : Hashable {
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String?
     var htmlValueIsVoidable : Bool { get }
 }
+public extension HTMLInitializable {
+    func unwrap<T>(_ value: T?, suffix: String? = nil) -> String? {
+        guard let value:T = value else { return nil }
+        return "\(value)" + (suffix ?? "")
+    }
+}
 public extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
     var key : String { rawValue }
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? { rawValue }
@@ -303,10 +309,6 @@ public extension HTMLElementAttribute.Extra {
         }
 
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
-            func unwrap<T>(_ value: T?) -> String? {
-                guard let value:T = value else { return nil }
-                return "\(value)"
-            }
             switch self {
                 case .activedescendant(let value): return value
                 case .atomic(let value): return unwrap(value)
