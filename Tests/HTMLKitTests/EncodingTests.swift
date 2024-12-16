@@ -5,7 +5,7 @@
 //  Created by Evan Anderson on 11/27/24.
 //
 
-#if swift(>=6.0)
+#if compiler(>=6.0)
 
 #if canImport(Foundation)
 import Foundation
