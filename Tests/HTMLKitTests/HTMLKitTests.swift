@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 9/16/24.
 //
 
+#if swift(>=6.0)
+
 import Testing
 import HTMLKit
 
@@ -153,3 +155,5 @@ extension HTMLKitTests {
         var html : String { #html(p(name, array_string)) }
     }
 }
+
+#endif

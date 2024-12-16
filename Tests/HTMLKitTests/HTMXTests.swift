@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/12/24.
 //
 
+#if swift(>=6.0)
+
 import Testing
 import HTMLKit
 
@@ -184,3 +186,5 @@ struct HTMXTests {
         #expect(string == "<div hx-ext=\"ws\"></div>")
     }
 }
+
+#endif

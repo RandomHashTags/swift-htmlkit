@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 10/6/24.
 //
 
+#if swift(>=6.0)
+
 import Testing
 import Utilities
 import SwiftHTMLKit
@@ -63,3 +65,5 @@ struct UnitTests {
         }
     }
 }
+
+#endif

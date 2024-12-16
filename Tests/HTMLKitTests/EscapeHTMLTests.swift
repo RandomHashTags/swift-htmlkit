@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/29/24.
 //
 
+#if swift(>=6.0)
+
 #if canImport(Foundation)
 import Foundation
 #endif
@@ -101,3 +103,5 @@ struct EscapeHTMLTests {
     }
     #endif
 }
+
+#endif

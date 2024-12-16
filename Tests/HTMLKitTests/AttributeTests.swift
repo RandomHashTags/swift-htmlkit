@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/3/24.
 //
 
+#if swift(>=6.0)
+
 import Testing
 import HTMLKit
 
@@ -86,3 +88,5 @@ struct AttributeTests {
         #expect(string == "<slash></slash>")
     }
 }
+
+#endif
