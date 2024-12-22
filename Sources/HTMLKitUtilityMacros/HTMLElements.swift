@@ -224,6 +224,13 @@ enum HTMLElements : DeclarationMacro {
         }
         return items
     }
+    /// The `a` HTML element.
+    ///
+    /// Creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address.
+    ///
+    /// Content within each `<a>` _should_ indicate the link's destination. If the `href` attribute is present, pressing the enter key while focused on the `<a>` element will activate it.
+    ///
+    /// [Read more](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a).
     // MARK: parse value type
     static func parse_value_type(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> (value_type: String, default_value: String, value_type_literal: HTMLElementValueType) {
         let value_type_key:String
