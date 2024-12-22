@@ -17,6 +17,23 @@ import struct Foundation.Data
 // MARK: Representations
 struct HTMLKitTests {
     @Test
+    func memoryLayout() {
+        //print("before=\((MemoryLayout<a>.alignment, MemoryLayout<a>.size, MemoryLayout<a>.stride))")
+        //print("after=\((MemoryLayout<Brother>.alignment, MemoryLayout<Brother>.size, MemoryLayout<Brother>.stride))")
+    }
+
+    struct Brother {
+        public let tag:String
+        public var attributes:[HTMLElementAttribute]
+        public var innerHTML:[CustomStringConvertible]
+        private var encoding:HTMLEncoding = .string
+        public var isVoid:Bool
+        public var trailingSlash:Bool
+        public var escaped:Bool = false
+        private var fromMacro:Bool = false
+    }
+
+    @Test
     func representations() {
         let _:StaticString = #html()
         let _:StaticString = #html(encoding: .string)

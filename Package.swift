@@ -29,6 +29,11 @@ let package = Package(
             ]
         ),
 
+        .plugin(
+            name: "GenerateElementsPlugin",
+            capability: .buildTool()
+        ),
+
         .target(
             name: "HTMLKitUtilities",
             dependencies: [

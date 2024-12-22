@@ -138,7 +138,7 @@ public protocol HTMLElement : CustomStringConvertible {
     var isVoid : Bool { get }
     /// Whether or not this element should include a forward slash in the tag name.
     var trailingSlash : Bool { get }
-    /// Whether or not to HTML escape the `<` & `>` characters directly adjacent of the opening and closing tag names when rendering.
+    /// Whether or not to HTML escape the `<` and `>` characters directly adjacent of the opening and closing tag names when rendering.
     var escaped : Bool { get set }
     /// This element's tag name.
     var tag : String { get }
@@ -150,14 +150,14 @@ public protocol HTMLElement : CustomStringConvertible {
 
 /// A custom HTML element.
 public struct custom : HTMLElement {
+    public let tag:String
+    public var attributes:[HTMLElementAttribute]
+    public var innerHTML:[CustomStringConvertible]
+    private var encoding:HTMLEncoding = .string
     public var isVoid:Bool
     public var trailingSlash:Bool
     public var escaped:Bool = false
-    public let tag:String
-    private var encoding:HTMLEncoding = .string
     private var fromMacro:Bool = false
-    public var attributes:[HTMLElementAttribute]
-    public var innerHTML:[CustomStringConvertible]
 
     public init(_ context: some MacroExpansionContext, _ encoding: HTMLEncoding, _ children: SyntaxChildren) {
         self.encoding = encoding

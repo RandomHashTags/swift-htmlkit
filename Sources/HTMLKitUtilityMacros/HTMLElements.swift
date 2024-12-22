@@ -38,14 +38,27 @@ enum HTMLElements : DeclarationMacro {
             if element == "variable" {
                 tag = "var"
             }
-            var string:String = "/// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element) : HTMLElement {\n"
-            string += "public private(set) var isVoid:Bool = \(is_void)\n"
+            var string:String = "// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element) : HTMLElement {\n"
+            string += """
+            public let tag:String = "\(tag)"
+            public var attributes:[HTMLElementAttribute]
+            public var innerHTML:[CustomStringConvertible]
+            private var encoding:HTMLEncoding = .string
+            private var fromMacro:Bool = false
+            public let isVoid:Bool = \(is_void)
+            public var trailingSlash:Bool = false
+            public var escaped:Bool = false
+            """
+
+            /*string += "public private(set) var isVoid:Bool = \(is_void)\n"
             string += "public var trailingSlash:Bool = false\n"
             string += "public var escaped:Bool = false\n"
             string += "public let tag:String = \"\(tag)\"\n"
             string += "private var encoding:HTMLEncoding = .string\n"
             string += "private var fromMacro:Bool = false\n"
             string += "public var attributes:[HTMLElementAttribute]\n"
+            string += "public var innerHTML:[CustomStringConvertible]\n"*/
+
 
             var initializers:String = ""
             var attribute_declarations:String = ""
@@ -86,7 +99,6 @@ enum HTMLElements : DeclarationMacro {
             }
 
             string += attribute_declarations
-            string += "\npublic var innerHTML:[CustomStringConvertible]\n"
 
             initializers += "\npublic init(\n"
             initializers += "attributes: [HTMLElementAttribute] = [],\n"
@@ -251,6 +263,15 @@ enum HTMLElements : DeclarationMacro {
     }
 }
 
+// MARK: HTMLElementVariable
+struct HTMLElementVariable {
+    let name:String
+    let defaultValue:String?
+    let `public`:Bool
+    let mutable:Bool
+}
+
+// MARK: HTMLElementValueType
 indirect enum HTMLElementValueType {
     case string
     case int
