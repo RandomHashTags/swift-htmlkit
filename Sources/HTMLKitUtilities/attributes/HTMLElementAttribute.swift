@@ -5,8 +5,10 @@
 //  Created by Evan Anderson on 11/19/24.
 //
 
+#if canImport(SwiftSyntax)
 import SwiftSyntax
 import SwiftSyntaxMacros
+#endif
 
 // MARK: HTMLElementAttribute
 public enum HTMLElementAttribute : HTMLInitializable {
@@ -59,6 +61,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
     @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
     case event(Extra.event, _ value: String? = nil)
 
+    #if canImport(SwiftSyntax)
     // MARK: init rawValue
     public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
         let expression:ExprSyntax = arguments.first!.expression
@@ -120,6 +123,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
             default: return nil
         }
     }
+    #endif
 
     // MARK: key
     public var key : String {
@@ -283,6 +287,7 @@ public extension HTMLElementAttribute {
         /// Relative to the parent element
         case percent(_ value: Float?)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
             func float() -> Float? {
@@ -309,6 +314,7 @@ public extension HTMLElementAttribute {
                 default: return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {

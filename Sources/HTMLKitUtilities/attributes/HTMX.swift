@@ -5,8 +5,10 @@
 //  Created by Evan Anderson on 11/12/24.
 //
 
+#if canImport(SwiftSyntax)
 import SwiftSyntax
 import SwiftSyntaxMacros
+#endif
 
 public extension HTMLElementAttribute {
     enum HTMX : HTMLInitializable {
@@ -50,6 +52,7 @@ public extension HTMLElementAttribute {
         case sse(ServerSentEvents?)
         case ws(WebSocket?)
 
+        #if canImport(SwiftSyntax)
         // MARK: init
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
@@ -111,6 +114,7 @@ public extension HTMLElementAttribute {
                 default: return nil
             }
         }
+        #endif
 
         // MARK: key
         public var key : String {

@@ -5,12 +5,16 @@
 //  Created by Evan Anderson on 11/21/24.
 //
 
+#if canImport(SwiftSyntax)
 import SwiftSyntax
 import SwiftSyntaxMacros
+#endif
 
 // MARK: HTMLInitializable
 public protocol HTMLInitializable : Hashable {
+    #if canImport(SwiftSyntax)
     init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax)
+    #endif
 
     var key : String { get }
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String?
@@ -27,16 +31,76 @@ public extension HTMLInitializable where Self: RawRepresentable, RawValue == Str
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? { rawValue }
     var htmlValueIsVoidable : Bool { false }
 
+    #if canImport(SwiftSyntax)
     init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
         guard let value:Self = .init(rawValue: key) else { return nil }
         self = value
     }
+    #endif
 }
 
 // MARK: HTMLElementAttribute.Extra
 extension HTMLElementAttribute {
     public enum Extra {
+        public static func memoryLayout(for key: String) -> (alignment: Int, size: Int, stride: Int)? {
+            func get<T>(_ dude: T.Type) -> (Int, Int, Int) {
+                return (MemoryLayout<T>.alignment, MemoryLayout<T>.size, MemoryLayout<T>.stride)
+            }
+            switch key {
+                case "as": return get(`as`.self)
+                case "autocapitalize": return get(autocapitalize.self)
+                case "autocomplete": return get(autocomplete.self)
+                case "autocorrect": return get(autocorrect.self)
+                case "blocking": return get(blocking.self)
+                case "buttontype": return get(buttontype.self)
+                case "capture": return get(capture.self)
+                case "command": return get(command.self)
+                case "contenteditable": return get(contenteditable.self)
+                case "controlslist": return get(controlslist.self)
+                case "crossorigin": return get(crossorigin.self)
+                case "decoding": return get(decoding.self)
+                case "dir": return get(dir.self)
+                case "dirname": return get(dirname.self)
+                case "draggable": return get(draggable.self)
+                case "download": return get(download.self)
+                case "enterkeyhint": return get(enterkeyhint.self)
+                case "event": return get(event.self)
+                case "fetchpriority": return get(fetchpriority.self)
+                case "formenctype": return get(formenctype.self)
+                case "formmethod": return get(formmethod.self)
+                case "formtarget": return get(formtarget.self)
+                case "hidden": return get(hidden.self)
+                case "httpequiv": return get(httpequiv.self)
+                case "inputmode": return get(inputmode.self)
+                case "inputtype": return get(inputtype.self)
+                case "kind": return get(kind.self)
+                case "loading": return get(loading.self)
+                case "numberingtype": return get(numberingtype.self)
+                case "popover": return get(popover.self)
+                case "popovertargetaction": return get(popovertargetaction.self)
+                case "preload": return get(preload.self)
+                case "referrerpolicy": return get(referrerpolicy.self)
+                case "rel": return get(rel.self)
+                case "sandbox": return get(sandbox.self)
+                case "scripttype": return get(scripttype.self)
+                case "scope": return get(scope.self)
+                case "shadowrootmode": return get(shadowrootmode.self)
+                case "shadowrootclonable": return get(shadowrootclonable.self)
+                case "shape": return get(shape.self)
+                case "spellcheck": return get(spellcheck.self)
+                case "target": return get(target.self)
+                case "translate": return get(translate.self)
+                case "virtualkeyboardpolicy": return get(virtualkeyboardpolicy.self)
+                case "wrap": return get(wrap.self)
+                case "writingsuggestions": return get(writingsuggestions.self)
 
+                case "width": return get(width.self)
+                case "height": return get(height.self)
+                default: return nil
+            }
+        }
+
+        #if canImport(SwiftSyntax)
         public static func parse(context: some MacroExpansionContext, key: String, expr: ExprSyntax) -> (any HTMLInitializable)? {
             func get<T : HTMLInitializable>(_ type: T.Type) -> T? {
                 let inner_key:String, arguments:LabeledExprListSyntax
@@ -104,6 +168,7 @@ extension HTMLElementAttribute {
                 default: return nil
             }
         }
+        #endif
     }
 }
 public extension HTMLElementAttribute.Extra {
@@ -184,6 +249,7 @@ public extension HTMLElementAttribute.Extra {
         case valuenow(Float?)
         case valuetext(String?)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
             func string() -> String?        { expression.string(context: context, key: key) }
@@ -249,6 +315,7 @@ public extension HTMLElementAttribute.Extra {
                 default:                       return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {
@@ -575,6 +642,7 @@ public extension HTMLElementAttribute.Extra {
         case togglePopover
         case custom(String)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "showModal":     self = .showModal
@@ -586,6 +654,7 @@ public extension HTMLElementAttribute.Extra {
                 default:              return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {
@@ -668,6 +737,7 @@ public extension HTMLElementAttribute.Extra {
         case empty
         case filename(String)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "empty":    self = .empty
@@ -675,6 +745,7 @@ public extension HTMLElementAttribute.Extra {
                 default:         return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {

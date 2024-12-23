@@ -5,8 +5,10 @@
 //  Created by Evan Anderson on 11/19/24.
 //
 
+#if canImport(SwiftSyntax)
 import SwiftSyntax
 import SwiftSyntaxMacros
+#endif
 
 public extension HTMLElementAttribute.HTMX {
     // MARK: TrueOrFalse
@@ -122,6 +124,7 @@ public extension HTMLElementAttribute.HTMX {
         case not([String]?)
         case list([String]?)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
             func array_string() -> [String]? { expression.array_string(context: context, key: key) }
@@ -133,6 +136,7 @@ public extension HTMLElementAttribute.HTMX {
                 default: return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {
@@ -169,6 +173,7 @@ public extension HTMLElementAttribute.HTMX {
         case drop, abort, replace
         case queue(Queue?)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "drop":    self = .drop
@@ -181,6 +186,7 @@ public extension HTMLElementAttribute.HTMX {
                 default:        return nil
             }
         }
+        #endif
 
         public enum Queue : String, HTMLInitializable {
             case first, last, all
@@ -212,6 +218,7 @@ public extension HTMLElementAttribute.HTMX {
         case `true`, `false`
         case url(String)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
                 case "true": self = .true
@@ -220,6 +227,7 @@ public extension HTMLElementAttribute.HTMX {
                 default: return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {
@@ -248,6 +256,7 @@ public extension HTMLElementAttribute.HTMX {
         case swap(String?)
         case close(String?)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             func string() -> String?        { arguments.first!.expression.string(context: context, key: key) }
             switch key {
@@ -257,6 +266,7 @@ public extension HTMLElementAttribute.HTMX {
                 default: return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {
@@ -285,6 +295,7 @@ public extension HTMLElementAttribute.HTMX {
         case connect(String?)
         case send(Bool?)
 
+        #if canImport(SwiftSyntax)
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
             func string() -> String?        { expression.string(context: context, key: key) }
@@ -295,6 +306,7 @@ public extension HTMLElementAttribute.HTMX {
                 default: return nil
             }
         }
+        #endif
 
         public var key : String {
             switch self {

@@ -6,12 +6,18 @@
 //
 
 // generate the html element files using the following command:
-//
-// swiftc main.swift -D GENERATE_ELEMENTS && ./main
+/*
+  swiftc main.swift ../HTMLKitUtilities/HTMLEncoding.swift \
+  ../HTMLKitUtilities/attributes/HTMLElementAttribute.swift \
+  ../HTMLKitUtilities/attributes/HTMLElementAttributeExtra.swift \
+  ../HTMLKitUtilities/attributes/HTMX.swift \
+  ../HTMLKitUtilities/attributes/HTMXAttributes.swift \
+  -D GENERATE_ELEMENTS && ./main
+*/
 
 #if canImport(Foundation) && GENERATE_ELEMENTS
 
-// We do we do it this way?
+// Why do we do it this way?
 // - The documentation doesn't link correctly if we generate from a macro
 
 import Foundation
@@ -22,31 +28,36 @@ writeTo = "/home/paradigm/Desktop/GitProjects" + suffix
 #elseif os(macOS)
 writeTo = "/Users/randomhashtags/GitProjects" + suffix
 #else
-#errorget("no write path declared for platform")
+#error("no write path declared for platform")
 #endif
 
-let now:Date = Date()
+let now:String = Date.now.formatted(date: .abbreviated, time: .complete)
 let template:String = """
 //
 //  %elementName%.swift
 //
 //
-//  Generated on \(now).
+//  Generated \(now).
 //
 
 import SwiftSyntax
 
-/// The `%tagName%` HTML element.%elementDocumentation%
+/// The `%tagName%`%aliases% HTML element.%elementDocumentation%
 public struct %elementName% : HTMLElement {%variables%
+}
+
+public extension %elementName% {
+    enum AttributeKeys {%customAttributeCases%
+    }
 }
 """
 let defaultVariables:[HTMLElementVariable] = [
-    .init(public: true, mutable: true, name: "trailingSlash", valueType: .bool, defaultValue: "false"),
-    .init(public: true, mutable: true, name: "escaped", valueType: .bool, defaultValue: "false"),
-    .init(public: false, mutable: true, name: "fromMacro", valueType: .bool, defaultValue: "false"),
-    .init(public: false, mutable: true, name: "encoding", valueType: .custom("HTMLEncoding"), defaultValue: ".string"),
-    .init(public: true, mutable: true, name: "innerHTML", valueType: .array(of: .custom("CustomStringConvertible"))),
-    .init(public: true, mutable: true, name: "attributes", valueType: .array(of: .custom("HTMLElementAttribute"))),
+    get(public: true, mutable: true, name: "trailingSlash", valueType: .bool, defaultValue: "false"),
+    get(public: true, mutable: true, name: "escaped", valueType: .bool, defaultValue: "false"),
+    get(public: false, mutable: true, name: "fromMacro", valueType: .bool, defaultValue: "false"),
+    get(public: false, mutable: true, name: "encoding", valueType: .custom("HTMLEncoding"), defaultValue: ".string"),
+    get(public: true, mutable: true, name: "innerHTML", valueType: .array(of: .custom("CustomStringConvertible"))),
+    get(public: true, mutable: true, name: "attributes", valueType: .array(of: .custom("HTMLElementAttribute"))),
 ]
 
 let indent1:String = "\n    "
@@ -56,44 +67,25 @@ for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
     var variablesString:String = ""
     
     var variables:[HTMLElementVariable] = defaultVariables
-    variables.append(.init(public: true, mutable: false, name: "tag", valueType: .string, defaultValue: "\"%tagName%\""))
-    variables.append(.init(public: true, mutable: false, name: "isVoid", valueType: .bool, defaultValue: "\(elementType.isVoid)"))
+    variables.append(get(public: true, mutable: false, name: "tag", valueType: .string, defaultValue: "\"%tagName%\""))
+    variables.append(get(public: true, mutable: false, name: "isVoid", valueType: .bool, defaultValue: "\(elementType.isVoid)"))
     for attribute in customAttributes {
         variables.append(attribute)
     }
-    
-    let booleans:[HTMLElementVariable] = variables.filter({ $0.valueType.isBool })
-    for bool in booleans {
-        variablesString += indent1 + bool.description
-    }
-    
-    let integers:[HTMLElementVariable] = variables.filter({ $0.valueType == .int })
-    for int in integers {
-        variablesString += indent1 + int.description
-    }
-    
-    let floats:[HTMLElementVariable] = variables.filter({ $0.valueType == .float })
-    for float in floats {
-        variablesString += indent1 + float.description
-    }
-    
-    let attributes:[HTMLElementVariable] = variables.filter({ $0.valueType.isAttribute })
-    for attribute in attributes {
-        variablesString += indent1 + attribute.description
-    }
-    
-    let strings:[HTMLElementVariable] = variables.filter({ $0.valueType == .string })
-    for string in strings {
-        variablesString += indent1 + string.description
-    }
-    
-    let arrays:[HTMLElementVariable] = variables.filter({ $0.valueType.isArray })
-    for array in arrays {
-        variablesString += indent1 + array.description
+
+    for variable in variables.sorted(by: {
+        guard $0.memoryLayoutAlignment == $1.memoryLayoutAlignment else { return $0.memoryLayoutAlignment > $1.memoryLayoutAlignment }
+        guard $0.memoryLayoutSize == $1.memoryLayoutSize else { return $0.memoryLayoutSize > $1.memoryLayoutSize }
+        guard $0.memoryLayoutStride == $1.memoryLayoutStride else { return $0.memoryLayoutStride > $1.memoryLayoutStride }
+        return $0.name < $1.name
+    }) {
+        variablesString += indent1 + variable.description
     }
     
     variables = variables.sorted(by: { $0.name <= $1.name })
+    var customAttributeCases:String = ""
     for variable in variables {
+        customAttributeCases += indent2 + "case " + variable.name + "(" + variable.valueType.annotation(variableName: variable.name) + " = " + variable.valueType.defaultOptionalValue + ")"
     }
     
     var code:String = template
@@ -103,7 +95,11 @@ for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
     let elementDocumentationString:String = "\n/// \n" + elementDocumentation.map({ "/// " + $0 }).joined(separator: "\n")
     code.replace("%elementDocumentation%", with: elementDocumentationString)
     code.replace("%tagName%", with: elementType.tagName)
+
+    let aliases:String = elementType.aliases.isEmpty ? "" : " (" + elementType.aliases.map({ "_" + $0 + "_" }).joined(separator: ", ") + ")"
+    code.replace("%aliases%", with: aliases)
     code.replace("%elementName%", with: elementType.rawValue)
+    code.replace("%customAttributeCases%", with: customAttributeCases)
     print(code)
     
     /*let fileName:String = elementType.rawValue + ".swift"
@@ -112,17 +108,33 @@ for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
         try FileManager.default.removeItem(atPath: filePath)
     }*/
 }
+extension Array where Element == HTMLElementVariable {
+    func filterAndSort(_ predicate: (Element) -> Bool) -> [Element] {
+        return filter(predicate).sorted(by: { $0.mutable == $1.mutable ? $0.public == $1.public ? $0.name < $1.name : !$0.public : !$0.mutable })
+    }
+}
 
 // MARK: HTMLElementVariable
-struct HTMLElementVariable {
+struct HTMLElementVariable : Hashable {
     let name:String
     let documentation:[String]
     let defaultValue:String?
     let `public`:Bool
     let mutable:Bool
     let valueType:HTMLElementValueType
+    let memoryLayoutAlignment:Int
+    let memoryLayoutSize:Int
+    let memoryLayoutStride:Int
     
-    init(public: Bool, mutable: Bool, name: String, documentation: [String] = [], valueType: HTMLElementValueType, defaultValue: String? = nil) {
+    init(
+        public: Bool,
+        mutable: Bool,
+        name: String,
+        documentation: [String] = [],
+        valueType: HTMLElementValueType,
+        defaultValue: String? = nil,
+        memoryLayout: (alignment: Int, size: Int, stride: Int)
+    ) {
         switch name {
         case "for", "default", "defer", "as":
             self.name = "`" + name + "`"
@@ -134,12 +146,16 @@ struct HTMLElementVariable {
         self.public = `public`
         self.mutable = mutable
         self.valueType = valueType
+        (memoryLayoutAlignment, memoryLayoutSize, memoryLayoutStride) = (memoryLayout.alignment, memoryLayout.size, memoryLayout.stride)
     }
     
     var description : String {
         var string:String = ""
         for documentation in documentation {
-            string += "/// " + documentation
+            string += indent1 + "/// " + documentation
+        }
+        if !string.isEmpty {
+            string += indent1
         }
         string += (`public` ? "public" : "private") + " " + (mutable ? "var" : "let") + " " + name + ":" + valueType.annotation(variableName: name) + (defaultValue != nil ? " = " + defaultValue! : "")
         return string
@@ -294,6 +310,15 @@ enum HTMLElementType : String, CaseIterable {
         default: return rawValue
         }
     }
+
+    var aliases : [String] {
+        var aliases:Set<String>
+        switch self {
+            case .a: aliases = ["anchor"]
+            default: aliases = []
+        }
+        return aliases.sorted(by: { $0 <= $1 })
+    }
     
     var documentation : [String] {
         switch self {
@@ -357,8 +382,7 @@ enum HTMLElementValueType : Hashable {
     
     var isAttribute : Bool {
         switch self {
-        case .attribute: return true
-        case .otherAttribute(_): return true
+        case .attribute, .otherAttribute(_): return true
         case .optional(let item): return item.isAttribute
         default: return false
         }
@@ -369,9 +393,73 @@ enum HTMLElementValueType : Hashable {
     }
 }
 
-
-func get(_ variableName: String, _ valueType: HTMLElementValueType, _ documentation: HTMLElementVariableDocumentation? = nil) -> HTMLElementVariable {
-    return HTMLElementVariable(public: true, mutable: true, name: variableName, documentation: documentation?.value ?? [], valueType: .optional(valueType), defaultValue: valueType.defaultOptionalValue)
+// MARK: Get
+func get(
+    _ variableName: String,
+    _ valueType: HTMLElementValueType,
+    _ documentation: HTMLElementVariableDocumentation? = nil
+) -> HTMLElementVariable {
+    return get(public: true, mutable: true, name: variableName, documentation: documentation?.value ?? [], valueType: .optional(valueType))
+}
+func get(
+    public: Bool,
+    mutable: Bool,
+    name: String,
+    documentation: [String] = [],
+    valueType: HTMLElementValueType,
+    defaultValue: String? = nil
+) -> HTMLElementVariable {
+    func get<T>(_ dude: T.Type) -> (Int, Int, Int) {
+        return (MemoryLayout<T>.alignment, MemoryLayout<T>.size, MemoryLayout<T>.stride)
+    }
+    var (alignment, size, stride):(Int, Int, Int) = (-1, -1, -1)
+    func layout(vt: HTMLElementValueType) -> (Int, Int, Int) {
+        switch vt {
+            case .bool, .booleanDefaultValue(_): return get(Bool.self)
+            case .string: return get(String.self)
+            case .int: return get(Int.self)
+            case .float: return get(Float.self)
+            case .cssUnit: return get(HTMLElementAttribute.CSSUnit.self)
+            case .attribute: return HTMLElementAttribute.Extra.memoryLayout(for: name.lowercased()) ?? (-1, -1, -1)
+            case .otherAttribute(let item): return HTMLElementAttribute.Extra.memoryLayout(for: item.lowercased()) ?? (-1, -1, -1)
+            case .custom(let s):
+                switch s {
+                    case "HTMLEncoding": return get(HTMLEncoding.self)
+                    default: break
+                }
+                
+            default: break
+        }
+        return (-1, -1, -1)
+    }
+    switch valueType {
+        case .bool, .string, .int, .float, .cssUnit, .attribute, .custom(_): (alignment, size, stride) = layout(vt: valueType)
+        case .optional(let innerVT):
+            switch innerVT {
+                case .bool, .booleanDefaultValue(_): (alignment, size, stride) = get(Bool.self)
+                case .string: (alignment, size, stride) = get(String?.self)
+                case .int: (alignment, size, stride) = get(Int?.self)
+                case .float: (alignment, size, stride) = get(Float?.self)
+                case .cssUnit: (alignment, size, stride) = get(HTMLElementAttribute.CSSUnit?.self)
+                case .attribute: (alignment, size, stride) = HTMLElementAttribute.Extra.memoryLayout(for: name.lowercased()) ?? (-1, -1, -1)
+                case .otherAttribute(let item): (alignment, size, stride) = HTMLElementAttribute.Extra.memoryLayout(for: item.lowercased()) ?? (-1, -1, -1)
+                case .array(_): (alignment, size, stride) = (8, 8, 8)
+                default: break
+            }
+        case .array(_): (alignment, size, stride) = (8, 8, 8)
+        default: break
+    }
+    //var documentation:[String] = documentation
+    //documentation.append(contentsOf: ["- Memory Layout:", "  - Alignment: \(alignment)", "  - Size: \(size)", "  - Stride: \(stride)"])
+    return HTMLElementVariable(
+        public: `public`,
+        mutable: mutable,
+        name: name,
+        documentation: documentation,
+        valueType: valueType,
+        defaultValue: defaultValue ?? valueType.defaultOptionalValue,
+        memoryLayout: (alignment, size, stride)
+    )
 }
 
 // MARK: Attribute Documentation
@@ -399,7 +487,7 @@ func attributes() ->  [HTMLElementType:[HTMLElementVariable]] {
         // MARK: A
         .a : [
             get("attributionsrc", .array(of: .string)),
-            get("download", .attribute),
+            get("download", .attribute, .download),
             get("href", .string),
             get("hrefLang", .string),
             get("ping", .array(of: .string)),
@@ -413,7 +501,7 @@ func attributes() ->  [HTMLElementType:[HTMLElementVariable]] {
         .area : [
             get("alt", .string),
             get("coords", .array(of: .int)),
-            get("download", .attribute),
+            get("download", .attribute, .download),
             get("href", .string),
             get("shape", .attribute),
             get("ping", .array(of: .string)),
