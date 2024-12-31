@@ -7,7 +7,9 @@
 
 // generate the html element files using the following command:
 /*
-  swiftc main.swift ../HTMLKitUtilities/HTMLEncoding.swift \
+  swiftc main.swift \
+  ../HTMLKitUtilities/HTMLElementType.swift \
+  ../HTMLKitUtilities/HTMLEncoding.swift \
   ../HTMLKitUtilities/attributes/HTMLElementAttribute.swift \
   ../HTMLKitUtilities/attributes/HTMLElementAttributeExtra.swift \
   ../HTMLKitUtilities/attributes/HTMX.swift \
@@ -18,7 +20,7 @@
 #if canImport(Foundation) && GENERATE_ELEMENTS
 
 // Why do we do it this way?
-// - The documentation doesn't link correctly if we generate from a macro
+// - The documentation doesn't link correctly (or at all) if we generate from a macro
 
 import Foundation
 

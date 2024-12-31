@@ -11,11 +11,11 @@ import SwiftSyntaxMacros
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
     public struct ElementData {
-        public let trailingSlash:Bool
         public let encoding:HTMLEncoding
         public let globalAttributes:[HTMLElementAttribute]
         public let attributes:[String:Any]
         public let innerHTML:[CustomStringConvertible]
+        public let trailingSlash:Bool
 
         init(
             _ encoding: HTMLEncoding,
@@ -35,18 +35,21 @@ public enum HTMLKitUtilities {
 
 // MARK: Escape HTML
 public extension String {
-    /// Escapes all occurrences of source-breaking HTML characters
+    /// Escapes all occurrences of source-breaking HTML characters.
+    /// 
     /// - Parameters:
-    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters
-    /// - Returns: A new `String` escaping source-breaking HTML
+    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters.
+    /// - Returns: A new `String` escaping source-breaking HTML.
     func escapingHTML(escapeAttributes: Bool) -> String {
         var string:String = self
         string.escapeHTML(escapeAttributes: escapeAttributes)
         return string
     }
-    /// Escapes all occurrences of source-breaking HTML characters
+
+    /// Escapes all occurrences of source-breaking HTML characters.
+    /// 
     /// - Parameters:
-    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters
+    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters.
     mutating func escapeHTML(escapeAttributes: Bool) {
         self.replace("&", with: "&amp;")
         self.replace("<", with: "&lt;")
@@ -55,14 +58,17 @@ public extension String {
             self.escapeHTMLAttributes()
         }
     }
-    /// Escapes all occurrences of source-breaking HTML attribute characters
-    /// - Returns: A new `String` escaping source-breaking HTML attribute characters
+
+    /// Escapes all occurrences of source-breaking HTML attribute characters.
+    /// 
+    /// - Returns: A new `String` escaping source-breaking HTML attribute characters.
     func escapingHTMLAttributes() -> String {
         var string:String = self
         string.escapeHTMLAttributes()
         return string
     }
-    /// Escapes all occurrences of source-breaking HTML attribute characters
+
+    /// Escapes all occurrences of source-breaking HTML attribute characters.
     mutating func escapeHTMLAttributes() {
         self.replace("\\\"", with: "&quot;")
         self.replace("\"", with: "&quot;")

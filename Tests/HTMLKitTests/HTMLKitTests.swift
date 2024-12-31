@@ -18,19 +18,16 @@ import struct Foundation.Data
 struct HTMLKitTests {
     @Test
     func memoryLayout() {
-        //print("before=\((MemoryLayout<a>.alignment, MemoryLayout<a>.size, MemoryLayout<a>.stride))")
+        //print("before=\((MemoryLayout<HTMLKitUtilities.ElementData>.alignment, MemoryLayout<HTMLKitUtilities.ElementData>.size, MemoryLayout<HTMLKitUtilities.ElementData>.stride))")
         //print("after=\((MemoryLayout<Brother>.alignment, MemoryLayout<Brother>.size, MemoryLayout<Brother>.stride))")
     }
 
     struct Brother {
-        public let tag:String
-        public var attributes:[HTMLElementAttribute]
-        public var innerHTML:[CustomStringConvertible]
-        private var encoding:HTMLEncoding = .string
-        public var isVoid:Bool
-        public var trailingSlash:Bool
-        public var escaped:Bool = false
-        private var fromMacro:Bool = false
+        public let encoding:HTMLEncoding
+        public let globalAttributes:[HTMLElementAttribute]
+        public let attributes:[String:Any]
+        public let innerHTML:[CustomStringConvertible]
+        public let trailingSlash:Bool
     }
 
     @Test

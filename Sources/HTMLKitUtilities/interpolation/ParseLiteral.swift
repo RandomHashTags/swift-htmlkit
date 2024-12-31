@@ -57,7 +57,11 @@ extension HTMLKitUtilities {
             }
             string = segments.map({ "\($0)" }).joined()
         } else {
-            warn_interpolation(context: context, node: expression)
+            if let function:FunctionCallExprSyntax = expression.functionCall {
+                warn_interpolation(context: context, node: function.calledExpression)
+            } else {
+                warn_interpolation(context: context, node: expression)
+            }
             if let member:MemberAccessExprSyntax = expression.memberAccess {
                 string = "\\(" + member.singleLineDescription + ")"
             } else {
