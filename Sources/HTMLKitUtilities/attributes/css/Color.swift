@@ -172,6 +172,7 @@ public extension HTMLElementAttribute.CSS {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .hex(let hex): return "#" + hex
@@ -185,6 +186,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }

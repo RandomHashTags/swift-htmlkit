@@ -39,6 +39,16 @@ let package = Package(
             ]
         ),
 
+        .target(
+            name: "HTMLElements",
+            dependencies: [
+                "HTMLKitUtilities",
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
+            ]
+        ),
+
         .macro(
             name: "HTMLKitMacros",
             dependencies: [

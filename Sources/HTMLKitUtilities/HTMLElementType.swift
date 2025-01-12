@@ -5,7 +5,7 @@
 //  Created by Evan Anderson on 11/21/24.
 //
 
-package enum HTMLElementType : String, CaseIterable {
+public enum HTMLElementType : String, CaseIterable {
     case html
     
     case a
@@ -137,7 +137,8 @@ package enum HTMLElementType : String, CaseIterable {
 
     case wbr
 
-    package var isVoid : Bool {
+    @inlinable
+    public var isVoid : Bool {
         switch self {
         case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
             return true

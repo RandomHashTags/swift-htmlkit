@@ -45,7 +45,7 @@ let template:String = """
 import SwiftSyntax
 
 /// The `%tagName%`%aliases% HTML element.%elementDocumentation%
-public struct %elementName% : HTMLElement {%variables%
+public struct %elementName% : HTMLElement {%variables%%render%
 }
 
 public extension %elementName% {
@@ -64,9 +64,24 @@ let defaultVariables:[HTMLElementVariable] = [
 
 let indent1:String = "\n    "
 let indent2:String = indent1 + "    "
+let indent3:String = indent2 + "    "
+let indent4:String = indent3 + "    "
+let indent5:String = indent4 + "    "
+let indent6:String = indent5 + "    "
 
 for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
     var variablesString:String = ""
+    var renderString:String = "\n" + indent1 + "@inlinable" + indent1 + "public var description : String {"
+    var renderAttributesString:String = indent2 + "func attributes() -> String {"
+    renderAttributesString += indent3 + "let sd:String = encoding.stringDelimiter(forMacro: fromMacro)"
+    renderAttributesString += indent3
+    renderAttributesString += """
+    var items:[String] = self.attributes.compactMap({
+                    guard let v:String = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }
+                    let d:String = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)
+                    return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=" + d + v + d)
+                })
+    """
     
     var variables:[HTMLElementVariable] = defaultVariables
     variables.append(get(public: true, mutable: false, name: "tag", valueType: .string, defaultValue: "\"%tagName%\""))
@@ -75,6 +90,18 @@ for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
         variables.append(attribute)
     }
 
+    func separator(key: String) -> String {
+        switch key {
+            case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
+                return ","
+            case "allow":
+                return ";"
+            default:
+                return " "
+        }
+    }
+
+    let excludeRendered:Set<String> = ["attributes", "isVoid", "encoding", "tag", "fromMacro", "trailingSlash", "escaped", "innerHTML"]
     for variable in variables.sorted(by: {
         guard $0.memoryLayoutAlignment == $1.memoryLayoutAlignment else { return $0.memoryLayoutAlignment > $1.memoryLayoutAlignment }
         guard $0.memoryLayoutSize == $1.memoryLayoutSize else { return $0.memoryLayoutSize > $1.memoryLayoutSize }
@@ -82,16 +109,80 @@ for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
         return $0.name < $1.name
     }) {
         variablesString += indent1 + variable.description
+        let variableName:String = variable.name
+        if !excludeRendered.contains(variableName) {
+            if variable.valueType.isOptional {
+                if variable.valueType.isAttribute {
+                    renderAttributesString += indent3 + "if let " + variableName
+                    renderAttributesString += ", let v:String = " + variableName + ".htmlValue(encoding: encoding, forMacro: fromMacro) {"
+                    renderAttributesString += indent4 + "let s:String = " + variableName + ".htmlValueIsVoidable && v.isEmpty ? \"\" : \"=\" + sd + v + sd"
+                    renderAttributesString += indent4 + "items.append(\"" + variableName.lowercased() + "\" + s)"
+                } else if variable.valueType.isString {
+                    renderAttributesString += indent3 + "if let " + variableName
+                    renderAttributesString += " {"
+                    renderAttributesString += indent4 + "items.append(\"" + variableName.lowercased() + "\" + sd + " + variableName + " + sd)"
+                } else if variable.valueType.isArray {
+                    let separator:String = separator(key: variableName.lowercased())
+                    renderAttributesString += indent3 + "if !" + variableName + ".isEmpty {"
+                    renderAttributesString += indent4 + "var v:String = sd"
+                    renderAttributesString += indent4
+
+                    var function:String = indent5
+                    switch variable.valueType {
+                    case .array(.string), .optional(.array(.string)):
+                        function += "v += e + \"\(separator)\""
+                    case .array(.int), .optional(.array(.int)):
+                        function += "v += String(describing: e) + \"\(separator)\""
+                    default:
+                        function += "if let e:String = e.htmlValue(encoding: encoding, forMacro: fromMacro) {" + indent6 + "v += e + \"\(separator)\"" + indent5 + "}"
+                    }
+
+                    renderAttributesString += """
+                    for e in \(variableName) {\(function)
+                                    }
+                    """
+                    renderAttributesString += indent4 + "v.removeLast()"
+                    renderAttributesString += indent4 + "items.append(\"" + variableName.lowercased() + "=\" + v + sd)"
+                } else {
+                    renderAttributesString += indent3 + "if let " + variableName
+                    renderAttributesString += " {"
+                    renderAttributesString += indent4 + "// test"
+                }
+                renderAttributesString += indent3 + "}"
+            } else {
+                renderAttributesString += "\n+ String(describing: " + variableName + ")"
+            }
+        }
     }
+    renderAttributesString += indent3 + "return (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")"
     
     variables = variables.sorted(by: { $0.name <= $1.name })
     var customAttributeCases:String = ""
     for variable in variables {
-        customAttributeCases += indent2 + "case " + variable.name + "(" + variable.valueType.annotation(variableName: variable.name) + " = " + variable.valueType.defaultOptionalValue + ")"
+        if !excludeRendered.contains(variable.name.lowercased()) {
+            customAttributeCases += indent2 + "case " + variable.name + "(" + variable.valueType.annotation(variableName: variable.name) + " = " + variable.valueType.defaultOptionalValue + ")"
+        }
     }
+
+    renderAttributesString += indent2 + "}"
+    renderString += renderAttributesString + "\n"
+    renderString += """
+            let string:String = innerHTML.map({ String(describing: $0) }).joined()
+            let l:String, g:String
+            if escaped {
+                l = "&lt;"
+                g = "&gt;"
+            } else {
+                l = "<"
+                g = ">"
+            }
+            return l + tag + attributes() + g + string + l + "/" + tag + g
+    """
+    renderString += indent1 + "}"
     
     var code:String = template
     code.replace("%variables%", with: variablesString)
+    code.replace("%render%", with: renderString)
     var elementDocumentation:[String] = elementType.documentation
     elementDocumentation.append(contentsOf: [" ", "[Read more](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/%tagName%)."])
     let elementDocumentationString:String = "\n/// \n" + elementDocumentation.map({ "/// " + $0 }).joined(separator: "\n")
@@ -108,7 +199,8 @@ for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
     let filePath:String = writeTo + fileName
     if FileManager.default.fileExists(atPath: filePath) {
         try FileManager.default.removeItem(atPath: filePath)
-    }*/
+    }
+    FileManager.default.createFile(atPath: filePath, contents: code.data(using: .utf8)!)*/
 }
 extension Array where Element == HTMLElementVariable {
     func filterAndSort(_ predicate: (Element) -> Bool) -> [Element] {
@@ -159,152 +251,13 @@ struct HTMLElementVariable : Hashable {
         if !string.isEmpty {
             string += indent1
         }
-        string += (`public` ? "public" : "private") + " " + (mutable ? "var" : "let") + " " + name + ":" + valueType.annotation(variableName: name) + (defaultValue != nil ? " = " + defaultValue! : "")
+        string += (`public` ? "public" : "@usableFromInline internal") + " " + (mutable ? "var" : "let") + " " + name + ":" + valueType.annotation(variableName: name) + (defaultValue != nil ? " = " + defaultValue! : "")
         return string
     }
 }
 
 // MARK: HTMLElementType
-enum HTMLElementType : String, CaseIterable {
-    case html
-    
-    case a
-    case abbr
-    case address
-    case area
-    case article
-    case aside
-    case audio
-
-    case b
-    case base
-    case bdi
-    case bdo
-    case blockquote
-    case body
-    case br
-    case button
-
-    case canvas
-    case caption
-    case cite
-    case code
-    case col
-    case colgroup
-
-    case data
-    case datalist
-    case dd
-    case del
-    case details
-    case dfn
-    case dialog
-    case div
-    case dl
-    case dt
-
-    case em
-    case embed
-
-    case fencedframe
-    case fieldset
-    case figcaption
-    case figure
-    case footer
-    case form
-
-    case h1, h2, h3, h4, h5, h6
-    case head
-    case header
-    case hgroup
-    case hr
-    
-    case i
-    case iframe
-    case img
-    case input
-    case ins
-
-    case kbd
-
-    case label
-    case legend
-    case li
-    case link
-
-    case main
-    case map
-    case mark
-    case menu
-    case meta
-    case meter
-
-    case nav
-    case noscript
-
-    case object
-    case ol
-    case optgroup
-    case option
-    case output
-
-    case p
-    case picture
-    case portal
-    case pre
-    case progress
-
-    case q
-
-    case rp
-    case rt
-    case ruby
-    
-    case s
-    case samp
-    case script
-    case search
-    case section
-    case select
-    case slot
-    case small
-    case source
-    case span
-    case strong
-    case style
-    case sub
-    case summary
-    case sup
-
-    case table
-    case tbody
-    case td
-    case template
-    case textarea
-    case tfoot
-    case th
-    case thead
-    case time
-    case title
-    case tr
-    case track
-
-    case u
-    case ul
-
-    case variable // var
-    case video
-
-    case wbr
-
-    var isVoid : Bool {
-        switch self {
-        case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
-            return true
-        default:
-            return false
-        }
-    }
+extension HTMLElementType {
     
     var tagName : String {
         switch self {
@@ -329,6 +282,14 @@ enum HTMLElementType : String, CaseIterable {
                 "[Its `href` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#href) creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address.",
                 " ",
                 "Content within each `<a>` _should_ indicate the link's destination. If the `href` attribute is present, pressing the enter key while focused on the `<a>` element will activate it."
+            ]
+        case .abbr:
+            return [
+                "Represents an abbreviation or acronym.",
+                "",
+                "When including an abbreviation or acronym, provide a full expansion of the term in plain text on first use, along with the `<abbr>` to mark up the abbreviation. This informs the user what the abbreviation or acronym means.",
+                "",
+                "The optional [`title`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/title) attribute can provide an expansion for the abbreviation or acronym when a full expansion is not present. This provides a hint to user agents on how to announce/display the content while informing all users what the abbreviation means. If present, `title` must contain this full description and nothing else."
             ]
         default: return []
         }
@@ -389,6 +350,20 @@ enum HTMLElementValueType : Hashable {
         default: return false
         }
     }
+
+    var isString : Bool {
+        switch self {
+        case .string, .optional(.string): return true
+        default: return false
+        }
+    }
+
+    var isOptional : Bool {
+        switch self {
+        case .optional(_): return true
+        default: return false
+        }
+    }
     
     var defaultOptionalValue : String {
         isArray ? "[]" : isBool ? "false" : "nil"
@@ -398,9 +373,9 @@ enum HTMLElementValueType : Hashable {
 // MARK: Get
 func get(
     _ variableName: String,
-    _ valueType: HTMLElementValueType,
-    _ documentation: HTMLElementVariableDocumentation? = nil
+    _ valueType: HTMLElementValueType
 ) -> HTMLElementVariable {
+    let documentation:HTMLElementVariableDocumentation? = HTMLElementVariableDocumentation(rawValue: variableName.lowercased())
     return get(public: true, mutable: true, name: variableName, documentation: documentation?.value ?? [], valueType: .optional(valueType))
 }
 func get(
@@ -465,7 +440,7 @@ func get(
 }
 
 // MARK: Attribute Documentation
-enum HTMLElementVariableDocumentation {
+enum HTMLElementVariableDocumentation : String {
     case download
     
     var value : [String] {
@@ -489,7 +464,7 @@ func attributes() ->  [HTMLElementType:[HTMLElementVariable]] {
         // MARK: A
         .a : [
             get("attributionsrc", .array(of: .string)),
-            get("download", .attribute, .download),
+            get("download", .attribute),
             get("href", .string),
             get("hrefLang", .string),
             get("ping", .array(of: .string)),
@@ -503,7 +478,7 @@ func attributes() ->  [HTMLElementType:[HTMLElementVariable]] {
         .area : [
             get("alt", .string),
             get("coords", .array(of: .int)),
-            get("download", .attribute, .download),
+            get("download", .attribute),
             get("href", .string),
             get("shape", .attribute),
             get("ping", .array(of: .string)),

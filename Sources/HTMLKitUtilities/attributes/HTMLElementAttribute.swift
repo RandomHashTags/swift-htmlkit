@@ -126,6 +126,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
     #endif
 
     // MARK: key
+    @inlinable
     public var key : String {
         switch self {
             case .accesskey(_):             return "accesskey"
@@ -182,6 +183,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
     }
 
     // MARK: htmlValue
+    @inlinable
     public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
         switch self {
             case .accesskey(let value):             return value
@@ -228,6 +230,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
     }
 
     // MARK: htmlValueIsVoidable
+    @inlinable
     public var htmlValueIsVoidable : Bool {
         switch self {
             case .autofocus(_), .hidden(_), .inert(_), .itemscope(_):
@@ -240,6 +243,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
     }
 
     // MARK: htmlValueDelimiter
+    @inlinable
     public func htmlValueDelimiter(encoding: HTMLEncoding, forMacro: Bool) -> String {
         switch self {
             case .htmx(let v):
@@ -316,6 +320,7 @@ public extension HTMLElementAttribute {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .centimeters(_):    return "centimeters"
@@ -337,6 +342,7 @@ public extension HTMLElementAttribute {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .centimeters(let v),
@@ -367,8 +373,10 @@ public extension HTMLElementAttribute {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
 
+        @inlinable
         public var suffix : String {
             switch self {
                 case .centimeters(_):    return "cm"

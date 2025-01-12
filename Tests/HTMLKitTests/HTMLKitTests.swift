@@ -18,16 +18,37 @@ import struct Foundation.Data
 struct HTMLKitTests {
     @Test
     func memoryLayout() {
-        //print("before=\((MemoryLayout<HTMLKitUtilities.ElementData>.alignment, MemoryLayout<HTMLKitUtilities.ElementData>.size, MemoryLayout<HTMLKitUtilities.ElementData>.stride))")
-        //print("after=\((MemoryLayout<Brother>.alignment, MemoryLayout<Brother>.size, MemoryLayout<Brother>.stride))")
+        //print("before=\((MemoryLayout<a>.alignment, MemoryLayout<a>.size, MemoryLayout<a>.stride))")
+        //print("after=\((MemoryLayout<NewA>.alignment, MemoryLayout<NewA>.size, MemoryLayout<NewA>.stride))")
     }
 
-    struct Brother {
-        public let encoding:HTMLEncoding
-        public let globalAttributes:[HTMLElementAttribute]
-        public let attributes:[String:Any]
-        public let innerHTML:[CustomStringConvertible]
-        public let trailingSlash:Bool
+    public struct NewA : HTMLElement {
+        private var encoding:HTMLEncoding = .string
+        
+        /// Causes the browser to treat the linked URL as a download. Can be used with or without a `filename` value.
+        /// 
+        /// Without a value, the browser will suggest a filename/extension, generated from various sources:
+        /// - The [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) HTTP header
+        /// - The final segment in the URL [path](https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname)
+        /// - The [media type](https://developer.mozilla.org/en-US/docs/Glossary/MIME_type) (from the [`Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) header, the start of a [`data:` URL](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data), or [`Blob.type`](https://developer.mozilla.org/en-US/docs/Web/API/Blob/type) for a [`blob:` URL](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static))
+        public var download:HTMLElementAttribute.Extra.download? = nil
+        public var href:String? = nil
+        public var hrefLang:String? = nil
+        public let tag:String = "a"
+        public var type:String? = nil
+        public var attributes:[HTMLElementAttribute] = []
+        public var attributionsrc:[String] = []
+        public var innerHTML:[CustomStringConvertible] = []
+        public var ping:[String] = []
+        public var rel:[HTMLElementAttribute.Extra.rel] = []
+        public var escaped:Bool = false
+        private var fromMacro:Bool = false
+        public let isVoid:Bool = false
+        public var referrerPolicy:HTMLElementAttribute.Extra.referrerpolicy? = nil
+        public var target:HTMLElementAttribute.Extra.target? = nil
+        public var trailingSlash:Bool = false
+
+        public var description : String { ""  }
     }
 
     @Test

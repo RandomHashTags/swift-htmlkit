@@ -161,6 +161,7 @@ public extension HTMLElementAttribute.CSS {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .auto: return "auto"
@@ -173,6 +174,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -192,6 +194,7 @@ public extension HTMLElementAttribute.CSS {
         case textfield
         case unset
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .menulistButton: return "menulist-button"
@@ -213,6 +216,7 @@ public extension HTMLElementAttribute.CSS {
         case unset
         case visible
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .revertLayer: return "revert-layer"
@@ -282,6 +286,7 @@ public extension HTMLElementAttribute.CSS {
         case onlyDark
         case onlyLight
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .lightDark: return "light dark"
@@ -324,6 +329,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .int(let i): return "\(i)"
@@ -331,6 +337,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -450,7 +457,8 @@ public extension HTMLElementAttribute.CSS {
         case tableRow
         /// Let the element behave like a `<tbody>` element
         case tableRowGroup
-        
+
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .inlineBlock: return "inline-block"
@@ -503,6 +511,7 @@ public extension HTMLElementAttribute.CSS {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .auto: return "auto"
@@ -517,6 +526,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -572,6 +582,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .char(let c): return "\(c)"
@@ -579,6 +590,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -594,6 +606,7 @@ public extension HTMLElementAttribute.CSS {
         case pixelated
         case smooth
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .crispEdges: return "crisp-edges"
@@ -625,6 +638,7 @@ public extension HTMLElementAttribute.CSS {
         case none
         case scaleDown
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .scaleDown: return "scale-down"
@@ -660,6 +674,7 @@ public extension HTMLElementAttribute.CSS {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .float(let f): return unwrap(f)
@@ -672,6 +687,7 @@ public extension HTMLElementAttribute.CSS {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -710,6 +726,7 @@ public extension HTMLElementAttribute.CSS.Text {
         case start
         case unset
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .matchParent: return "match-parent"
@@ -736,6 +753,7 @@ public extension HTMLElementAttribute.CSS.Text.Align {
         case start
         case unset
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .revertLayer: return "revert-layer"
@@ -764,6 +782,7 @@ public extension HTMLElementAttribute.CSS.Word {
         case keepAll
         case normal
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .breakAll: return "break-all"
@@ -793,6 +812,7 @@ public extension HTMLElementAttribute.CSS.Word {
         case initial
         case normal
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .breakWord: return "break-word"
@@ -809,6 +829,7 @@ public extension HTMLElementAttribute.CSS {
         case verticalRL
         case verticalLR
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .horizontalTB: return "horizontal-tb"
@@ -859,6 +880,7 @@ public extension HTMLElementAttribute.CSS {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .float(let f): return unwrap(f)

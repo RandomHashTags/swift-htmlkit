@@ -16,8 +16,13 @@ public protocol HTMLInitializable : Hashable {
     init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax)
     #endif
 
+    @inlinable
     var key : String { get }
+
+    @inlinable
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String?
+
+    @inlinable
     var htmlValueIsVoidable : Bool { get }
 }
 public extension HTMLInitializable {
@@ -27,8 +32,13 @@ public extension HTMLInitializable {
     }
 }
 public extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
+    @inlinable
     var key : String { rawValue }
+
+    @inlinable
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? { rawValue }
+
+    @inlinable
     var htmlValueIsVoidable : Bool { false }
 
     #if canImport(SwiftSyntax)
@@ -317,6 +327,7 @@ public extension HTMLElementAttribute.Extra {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .activedescendant(_): return "activedescendant"
@@ -375,6 +386,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .activedescendant(let value): return value
@@ -656,6 +668,7 @@ public extension HTMLElementAttribute.Extra {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .showModal:          return "showModal"
@@ -667,6 +680,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .showModal:          return "show-modal"
@@ -678,6 +692,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 
@@ -686,6 +701,7 @@ public extension HTMLElementAttribute.Extra {
         case `true`, `false`
         case plaintextOnly
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .plaintextOnly: return "plaintext-only"
@@ -704,6 +720,7 @@ public extension HTMLElementAttribute.Extra {
         case anonymous
         case useCredentials
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .useCredentials: return "use-credentials"
@@ -747,6 +764,7 @@ public extension HTMLElementAttribute.Extra {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .empty:       return "empty"
@@ -754,6 +772,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .empty: return ""
@@ -761,6 +780,7 @@ public extension HTMLElementAttribute.Extra {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool {
             switch self {
                 case .empty: return true
@@ -808,6 +828,7 @@ public extension HTMLElementAttribute.Extra {
         case multipartFormData
         case textPlain
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .applicationXWWWFormURLEncoded: return "application/x-www-form-urlencoded"
@@ -832,6 +853,7 @@ public extension HTMLElementAttribute.Extra {
         case `true`
         case untilFound
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .true: return ""
@@ -848,6 +870,7 @@ public extension HTMLElementAttribute.Extra {
         case xUACompatible
         case refresh
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .contentSecurityPolicy: return "content-security-policy"
@@ -870,6 +893,7 @@ public extension HTMLElementAttribute.Extra {
         case datetimeLocal
         case email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .datetimeLocal: return "datetime-local"
@@ -892,6 +916,7 @@ public extension HTMLElementAttribute.Extra {
     enum numberingtype : String, HTMLInitializable {
         case a, A, i, I, one
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .one: return "1"
@@ -926,6 +951,7 @@ public extension HTMLElementAttribute.Extra {
         case strictOriginWhenCrossOrigin
         case unsafeURL
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .noReferrer:                  return "no-referrer"
@@ -950,6 +976,7 @@ public extension HTMLElementAttribute.Extra {
         case search, stylesheet, tag
         case termsOfService
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .dnsPrefetch:    return "dns-prefetch"
@@ -977,6 +1004,7 @@ public extension HTMLElementAttribute.Extra {
         case allowTopNavigationByUserActivation
         case allowTopNavigationToCustomProtocols
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .allowDownloads:                      return "allow-downloads"

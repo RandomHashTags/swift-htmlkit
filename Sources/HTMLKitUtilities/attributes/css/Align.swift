@@ -40,6 +40,7 @@ public extension HTMLElementAttribute.CSS.Align {
         case unsafeCenter
         case unset
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .firstBaseline: return "first baseline"
@@ -82,6 +83,7 @@ public extension HTMLElementAttribute.CSS.Align {
         case unsafeCenter
         case unset
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .anchorCenter: return "anchor-center"
@@ -125,6 +127,7 @@ public extension HTMLElementAttribute.CSS {
         case unsafeCenter
         case unset
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .anchorCenter: return "anchor-center"

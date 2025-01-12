@@ -138,6 +138,7 @@ public extension HTMLElementAttribute.HTMX {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .all:     return "all"
@@ -147,6 +148,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .all:             return "*"
@@ -156,6 +158,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 
@@ -192,6 +195,7 @@ public extension HTMLElementAttribute.HTMX {
             case first, last, all
         }
 
+        @inlinable
         public var key : String {
             switch self {
                 case .drop:     return "drop"
@@ -201,6 +205,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .drop:             return "drop"
@@ -210,6 +215,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 
@@ -229,6 +235,7 @@ public extension HTMLElementAttribute.HTMX {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .true:   return "true"
@@ -237,6 +244,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .true: return "true"
@@ -245,6 +253,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -268,6 +277,7 @@ public extension HTMLElementAttribute.HTMX {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .connect(_): return "connect"
@@ -276,6 +286,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .connect(let value),
@@ -285,6 +296,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -308,6 +320,7 @@ public extension HTMLElementAttribute.HTMX {
         }
         #endif
 
+        @inlinable
         public var key : String {
             switch self {
                 case .connect(_): return "connect"
@@ -315,6 +328,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .connect(let value): return value
@@ -322,6 +336,7 @@ public extension HTMLElementAttribute.HTMX {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool {
             switch self {
                 case .send(_): return true

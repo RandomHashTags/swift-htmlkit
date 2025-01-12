@@ -117,6 +117,7 @@ public extension HTMLElementAttribute {
         #endif
 
         // MARK: key
+        @inlinable
         public var key : String {
             switch self {
                 case .boost(_): return "boost"
@@ -162,6 +163,7 @@ public extension HTMLElementAttribute {
         }
 
         //  MARK: htmlValue
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .boost(let value): return value?.rawValue
@@ -222,6 +224,7 @@ public extension HTMLElementAttribute {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool {
             switch self {
                 case .disable(_), .historyElt(_), .preserve(_):

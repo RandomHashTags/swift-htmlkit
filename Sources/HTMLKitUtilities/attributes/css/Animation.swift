@@ -55,6 +55,7 @@ public extension HTMLElementAttribute.CSS.Animation {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .alternate: return "alternate"
@@ -70,6 +71,7 @@ public extension HTMLElementAttribute.CSS.Animation {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -106,6 +108,7 @@ public extension HTMLElementAttribute.CSS.Animation {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .backwards: return "backwards"
@@ -121,6 +124,7 @@ public extension HTMLElementAttribute.CSS.Animation {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }
@@ -153,6 +157,7 @@ public extension HTMLElementAttribute.CSS.Animation {
 
         public var key : String { "" }
 
+        @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
                 case .inherit: return "inherit"
@@ -166,6 +171,7 @@ public extension HTMLElementAttribute.CSS.Animation {
             }
         }
 
+        @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
 }

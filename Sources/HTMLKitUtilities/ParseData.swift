@@ -102,14 +102,14 @@ public extension HTMLKitUtilities {
                         }
                         if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, key: target_key, expr: child.expression) {
                             attributes[key] = test
-                        } else if let string:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
-                            switch string {
+                        } else if let literal:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
+                            switch literal {
                                 case .boolean(let b): attributes[key] = b
-                                case .string(_), .interpolation(_): attributes[key] = string.value(key: key)
+                                case .string(_), .interpolation(_): attributes[key] = literal.value(key: key)
                                 case .int(let i): attributes[key] = i
                                 case .float(let f): attributes[key] = f
                                 case .array(_):
-                                    let escaped:LiteralReturnType = string.escapeArray()
+                                    let escaped:LiteralReturnType = literal.escapeArray()
                                     switch escaped {
                                         case .array(let a): attributes[key] = a
                                         default: break
