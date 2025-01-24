@@ -7,7 +7,9 @@
 
 #if compiler(>=6.0)
 
-#if canImport(Foundation)
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#elseif canImport(Foundation)
 import Foundation
 #endif
 
@@ -83,7 +85,7 @@ struct EscapeHTMLTests {
         #expect(string == expected_result)
     }
 
-    #if canImport(Foundation)
+    #if canImport(FoundationEssentials) || canImport(Foundation)
     // MARK: utf8Array
     @Test func escape_encoding_utf8Array() {
         var expected_result:String = #html(option(value: "juice WRLD <<<&>>> 999"))

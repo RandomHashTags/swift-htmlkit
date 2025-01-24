@@ -8,20 +8,20 @@
 @_exported import HTMLKitUtilities
 
 // MARK: StaticString equality
-public extension StaticString {
-    static func == (left: Self, right: Self) -> Bool { left.description == right.description }
-    static func != (left: Self, right: Self) -> Bool { left.description != right.description }
+extension StaticString {
+    public static func == (left: Self, right: Self) -> Bool { left.description == right.description }
+    public static func != (left: Self, right: Self) -> Bool { left.description != right.description }
 }
 // MARK: StaticString and StringProtocol equality
-public extension StringProtocol {
-    static func == (left: Self, right: StaticString) -> Bool { left == right.description }
-    static func == (left: StaticString, right: Self) -> Bool { left.description == right }
+extension StringProtocol {
+    public static func == (left: Self, right: StaticString) -> Bool { left == right.description }
+    public static func == (left: StaticString, right: Self) -> Bool { left.description == right }
 }
 
 @freestanding(expression)
 public macro escapeHTML(
     encoding: HTMLEncoding = .string,
-    _ innerHTML: CustomStringConvertible...
+    _ innerHTML: CustomStringConvertible & Sendable...
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
 // MARK: HTML Representation
@@ -29,5 +29,5 @@ public macro escapeHTML(
 public macro html<T: CustomStringConvertible>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible...
+    _ innerHTML: CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")

@@ -8,8 +8,8 @@
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public extension HTMLElementAttribute.CSS {
-    enum Align {
+extension HTMLElementAttribute.CSS {
+    public enum Align {
         case content(Content?)
         case items(Items?)
         case `self`(AlignSelf?)
@@ -17,8 +17,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Align Content
-public extension HTMLElementAttribute.CSS.Align {
-    enum Content : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS.Align {
+    public enum Content : String, HTMLInitializable {
         case baseline
         case end
         case firstBaseline
@@ -43,25 +43,25 @@ public extension HTMLElementAttribute.CSS.Align {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .firstBaseline: return "first baseline"
-                case .flexEnd: return "flex-end"
-                case .flexStart: return "flex-start"
-                case .lastBaseline: return "last baseline"
-                case .revertLayer: return "revert-layer"
-                case .safeCenter: return "safe center"
-                case .spaceAround: return "space-around"
-                case .spaceBetween: return "space-between"
-                case .spaceEvenly: return "space-evenly"
-                case .unsafeCenter: return "unsafe center"
-                default: return rawValue
+            case .firstBaseline: return "first baseline"
+            case .flexEnd: return "flex-end"
+            case .flexStart: return "flex-start"
+            case .lastBaseline: return "last baseline"
+            case .revertLayer: return "revert-layer"
+            case .safeCenter: return "safe center"
+            case .spaceAround: return "space-around"
+            case .spaceBetween: return "space-between"
+            case .spaceEvenly: return "space-evenly"
+            case .unsafeCenter: return "unsafe center"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Align Items
-public extension HTMLElementAttribute.CSS.Align {
-    enum Items : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS.Align {
+    public enum Items : String, HTMLInitializable {
         case anchorCenter
         case baseline
         case center
@@ -86,25 +86,25 @@ public extension HTMLElementAttribute.CSS.Align {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .anchorCenter: return "anchor-center"
-                case .firstBaseline: return "first baseline"
-                case .flexEnd: return "flex-end"
-                case .flexStart: return "flex-start"
-                case .lastBaseline: return "last baseline"
-                case .revertLayer: return "revert-layer"
-                case .safeCenter: return "safe center"
-                case .selfEnd: return "self-end"
-                case .selfStart: return "self-start"
-                case .unsafeCenter: return "unsafe center"
-                default: return rawValue
+            case .anchorCenter: return "anchor-center"
+            case .firstBaseline: return "first baseline"
+            case .flexEnd: return "flex-end"
+            case .flexStart: return "flex-start"
+            case .lastBaseline: return "last baseline"
+            case .revertLayer: return "revert-layer"
+            case .safeCenter: return "safe center"
+            case .selfEnd: return "self-end"
+            case .selfStart: return "self-start"
+            case .unsafeCenter: return "unsafe center"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Align Self
-public extension HTMLElementAttribute.CSS {
-    enum AlignSelf : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum AlignSelf : String, HTMLInitializable {
         case anchorCenter
         case auto
         case baseline
@@ -130,17 +130,17 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .anchorCenter: return "anchor-center"
-                case .firstBaseline: return "first baseline"
-                case .flexEnd: return "flex-end"
-                case .flexStart: return "flex-start"
-                case .lastBaseline: return "last baseline"
-                case .revertLayer: return "revert-layer"
-                case .safeCenter: return "safe center"
-                case .selfEnd: return "self-end"
-                case .selfStart: return "self-start"
-                case .unsafeCenter: return "unsafe center"
-                default: return rawValue
+            case .anchorCenter: return "anchor-center"
+            case .firstBaseline: return "first baseline"
+            case .flexEnd: return "flex-end"
+            case .flexStart: return "flex-start"
+            case .lastBaseline: return "last baseline"
+            case .revertLayer: return "revert-layer"
+            case .safeCenter: return "safe center"
+            case .selfEnd: return "self-end"
+            case .selfStart: return "self-start"
+            case .unsafeCenter: return "unsafe center"
+            default: return rawValue
             }
         }
     }

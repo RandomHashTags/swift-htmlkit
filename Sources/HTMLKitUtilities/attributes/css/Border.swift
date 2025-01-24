@@ -8,8 +8,8 @@
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public extension HTMLElementAttribute.CSS {
-    enum Border {
+extension HTMLElementAttribute.CSS {
+    public enum Border {
         case block(Block?)
         case bottom(Bottom?)
         case collapse
@@ -22,8 +22,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Block
-public extension HTMLElementAttribute.CSS.Border {
-    enum Block {
+extension HTMLElementAttribute.CSS.Border {
+    public enum Block {
         case color(HTMLElementAttribute.CSS.Color?)
         case end
         case endColor(HTMLElementAttribute.CSS.Color?)
@@ -41,8 +41,8 @@ public extension HTMLElementAttribute.CSS.Border {
 }
 
 // MARK: Bottom
-public extension HTMLElementAttribute.CSS.Border {
-    enum Bottom {
+extension HTMLElementAttribute.CSS.Border {
+    public enum Bottom {
         case color(HTMLElementAttribute.CSS.Color?)
         case leftRadius
         case rightRadius
@@ -54,16 +54,16 @@ public extension HTMLElementAttribute.CSS.Border {
 }
 
 // MARK: End
-public extension HTMLElementAttribute.CSS.Border {
-    enum End {
+extension HTMLElementAttribute.CSS.Border {
+    public enum End {
         case endRadius
         case startRadius
     }
 }
 
 // MARK: Image
-public extension HTMLElementAttribute.CSS.Border {
-    enum Image {
+extension HTMLElementAttribute.CSS.Border {
+    public enum Image {
         case outset
         case `repeat`
         case slice
@@ -75,8 +75,8 @@ public extension HTMLElementAttribute.CSS.Border {
 }
 
 // MARK: Inline
-public extension HTMLElementAttribute.CSS.Border {
-    enum Inline {
+extension HTMLElementAttribute.CSS.Border {
+    public enum Inline {
         case color(HTMLElementAttribute.CSS.Color?)
         case end
         case endColor(HTMLElementAttribute.CSS.Color?)

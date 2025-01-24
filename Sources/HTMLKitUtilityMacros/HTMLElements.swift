@@ -18,12 +18,12 @@ enum HTMLElements : DeclarationMacro {
 
         func separator(key: String) -> String {
             switch key {
-                case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
-                    return ","
-                case "allow":
-                    return ";"
-                default:
-                    return " "
+            case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
+                return ","
+            case "allow":
+                return ";"
+            default:
+                return " "
             }
         }
 
@@ -42,7 +42,7 @@ enum HTMLElements : DeclarationMacro {
             string += """
             public let tag:String = "\(tag)"
             public var attributes:[HTMLElementAttribute]
-            public var innerHTML:[CustomStringConvertible]
+            public var innerHTML:[CustomStringConvertible & Sendable]
             private var encoding:HTMLEncoding = .string
             private var fromMacro:Bool = false
             public let isVoid:Bool = \(is_void)
@@ -76,20 +76,19 @@ enum HTMLElements : DeclarationMacro {
                             key.removeFirst()
                             key.removeLast()
                             switch key {
-                                case "for", "default", "defer", "as":
-                                    key = "`\(key)`"
-                                default:
-                                    break
+                            case "for", "default", "defer", "as":
+                                key = "`\(key)`"
+                            default:
+                                break
                             }
                         } else {
                             var isArray:Bool = false
                             let (value_type, default_value, value_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, label.expression)
                             switch value_type_literal {
-                                case .otherAttribute(let other):
-                                    other_attributes.append((key, other))
-                                    break
-                                default:
-                                    break
+                            case .otherAttribute(let other):
+                                other_attributes.append((key, other))
+                            default:
+                                break
                             }
                             attribute_declarations += "\npublic var \(key):\(value_type)\(default_value.split(separator: "=", omittingEmptySubsequences: false)[0])"
                             attributes.append((key, value_type, default_value))
@@ -134,10 +133,10 @@ enum HTMLElements : DeclarationMacro {
                 }
                 var value:String = "as? \(value_type)"
                 switch value_type {
-                    case "Bool":
-                        value += " ?? false"
-                    default:
-                        break
+                case "Bool":
+                    value += " ?? false"
+                default:
+                    break
                 }
                 initializers += "self.\(key) = data.attributes[\"\(key_literal)\"] " + value + "\n"
             }
@@ -176,15 +175,12 @@ enum HTMLElements : DeclarationMacro {
                     attributes_func += "if let _\(variable_name):String = "
                     let separator:String = separator(key: key)
                     switch value_type {
-                        case "[String]":
-                            attributes_func += "\(key)?"
-                            break
-                        case "[Int]", "[Float]":
-                            attributes_func += "\(key)?.map({ \"\\($0)\" })"
-                            break
-                        default:
-                            attributes_func += "\(key)?.compactMap({ return $0.htmlValue(encoding: encoding, forMacro: fromMacro) })"
-                            break
+                    case "[String]":
+                        attributes_func += "\(key)?"
+                    case "[Int]", "[Float]":
+                        attributes_func += "\(key)?.map({ \"\\($0)\" })"
+                    default:
+                        attributes_func += "\(key)?.compactMap({ return $0.htmlValue(encoding: encoding, forMacro: fromMacro) })"
                     }
                     attributes_func += ".joined(separator: \"\(separator)\") {\n"
                     attributes_func += #"let k:String = _\#(variable_name).isEmpty ? "" : "=" + sd + _\#(variable_name) + sd"#
@@ -233,32 +229,32 @@ enum HTMLElements : DeclarationMacro {
             value_type_key = expr.as(FunctionCallExprSyntax.self)!.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
         }
         switch value_type_key {
-            case "array":
-                isArray = true
-                let (of_type, _, of_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
-                return ("[" + of_type + "]", "? = nil", .array(of: of_type_literal))
-            case "attribute":
-                return ("HTMLElementAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)
-            case "otherAttribute":
-                var string:String = "\(expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(StringLiteralExprSyntax.self)!)"
-                string.removeFirst()
-                string.removeLast()
-                return ("HTMLElementAttribute.Extra." + string, isArray ? "" : "? = nil", .otherAttribute(string))
-            case "string":
-                return ("String", isArray ? "" : "? = nil", .string)
-            case "int":
-                return ("Int", isArray ? "" : "? = nil", .int)
-            case "float":
-                return ("Float", isArray ? "" : "? = nil", .float)
-            case "bool":
-                return ("Bool", isArray ? "" : " = false", .bool)
-            case "booleanDefaultValue":
-                let value:Bool = expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
-                return ("Bool", "= \(value)", .booleanDefaultValue(value))
-            case "cssUnit":
-                return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil", .cssUnit)
-            default:
-                return ("Float", "? = nil", .float)
+        case "array":
+            isArray = true
+            let (of_type, _, of_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
+            return ("[" + of_type + "]", "? = nil", .array(of: of_type_literal))
+        case "attribute":
+            return ("HTMLElementAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)
+        case "otherAttribute":
+            var string:String = "\(expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(StringLiteralExprSyntax.self)!)"
+            string.removeFirst()
+            string.removeLast()
+            return ("HTMLElementAttribute.Extra." + string, isArray ? "" : "? = nil", .otherAttribute(string))
+        case "string":
+            return ("String", isArray ? "" : "? = nil", .string)
+        case "int":
+            return ("Int", isArray ? "" : "? = nil", .int)
+        case "float":
+            return ("Float", isArray ? "" : "? = nil", .float)
+        case "bool":
+            return ("Bool", isArray ? "" : " = false", .bool)
+        case "booleanDefaultValue":
+            let value:Bool = expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
+            return ("Bool", "= \(value)", .booleanDefaultValue(value))
+        case "cssUnit":
+            return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil", .cssUnit)
+        default:
+            return ("Float", "? = nil", .float)
         }
     }
 }

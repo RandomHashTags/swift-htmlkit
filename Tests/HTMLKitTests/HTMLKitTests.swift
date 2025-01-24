@@ -10,7 +10,9 @@
 import Testing
 import HTMLKit
 
-#if canImport(Foundation)
+#if canImport(FoundationEssentials)
+import struct FoundationEssentials.Data
+#elseif canImport(Foundation)
 import struct Foundation.Data
 #endif
 
@@ -38,7 +40,7 @@ struct HTMLKitTests {
         public var type:String? = nil
         public var attributes:[HTMLElementAttribute] = []
         public var attributionsrc:[String] = []
-        public var innerHTML:[CustomStringConvertible] = []
+        public var innerHTML:[CustomStringConvertible & Sendable] = []
         public var ping:[String] = []
         public var rel:[HTMLElementAttribute.Extra.rel] = []
         public var escaped:Bool = false
@@ -60,7 +62,7 @@ struct HTMLKitTests {
         let _:[UInt8] = #html(encoding: .utf8Bytes, p())
         let _:[UInt16] = #html(encoding: .utf16Bytes, p())
         let _:ContiguousArray<CChar> = #html(encoding: .utf8CString, p())
-        #if canImport(Foundation)
+        #if canImport(FoundationEssentials) || canImport(Foundation)
         let _:Data = #html(encoding: .foundationData, p())
         #endif
         //let _:ByteBuffer = #html(encoding: .byteBuffer, "")
@@ -86,7 +88,7 @@ struct HTMLKitTests {
     func representation5() -> ContiguousArray<CChar> {
         #html(encoding: .utf8CString, p(123))
     }
-    #if canImport(Foundation)
+    #if canImport(FoundationEssentials) || canImport(Foundation)
     @Test
     func representation6() -> Data {
         #html(encoding: .foundationData, p(123))

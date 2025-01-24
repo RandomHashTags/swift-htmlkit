@@ -8,8 +8,8 @@
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public extension HTMLElementAttribute {
-    enum CSS {
+extension HTMLElementAttribute {
+    public enum CSS {
         public typealias SFloat = Swift.Float
 
         case accentColor(AccentColor?)
@@ -136,8 +136,8 @@ public extension HTMLElementAttribute {
 }
 
 // MARK: AccentColor
-public extension HTMLElementAttribute.CSS {
-    enum AccentColor : HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum AccentColor : HTMLInitializable {
         case auto
         case color(Color?)
         case inherit
@@ -148,14 +148,14 @@ public extension HTMLElementAttribute.CSS {
 
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
-                case "auto": self = .auto
-                case "color": self = .color(arguments.first!.expression.enumeration(context: context, key: key, arguments: arguments))
-                case "inherit": self = .inherit
-                case "initial": self = .initial
-                case "revert": self = .revert
-                case "revertLayer": self = .revertLayer
-                case "unset": self = .unset
-                default: return nil
+            case "auto": self = .auto
+            case "color": self = .color(arguments.first!.expression.enumeration(context: context, key: key, arguments: arguments))
+            case "inherit": self = .inherit
+            case "initial": self = .initial
+            case "revert": self = .revert
+            case "revertLayer": self = .revertLayer
+            case "unset": self = .unset
+            default: return nil
             }
         }
 
@@ -164,13 +164,13 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .auto: return "auto"
-                case .color(let color): return color?.htmlValue(encoding: encoding, forMacro: forMacro)
-                case .inherit: return "inherit"
-                case .initial: return "initial"
-                case .revert: return "revert"
-                case .revertLayer: return "revert-layer"
-                case .unset: return "unset"
+            case .auto: return "auto"
+            case .color(let color): return color?.htmlValue(encoding: encoding, forMacro: forMacro)
+            case .inherit: return "inherit"
+            case .initial: return "initial"
+            case .revert: return "revert"
+            case .revertLayer: return "revert-layer"
+            case .unset: return "unset"
             }
         }
 
@@ -180,8 +180,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Appearance
-public extension HTMLElementAttribute.CSS {
-    enum Appearance : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Appearance : String, HTMLInitializable {
         case auto
         case button
         case checkbox
@@ -197,17 +197,17 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .menulistButton: return "menulist-button"
-                case .revertLayer: return "revert-layer"
-                default: return rawValue
+            case .menulistButton: return "menulist-button"
+            case .revertLayer: return "revert-layer"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Backface Visibility
-public extension HTMLElementAttribute.CSS {
-    enum BackfaceVisibility : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum BackfaceVisibility : String, HTMLInitializable {
         case hidden
         case inherit
         case initial
@@ -219,16 +219,16 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .revertLayer: return "revert-layer"
-                default: return rawValue
+            case .revertLayer: return "revert-layer"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Background
-public extension HTMLElementAttribute.CSS {
-    enum Background {
+extension HTMLElementAttribute.CSS {
+    public enum Background {
         case attachment
         case blendMode
         case clip
@@ -246,8 +246,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Box
-public extension HTMLElementAttribute.CSS {
-    enum Box : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Box : String, HTMLInitializable {
         case decorationBreak
         case reflect
         case shadow
@@ -256,8 +256,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Break
-public extension HTMLElementAttribute.CSS {
-    enum Break : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Break : String, HTMLInitializable {
         case after
         case before
         case inside
@@ -265,8 +265,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Clear
-public extension HTMLElementAttribute.CSS {
-    enum Clear : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Clear : String, HTMLInitializable {
         case both
         case inherit
         case initial
@@ -277,8 +277,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: ColorScheme
-public extension HTMLElementAttribute.CSS {
-    enum ColorScheme : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum ColorScheme : String, HTMLInitializable {
         case dark
         case light
         case lightDark
@@ -289,18 +289,18 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .lightDark: return "light dark"
-                case .onlyDark: return "only dark"
-                case .onlyLight: return "only light"
-                default: return rawValue
+            case .lightDark: return "light dark"
+            case .onlyDark: return "only dark"
+            case .onlyLight: return "only light"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Column
-public extension HTMLElementAttribute.CSS {
-    enum Column {
+extension HTMLElementAttribute.CSS {
+    public enum Column {
         case count(ColumnCount?)
         case fill
         case gap
@@ -311,8 +311,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Column Count
-public extension HTMLElementAttribute.CSS {
-    enum ColumnCount : HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum ColumnCount : HTMLInitializable {
         case auto
         case inherit
         case initial
@@ -324,16 +324,16 @@ public extension HTMLElementAttribute.CSS {
 
         public var key : String {
             switch self {
-                case .int(_): return "int"
-                default: return "\(self)"
+            case .int(_): return "int"
+            default: return "\(self)"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .int(let i): return "\(i)"
-                default: return "\(self)"
+            case .int(let i): return "\(i)"
+            default: return "\(self)"
             }
         }
 
@@ -343,8 +343,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Column Rule
-public extension HTMLElementAttribute.CSS.Column {
-    enum Rule : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS.Column {
+    public enum Rule : String, HTMLInitializable {
         case color
         case style
         case width
@@ -354,8 +354,8 @@ public extension HTMLElementAttribute.CSS.Column {
 }
 
 // MARK: Cursor
-public extension HTMLElementAttribute.CSS {
-    enum Cursor {
+extension HTMLElementAttribute.CSS {
+    public enum Cursor {
         case alias
         case allScroll
         case auto
@@ -399,8 +399,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Direction
-public extension HTMLElementAttribute.CSS {
-    enum Direction : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Direction : String, HTMLInitializable {
         case ltr
         case inherit
         case initial
@@ -409,8 +409,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Display
-public extension HTMLElementAttribute.CSS {
-    enum Display : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Display : String, HTMLInitializable {
         /// Displays an element as a block element (like `<p>`). It starts on a new line, and takes up the whole width
         case block
         /// Makes the container disappear, making the child elements children of the element the next level up in the DOM
@@ -461,29 +461,29 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .inlineBlock: return "inline-block"
-                case .inlineFlex: return "inline-flex"
-                case .inlineGrid: return "inline-grid"
-                case .inlineTable: return "inline-table"
-                case .listItem: return "list-item"
-                case .runIn: return "run-in"
-                case .tableCaption: return "table-caption"
-                case .tableCell: return "table-cell"
-                case .tableColumn: return "table-column"
-                case .tableColumnGroup: return "table-column-group"
-                case .tableFooterGroup: return "table-footer-group"
-                case .tableHeaderGroup: return "table-header-group"
-                case .tableRow: return "table-row"
-                case .tableRowGroup: return "table-row-group"
-                default: return rawValue
+            case .inlineBlock: return "inline-block"
+            case .inlineFlex: return "inline-flex"
+            case .inlineGrid: return "inline-grid"
+            case .inlineTable: return "inline-table"
+            case .listItem: return "list-item"
+            case .runIn: return "run-in"
+            case .tableCaption: return "table-caption"
+            case .tableCell: return "table-cell"
+            case .tableColumn: return "table-column"
+            case .tableColumnGroup: return "table-column-group"
+            case .tableFooterGroup: return "table-footer-group"
+            case .tableHeaderGroup: return "table-header-group"
+            case .tableRow: return "table-row"
+            case .tableRowGroup: return "table-row-group"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Duration
-public extension HTMLElementAttribute.CSS {
-    enum Duration : HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Duration : HTMLInitializable {
         case auto
         case inherit
         case initial
@@ -496,16 +496,16 @@ public extension HTMLElementAttribute.CSS {
 
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
-                case "auto": self = .auto
-                case "inherit": self = .inherit
-                case "initial": self = .initial
-                case "ms": self = .ms(arguments.first!.expression.int(context: context, key: key))
-                case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, key: key, arguments: arguments) }))
-                case "revert": self = .revert
-                case "revertLayer": self = .revertLayer
-                case "s": self = .s(arguments.first!.expression.float(context: context, key: key))
-                case "unset": self = .unset
-                default: return nil
+            case "auto": self = .auto
+            case "inherit": self = .inherit
+            case "initial": self = .initial
+            case "ms": self = .ms(arguments.first!.expression.int(context: context, key: key))
+            case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, key: key, arguments: arguments) }))
+            case "revert": self = .revert
+            case "revertLayer": self = .revertLayer
+            case "s": self = .s(arguments.first!.expression.float(context: context, key: key))
+            case "unset": self = .unset
+            default: return nil
             }
         }
 
@@ -514,15 +514,15 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .auto: return "auto"
-                case .inherit: return "inherit"
-                case .initial: return "initial"
-                case .ms(let ms): return unwrap(ms, suffix: "ms")
-                case .multiple(let durations): return durations.compactMap({ $0.htmlValue(encoding: encoding, forMacro: forMacro) }).joined(separator: ",")
-                case .revert: return "revert"
-                case .revertLayer: return "revertLayer"
-                case .s(let s): return unwrap(s, suffix: "s")
-                case .unset: return "unset"
+            case .auto: return "auto"
+            case .inherit: return "inherit"
+            case .initial: return "initial"
+            case .ms(let ms): return unwrap(ms, suffix: "ms")
+            case .multiple(let durations): return durations.compactMap({ $0.htmlValue(encoding: encoding, forMacro: forMacro) }).joined(separator: ",")
+            case .revert: return "revert"
+            case .revertLayer: return "revertLayer"
+            case .s(let s): return unwrap(s, suffix: "s")
+            case .unset: return "unset"
             }
         }
 
@@ -532,8 +532,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: EmptyCells
-public extension HTMLElementAttribute.CSS {
-    enum EmptyCells : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum EmptyCells : String, HTMLInitializable {
         case hide
         case inherit
         case initial
@@ -542,8 +542,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Float
-public extension HTMLElementAttribute.CSS {
-    enum Float : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Float : String, HTMLInitializable {
         case inherit
         case initial
         case left
@@ -553,8 +553,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Hyphens
-public extension HTMLElementAttribute.CSS {
-    enum Hyphens : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Hyphens : String, HTMLInitializable {
         case auto
         case inherit
         case initial
@@ -564,8 +564,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Hyphenate Character
-public extension HTMLElementAttribute.CSS {
-    enum HyphenateCharacter : HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum HyphenateCharacter : HTMLInitializable {
         case auto
         case char(Character)
         case inherit
@@ -577,16 +577,16 @@ public extension HTMLElementAttribute.CSS {
 
         public var key : String {
             switch self {
-                case .char(_): return "char"
-                default: return "\(self)"
+            case .char(_): return "char"
+            default: return "\(self)"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .char(let c): return "\(c)"
-                default: return "\(self)"
+            case .char(let c): return "\(c)"
+            default: return "\(self)"
             }
         }
 
@@ -596,8 +596,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Image Rendering
-public extension HTMLElementAttribute.CSS {
-    enum ImageRendering : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum ImageRendering : String, HTMLInitializable {
         case auto
         case crispEdges
         case highQuality
@@ -609,17 +609,17 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .crispEdges: return "crisp-edges"
-                case .highQuality: return "high-quality"
-                default: return rawValue
+            case .crispEdges: return "crisp-edges"
+            case .highQuality: return "high-quality"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Isolation
-public extension HTMLElementAttribute.CSS {
-    enum Isolation : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Isolation : String, HTMLInitializable {
         case auto
         case inherit
         case initial
@@ -628,8 +628,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Object Fit
-public extension HTMLElementAttribute.CSS {
-    enum ObjectFit : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum ObjectFit : String, HTMLInitializable {
         case contain
         case cover
         case fill
@@ -641,16 +641,16 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .scaleDown: return "scale-down"
-                default: return rawValue
+            case .scaleDown: return "scale-down"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Opacity
-public extension HTMLElementAttribute.CSS {
-    enum Opacity : HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Opacity : HTMLInitializable {
         case float(SFloat?)
         case inherit
         case initial
@@ -661,14 +661,14 @@ public extension HTMLElementAttribute.CSS {
 
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
-                case "float": self = .float(arguments.first!.expression.float(context: context, key: key))
-                case "inherit": self = .inherit
-                case "initial": self = .initial
-                case "percent": self = .percent(arguments.first!.expression.float(context: context, key: key))
-                case "revert": self = .revert
-                case "revertLayer": self = .revertLayer
-                case "unset": self = .unset
-                default: return nil
+            case "float": self = .float(arguments.first!.expression.float(context: context, key: key))
+            case "inherit": self = .inherit
+            case "initial": self = .initial
+            case "percent": self = .percent(arguments.first!.expression.float(context: context, key: key))
+            case "revert": self = .revert
+            case "revertLayer": self = .revertLayer
+            case "unset": self = .unset
+            default: return nil
             }
         }
 
@@ -677,13 +677,13 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .float(let f): return unwrap(f)
-                case .inherit: return "inherit"
-                case .initial: return "initial"
-                case .percent(let p): return unwrap(p, suffix: "%")
-                case .revert: return "revert"
-                case .revertLayer: return "revert-layer"
-                case .unset: return "unset"
+            case .float(let f): return unwrap(f)
+            case .inherit: return "inherit"
+            case .initial: return "initial"
+            case .percent(let p): return unwrap(p, suffix: "%")
+            case .revert: return "revert"
+            case .revertLayer: return "revert-layer"
+            case .unset: return "unset"
             }
         }
 
@@ -693,8 +693,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Order
-public extension HTMLElementAttribute.CSS {
-    enum Order {
+extension HTMLElementAttribute.CSS {
+    public enum Order {
         case int(Int)
         case initial
         case inherit
@@ -702,8 +702,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Text
-public extension HTMLElementAttribute.CSS {
-    enum Text {
+extension HTMLElementAttribute.CSS {
+    public enum Text {
         case align(Align?)
         case alignLast(Align.Last?)
         case shorthand
@@ -711,8 +711,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Text Align
-public extension HTMLElementAttribute.CSS.Text {
-    enum Align : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS.Text {
+    public enum Align : String, HTMLInitializable {
         case center
         case end
         case inherit
@@ -729,17 +729,17 @@ public extension HTMLElementAttribute.CSS.Text {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .matchParent: return "match-parent"
-                case .revertLayer: return "revert-layer"
-                default: return rawValue
+            case .matchParent: return "match-parent"
+            case .revertLayer: return "revert-layer"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Text Align Last
-public extension HTMLElementAttribute.CSS.Text.Align {
-    enum Last : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS.Text.Align {
+    public enum Last : String, HTMLInitializable {
         case auto
         case center
         case end
@@ -756,16 +756,16 @@ public extension HTMLElementAttribute.CSS.Text.Align {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .revertLayer: return "revert-layer"
-                default: return rawValue
+            case .revertLayer: return "revert-layer"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Word
-public extension HTMLElementAttribute.CSS {
-    enum Word {
+extension HTMLElementAttribute.CSS {
+    public enum Word {
         case `break`(Break?)
         case spacing(Spacing?)
         case wrap(Wrap?)
@@ -773,8 +773,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Word Break
-public extension HTMLElementAttribute.CSS.Word {
-    enum Break : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS.Word {
+    public enum Break : String, HTMLInitializable {
         case breakAll
         case breakWord
         case inherit
@@ -785,18 +785,18 @@ public extension HTMLElementAttribute.CSS.Word {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .breakAll: return "break-all"
-                case .breakWord: return "break-word"
-                case .keepAll: return "keep-all"
-                default: return rawValue
+            case .breakAll: return "break-all"
+            case .breakWord: return "break-word"
+            case .keepAll: return "keep-all"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Word Spacing
-public extension HTMLElementAttribute.CSS.Word {
-    enum Spacing {
+extension HTMLElementAttribute.CSS.Word {
+    public enum Spacing {
         case inherit
         case initial
         case normal
@@ -805,8 +805,8 @@ public extension HTMLElementAttribute.CSS.Word {
 }
 
 // MARK: Word Wrap
-public extension HTMLElementAttribute.CSS.Word {
-    enum Wrap : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS.Word {
+    public enum Wrap : String, HTMLInitializable {
         case breakWord
         case inherit
         case initial
@@ -815,16 +815,16 @@ public extension HTMLElementAttribute.CSS.Word {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .breakWord: return "break-word"
-                default: return rawValue
+            case .breakWord: return "break-word"
+            default: return rawValue
             }
         }
     }
 }
 
 // MARK: Writing Mode
-public extension HTMLElementAttribute.CSS {
-    enum WritingMode : String, HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum WritingMode : String, HTMLInitializable {
         case horizontalTB
         case verticalRL
         case verticalLR
@@ -832,17 +832,17 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .horizontalTB: return "horizontal-tb"
-                case .verticalLR: return "vertical-lr"
-                case .verticalRL: return "vertical-rl"
+            case .horizontalTB: return "horizontal-tb"
+            case .verticalLR: return "vertical-lr"
+            case .verticalRL: return "vertical-rl"
             }
         }
     }
 }
 
 // MARK: Z Index
-public extension HTMLElementAttribute.CSS {
-    enum ZIndex {
+extension HTMLElementAttribute.CSS {
+    public enum ZIndex {
         case auto
         case inherit
         case initial
@@ -851,8 +851,8 @@ public extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Zoom
-public extension HTMLElementAttribute.CSS {
-    enum Zoom : HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Zoom : HTMLInitializable {
         case float(SFloat?)
         case inherit
         case initial
@@ -865,16 +865,16 @@ public extension HTMLElementAttribute.CSS {
 
         public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
             switch key {
-                case "float": self = .float(arguments.first!.expression.float(context: context, key: key))
-                case "inherit": self = .inherit
-                case "initial": self = .initial
-                case "normal": self = .normal
-                case "percent": self = .percent(arguments.first!.expression.float(context: context, key: key))
-                case "reset": self = .reset
-                case "revert": self = .revert
-                case "revertLayer": self = .revertLayer
-                case "unset": self = .revertLayer
-                default: return nil
+            case "float": self = .float(arguments.first!.expression.float(context: context, key: key))
+            case "inherit": self = .inherit
+            case "initial": self = .initial
+            case "normal": self = .normal
+            case "percent": self = .percent(arguments.first!.expression.float(context: context, key: key))
+            case "reset": self = .reset
+            case "revert": self = .revert
+            case "revertLayer": self = .revertLayer
+            case "unset": self = .revertLayer
+            default: return nil
             }
         }
 
@@ -883,15 +883,15 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .float(let f): return unwrap(f)
-                case .inherit: return "inherit"
-                case .initial: return "initial"
-                case .normal: return "normal"
-                case .percent(let p): return unwrap(p, suffix: "%")
-                case .reset: return "reset"
-                case .revert: return "revert"
-                case .revertLayer: return "revertLayer"
-                case .unset: return "unset"
+            case .float(let f): return unwrap(f)
+            case .inherit: return "inherit"
+            case .initial: return "initial"
+            case .normal: return "normal"
+            case .percent(let p): return unwrap(p, suffix: "%")
+            case .reset: return "reset"
+            case .revert: return "revert"
+            case .revertLayer: return "revertLayer"
+            case .unset: return "unset"
             }
         }
 

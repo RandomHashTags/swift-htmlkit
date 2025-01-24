@@ -9,9 +9,9 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public extension HTMLKitUtilities {
+extension HTMLKitUtilities {
     // MARK: Escape HTML
-    static func escapeHTML(expansion: MacroExpansionExprSyntax, encoding: HTMLEncoding = .string, context: some MacroExpansionContext) -> String {
+    public static func escapeHTML(expansion: MacroExpansionExprSyntax, encoding: HTMLEncoding = .string, context: some MacroExpansionContext) -> String {
         var encoding:HTMLEncoding = encoding
         let children:SyntaxChildren = expansion.arguments.children(viewMode: .all)
         var inner_html:String = ""
@@ -35,9 +35,9 @@ public extension HTMLKitUtilities {
     }
     
     // MARK: Expand #html
-    static func expandHTMLMacro(context: some MacroExpansionContext, macroNode: MacroExpansionExprSyntax) throws -> ExprSyntax {
+    public static func expandHTMLMacro(context: some MacroExpansionContext, macroNode: MacroExpansionExprSyntax) throws -> ExprSyntax {
         let (string, encoding):(String, HTMLEncoding) = expand_macro(context: context, macro: macroNode)
-        func has_no_interpolation() -> Bool {
+        func hasNoInterpolation() -> Bool {
             let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !has_interpolation else {
                 context.diagnose(Diagnostic(node: macroNode, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
@@ -49,32 +49,32 @@ public extension HTMLKitUtilities {
             return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
         }
         switch encoding {
-            case .utf8Bytes:
-                guard has_no_interpolation() else { return "" }
-                return "\(raw: bytes([UInt8](string.utf8)))"
-            case .utf16Bytes:
-                guard has_no_interpolation() else { return "" }
-                return "\(raw: bytes([UInt16](string.utf16)))"
-            case .utf8CString:
-                return "\(raw: string.utf8CString)"
+        case .utf8Bytes:
+            guard hasNoInterpolation() else { return "" }
+            return "\(raw: bytes([UInt8](string.utf8)))"
+        case .utf16Bytes:
+            guard hasNoInterpolation() else { return "" }
+            return "\(raw: bytes([UInt16](string.utf16)))"
+        case .utf8CString:
+            return "\(raw: string.utf8CString)"
 
-            case .foundationData:
-                guard has_no_interpolation() else { return "" }
-                return "Data(\(raw: bytes([UInt8](string.utf8))))"
+        case .foundationData:
+            guard hasNoInterpolation() else { return "" }
+            return "Data(\(raw: bytes([UInt8](string.utf8))))"
 
-            case .byteBuffer:
-                guard has_no_interpolation() else { return "" }
-                return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
+        case .byteBuffer:
+            guard hasNoInterpolation() else { return "" }
+            return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
 
-            case .string:
-                return "\"\(raw: string)\""
-            case .custom(let encoded, _):
-                return "\(raw: encoded.replacingOccurrences(of: "$0", with: string))"
+        case .string:
+            return "\"\(raw: string)\""
+        case .custom(let encoded, _):
+            return "\(raw: encoded.replacingOccurrences(of: "$0", with: string))"
         }
     }
 
     // MARK: Parse Arguments
-    static func parseArguments(
+    public static func parseArguments(
         context: some MacroExpansionContext,
         encoding: HTMLEncoding,
         children: SyntaxChildren,
@@ -104,16 +104,16 @@ public extension HTMLKitUtilities {
                             attributes[key] = test
                         } else if let literal:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             switch literal {
-                                case .boolean(let b): attributes[key] = b
-                                case .string(_), .interpolation(_): attributes[key] = literal.value(key: key)
-                                case .int(let i): attributes[key] = i
-                                case .float(let f): attributes[key] = f
-                                case .array(_):
-                                    let escaped:LiteralReturnType = literal.escapeArray()
-                                    switch escaped {
-                                        case .array(let a): attributes[key] = a
-                                        default: break
-                                    }
+                            case .boolean(let b): attributes[key] = b
+                            case .string(_), .interpolation(_): attributes[key] = literal.value(key: key)
+                            case .int(let i): attributes[key] = i
+                            case .float(let f): attributes[key] = f
+                            case .array(_):
+                                let escaped:LiteralReturnType = literal.escapeArray()
+                                switch escaped {
+                                case .array(let a): attributes[key] = a
+                                default: break
+                                }
                             }
                         }
                     }
@@ -127,7 +127,7 @@ public extension HTMLKitUtilities {
     }
 
     // MARK: Parse Encoding
-    static func parseEncoding(expression: ExprSyntax) -> HTMLEncoding? {
+    public static func parseEncoding(expression: ExprSyntax) -> HTMLEncoding? {
         if let key:String = expression.memberAccess?.declName.baseName.text {
             return HTMLEncoding(rawValue: key)
         } else if let custom:FunctionCallExprSyntax = expression.functionCall {
@@ -142,7 +142,7 @@ public extension HTMLKitUtilities {
     }
 
     // MARK: Parse Global Attributes
-    static func parseGlobalAttributes(
+    public static func parseGlobalAttributes(
         context: some MacroExpansionContext,
         array: ArrayElementListSyntax,
         lookupFiles: Set<String>
@@ -176,7 +176,7 @@ public extension HTMLKitUtilities {
     }
 
     // MARK: Parse Inner HTML
-    static func parseInnerHTML(
+    public static func parseInnerHTML(
         context: some MacroExpansionContext,
         encoding: HTMLEncoding,
         child: LabeledExprSyntax,
@@ -198,7 +198,7 @@ public extension HTMLKitUtilities {
     }
 
     // MARK: Parse element
-    static func parse_element(context: some MacroExpansionContext, encoding: HTMLEncoding, expr: ExprSyntax) -> HTMLElement? {
+    public static func parse_element(context: some MacroExpansionContext, encoding: HTMLEncoding, expr: ExprSyntax) -> HTMLElement? {
         guard let function:FunctionCallExprSyntax = expr.functionCall else { return nil }
         return HTMLElementValueType.parse_element(context: context, encoding: encoding, function)
     }

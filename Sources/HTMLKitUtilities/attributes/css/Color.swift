@@ -8,8 +8,8 @@
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public extension HTMLElementAttribute.CSS {
-    enum Color : HTMLInitializable {
+extension HTMLElementAttribute.CSS {
+    public enum Color : HTMLInitializable {
         case currentColor
         case hex(String)
         case hsl(SFloat, SFloat, SFloat, SFloat? = nil)
@@ -175,14 +175,14 @@ public extension HTMLElementAttribute.CSS {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-                case .hex(let hex): return "#" + hex
-                case .rgb(let r, let g, let b, let a):
-                    var string:String = "rbg(\(r),\(g),\(b)"
-                    if let a:SFloat = a {
-                        string += ",\(a)"
-                    }
-                    return string + ")"
-                default: return "\(self)".lowercased()
+            case .hex(let hex): return "#" + hex
+            case .rgb(let r, let g, let b, let a):
+                var string:String = "rbg(\(r),\(g),\(b)"
+                if let a:SFloat = a {
+                    string += ",\(a)"
+                }
+                return string + ")"
+            default: return "\(self)".lowercased()
             }
         }
 

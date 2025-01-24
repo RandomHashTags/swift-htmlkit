@@ -48,8 +48,8 @@ import SwiftSyntax
 public struct %elementName% : HTMLElement {%variables%%render%
 }
 
-public extension %elementName% {
-    enum AttributeKeys {%customAttributeCases%
+extension %elementName% {
+    public enum AttributeKeys {%customAttributeCases%
     }
 }
 """
@@ -167,7 +167,10 @@ for (elementType, customAttributes) in attributes().filter({ $0.key == .a }) {
     renderAttributesString += indent2 + "}"
     renderString += renderAttributesString + "\n"
     renderString += """
-            let string:String = innerHTML.map({ String(describing: $0) }).joined()
+            var string:String = ""
+            for element in innerHTML {
+                string += String(describing: $0)
+            }
             let l:String, g:String
             if escaped {
                 l = "&lt;"

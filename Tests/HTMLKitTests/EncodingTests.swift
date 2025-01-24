@@ -7,7 +7,9 @@
 
 #if compiler(>=6.0)
 
-#if canImport(Foundation)
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#elseif canImport(Foundation)
 import Foundation
 #endif
 
@@ -18,7 +20,7 @@ struct EncodingTests {
     let backslash:UInt8 = 92
 
     private func uint8Array_equals_string(array: [UInt8], string: String) -> Bool {
-        #if canImport(Foundation)
+        #if canImport(FoundationEssentials) || canImport(Foundation)
         return String(data: Data(array), encoding: .utf8) == string
         #endif
         return true
@@ -43,7 +45,7 @@ struct EncodingTests {
         uint8Array = #html(encoding: .utf8Bytes,
             div(attributes: [.htmx(.headers(js: false, ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]))])
         )
-        #if canImport(Foundation)
+        #if canImport(FoundationEssentials) || canImport(Foundation)
         let set:Set<Data?> = Set(HTMXTests.dictionary_json_results(tag: "div", closingTag: true, attribute: "hx-headers", delimiter: "'", ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]).map({
             $0.data(using: .utf8)
         }))
@@ -52,7 +54,7 @@ struct EncodingTests {
         #expect(uint8Array.firstIndex(of: backslash) == nil)
     }
 
-    #if canImport(Foundation)
+    #if canImport(FoundationEssentials) || canImport(Foundation)
 
         // MARK: foundationData
         @Test func encoding_foundationData() {

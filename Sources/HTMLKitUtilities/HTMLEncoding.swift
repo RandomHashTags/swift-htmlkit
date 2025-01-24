@@ -30,7 +30,7 @@
 /// let _:String = #html(div(string)) // ⚠️ promotion cannot be applied; compiles to "<div>" + String(describing: string) + "</div>"
 /// ```
 /// 
-public enum HTMLEncoding {
+public enum HTMLEncoding : Sendable {
     /// `String`/`StaticString`
     case string
 
@@ -44,7 +44,7 @@ public enum HTMLEncoding {
     case utf16Bytes
 
     /// `Data`
-    /// - Warning: You need to import `Foundation` to use this!
+    /// - Warning: You need to import `Foundation`/`FoundationEssentials` to use this!
     case foundationData
 
     /// `ByteBuffer`
@@ -66,25 +66,25 @@ public enum HTMLEncoding {
 
     public init?(rawValue: String) {
         switch rawValue {
-            case "string": self = .string
-            case "utf8Bytes": self = .utf8Bytes
-            case "utf8CString": self = .utf8CString
-            case "utf16Bytes": self = .utf16Bytes
-            case "foundationData": self = .foundationData
-            case "byteBuffer": self = .byteBuffer
-            default: return nil
+        case "string": self = .string
+        case "utf8Bytes": self = .utf8Bytes
+        case "utf8CString": self = .utf8CString
+        case "utf16Bytes": self = .utf16Bytes
+        case "foundationData": self = .foundationData
+        case "byteBuffer": self = .byteBuffer
+        default: return nil
         }
     }
     
     @inlinable
     public func stringDelimiter(forMacro: Bool) -> String {
         switch self {
-            case .string:
-                return forMacro ? "\\\"" : "\""
-            case .utf8Bytes, .utf16Bytes, .utf8CString, .foundationData, .byteBuffer:
-                return "\""
-            case .custom(_, let delimiter):
-                return delimiter
+        case .string:
+            return forMacro ? "\\\"" : "\""
+        case .utf8Bytes, .utf16Bytes, .utf8CString, .foundationData, .byteBuffer:
+            return "\""
+        case .custom(_, let delimiter):
+            return delimiter
         }
     }
 }

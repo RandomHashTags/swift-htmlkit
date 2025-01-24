@@ -23,14 +23,14 @@ private enum TranslateHTML { // TODO: finish
                     i += 1
                     let char:Character = string[string.index(index, offsetBy: i)]
                     switch char {
-                        case "<": depth += 1
-                        case ">":
-                            depth -= 1
-                            if depth == 0 {
-                                break loop
-                            }
-                        default:
-                            break
+                    case "<": depth += 1
+                    case ">":
+                        depth -= 1
+                        if depth == 0 {
+                            break loop
+                        }
+                    default:
+                        break
                     }
                 }
 

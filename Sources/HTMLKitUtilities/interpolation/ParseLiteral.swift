@@ -156,11 +156,11 @@ extension HTMLKitUtilities {
         if let function:FunctionCallExprSyntax = expression.functionCall {
             if let decl:String = function.calledExpression.declRef?.baseName.text {
                 switch decl {
-                    case "StaticString":
-                        let string:String = function.arguments.first!.expression.stringLiteral!.string
-                        return .string(string)
-                    default:
-                        break
+                case "StaticString":
+                    let string:String = function.arguments.first!.expression.stringLiteral!.string
+                    return .string(string)
+                default:
+                    break
                 }
             }
             return .interpolation("\(function)")
@@ -171,15 +171,12 @@ extension HTMLKitUtilities {
         if let array:ArrayExprSyntax = expression.array {
             let separator:String
             switch key {
-                case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
-                    separator = ","
-                    break
-                case "allow":
-                    separator = ";"
-                    break
-                default:
-                    separator = " "
-                    break
+            case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
+                separator = ","
+            case "allow":
+                separator = ";"
+            default:
+                separator = " "
             }
             var results:[Any] = []
             for element in array.elements {
@@ -187,18 +184,17 @@ extension HTMLKitUtilities {
                     results.append(attribute)
                 } else if let literal:LiteralReturnType = parse_literal_value(context: context, key: key, expression: element.expression, lookupFiles: lookupFiles) {
                     switch literal {
-                        case .string(let string), .interpolation(let string):
-                            if string.contains(separator) {
-                                context.diagnose(Diagnostic(node: element.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + key + "\".")))
-                                return nil
-                            }
-                            results.append(string)
-                        case .int(let i): results.append(i)
-                        case .float(let f): results.append(f)
-                        case .array(let a): results.append(a)
-                        case .boolean(let b): results.append(b)
+                    case .string(let string), .interpolation(let string):
+                        if string.contains(separator) {
+                            context.diagnose(Diagnostic(node: element.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + key + "\".")))
+                            return nil
+                        }
+                        results.append(string)
+                    case .int(let i): results.append(i)
+                    case .float(let f): results.append(f)
+                    case .array(let a): results.append(a)
+                    case .boolean(let b): results.append(b)
                     }
-                    
                 }
             }
             return .array(results)
@@ -222,40 +218,40 @@ public enum LiteralReturnType {
 
     public var isInterpolation : Bool {
         switch self {
-            case .interpolation(_): return true
-            default: return false
+        case .interpolation(_): return true
+        default: return false
         }
     }
 
     public func value(key: String) -> String? {
         switch self {
-            case .boolean(let b): return b ? key : nil
-            case .string(var string):
-                if string.isEmpty && key == "attributionsrc" {
-                    return ""
-                }
-                string.escapeHTML(escapeAttributes: true)
-                return string
-            case .int(let int):
-                return String(describing: int)
-            case .float(let float):
-                return String(describing: float)
-            case .interpolation(let string):
-                return string
-            case .array(_):
-                return nil
+        case .boolean(let b): return b ? key : nil
+        case .string(var string):
+            if string.isEmpty && key == "attributionsrc" {
+                return ""
+            }
+            string.escapeHTML(escapeAttributes: true)
+            return string
+        case .int(let int):
+            return String(describing: int)
+        case .float(let float):
+            return String(describing: float)
+        case .interpolation(let string):
+            return string
+        case .array(_):
+            return nil
         }
     }
 
     public func escapeArray() -> LiteralReturnType {
         switch self {
-            case .array(let a):
-                if let array_string:[String] = a as? [String] {
-                    return .array(array_string.map({ $0.escapingHTML(escapeAttributes: true) }))
-                }
-                return .array(a)
-            default:
-                return self
+        case .array(let a):
+            if let array_string:[String] = a as? [String] {
+                return .array(array_string.map({ $0.escapingHTML(escapeAttributes: true) }))
+            }
+            return .array(a)
+        default:
+            return self
         }
     }
 }

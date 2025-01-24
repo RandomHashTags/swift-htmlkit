@@ -29,16 +29,16 @@ enum InterpolationLookup {
         }
         //print("InterpolationLookup;find;item=\(item)")
         switch item {
-            case .literal(let tokens):
-                for (_, statements) in cached {
-                    if let flattened:String = flatten(tokens, statements: statements) {
-                        return flattened
-                    }
+        case .literal(let tokens):
+            for (_, statements) in cached {
+                if let flattened:String = flatten(tokens, statements: statements) {
+                    return flattened
                 }
-                return nil
-            case .function(let tokens, let parameters):
-                return nil
-                //return target + "(" + parameters.map({ "\"" + $0 + "\"" }).joined(separator: ",") + ")"
+            }
+            return nil
+        case .function(let tokens, let parameters):
+            return nil
+            //return target + "(" + parameters.map({ "\"" + $0 + "\"" }).joined(separator: ",") + ")"
         }
     }
 
@@ -138,12 +138,12 @@ private extension InterpolationLookup {
                             return case_name
                         }
                         switch value_type {
-                            case "String":          return enum_case.rawValue?.value.stringLiteral!.string ?? case_name
-                            case "Int":             return enum_case.rawValue?.value.integerLiteral!.literal.text ?? case_name
-                            case "Double", "Float": return enum_case.rawValue?.value.floatLiteral!.literal.text ?? case_name
-                            default:
-                                // TODO: check body (can have nested enums)
-                                break
+                        case "String":          return enum_case.rawValue?.value.stringLiteral!.string ?? case_name
+                        case "Int":             return enum_case.rawValue?.value.integerLiteral!.literal.text ?? case_name
+                        case "Double", "Float": return enum_case.rawValue?.value.floatLiteral!.literal.text ?? case_name
+                        default:
+                            // TODO: check body (can have nested enums)
+                            break
                         }
                     }
                 }

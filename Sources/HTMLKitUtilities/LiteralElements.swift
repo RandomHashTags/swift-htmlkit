@@ -133,7 +133,7 @@ macro HTMLElements(
 ) = #externalMacro(module: "HTMLKitUtilityMacros", type: "HTMLElements")
 
 // MARK: HTML
-public protocol HTMLElement : CustomStringConvertible {
+public protocol HTMLElement : CustomStringConvertible, Sendable {
     /// Whether or not this element is a void element.
     var isVoid : Bool { get }
     /// Whether or not this element should include a forward slash in the tag name.
@@ -145,14 +145,14 @@ public protocol HTMLElement : CustomStringConvertible {
     /// The global attributes of this element.
     var attributes : [HTMLElementAttribute] { get }
     /// The inner HTML content of this element.
-    var innerHTML : [CustomStringConvertible] { get }
+    var innerHTML : [CustomStringConvertible & Sendable] { get }
 }
 
 /// A custom HTML element.
 public struct custom : HTMLElement {
     public let tag:String
     public var attributes:[HTMLElementAttribute]
-    public var innerHTML:[CustomStringConvertible]
+    public var innerHTML:[CustomStringConvertible & Sendable]
     private var encoding:HTMLEncoding = .string
     public var isVoid:Bool
     public var trailingSlash:Bool

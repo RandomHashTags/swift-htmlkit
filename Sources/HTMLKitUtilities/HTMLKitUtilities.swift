@@ -34,13 +34,14 @@ public enum HTMLKitUtilities {
 }
 
 // MARK: Escape HTML
-public extension String {
+extension String {
     /// Escapes all occurrences of source-breaking HTML characters.
     /// 
     /// - Parameters:
     ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters.
     /// - Returns: A new `String` escaping source-breaking HTML.
-    func escapingHTML(escapeAttributes: Bool) -> String {
+    @inlinable
+    public func escapingHTML(escapeAttributes: Bool) -> String {
         var string:String = self
         string.escapeHTML(escapeAttributes: escapeAttributes)
         return string
@@ -50,7 +51,8 @@ public extension String {
     /// 
     /// - Parameters:
     ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters.
-    mutating func escapeHTML(escapeAttributes: Bool) {
+    @inlinable
+    public mutating func escapeHTML(escapeAttributes: Bool) {
         self.replace("&", with: "&amp;")
         self.replace("<", with: "&lt;")
         self.replace(">", with: "&gt;")
@@ -62,14 +64,16 @@ public extension String {
     /// Escapes all occurrences of source-breaking HTML attribute characters.
     /// 
     /// - Returns: A new `String` escaping source-breaking HTML attribute characters.
-    func escapingHTMLAttributes() -> String {
+    @inlinable
+    public func escapingHTMLAttributes() -> String {
         var string:String = self
         string.escapeHTMLAttributes()
         return string
     }
 
     /// Escapes all occurrences of source-breaking HTML attribute characters.
-    mutating func escapeHTMLAttributes() {
+    @inlinable
+    public mutating func escapeHTMLAttributes() {
         self.replace("\\\"", with: "&quot;")
         self.replace("\"", with: "&quot;")
         self.replace("'", with: "&#39")
