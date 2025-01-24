@@ -3,11 +3,9 @@
 ## Table of Contents
 
 - [Rules](#rules)
-  - [Variable naming](#variable-naming) <sup>[justification](#justification)</sup>
   - [Type annotation](#type-annotation)
     - [Protocols](#protocols)
-    - [Variables](#variables) <sup>[exceptions](#exceptions) | [justification](#justification-1)</sup>
-  - [Extensions](#extensions) <sup>[justification](#justification-2)</sup>
+    - [Variables](#variables) <sup>[exceptions](#exceptions) | [justification](#justification)</sup>
   - [Documentation](#documentation)
 
 ## Rules
@@ -18,23 +16,15 @@ You can format your code running `swift format` with our given format file. Due 
 
 At the end of the day, you can write however you want. The maintainers will modify the syntax after merging.
 
-### Variable naming
-
-All public facing functions and variables should use `lowerCamelCase`. Non-public functions and variables should use `snake_case`, but it is not required. Snake case is recommended for `package`, `private` and `fileprivate` declarations.
-
-#### Justification
-
-`lowerCamelCase` is recommended by the Swift Language. `snake_case` is more readable and maintainable with larger projects.
-
 ### Type annotation
 
 Declaring a native Swift type never contains spaces. The only exception is type aliases.
 
-Example: declaring a dictionary should look like `[String:String]` instead of `Dictionary<String, String>`.
+Example: declaring a dictionary should look like `[String:String]` instead of `[String : String]` (and `Dictionary<String, String>`).
 
 #### Protocols
 
-As protocols outline an implementation, conformances and variables should always be separated by a single space between each token. Conformances should always be sorted alphabetically.
+As protocols outline an implementation, conformances and variables should always be 1 line and separated by a single space between each token. Conformances should always be sorted alphabetically.
 
 ```swift
 // ✅ DO
@@ -112,14 +102,6 @@ var headers : [String:String] {
 ##### Justification
 
 Reduces syntax noise, improves readability
-
-### Extensions
-
-If you're making an `extension` where all content is the same visibility: declare the visibility at the extension level. There are no exceptions.
-
-#### Justification
-
-Waste of disk space to declare the same visibility for every declaration.
 
 ### Documentation
 
