@@ -9,10 +9,10 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public enum CSSStyle : HTMLInitializable {
+public enum CSSStyle : HTMLParsable {
     public typealias SFloat = Swift.Float
 
-    case accentColor(AccentColor?)
+    //case accentColor(AccentColor?)
     //case align(Align?)
     case all
     //case animation(Animation?)
@@ -144,7 +144,7 @@ public enum CSSStyle : HTMLInitializable {
     @inlinable
     public var key : String {
         switch self {
-        case .accentColor: return "accentColor"
+        //case .accentColor: return "accentColor"
         //case .align: return "align"
         case .all: return "all"
         //case .animation: return "animation"

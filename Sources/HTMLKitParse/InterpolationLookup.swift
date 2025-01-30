@@ -15,7 +15,7 @@ import SwiftSyntax
 enum InterpolationLookup {
     private static var cached:[String:CodeBlockItemListSyntax] = [:]
 
-    static func find(context: some MacroExpansionContext, _ node: some SyntaxProtocol, files: Set<String>) -> String? {
+    static func find(context: some MacroExpansionContext, _ node: some ExprSyntaxProtocol, files: Set<String>) -> String? {
         guard !files.isEmpty, let item:Item = item(node) else { return nil }
         for file in files {
             if cached[file] == nil {
@@ -42,7 +42,7 @@ enum InterpolationLookup {
         }
     }
 
-    private static func item(_ node: some SyntaxProtocol) -> Item? {
+    private static func item(_ node: some ExprSyntaxProtocol) -> Item? {
         if let function:FunctionCallExprSyntax = node.functionCall {
             var array:[String] = []
             if let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {

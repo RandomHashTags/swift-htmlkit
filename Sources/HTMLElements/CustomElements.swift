@@ -5,14 +5,18 @@
 //  Created by Evan Anderson on 1/30/26.
 //
 
+import HTMLAttributes
+import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
 // MARK: custom
 /// A custom HTML element.
 public struct custom : HTMLElement {
+    public static let otherAttributes:[String:String] = [:]
+    
     public let tag:String
-    public var attributes:[HTMLElementAttribute]
+    public var attributes:[HTMLAttribute]
     public var innerHTML:[CustomStringConvertible & Sendable]
 
     @usableFromInline internal var encoding:HTMLEncoding = .string
@@ -22,10 +26,9 @@ public struct custom : HTMLElement {
 
     @usableFromInline internal var fromMacro:Bool = false
 
-    public init(_ context: some MacroExpansionContext, _ encoding: HTMLEncoding, _ children: SyntaxChildren) {
+    public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {
         self.encoding = encoding
         fromMacro = true
-        let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, encoding: encoding, children: children)
         tag = data.attributes["tag"] as? String ?? ""
         isVoid = data.attributes["isVoid"] as? Bool ?? false
         trailingSlash = data.trailingSlash
@@ -35,7 +38,7 @@ public struct custom : HTMLElement {
     public init(
         tag: String,
         isVoid: Bool,
-        attributes: [HTMLElementAttribute] = [],
+        attributes: [HTMLAttribute] = [],
         _ innerHTML: CustomStringConvertible...
     ) {
         self.tag = tag

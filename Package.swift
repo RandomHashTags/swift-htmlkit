@@ -46,13 +46,19 @@ let package = Package(
         .target(
             name: "CSS",
             dependencies: [
-                "HTMLKitUtilities"
+                "HTMLKitUtilities",
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
         ),
         .target(
             name: "HTMX",
             dependencies: [
-                "HTMLKitUtilities"
+                "HTMLKitUtilities",
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
         ),
 
@@ -60,19 +66,26 @@ let package = Package(
             name: "HTMLAttributes",
             dependencies: [
                 "CSS",
-                "HTMX"
+                "HTMX",
+                "HTMLKitUtilities",
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
         ),
 
         .target(
             name: "HTMLElements",
             dependencies: [
-                "HTMLAttributes"
+                "HTMLKitUtilities",
+                "HTMLAttributes",
+                "CSS",
+                "HTMX"
             ]
         ),
 
         .target(
-            name: "HTMLKitMacroImpl",
+            name: "HTMLKitParse",
             dependencies: [
                 "HTMLElements"
             ]
@@ -81,7 +94,7 @@ let package = Package(
         .macro(
             name: "HTMLKitMacros",
             dependencies: [
-                "HTMLKitUtilities",
+                "HTMLKitParse",
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "SwiftDiagnostics", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
@@ -99,7 +112,7 @@ let package = Package(
 
         .testTarget(
             name: "HTMLKitTests",
-            dependencies: ["HTMLKit"]
+            dependencies: ["HTMLKit", "HTMLAttributes", "HTMLElements"]
         ),
     ]
 )

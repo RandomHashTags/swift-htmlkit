@@ -5,15 +5,7 @@
 //  Created by Evan Anderson on 12/1/24.
 //
 
-#if canImport(SwiftSyntax)
-import SwiftSyntax
-import SwiftSyntaxMacros
-#endif
-
 public protocol HTMLInitializable : Hashable, Sendable {
-    #if canImport(SwiftSyntax)
-    init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax)
-    #endif
 
     @inlinable
     var key : String { get }
@@ -41,11 +33,4 @@ extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
 
     @inlinable
     public var htmlValueIsVoidable : Bool { false }
-
-    #if canImport(SwiftSyntax)
-    public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-        guard let value:Self = .init(rawValue: key) else { return nil }
-        self = value
-    }
-    #endif
 }

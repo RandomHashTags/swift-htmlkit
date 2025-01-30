@@ -5,8 +5,12 @@
 //  Created by Evan Anderson on 9/14/24.
 //
 
+@_exported import CSS
 @_exported import HTMLAttributes
+@_exported import HTMLElements
 @_exported import HTMLKitUtilities
+@_exported import HTMLKitParse
+@_exported import HTMX
 
 // MARK: StaticString equality
 extension StaticString {

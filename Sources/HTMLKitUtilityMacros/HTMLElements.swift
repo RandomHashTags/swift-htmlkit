@@ -41,7 +41,7 @@ enum HTMLElements : DeclarationMacro {
             var string:String = "// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element) : HTMLElement {\n"
             string += """
             public let tag:String = "\(tag)"
-            public var attributes:[HTMLElementAttribute]
+            public var attributes:[HTMLAttribute]
             public var innerHTML:[CustomStringConvertible & Sendable]
             private var encoding:HTMLEncoding = .string
             private var fromMacro:Bool = false
@@ -49,16 +49,6 @@ enum HTMLElements : DeclarationMacro {
             public var trailingSlash:Bool = false
             public var escaped:Bool = false
             """
-
-            /*string += "public private(set) var isVoid:Bool = \(is_void)\n"
-            string += "public var trailingSlash:Bool = false\n"
-            string += "public var escaped:Bool = false\n"
-            string += "public let tag:String = \"\(tag)\"\n"
-            string += "private var encoding:HTMLEncoding = .string\n"
-            string += "private var fromMacro:Bool = false\n"
-            string += "public var attributes:[HTMLElementAttribute]\n"
-            string += "public var innerHTML:[CustomStringConvertible]\n"*/
-
 
             var initializers:String = ""
             var attribute_declarations:String = ""
@@ -96,11 +86,14 @@ enum HTMLElements : DeclarationMacro {
                     }
                 }
             }
-
+            if !other_attributes.isEmpty {
+                let oa:String = other_attributes.map({ "\"" + $0.0 + "\":\"" + $0.1 + "\"" }).joined(separator: ",")
+                string += "\npublic static let otherAttributes:[String:String] = [" + oa + "]\n"
+            }
             string += attribute_declarations
 
             initializers += "\npublic init(\n"
-            initializers += "attributes: [HTMLElementAttribute] = [],\n"
+            initializers += "attributes: [HTMLAttribute] = [],\n"
             for (key, value_type, default_value) in attributes {
                 initializers += key + ": " + value_type + default_value + ",\n"
             }
@@ -116,11 +109,9 @@ enum HTMLElements : DeclarationMacro {
             }
             initializers += "self.innerHTML = innerHTML\n}\n"
 
-            initializers += "public init?(_ context: some MacroExpansionContext, _ encoding: HTMLEncoding, _ children: SyntaxChildren) {\n"
-            let other_attributes_string:String = other_attributes.isEmpty ? "" : ", otherAttributes: [" + other_attributes.map({ "\"" + $0.0 + "\":\"" + $0.1 + "\"" }).joined(separator: ",") + "]"
+            initializers += "public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {\n"
             initializers += "self.encoding = encoding\n"
             initializers += "self.fromMacro = true\n"
-            initializers += "let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, encoding: encoding, children: children\(other_attributes_string))\n"
             if is_void {
                 initializers += "self.trailingSlash = data.trailingSlash\n"
             }
@@ -234,12 +225,12 @@ enum HTMLElements : DeclarationMacro {
             let (of_type, _, of_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
             return ("[" + of_type + "]", "? = nil", .array(of: of_type_literal))
         case "attribute":
-            return ("HTMLElementAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)
+            return ("HTMLAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)
         case "otherAttribute":
             var string:String = "\(expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(StringLiteralExprSyntax.self)!)"
             string.removeFirst()
             string.removeLast()
-            return ("HTMLElementAttribute.Extra." + string, isArray ? "" : "? = nil", .otherAttribute(string))
+            return ("HTMLAttribute.Extra." + string, isArray ? "" : "? = nil", .otherAttribute(string))
         case "string":
             return ("String", isArray ? "" : "? = nil", .string)
         case "int":
@@ -252,7 +243,7 @@ enum HTMLElements : DeclarationMacro {
             let value:Bool = expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(BooleanLiteralExprSyntax.self)!.literal.text == "true"
             return ("Bool", "= \(value)", .booleanDefaultValue(value))
         case "cssUnit":
-            return ("HTMLElementAttribute.CSSUnit", isArray ? "" : "? = nil", .cssUnit)
+            return ("CSSUnit", isArray ? "" : "? = nil", .cssUnit)
         default:
             return ("Float", "? = nil", .float)
         }

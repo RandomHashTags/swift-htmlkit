@@ -70,86 +70,14 @@ public enum HTMLAttribute : HTMLInitializable {
     /// Usually only used to support foreign content.
     case trailingSlash
 
-    case htmx(_ attribute: HTMX? = nil)
+    #if canImport(HTMX)
+    case htmx(_ attribute: HTMXAttribute? = nil)
+    #endif
 
     case custom(_ id: String, _ value: String?)
 
     @available(*, deprecated, message: "General consensus considers this \"bad practice\" and you shouldn't mix your HTML and JavaScript. This will never be removed and remains deprecated to encourage use of other techniques. Learn more at https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#inline_event_handlers_—_dont_use_these.")
-    case event(Extra.event, _ value: String? = nil)
-
-    #if canImport(SwiftSyntax)
-    // MARK: init rawValue
-    public init?(
-        context: some MacroExpansionContext,
-        isUnchecked: Bool,
-        key: String,
-        arguments: LabeledExprListSyntax
-    ) {
-        guard let expression:ExprSyntax = arguments.first?.expression else { return nil }
-        func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
-        func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-        func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
-        func int() -> Int? { expression.int(context: context, key: key) }
-        func array_string() -> [String]? { expression.array_string(context: context, isUnchecked: isUnchecked, key: key) }
-        func array_enumeration<T: HTMLInitializable>() -> [T]? { expression.array_enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
-        switch key {
-        case "accesskey":             self = .accesskey(string())
-        case "ariaattribute":         self = .ariaattribute(enumeration())
-        case "role":                  self = .role(enumeration())
-        case "autocapitalize":        self = .autocapitalize(enumeration())
-        case "autofocus":             self = .autofocus(boolean())
-        case "class":                 self = .class(array_string())
-        case "contenteditable":       self = .contenteditable(enumeration())
-        case "data", "custom":
-            guard let id:String = string(), let value:String = arguments.last?.expression.string(context: context, isUnchecked: isUnchecked, key: key) else {
-                return nil
-            }
-            if key == "data" {
-                self = .data(id, value)
-            } else {
-                self = .custom(id, value)
-            }
-        case "dir":                   self = .dir(enumeration())
-        case "draggable":             self = .draggable(enumeration())
-        case "enterkeyhint":          self = .enterkeyhint(enumeration())
-        case "exportparts":           self = .exportparts(array_string())
-        case "hidden":                self = .hidden(enumeration())
-        case "id":                    self = .id(string())
-        case "inert":                 self = .inert(boolean())
-        case "inputmode":             self = .inputmode(enumeration())
-        case "is":                    self = .is(string())
-        case "itemid":                self = .itemid(string())
-        case "itemprop":              self = .itemprop(string())
-        case "itemref":               self = .itemref(string())
-        case "itemscope":             self = .itemscope(boolean())
-        case "itemtype":              self = .itemtype(string())
-        case "lang":                  self = .lang(string())
-        case "nonce":                 self = .nonce(string())
-        case "part":                  self = .part(array_string())
-        case "popover":               self = .popover(enumeration())
-        case "slot":                  self = .slot(string())
-        case "spellcheck":            self = .spellcheck(enumeration())
-
-        #if canImport(CSS)
-        case "style":                 self = .style(array_enumeration())
-        #endif
-
-        case "tabindex":              self = .tabindex(int())
-        case "title":                 self = .title(string())
-        case "translate":             self = .translate(enumeration())
-        case "virtualkeyboardpolicy": self = .virtualkeyboardpolicy(enumeration())
-        case "writingsuggestions":    self = .writingsuggestions(enumeration())
-        case "trailingSlash":         self = .trailingSlash
-        case "htmx":                  self = .htmx(enumeration())
-        case "event":
-            guard let event:HTMLAttribute.Extra.event = enumeration(), let value:String = arguments.last?.expression.string(context: context, isUnchecked: isUnchecked, key: key) else {
-                return nil
-            }
-            self = .event(event, value)
-        default: return nil
-        }
-    }
-    #endif
+    case event(HTMLEvent, _ value: String? = nil)
 
     // MARK: key
     @inlinable
@@ -198,6 +126,7 @@ public enum HTMLAttribute : HTMLInitializable {
 
         case .trailingSlash:            return ""
 
+        #if canImport(HTMX)
         case .htmx(let htmx):
             switch htmx {
             case .ws(let value):
@@ -207,6 +136,8 @@ public enum HTMLAttribute : HTMLInitializable {
             default:
                 return (htmx != nil ? "hx-" + htmx!.key : "")
             }
+        #endif
+
         case .custom(let id, _):        return id
         case .event(let event, _):      return "on" + event.rawValue
         }
@@ -257,7 +188,10 @@ public enum HTMLAttribute : HTMLInitializable {
 
         case .trailingSlash:                    return nil
 
+        #if canImport(HTMX)
         case .htmx(let htmx):                   return htmx?.htmlValue(encoding: encoding, forMacro: forMacro)
+        #endif
+
         case .custom(_, let value):             return value
         case .event(_, let value):              return value
         }
@@ -269,8 +203,12 @@ public enum HTMLAttribute : HTMLInitializable {
         switch self {
         case .autofocus, .hidden, .inert, .itemscope:
             return true
+            
+        #if canImport(HTMX)
         case .htmx(let value):
             return value?.htmlValueIsVoidable ?? false
+        #endif
+
         default:
             return false
         }
@@ -280,12 +218,41 @@ public enum HTMLAttribute : HTMLInitializable {
     @inlinable
     public func htmlValueDelimiter(encoding: HTMLEncoding, forMacro: Bool) -> String {
         switch self {
+
+        #if canImport(HTMX)
         case .htmx(let v):
             switch v {
             case .request(_, _, _, _), .headers(_, _): return "'"
             default: return encoding.stringDelimiter(forMacro: forMacro)
             }
+        #endif
+
         default: return encoding.stringDelimiter(forMacro: forMacro)
+        }
+    }
+}
+
+// MARK: ElementData
+extension HTMLKitUtilities {
+    public struct ElementData {
+        public let encoding:HTMLEncoding
+        public let globalAttributes:[HTMLAttribute]
+        public let attributes:[String:Any]
+        public let innerHTML:[CustomStringConvertible]
+        public let trailingSlash:Bool
+
+        package init(
+            _ encoding: HTMLEncoding,
+            _ globalAttributes: [HTMLAttribute],
+            _ attributes: [String:Any],
+            _ innerHTML: [CustomStringConvertible],
+            _ trailingSlash: Bool
+        ) {
+            self.encoding = encoding
+            self.globalAttributes = globalAttributes
+            self.attributes = attributes
+            self.innerHTML = innerHTML
+            self.trailingSlash = trailingSlash
         }
     }
 }

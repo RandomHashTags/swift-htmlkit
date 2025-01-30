@@ -5,8 +5,14 @@
 //  Created by Evan Anderson on 11/16/24.
 //
 
+import HTMLAttributes
+import HTMLKitUtilities
+
 /// An HTML element.
 public protocol HTMLElement : CustomStringConvertible, Sendable {
+    /// Remapped attribute names.
+    static var otherAttributes : [String:String] { get }
+
     /// Whether or not this element is a void element.
     var isVoid : Bool { get }
 
@@ -20,8 +26,16 @@ public protocol HTMLElement : CustomStringConvertible, Sendable {
     var tag : String { get }
 
     /// The global attributes of this element.
-    var attributes : [HTMLElementAttribute] { get }
+    var attributes : [HTMLAttribute] { get }
 
     /// The inner HTML content of this element.
     var innerHTML : [CustomStringConvertible & Sendable] { get }
+
+    init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData)
+}
+
+extension HTMLElement {
+    public static var otherAttributes : [String:String] {
+        return [:]
+    }
 }

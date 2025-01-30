@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/27/24.
 //
 
+import HTMLAttributes
+import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
@@ -187,7 +189,7 @@ extension HTMLKitUtilities {
             }
             var results:[Any] = []
             for element in array.elements {
-                if let attribute:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, isUnchecked: isUnchecked, key: key, expr: element.expression) {
+                if let attribute:any HTMLInitializable = HTMLAttribute.Extra.parse(context: context, isUnchecked: isUnchecked, key: key, expr: element.expression) {
                     results.append(attribute)
                 } else if let literal:LiteralReturnType = parse_literal_value(context: context, isUnchecked: isUnchecked, key: key, expression: element.expression, lookupFiles: lookupFiles) {
                     switch literal {

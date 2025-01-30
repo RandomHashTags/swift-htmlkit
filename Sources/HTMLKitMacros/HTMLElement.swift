@@ -5,6 +5,7 @@
 //  Created by Evan Anderson on 9/14/24.
 //
 
+import HTMLKitParse
 import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
@@ -12,6 +13,6 @@ import SwiftSyntaxMacros
 
 enum HTMLElementMacro : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        return try HTMLKitUtilities.expandHTMLMacro(context: context, macroNode: node.macroExpansion!)
+        return try HTMLKitUtilities.expandHTMLMacro(context: context, macroNode: node.as(ExprSyntax.self)!.macroExpansion!)
     }
 }

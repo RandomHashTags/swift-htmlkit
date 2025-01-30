@@ -9,6 +9,7 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
+/*
 extension CSSStyle {
     public enum AccentColor : HTMLInitializable {
         case auto
@@ -18,19 +19,6 @@ extension CSSStyle {
         case revert
         case revertLayer
         case unset
-
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-            switch key {
-            case "auto": self = .auto
-            case "color": self = .color(arguments.first!.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments))
-            case "inherit": self = .inherit
-            case "initial": self = .initial
-            case "revert": self = .revert
-            case "revertLayer": self = .revertLayer
-            case "unset": self = .unset
-            default: return nil
-            }
-        }
 
         @inlinable
         public var key : String {
@@ -61,4 +49,4 @@ extension CSSStyle {
         @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
-}
+}*/

@@ -5,6 +5,9 @@
 //  Created by Evan Anderson on 11/21/24.
 //
 
+import HTMLAttributes
+import HTMLElements
+import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
@@ -90,7 +93,7 @@ extension HTMLKitUtilities {
         otherAttributes: [String:String] = [:]
     ) -> ElementData {
         var encoding:HTMLEncoding = encoding
-        var global_attributes:[HTMLElementAttribute] = []
+        var global_attributes:[HTMLAttribute] = []
         var attributes:[String:Any] = [:]
         var innerHTML:[CustomStringConvertible] = []
         var trailingSlash:Bool = false
@@ -109,15 +112,15 @@ extension HTMLKitUtilities {
                         if let target:String = otherAttributes[key] {
                             target_key = target
                         }
-                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, isUnchecked: encoding.isUnchecked, key: target_key, expr: child.expression) {
+                        if let test:any HTMLInitializable = HTMLAttribute.Extra.parse(context: context, isUnchecked: encoding.isUnchecked, key: target_key, expr: child.expression) {
                             attributes[key] = test
                         } else if let literal:LiteralReturnType = parse_literal_value(context: context, isUnchecked: encoding.isUnchecked, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             switch literal {
                             case .boolean(let b): attributes[key] = b
-                            case .string(_), .interpolation(_): attributes[key] = literal.value(key: key)
+                            case .string, .interpolation: attributes[key] = literal.value(key: key)
                             case .int(let i): attributes[key] = i
                             case .float(let f): attributes[key] = f
-                            case .array(_):
+                            case .array:
                                 let escaped:LiteralReturnType = literal.escapeArray()
                                 switch escaped {
                                 case .array(let a): attributes[key] = a
@@ -164,9 +167,9 @@ extension HTMLKitUtilities {
         isUnchecked: Bool,
         array: ArrayElementListSyntax,
         lookupFiles: Set<String>
-    ) -> (attributes: [HTMLElementAttribute], trailingSlash: Bool) {
+    ) -> (attributes: [HTMLAttribute], trailingSlash: Bool) {
         var keys:Set<String> = []
-        var attributes:[HTMLElementAttribute] = []
+        var attributes:[HTMLAttribute] = []
         var trailingSlash:Bool = false
         for element in array {
             if let function:FunctionCallExprSyntax = element.expression.functionCall {
@@ -176,7 +179,7 @@ extension HTMLKitUtilities {
                     context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
                 } else if keys.contains(key) {
                     global_attribute_already_defined(context: context, attribute: key, node: first_expression)
-                } else if let attr:HTMLElementAttribute = HTMLElementAttribute(context: context, isUnchecked: isUnchecked, key: key, arguments: function.arguments) {
+                } else if let attr:HTMLAttribute = HTMLAttribute(context: context, isUnchecked: isUnchecked, key: key, arguments: function.arguments) {
                     attributes.append(attr)
                     key = attr.key
                     keys.insert(key)
@@ -265,30 +268,6 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Misc
-extension SyntaxProtocol {
-    package var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
-    package var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
-    package var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
-    package var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
-    package var array : ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
-    package var dictionary : DictionaryExprSyntax? { self.as(DictionaryExprSyntax.self) }
-    package var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
-    package var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
-    package var functionCall : FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
-    package var declRef : DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
-}
-extension SyntaxChildren.Element {
-    package var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
-}
-extension StringLiteralExprSyntax {
-    package var string : String { "\(segments)" }
-}
-extension LabeledExprListSyntax {
-    package func get(_ index: Int) -> Element? {
-        return index < count ? self[self.index(at: index)] : nil
-    }
-}
-
 extension ExprSyntax {
     package func string(context: some MacroExpansionContext, isUnchecked: Bool, key: String) -> String? {
         return HTMLKitUtilities.parse_literal_value(context: context, isUnchecked: isUnchecked, key: key, expression: self, lookupFiles: [])?.value(key: key)
@@ -296,7 +275,7 @@ extension ExprSyntax {
     package func boolean(context: some MacroExpansionContext, key: String) -> Bool? {
         booleanLiteral?.literal.text == "true"
     }
-    package func enumeration<T : HTMLInitializable>(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) -> T? {
+    package func enumeration<T : HTMLParsable>(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) -> T? {
         if let function:FunctionCallExprSyntax = functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
             return T(context: context, isUnchecked: isUnchecked, key: member.declName.baseName.text, arguments: function.arguments)
         }
@@ -312,7 +291,7 @@ extension ExprSyntax {
     package func array_string(context: some MacroExpansionContext, isUnchecked: Bool, key: String) -> [String]? {
         array?.elements.compactMap({ $0.expression.string(context: context, isUnchecked: isUnchecked, key: key) })
     }
-    package func array_enumeration<T: HTMLInitializable>(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) -> [T]? {
+    package func array_enumeration<T: HTMLParsable>(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) -> [T]? {
         array?.elements.compactMap({ $0.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) })
     }
     package func dictionary_string_string(context: some MacroExpansionContext, isUnchecked: Bool, key: String) -> [String:String] {

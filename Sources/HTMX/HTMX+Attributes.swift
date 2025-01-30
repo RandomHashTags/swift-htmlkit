@@ -14,14 +14,14 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 #endif
 
-extension HTMX {
+extension HTMXAttribute {
     // MARK: TrueOrFalse
-    public enum TrueOrFalse : String, HTMLInitializable {
+    public enum TrueOrFalse : String, HTMLParsable {
         case `true`, `false`
     }
 
     // MARK: Event
-    public enum Event : String, HTMLInitializable {
+    public enum Event : String, HTMLParsable {
         case abort
         case afterOnLoad
         case afterProcessNode
@@ -70,6 +70,7 @@ extension HTMX {
         case xhrLoadStart
         case xhrProgress
 
+        @inlinable
         public var key : String {
             func slug() -> String {
                 switch self {
@@ -128,20 +129,6 @@ extension HTMX {
         case not([String]?)
         case list([String]?)
 
-        #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-            let expression:ExprSyntax = arguments.first!.expression
-            func array_string() -> [String]? { expression.array_string(context: context, isUnchecked: isUnchecked, key: key) }
-            switch key {
-            case "all":  self = .all
-            case "none": self = .none
-            case "not":  self = .not(array_string())
-            case "list": self = .list(array_string())
-            default: return nil
-            }
-        }
-        #endif
-
         @inlinable
         public var key : String {
             switch self {
@@ -167,7 +154,7 @@ extension HTMX {
     }
 
     // MARK: Swap
-    public enum Swap : String, HTMLInitializable {
+    public enum Swap : String, HTMLParsable {
         case innerHTML, outerHTML
         case textContent
         case beforebegin, afterbegin
@@ -175,27 +162,12 @@ extension HTMX {
         case delete, none
     }
 
-    // MARK: Sync
+    // MARK: SyncStrategy
     public enum SyncStrategy : HTMLInitializable {
         case drop, abort, replace
         case queue(Queue?)
 
-        #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-            switch key {
-            case "drop":    self = .drop
-            case "abort":   self = .abort
-            case "replace": self = .replace
-            case "queue":
-                let expression:ExprSyntax = arguments.first!.expression
-                func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
-                self = .queue(enumeration())
-            default:        return nil
-            }
-        }
-        #endif
-
-        public enum Queue : String, HTMLInitializable {
+        public enum Queue : String, HTMLParsable {
             case first, last, all
         }
 
@@ -228,17 +200,6 @@ extension HTMX {
         case `true`, `false`
         case url(String)
 
-        #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-            switch key {
-            case "true": self = .true
-            case "false": self = .false
-            case "url": self = .url(arguments.first!.expression.stringLiteral!.string)
-            default: return nil
-            }
-        }
-        #endif
-
         @inlinable
         public var key : String {
             switch self {
@@ -263,23 +224,11 @@ extension HTMX {
 }
 
 // MARK: Server Sent Events
-extension HTMX {
+extension HTMXAttribute {
     public enum ServerSentEvents : HTMLInitializable {
         case connect(String?)
         case swap(String?)
         case close(String?)
-
-        #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-            func string() -> String?        { arguments.first!.expression.string(context: context, isUnchecked: isUnchecked, key: key) }
-            switch key {
-            case "connect": self = .connect(string())
-            case "swap": self = .swap(string())
-            case "close": self = .close(string())
-            default: return nil
-            }
-        }
-        #endif
 
         @inlinable
         public var key : String {
@@ -306,23 +255,10 @@ extension HTMX {
 }
 
 // MARK: WebSocket
-extension HTMX {
+extension HTMXAttribute {
     public enum WebSocket : HTMLInitializable {
         case connect(String?)
         case send(Bool?)
-
-        #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-            let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
-            func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-            switch key {
-            case "connect": self = .connect(string())
-            case "send": self = .send(boolean())
-            default: return nil
-            }
-        }
-        #endif
 
         @inlinable
         public var key : String {

@@ -10,27 +10,6 @@ import SwiftSyntaxMacros
 
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
-    public struct ElementData {
-        public let encoding:HTMLEncoding
-        public let globalAttributes:[HTMLElementAttribute]
-        public let attributes:[String:Any]
-        public let innerHTML:[CustomStringConvertible]
-        public let trailingSlash:Bool
-
-        init(
-            _ encoding: HTMLEncoding,
-            _ globalAttributes: [HTMLElementAttribute],
-            _ attributes: [String:Any],
-            _ innerHTML: [CustomStringConvertible],
-            _ trailingSlash: Bool
-        ) {
-            self.encoding = encoding
-            self.globalAttributes = globalAttributes
-            self.attributes = attributes
-            self.innerHTML = innerHTML
-            self.trailingSlash = trailingSlash
-        }
-    }
 }
 
 // MARK: Escape HTML
@@ -77,5 +56,30 @@ extension String {
         self.replace("\\\"", with: "&quot;")
         self.replace("\"", with: "&quot;")
         self.replace("'", with: "&#39")
+    }
+}
+
+// MARK: Misc
+extension ExprSyntaxProtocol {
+    package var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
+    package var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
+    package var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
+    package var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
+    package var array : ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
+    package var dictionary : DictionaryExprSyntax? { self.as(DictionaryExprSyntax.self) }
+    package var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
+    package var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
+    package var functionCall : FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
+    package var declRef : DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
+}
+extension SyntaxChildren.Element {
+    package var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
+}
+extension StringLiteralExprSyntax {
+    package var string : String { "\(segments)" }
+}
+extension LabeledExprListSyntax {
+    package func get(_ index: Int) -> Element? {
+        return index < count ? self[self.index(at: index)] : nil
     }
 }
