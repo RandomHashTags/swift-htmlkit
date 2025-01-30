@@ -5,7 +5,9 @@
 //  Created by Evan Anderson on 11/19/24.
 //
 
+#if canImport(HTMLKitUtilities)
 import HTMLKitUtilities
+#endif
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax

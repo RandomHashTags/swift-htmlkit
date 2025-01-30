@@ -5,9 +5,17 @@
 //  Created by Evan Anderson on 11/19/24.
 //
 
+#if canImport(CSS)
 import CSS
+#endif
+
+#if canImport(HTMLKitUtilities)
 import HTMLKitUtilities
+#endif
+
+#if canImport(HTMX)
 import HTMX
+#endif
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax
@@ -46,7 +54,11 @@ public enum HTMLAttribute : HTMLInitializable {
     case popover(Extra.popover? = nil)
     case slot(String? = nil)
     case spellcheck(Extra.spellcheck? = nil)
+
+    #if canImport(CSS)
     case style([CSSStyle]? = nil)
+    #endif
+
     case tabindex(Int? = nil)
     case title(String? = nil)
     case translate(Extra.translate? = nil)
@@ -117,7 +129,11 @@ public enum HTMLAttribute : HTMLInitializable {
         case "popover":               self = .popover(enumeration())
         case "slot":                  self = .slot(string())
         case "spellcheck":            self = .spellcheck(enumeration())
+
+        #if canImport(CSS)
         case "style":                 self = .style(array_enumeration())
+        #endif
+
         case "tabindex":              self = .tabindex(int())
         case "title":                 self = .title(string())
         case "translate":             self = .translate(enumeration())
@@ -169,7 +185,11 @@ public enum HTMLAttribute : HTMLInitializable {
         case .popover:               return "popover"
         case .slot:                  return "slot"
         case .spellcheck:            return "spellcheck"
+
+        #if canImport(CSS)
         case .style:                 return "style"
+        #endif
+
         case .tabindex:              return "tabindex"
         case .title:                 return "title"
         case .translate:             return "translate"
@@ -224,7 +244,11 @@ public enum HTMLAttribute : HTMLInitializable {
         case .popover(let value):               return value?.rawValue
         case .slot(let value):                  return value
         case .spellcheck(let value):            return value?.rawValue
+
+        #if canImport(CSS)
         case .style(let value):                 return value?.compactMap({ $0.htmlValue(encoding: encoding, forMacro: forMacro) }).joined(separator: ";")
+        #endif
+        
         case .tabindex(let value):              return value?.description
         case .title(let value):                 return value
         case .translate(let value):             return value?.rawValue

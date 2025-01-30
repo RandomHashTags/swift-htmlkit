@@ -5,8 +5,13 @@
 //  Created by Evan Anderson on 11/21/24.
 //
 
+#if canImport(CSS)
 import CSS
+#endif
+
+#if canImport(HTMLKitUtilities)
 import HTMLKitUtilities
+#endif
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax

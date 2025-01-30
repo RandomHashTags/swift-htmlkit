@@ -10,6 +10,7 @@
   swiftc main.swift \
   ../HTMLKitUtilities/HTMLElementType.swift \
   ../HTMLKitUtilities/HTMLEncoding.swift \
+  ../HTMLKitUtilities/HTMLInitializable.swift \
   ../HTMLAttributes/HTMLAttributes.swift \
   ../HTMLAttributes/HTMLAttributes+Extra.swift \
   ../CSS/CSSUnit.swift \
@@ -22,6 +23,7 @@
 
 // Why do we do it this way?
 // - The documentation doesn't link correctly (or at all) if we generate from a macro
+// - Noticable performance hit for incremental builds under certain conditions due to multiple macro expansions/indexing
 
 import Foundation
 

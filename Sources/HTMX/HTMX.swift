@@ -5,7 +5,9 @@
 //  Created by Evan Anderson on 11/12/24.
 //
 
+#if canImport(HTMLKitUtilities)
 import HTMLKitUtilities
+#endif
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax
@@ -40,7 +42,14 @@ public enum HTMX : HTMLInitializable {
     case get(String?)
     case post(String?)
     case on(Event?, String)
+
+    #if canImport(HTMLKitUtilities)
     case onevent(HTMLElementAttribute.Extra.event?, String)
+    #else
+    case onevent(HTMLAttribute.Extra.event?, String)
+    #endif
+
+
     case pushURL(URL?)
     case select(String?)
     case selectOOB(String?)
