@@ -331,6 +331,10 @@ extension InterpolationTests {
         let string:String = #html(div(attributes: [.title(InterpolationTests.spongebobCharacter("patrick"))]))
         #expect(string == "<div title=\"Patrick Star\"></div>")
     }
+
+    @Test func uncheckedInterpolation() {
+        let _:String = #html(encoding: .unchecked(.string), div(InterpolationTests.patrick))
+    }
 }
 
 #endif

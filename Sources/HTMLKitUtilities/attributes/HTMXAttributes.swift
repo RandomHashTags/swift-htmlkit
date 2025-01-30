@@ -125,9 +125,9 @@ extension HTMLElementAttribute.HTMX {
         case list([String]?)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func array_string() -> [String]? { expression.array_string(context: context, key: key) }
+            func array_string() -> [String]? { expression.array_string(context: context, isUnchecked: isUnchecked, key: key) }
             switch key {
             case "all":  self = .all
             case "none": self = .none
@@ -177,14 +177,14 @@ extension HTMLElementAttribute.HTMX {
         case queue(Queue?)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "drop":    self = .drop
             case "abort":   self = .abort
             case "replace": self = .replace
             case "queue":
                 let expression:ExprSyntax = arguments.first!.expression
-                func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
+                func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
                 self = .queue(enumeration())
             default:        return nil
             }
@@ -225,7 +225,7 @@ extension HTMLElementAttribute.HTMX {
         case url(String)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "true": self = .true
             case "false": self = .false
@@ -266,8 +266,8 @@ extension HTMLElementAttribute.HTMX {
         case close(String?)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
-            func string() -> String?        { arguments.first!.expression.string(context: context, key: key) }
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
+            func string() -> String?        { arguments.first!.expression.string(context: context, isUnchecked: isUnchecked, key: key) }
             switch key {
             case "connect": self = .connect(string())
             case "swap": self = .swap(string())
@@ -308,9 +308,9 @@ extension HTMLElementAttribute.HTMX {
         case send(Bool?)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String?        { expression.string(context: context, key: key) }
+            func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
             func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
             switch key {
             case "connect": self = .connect(string())

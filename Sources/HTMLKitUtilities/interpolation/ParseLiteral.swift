@@ -13,6 +13,7 @@ extension HTMLKitUtilities {
     // MARK: Parse Literal Value
     static func parse_literal_value(
         context: some MacroExpansionContext,
+        isUnchecked: Bool,
         key: String,
         expression: ExprSyntax,
         lookupFiles: Set<String>
@@ -26,7 +27,7 @@ extension HTMLKitUtilities {
         if let string:String = expression.floatLiteral?.literal.text {
             return .float(Float(string)!)
         }
-        guard var returnType:LiteralReturnType = extract_literal(context: context, key: key, expression: expression, lookupFiles: lookupFiles) else {
+        guard var returnType:LiteralReturnType = extract_literal(context: context, isUnchecked: isUnchecked, key: key, expression: expression, lookupFiles: lookupFiles) else {
             return nil
         }
         guard returnType.isInterpolation else { return returnType }
@@ -45,7 +46,7 @@ extension HTMLKitUtilities {
             }
             var minimum:Int = 0
             for expr in interpolation {
-                let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles)
+                let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, isUnchecked: isUnchecked, remaining_interpolation: &remaining_interpolation, expr: expr, lookupFiles: lookupFiles)
                 for (i, segment) in segments.enumerated() {
                     if i >= minimum && segment.as(ExpressionSegmentSyntax.self) == expr {
                         segments.remove(at: i)
@@ -57,10 +58,12 @@ extension HTMLKitUtilities {
             }
             string = segments.map({ "\($0)" }).joined()
         } else {
-            if let function:FunctionCallExprSyntax = expression.functionCall {
-                warn_interpolation(context: context, node: function.calledExpression)
-            } else {
-                warn_interpolation(context: context, node: expression)
+            if !isUnchecked {
+                if let function:FunctionCallExprSyntax = expression.functionCall {
+                    warn_interpolation(context: context, node: function.calledExpression)
+                } else {
+                    warn_interpolation(context: context, node: expression)
+                }
             }
             if let member:MemberAccessExprSyntax = expression.memberAccess {
                 string = "\\(" + member.singleLineDescription + ")"
@@ -86,6 +89,7 @@ extension HTMLKitUtilities {
     // MARK: Promote Interpolation
     static func promoteInterpolation(
         context: some MacroExpansionContext,
+        isUnchecked: Bool,
         remaining_interpolation: inout Int,
         expr: ExpressionSegmentSyntax,
         lookupFiles: Set<String>
@@ -114,7 +118,7 @@ extension HTMLKitUtilities {
                         if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
                             values.append(create(literal))
                         } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                            let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
+                            let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, isUnchecked: isUnchecked, remaining_interpolation: &remaining_interpolation, expr: interpolation, lookupFiles: lookupFiles)
                             values.append(contentsOf: promotions)
                         } else {
                             context.diagnose(Diagnostic(node: segment, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")")))
@@ -130,7 +134,9 @@ extension HTMLKitUtilities {
                     // TODO: lookup and try to promote | need to wait for swift-syntax to update to access SwiftLexicalLookup
                 //}
                 values.append(interpolate(expression))
-                warn_interpolation(context: context, node: expression)
+                if !isUnchecked {
+                    warn_interpolation(context: context, node: expression)
+                }
             }
         }
         return values
@@ -138,6 +144,7 @@ extension HTMLKitUtilities {
     // MARK: Extract Literal
     static func extract_literal(
         context: some MacroExpansionContext,
+        isUnchecked: Bool,
         key: String,
         expression: ExprSyntax,
         lookupFiles: Set<String>
@@ -180,9 +187,9 @@ extension HTMLKitUtilities {
             }
             var results:[Any] = []
             for element in array.elements {
-                if let attribute:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, key: key, expr: element.expression) {
+                if let attribute:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, isUnchecked: isUnchecked, key: key, expr: element.expression) {
                     results.append(attribute)
-                } else if let literal:LiteralReturnType = parse_literal_value(context: context, key: key, expression: element.expression, lookupFiles: lookupFiles) {
+                } else if let literal:LiteralReturnType = parse_literal_value(context: context, isUnchecked: isUnchecked, key: key, expression: element.expression, lookupFiles: lookupFiles) {
                     switch literal {
                     case .string(let string), .interpolation(let string):
                         if string.contains(separator) {
@@ -200,7 +207,9 @@ extension HTMLKitUtilities {
             return .array(results)
         }
         if let decl:DeclReferenceExprSyntax = expression.declRef {
-            warn_interpolation(context: context, node: expression)
+            if !isUnchecked {
+                warn_interpolation(context: context, node: expression)
+            }
             return .interpolation(decl.baseName.text)
         }
         return nil

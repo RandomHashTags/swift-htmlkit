@@ -37,10 +37,15 @@ extension HTMLKitUtilities {
     // MARK: Expand #html
     public static func expandHTMLMacro(context: some MacroExpansionContext, macroNode: MacroExpansionExprSyntax) throws -> ExprSyntax {
         let (string, encoding):(String, HTMLEncoding) = expand_macro(context: context, macro: macroNode)
+        return "\(raw: encodingResult(context: context, node: macroNode, string: string, for: encoding))"
+    }
+    private static func encodingResult(context: some MacroExpansionContext, node: MacroExpansionExprSyntax, string: String, for encoding: HTMLEncoding) -> String {
         func hasNoInterpolation() -> Bool {
             let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !has_interpolation else {
-                context.diagnose(Diagnostic(node: macroNode, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
+                if !encoding.isUnchecked {
+                    context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
+                }
                 return false
             }
             return true
@@ -49,27 +54,31 @@ extension HTMLKitUtilities {
             return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
         }
         switch encoding {
+        case .unchecked(let e):
+            return encodingResult(context: context, node: node, string: string, for: e)
+
         case .utf8Bytes:
             guard hasNoInterpolation() else { return "" }
-            return "\(raw: bytes([UInt8](string.utf8)))"
+            return bytes([UInt8](string.utf8))
         case .utf16Bytes:
             guard hasNoInterpolation() else { return "" }
-            return "\(raw: bytes([UInt16](string.utf16)))"
+            return bytes([UInt16](string.utf16))
         case .utf8CString:
-            return "\(raw: string.utf8CString)"
+            guard hasNoInterpolation() else { return "" }
+            return "\(string.utf8CString)"
 
         case .foundationData:
             guard hasNoInterpolation() else { return "" }
-            return "Data(\(raw: bytes([UInt8](string.utf8))))"
+            return "Data(\(bytes([UInt8](string.utf8))))"
 
         case .byteBuffer:
             guard hasNoInterpolation() else { return "" }
-            return "ByteBuffer(bytes: \(raw: bytes([UInt8](string.utf8))))"
+            return "ByteBuffer(bytes: \(bytes([UInt8](string.utf8))))"
 
         case .string:
-            return "\"\(raw: string)\""
+            return "\"\(string)\""
         case .custom(let encoded, _):
-            return "\(raw: encoded.replacingOccurrences(of: "$0", with: string))"
+            return encoded.replacingOccurrences(of: "$0", with: string)
         }
     }
 
@@ -94,15 +103,15 @@ extension HTMLKitUtilities {
                     } else if key == "lookupFiles" {
                         lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string }))
                     } else if key == "attributes" {
-                        (global_attributes, trailingSlash) = parseGlobalAttributes(context: context, array: child.expression.array!.elements, lookupFiles: lookupFiles)
+                        (global_attributes, trailingSlash) = parseGlobalAttributes(context: context, isUnchecked: encoding.isUnchecked, array: child.expression.array!.elements, lookupFiles: lookupFiles)
                     } else {
                         var target_key:String = key
                         if let target:String = otherAttributes[key] {
                             target_key = target
                         }
-                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, key: target_key, expr: child.expression) {
+                        if let test:any HTMLInitializable = HTMLElementAttribute.Extra.parse(context: context, isUnchecked: encoding.isUnchecked, key: target_key, expr: child.expression) {
                             attributes[key] = test
-                        } else if let literal:LiteralReturnType = parse_literal_value(context: context, key: key, expression: child.expression, lookupFiles: lookupFiles) {
+                        } else if let literal:LiteralReturnType = parse_literal_value(context: context, isUnchecked: encoding.isUnchecked, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             switch literal {
                             case .boolean(let b): attributes[key] = b
                             case .string(_), .interpolation(_): attributes[key] = literal.value(key: key)
@@ -130,12 +139,20 @@ extension HTMLKitUtilities {
     public static func parseEncoding(expression: ExprSyntax) -> HTMLEncoding? {
         if let key:String = expression.memberAccess?.declName.baseName.text {
             return HTMLEncoding(rawValue: key)
-        } else if let custom:FunctionCallExprSyntax = expression.functionCall {
-            guard let logic:String = custom.arguments.first?.expression.stringLiteral?.string else { return nil }
-            if custom.arguments.count == 1 {
-                return .custom(logic)
-            } else {
-                return .custom(logic, stringDelimiter: custom.arguments.last!.expression.stringLiteral!.string)
+        } else if let function:FunctionCallExprSyntax = expression.functionCall {
+            switch function.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
+            case "unchecked":
+                guard let encoding:HTMLEncoding = parseEncoding(expression: function.arguments.first!.expression) else { break }
+                return .unchecked(encoding)
+            case "custom":
+                guard let logic:String = function.arguments.first?.expression.stringLiteral?.string else { break }
+                if function.arguments.count == 1 {
+                    return .custom(logic)
+                } else {
+                    return .custom(logic, stringDelimiter: function.arguments.last!.expression.stringLiteral!.string)
+                }
+            default:
+                break
             }
         }
         return nil
@@ -144,6 +161,7 @@ extension HTMLKitUtilities {
     // MARK: Parse Global Attributes
     public static func parseGlobalAttributes(
         context: some MacroExpansionContext,
+        isUnchecked: Bool,
         array: ArrayElementListSyntax,
         lookupFiles: Set<String>
     ) -> (attributes: [HTMLElementAttribute], trailingSlash: Bool) {
@@ -158,7 +176,7 @@ extension HTMLKitUtilities {
                     context.diagnose(Diagnostic(node: first_expression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
                 } else if keys.contains(key) {
                     global_attribute_already_defined(context: context, attribute: key, node: first_expression)
-                } else if let attr:HTMLElementAttribute = HTMLElementAttribute(context: context, key: key, arguments: function.arguments) {
+                } else if let attr:HTMLElementAttribute = HTMLElementAttribute(context: context, isUnchecked: isUnchecked, key: key, arguments: function.arguments) {
                     attributes.append(attr)
                     key = attr.key
                     keys.insert(key)
@@ -189,7 +207,7 @@ extension HTMLKitUtilities {
             return "" // TODO: fix?
         } else if let element:HTMLElement = parse_element(context: context, encoding: encoding, expr: child.expression) {
             return element
-        } else if let string:String = parse_literal_value(context: context, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value(key: "") {
+        } else if let string:String = parse_literal_value(context: context, isUnchecked: encoding.isUnchecked, key: "", expression: child.expression, lookupFiles: lookupFiles)?.value(key: "") {
             return string
         } else {
             unallowed_expression(context: context, node: child)
@@ -247,65 +265,66 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Misc
-package extension SyntaxProtocol {
-    var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
-    var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
-    var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
-    var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
-    var array : ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
-    var dictionary : DictionaryExprSyntax? { self.as(DictionaryExprSyntax.self) }
-    var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
-    var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
-    var functionCall : FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
-    var declRef : DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
+extension SyntaxProtocol {
+    package var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
+    package var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
+    package var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
+    package var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
+    package var array : ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
+    package var dictionary : DictionaryExprSyntax? { self.as(DictionaryExprSyntax.self) }
+    package var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
+    package var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
+    package var functionCall : FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
+    package var declRef : DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
 }
-package extension SyntaxChildren.Element {
-    var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
+extension SyntaxChildren.Element {
+    package var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
 }
-package extension StringLiteralExprSyntax {
-    var string : String { "\(segments)" }
+extension StringLiteralExprSyntax {
+    package var string : String { "\(segments)" }
 }
-package extension LabeledExprListSyntax {
-    func get(_ index: Int) -> Element? {
+extension LabeledExprListSyntax {
+    package func get(_ index: Int) -> Element? {
         return index < count ? self[self.index(at: index)] : nil
     }
 }
-package extension ExprSyntax {
-    func string(context: some MacroExpansionContext, key: String) -> String? {
-        return HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key)
+
+extension ExprSyntax {
+    package func string(context: some MacroExpansionContext, isUnchecked: Bool, key: String) -> String? {
+        return HTMLKitUtilities.parse_literal_value(context: context, isUnchecked: isUnchecked, key: key, expression: self, lookupFiles: [])?.value(key: key)
     }
-    func boolean(context: some MacroExpansionContext, key: String) -> Bool? {
+    package func boolean(context: some MacroExpansionContext, key: String) -> Bool? {
         booleanLiteral?.literal.text == "true"
     }
-    func enumeration<T : HTMLInitializable>(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) -> T? {
+    package func enumeration<T : HTMLInitializable>(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) -> T? {
         if let function:FunctionCallExprSyntax = functionCall, let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
-            return T(context: context, key: member.declName.baseName.text, arguments: function.arguments)
+            return T(context: context, isUnchecked: isUnchecked, key: member.declName.baseName.text, arguments: function.arguments)
         }
         if let member:MemberAccessExprSyntax = memberAccess {
-            return T(context: context, key: member.declName.baseName.text, arguments: arguments)
+            return T(context: context, isUnchecked: isUnchecked, key: member.declName.baseName.text, arguments: arguments)
         }
         return nil
     }
-    func int(context: some MacroExpansionContext, key: String) -> Int? {
-        guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }
+    package func int(context: some MacroExpansionContext, key: String) -> Int? {
+        guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, isUnchecked: false, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }
         return Int(s)
     }
-    func array_string(context: some MacroExpansionContext, key: String) -> [String]? {
-        array?.elements.compactMap({ $0.expression.string(context: context, key: key) })
+    package func array_string(context: some MacroExpansionContext, isUnchecked: Bool, key: String) -> [String]? {
+        array?.elements.compactMap({ $0.expression.string(context: context, isUnchecked: isUnchecked, key: key) })
     }
-    func dictionary_string_string(context: some MacroExpansionContext, key: String) -> [String:String] {
+    package func dictionary_string_string(context: some MacroExpansionContext, isUnchecked: Bool, key: String) -> [String:String] {
         var d:[String:String] = [:]
         if let elements:DictionaryElementListSyntax = dictionary?.content.as(DictionaryElementListSyntax.self) {
             for element in elements {
-                if let key:String = element.key.string(context: context, key: key), let value:String = element.value.string(context: context, key: key) {
+                if let key:String = element.key.string(context: context, isUnchecked: isUnchecked, key: key), let value:String = element.value.string(context: context, isUnchecked: isUnchecked, key: key) {
                     d[key] = value
                 }
             }
         }
         return d
     }
-    func float(context: some MacroExpansionContext, key: String) -> Float? {
-        guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }
+    package func float(context: some MacroExpansionContext, key: String) -> Float? {
+        guard let s:String = HTMLKitUtilities.parse_literal_value(context: context, isUnchecked: false, key: key, expression: self, lookupFiles: [])?.value(key: key) else { return nil }
         return Float(s)
     }
 }

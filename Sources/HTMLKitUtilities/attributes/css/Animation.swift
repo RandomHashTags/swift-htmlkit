@@ -37,13 +37,13 @@ extension HTMLElementAttribute.CSS.Animation {
         case revertLayer
         case unset
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "alternate": self = .alternate
             case "alternateReverse": self = .alternateReverse
             case "inherit": self = .inherit
             case "initial": self = .initial
-            case "multiple": self = .multiple(arguments.first!.array!.elements.map({ $0.expression.enumeration(context: context, key: key, arguments: arguments)! }))
+            case "multiple": self = .multiple(arguments.first!.array!.elements.map({ $0.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments)! }))
             case "normal": self = .normal
             case "reverse": self = .reverse
             case "revert": self = .revert
@@ -90,14 +90,14 @@ extension HTMLElementAttribute.CSS.Animation {
         case revertLayer
         case unset
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "backwards": self = .backwards
             case "both": self = .both
             case "forwards": self = .forwards
             case "inherit": self = .inherit
             case "initial": self = .initial
-            case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, key: key, arguments: arguments) }))
+            case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }))
             case "none": self = .none
             case "revert": self = .revert
             case "revertLayer": self = .revertLayer
@@ -141,11 +141,11 @@ extension HTMLElementAttribute.CSS.Animation {
         case running
         case unset
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "inherit": self = .inherit
             case "initial": self = .initial
-            case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, key: key, arguments: arguments) }))
+            case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }))
             case "paused": self = .paused
             case "revert": self = .revert
             case "revertLayer": self = .revertLayer

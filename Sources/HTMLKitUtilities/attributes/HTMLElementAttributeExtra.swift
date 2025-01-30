@@ -13,7 +13,7 @@ import SwiftSyntaxMacros
 // MARK: HTMLInitializable
 public protocol HTMLInitializable : Hashable, Sendable {
     #if canImport(SwiftSyntax)
-    init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax)
+    init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax)
     #endif
 
     @inlinable
@@ -42,7 +42,7 @@ extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
     public var htmlValueIsVoidable : Bool { false }
 
     #if canImport(SwiftSyntax)
-    public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+    public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
         guard let value:Self = .init(rawValue: key) else { return nil }
         self = value
     }
@@ -111,7 +111,7 @@ extension HTMLElementAttribute {
         }
 
         #if canImport(SwiftSyntax)
-        public static func parse(context: some MacroExpansionContext, key: String, expr: ExprSyntax) -> (any HTMLInitializable)? {
+        public static func parse(context: some MacroExpansionContext, isUnchecked: Bool, key: String, expr: ExprSyntax) -> (any HTMLInitializable)? {
             func get<T : HTMLInitializable>(_ type: T.Type) -> T? {
                 let inner_key:String, arguments:LabeledExprListSyntax
                 if let function:FunctionCallExprSyntax = expr.functionCall {
@@ -123,7 +123,7 @@ extension HTMLElementAttribute {
                 } else {
                     return nil
                 }
-                return T(context: context, key: inner_key, arguments: arguments)
+                return T(context: context, isUnchecked: isUnchecked, key: inner_key, arguments: arguments)
             }
             switch key {
             case "as": return get(`as`.self)
@@ -260,13 +260,13 @@ extension HTMLElementAttribute.Extra {
         case valuetext(String?)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String?        { expression.string(context: context, key: key) }
+            func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
             func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-            func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
+            func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
             func int() -> Int? { expression.int(context: context, key: key) }
-            func array_string() -> [String]? { expression.array_string(context: context, key: key) }
+            func array_string() -> [String]? { expression.array_string(context: context, isUnchecked: isUnchecked, key: key) }
             func float() -> Float? { expression.float(context: context, key: key) }
             switch key {
             case "activedescendant":       self = .activedescendant(string())
@@ -655,7 +655,7 @@ extension HTMLElementAttribute.Extra {
         case custom(String)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "showModal":     self = .showModal
             case "close":         self = .close
@@ -755,7 +755,7 @@ extension HTMLElementAttribute.Extra {
         case filename(String)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "empty":    self = .empty
             case "filename": self = .filename(arguments.first!.expression.stringLiteral!.string)

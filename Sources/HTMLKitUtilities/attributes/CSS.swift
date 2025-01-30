@@ -146,10 +146,10 @@ extension HTMLElementAttribute.CSS {
         case revertLayer
         case unset
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "auto": self = .auto
-            case "color": self = .color(arguments.first!.expression.enumeration(context: context, key: key, arguments: arguments))
+            case "color": self = .color(arguments.first!.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments))
             case "inherit": self = .inherit
             case "initial": self = .initial
             case "revert": self = .revert
@@ -318,7 +318,7 @@ extension HTMLElementAttribute.CSS {
         case initial
         case int(Int)
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: SwiftSyntax.LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: SwiftSyntax.LabeledExprListSyntax) {
             return nil
         }
 
@@ -494,13 +494,13 @@ extension HTMLElementAttribute.CSS {
         case s(SFloat?)
         case unset
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "auto": self = .auto
             case "inherit": self = .inherit
             case "initial": self = .initial
             case "ms": self = .ms(arguments.first!.expression.int(context: context, key: key))
-            case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, key: key, arguments: arguments) }))
+            case "multiple": self = .multiple(arguments.first!.expression.array!.elements.compactMap({ $0.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }))
             case "revert": self = .revert
             case "revertLayer": self = .revertLayer
             case "s": self = .s(arguments.first!.expression.float(context: context, key: key))
@@ -571,7 +571,7 @@ extension HTMLElementAttribute.CSS {
         case inherit
         case initial
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             return nil
         }
 
@@ -659,7 +659,7 @@ extension HTMLElementAttribute.CSS {
         case revertLayer
         case unset
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "float": self = .float(arguments.first!.expression.float(context: context, key: key))
             case "inherit": self = .inherit
@@ -863,7 +863,7 @@ extension HTMLElementAttribute.CSS {
         case revertLayer
         case unset
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             switch key {
             case "float": self = .float(arguments.first!.expression.float(context: context, key: key))
             case "inherit": self = .inherit

@@ -63,13 +63,18 @@ public enum HTMLElementAttribute : HTMLInitializable {
 
     #if canImport(SwiftSyntax)
     // MARK: init rawValue
-    public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+    public init?(
+        context: some MacroExpansionContext,
+        isUnchecked: Bool,
+        key: String,
+        arguments: LabeledExprListSyntax
+    ) {
         let expression:ExprSyntax = arguments.first!.expression
-        func string() -> String?        { expression.string(context: context, key: key) }
+        func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
         func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-        func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
+        func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
         func int() -> Int? { expression.int(context: context, key: key) }
-        func array_string() -> [String]? { expression.array_string(context: context, key: key) }
+        func array_string() -> [String]? { expression.array_string(context: context, isUnchecked: isUnchecked, key: key) }
         switch key {
         case "accesskey":             self = .accesskey(string())
         case "ariaattribute":         self = .ariaattribute(enumeration())
@@ -79,7 +84,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
         case "class":                 self = .class(array_string())
         case "contenteditable":       self = .contenteditable(enumeration())
         case "data", "custom":
-            guard let id:String = string(), let value:String = arguments.last?.expression.string(context: context, key: key) else {
+            guard let id:String = string(), let value:String = arguments.last?.expression.string(context: context, isUnchecked: isUnchecked, key: key) else {
                 return nil
             }
             if key == "data" {
@@ -116,7 +121,7 @@ public enum HTMLElementAttribute : HTMLInitializable {
         case "trailingSlash":         self = .trailingSlash
         case "htmx":                  self = .htmx(enumeration())
         case "event":
-            guard let event:HTMLElementAttribute.Extra.event = enumeration(), let value:String = arguments.last?.expression.string(context: context, key: key) else {
+            guard let event:HTMLElementAttribute.Extra.event = enumeration(), let value:String = arguments.last?.expression.string(context: context, isUnchecked: isUnchecked, key: key) else {
                 return nil
             }
             self = .event(event, value)
@@ -292,7 +297,7 @@ extension HTMLElementAttribute {
         case percent(_ value: Float?)
 
         #if canImport(SwiftSyntax)
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
             func float() -> Float? {
                 guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }

@@ -54,11 +54,11 @@ extension HTMLElementAttribute {
 
         #if canImport(SwiftSyntax)
         // MARK: init
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             let expression:ExprSyntax = arguments.first!.expression
-            func string() -> String?        { expression.string(context: context, key: key) }
+            func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
             func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-            func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, key: key, arguments: arguments) }
+            func enumeration<T : HTMLInitializable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
             switch key {
             case "boost": self = .boost(enumeration())
             case "confirm": self = .confirm(string())
@@ -68,7 +68,7 @@ extension HTMLElementAttribute {
             case "disinherit": self = .disinherit(string())
             case "encoding": self = .encoding(string())
             case "ext": self = .ext(string())
-            case "headers": self = .headers(js: boolean() ?? false, arguments.last!.expression.dictionary_string_string(context: context, key: key))
+            case "headers": self = .headers(js: boolean() ?? false, arguments.last!.expression.dictionary_string_string(context: context, isUnchecked: isUnchecked, key: key))
             case "history": self = .history(enumeration())
             case "historyElt": self = .historyElt(boolean())
             case "include": self = .include(string())
@@ -82,19 +82,19 @@ extension HTMLElementAttribute {
             case "replaceURL": self = .replaceURL(enumeration())
             case "request":
                 guard let js:Bool = boolean() else { return nil }
-                let timeout:String? = arguments.get(1)?.expression.string(context: context, key: key)
-                let credentials:String? = arguments.get(2)?.expression.string(context: context, key: key)
-                let noHeaders:String? = arguments.get(3)?.expression.string(context: context, key: key)
+                let timeout:String? = arguments.get(1)?.expression.string(context: context, isUnchecked: isUnchecked, key: key)
+                let credentials:String? = arguments.get(2)?.expression.string(context: context, isUnchecked: isUnchecked, key: key)
+                let noHeaders:String? = arguments.get(3)?.expression.string(context: context, isUnchecked: isUnchecked, key: key)
                 self = .request(js: js, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
             case "sync":
                 guard let s:String = string() else { return nil }
-                self = .sync(s, strategy: arguments.last!.expression.enumeration(context: context, key: key, arguments: arguments))
+                self = .sync(s, strategy: arguments.last!.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments))
             case "validate": self = .validate(enumeration())
 
             case "get": self = .get(string())
             case "post": self = .post(string())
             case "on", "onevent":
-                guard let s:String = arguments.last!.expression.string(context: context, key: key) else { return nil }
+                guard let s:String = arguments.last!.expression.string(context: context, isUnchecked: isUnchecked, key: key) else { return nil }
                 if key == "on" {
                     self = .on(enumeration(), s)
                 } else {

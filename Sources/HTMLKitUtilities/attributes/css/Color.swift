@@ -166,7 +166,7 @@ extension HTMLElementAttribute.CSS {
         case yellow
         case yellowGreen
 
-        public init?(context: some MacroExpansionContext, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
             return nil
         }
 
