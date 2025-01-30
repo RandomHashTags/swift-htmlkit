@@ -5,11 +5,13 @@
 //  Created by Evan Anderson on 12/10/24.
 //
 
+import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-extension HTMLElementAttribute.CSS {
-    public enum Align {
+/*
+extension CSSStyle {
+    public enum Align : HTMLInitializable {
         case content(Content?)
         case items(Items?)
         case `self`(AlignSelf?)
@@ -17,7 +19,7 @@ extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Align Content
-extension HTMLElementAttribute.CSS.Align {
+extension CSSStyle.Align {
     public enum Content : String, HTMLInitializable {
         case baseline
         case end
@@ -60,7 +62,7 @@ extension HTMLElementAttribute.CSS.Align {
 }
 
 // MARK: Align Items
-extension HTMLElementAttribute.CSS.Align {
+extension CSSStyle.Align {
     public enum Items : String, HTMLInitializable {
         case anchorCenter
         case baseline
@@ -103,7 +105,7 @@ extension HTMLElementAttribute.CSS.Align {
 }
 
 // MARK: Align Self
-extension HTMLElementAttribute.CSS {
+extension CSSStyle {
     public enum AlignSelf : String, HTMLInitializable {
         case anchorCenter
         case auto
@@ -144,4 +146,4 @@ extension HTMLElementAttribute.CSS {
             }
         }
     }
-}
+}*/

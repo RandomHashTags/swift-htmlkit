@@ -120,42 +120,42 @@ extension HTMLElementAttribute {
         @inlinable
         public var key : String {
             switch self {
-            case .boost(_): return "boost"
-            case .confirm(_): return "confirm"
-            case .delete(_): return "delete"
-            case .disable(_): return "disable"
-            case .disabledElt(_): return "disabled-elt"
-            case .disinherit(_): return "disinherit"
-            case .encoding(_): return "encoding"
-            case .ext(_): return "ext"
+            case .boost: return "boost"
+            case .confirm: return "confirm"
+            case .delete: return "delete"
+            case .disable: return "disable"
+            case .disabledElt: return "disabled-elt"
+            case .disinherit: return "disinherit"
+            case .encoding: return "encoding"
+            case .ext: return "ext"
             case .headers(_, _): return "headers"
-            case .history(_): return "history"
-            case .historyElt(_): return "history-elt"
-            case .include(_): return "include"
-            case .indicator(_): return "indicator"
-            case .inherit(_): return "inherit"
-            case .params(_): return "params"
-            case .patch(_): return "patch"
-            case .preserve(_): return "preserve"
-            case .prompt(_): return "prompt"
-            case .put(_): return "put"
-            case .replaceURL(_): return "replace-url"
+            case .history: return "history"
+            case .historyElt: return "history-elt"
+            case .include: return "include"
+            case .indicator: return "indicator"
+            case .inherit: return "inherit"
+            case .params: return "params"
+            case .patch: return "patch"
+            case .preserve: return "preserve"
+            case .prompt: return "prompt"
+            case .put: return "put"
+            case .replaceURL: return "replace-url"
             case .request(_, _, _, _): return "request"
             case .sync(_, _): return "sync"
-            case .validate(_): return "validate"
+            case .validate: return "validate"
 
-            case .get(_): return "get"
-            case .post(_): return "post"
+            case .get: return "get"
+            case .post: return "post"
             case .on(let event, _): return (event != nil ? "on:" + event!.key : "")
             case .onevent(let event, _): return (event != nil ? "on:" + event!.rawValue : "")
-            case .pushURL(_): return "push-url"
-            case .select(_): return "select"
-            case .selectOOB(_): return "select-oob"
-            case .swap(_): return "swap"
-            case .swapOOB(_): return "swap-oob"
-            case .target(_): return "target"
-            case .trigger(_): return "trigger"
-            case .vals(_): return "vals"
+            case .pushURL: return "push-url"
+            case .select: return "select"
+            case .selectOOB: return "select-oob"
+            case .swap: return "swap"
+            case .swapOOB: return "swap-oob"
+            case .target: return "target"
+            case .trigger: return "trigger"
+            case .vals: return "vals"
 
             case .sse(let event): return (event != nil ? "sse-" + event!.key : "")
             case .ws(let value): return (value != nil ? "ws-" + value!.key : "")
@@ -227,11 +227,11 @@ extension HTMLElementAttribute {
         @inlinable
         public var htmlValueIsVoidable : Bool {
             switch self {
-            case .disable(_), .historyElt(_), .preserve(_):
+            case .disable, .historyElt, .preserve:
                 return true
             case .ws(let value):
                 switch value {
-                case .send(_): return true
+                case .send: return true
                 default: return false
                 }
             default:

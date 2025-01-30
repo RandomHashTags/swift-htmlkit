@@ -44,12 +44,37 @@ let package = Package(
         ),
 
         .target(
+            name: "CSS",
+            dependencies: [
+                "HTMLKitUtilities"
+            ]
+        ),
+        .target(
+            name: "HTMX",
+            dependencies: [
+                "HTMLKitUtilities"
+            ]
+        ),
+
+        .target(
+            name: "HTMLAttributes",
+            dependencies: [
+                "CSS",
+                "HTMX"
+            ]
+        ),
+
+        .target(
             name: "HTMLElements",
             dependencies: [
-                "HTMLKitUtilities",
-                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
+                "HTMLAttributes"
+            ]
+        ),
+
+        .target(
+            name: "HTMLKitMacroImpl",
+            dependencies: [
+                "HTMLElements"
             ]
         ),
 
@@ -59,7 +84,6 @@ let package = Package(
                 "HTMLKitUtilities",
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-                //.product(name: "SwiftLexicalLookup", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
@@ -67,6 +91,7 @@ let package = Package(
         .target(
             name: "HTMLKit",
             dependencies: [
+                "HTMLAttributes",
                 "HTMLKitUtilities",
                 "HTMLKitMacros"
             ]

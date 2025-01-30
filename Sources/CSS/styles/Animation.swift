@@ -5,14 +5,16 @@
 //  Created by Evan Anderson on 12/10/24.
 //
 
+import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-extension HTMLElementAttribute.CSS {
-    public enum Animation {
-        case delay(HTMLElementAttribute.CSS.Duration?)
+/*
+extension CSSStyle {
+    public enum Animation : HTMLInitializable {
+        case delay(CSSStyle.Duration?)
         case direction(Direction?)
-        case duration(HTMLElementAttribute.CSS.Duration?)
+        case duration(CSSStyle.Duration?)
         case fillMode(FillMode?)
         case iterationCount
         case name
@@ -24,7 +26,7 @@ extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Direction
-extension HTMLElementAttribute.CSS.Animation {
+extension CSSStyle.Animation {
     public enum Direction : HTMLInitializable {
         case alternate
         case alternateReverse
@@ -77,7 +79,7 @@ extension HTMLElementAttribute.CSS.Animation {
 }
 
 // MARK: Fill Mode
-extension HTMLElementAttribute.CSS.Animation {
+extension CSSStyle.Animation {
     public enum FillMode : HTMLInitializable {
         case backwards
         case both
@@ -130,7 +132,7 @@ extension HTMLElementAttribute.CSS.Animation {
 }
 
 // MARK: Play State
-extension HTMLElementAttribute.CSS.Animation {
+extension CSSStyle.Animation {
     public enum PlayState : HTMLInitializable {
         case inherit
         case initial
@@ -174,4 +176,4 @@ extension HTMLElementAttribute.CSS.Animation {
         @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
-}
+}*/

@@ -5,6 +5,8 @@
 //  Created by Evan Anderson on 11/21/24.
 //
 
+/*
+import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
@@ -114,10 +116,10 @@ extension HTMLKitUtilities {
                         } else if let literal:LiteralReturnType = parse_literal_value(context: context, isUnchecked: encoding.isUnchecked, key: key, expression: child.expression, lookupFiles: lookupFiles) {
                             switch literal {
                             case .boolean(let b): attributes[key] = b
-                            case .string(_), .interpolation(_): attributes[key] = literal.value(key: key)
+                            case .string, .interpolation: attributes[key] = literal.value(key: key)
                             case .int(let i): attributes[key] = i
                             case .float(let f): attributes[key] = f
-                            case .array(_):
+                            case .array:
                                 let escaped:LiteralReturnType = literal.escapeArray()
                                 switch escaped {
                                 case .array(let a): attributes[key] = a
@@ -345,3 +347,4 @@ package struct DiagnosticMsg : DiagnosticMessage, FixItMessage {
         self.severity = severity
     }
 }
+*/

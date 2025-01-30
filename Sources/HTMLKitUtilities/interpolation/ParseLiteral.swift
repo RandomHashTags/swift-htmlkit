@@ -227,7 +227,7 @@ public enum LiteralReturnType {
 
     public var isInterpolation : Bool {
         switch self {
-        case .interpolation(_): return true
+        case .interpolation: return true
         default: return false
         }
     }
@@ -247,7 +247,7 @@ public enum LiteralReturnType {
             return String(describing: float)
         case .interpolation(let string):
             return string
-        case .array(_):
+        case .array:
             return nil
         }
     }

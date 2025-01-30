@@ -5,12 +5,14 @@
 //  Created by Evan Anderson on 11/19/24.
 //
 
+import HTMLKitUtilities
+
 #if canImport(SwiftSyntax)
 import SwiftSyntax
 import SwiftSyntaxMacros
 #endif
 
-extension HTMLElementAttribute.HTMX {
+extension HTMX {
     // MARK: TrueOrFalse
     public enum TrueOrFalse : String, HTMLInitializable {
         case `true`, `false`
@@ -259,7 +261,7 @@ extension HTMLElementAttribute.HTMX {
 }
 
 // MARK: Server Sent Events
-extension HTMLElementAttribute.HTMX {
+extension HTMX {
     public enum ServerSentEvents : HTMLInitializable {
         case connect(String?)
         case swap(String?)
@@ -302,7 +304,7 @@ extension HTMLElementAttribute.HTMX {
 }
 
 // MARK: WebSocket
-extension HTMLElementAttribute.HTMX {
+extension HTMX {
     public enum WebSocket : HTMLInitializable {
         case connect(String?)
         case send(Bool?)

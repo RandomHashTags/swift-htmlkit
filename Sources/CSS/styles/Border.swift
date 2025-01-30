@@ -5,11 +5,11 @@
 //  Created by Evan Anderson on 12/10/24.
 //
 
-import SwiftSyntax
-import SwiftSyntaxMacros
+import HTMLKitUtilities
 
-extension HTMLElementAttribute.CSS {
-    public enum Border {
+/*
+extension CSSStyle {
+    public enum Border : HTMLInitializable {
         case block(Block?)
         case bottom(Bottom?)
         case collapse
@@ -22,15 +22,15 @@ extension HTMLElementAttribute.CSS {
 }
 
 // MARK: Block
-extension HTMLElementAttribute.CSS.Border {
-    public enum Block {
-        case color(HTMLElementAttribute.CSS.Color?)
+extension CSSStyle.Border {
+    public enum Block : HTMLInitializable {
+        case color(CSSStyle.Color?)
         case end
-        case endColor(HTMLElementAttribute.CSS.Color?)
+        case endColor(CSSStyle.Color?)
         case endStyle
         case endWidth
         case start
-        case startColor(HTMLElementAttribute.CSS.Color?)
+        case startColor(CSSStyle.Color?)
         case startStyle
         case startWidth
         case style
@@ -41,9 +41,9 @@ extension HTMLElementAttribute.CSS.Border {
 }
 
 // MARK: Bottom
-extension HTMLElementAttribute.CSS.Border {
-    public enum Bottom {
-        case color(HTMLElementAttribute.CSS.Color?)
+extension CSSStyle.Border {
+    public enum Bottom : HTMLInitializable {
+        case color(CSSStyle.Color?)
         case leftRadius
         case rightRadius
         case style
@@ -54,16 +54,16 @@ extension HTMLElementAttribute.CSS.Border {
 }
 
 // MARK: End
-extension HTMLElementAttribute.CSS.Border {
-    public enum End {
+extension CSSStyle.Border {
+    public enum End : HTMLInitializable {
         case endRadius
         case startRadius
     }
 }
 
 // MARK: Image
-extension HTMLElementAttribute.CSS.Border {
-    public enum Image {
+extension CSSStyle.Border {
+    public enum Image : HTMLInitializable {
         case outset
         case `repeat`
         case slice
@@ -75,15 +75,15 @@ extension HTMLElementAttribute.CSS.Border {
 }
 
 // MARK: Inline
-extension HTMLElementAttribute.CSS.Border {
-    public enum Inline {
-        case color(HTMLElementAttribute.CSS.Color?)
+extension CSSStyle.Border {
+    public enum Inline : HTMLInitializable {
+        case color(CSSStyle.Color?)
         case end
-        case endColor(HTMLElementAttribute.CSS.Color?)
+        case endColor(CSSStyle.Color?)
         case endStyle
         case endWidth
         case start
-        case startColor(HTMLElementAttribute.CSS.Color?)
+        case startColor(CSSStyle.Color?)
         case startStyle
         case startWidth
         case style
@@ -91,4 +91,4 @@ extension HTMLElementAttribute.CSS.Border {
 
         case shorthand
     }
-}
+}*/

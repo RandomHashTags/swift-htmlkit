@@ -10,10 +10,11 @@
   swiftc main.swift \
   ../HTMLKitUtilities/HTMLElementType.swift \
   ../HTMLKitUtilities/HTMLEncoding.swift \
-  ../HTMLKitUtilities/attributes/HTMLElementAttribute.swift \
-  ../HTMLKitUtilities/attributes/HTMLElementAttributeExtra.swift \
-  ../HTMLKitUtilities/attributes/HTMX.swift \
-  ../HTMLKitUtilities/attributes/HTMXAttributes.swift \
+  ../HTMLAttributes/HTMLAttributes.swift \
+  ../HTMLAttributes/HTMLAttributes+Extra.swift \
+  ../CSS/CSSUnit.swift \
+  ../HTMX/HTMX.swift \
+  ../HTMX/HTMX+Attributes.swift \
   -D GENERATE_ELEMENTS && ./main
 */
 
@@ -42,6 +43,8 @@ let template:String = """
 //  Generated \(now).
 //
 
+import HTMLAttributes
+import HTMLKitUtilities
 import SwiftSyntax
 
 /// The `%tagName%`%aliases% HTML element.%elementDocumentation%
@@ -59,7 +62,7 @@ let defaultVariables:[HTMLElementVariable] = [
     get(public: false, mutable: true, name: "fromMacro", valueType: .bool, defaultValue: "false"),
     get(public: false, mutable: true, name: "encoding", valueType: .custom("HTMLEncoding"), defaultValue: ".string"),
     get(public: true, mutable: true, name: "innerHTML", valueType: .array(of: .custom("CustomStringConvertible"))),
-    get(public: true, mutable: true, name: "attributes", valueType: .array(of: .custom("HTMLElementAttribute"))),
+    get(public: true, mutable: true, name: "attributes", valueType: .array(of: .custom("HTMLAttribute"))),
 ]
 
 let indent1:String = "\n    "
@@ -319,10 +322,10 @@ enum HTMLElementValueType : Hashable {
         case .int: return "Int"
         case .float: return "Float"
         case .bool: return "Bool"
-        case .booleanDefaultValue(_): return "Bool"
-        case .attribute: return "HTMLElementAttribute.Extra.\(variableName.lowercased())"
-        case .otherAttribute(let item): return "HTMLElementAttribute.Extra.\(item)"
-        case .cssUnit: return "HTMLElementAttribute.CSSUnit"
+        case .booleanDefaultValue: return "Bool"
+        case .attribute: return "HTMLAttribute.Extra.\(variableName.lowercased())"
+        case .otherAttribute(let item): return "HTMLAttribute.Extra.\(item)"
+        case .cssUnit: return "CSSUnit"
         case .array(let item): return "[" + item.annotation(variableName: variableName.lowercased()) + "]"
         case .custom(let s): return s
         case .optional(let item): return item.annotation(variableName: variableName.lowercased()) + (item.isArray ? "" : "?")
@@ -332,7 +335,7 @@ enum HTMLElementValueType : Hashable {
     var isBool : Bool {
         switch self {
         case .bool: return true
-        case .booleanDefaultValue(_): return true
+        case .booleanDefaultValue: return true
         case .optional(let item): return item.isBool
         default: return false
         }
@@ -340,7 +343,7 @@ enum HTMLElementValueType : Hashable {
     
     var isArray : Bool {
         switch self {
-        case .array(_): return true
+        case .array: return true
         case .optional(let item): return item.isArray
         default: return false
         }
@@ -348,7 +351,7 @@ enum HTMLElementValueType : Hashable {
     
     var isAttribute : Bool {
         switch self {
-        case .attribute, .otherAttribute(_): return true
+        case .attribute, .otherAttribute: return true
         case .optional(let item): return item.isAttribute
         default: return false
         }
@@ -363,7 +366,7 @@ enum HTMLElementValueType : Hashable {
 
     var isOptional : Bool {
         switch self {
-        case .optional(_): return true
+        case .optional: return true
         default: return false
         }
     }
@@ -395,13 +398,13 @@ func get(
     var (alignment, size, stride):(Int, Int, Int) = (-1, -1, -1)
     func layout(vt: HTMLElementValueType) -> (Int, Int, Int) {
         switch vt {
-            case .bool, .booleanDefaultValue(_): return get(Bool.self)
+            case .bool, .booleanDefaultValue: return get(Bool.self)
             case .string: return get(String.self)
             case .int: return get(Int.self)
             case .float: return get(Float.self)
-            case .cssUnit: return get(HTMLElementAttribute.CSSUnit.self)
-            case .attribute: return HTMLElementAttribute.Extra.memoryLayout(for: name.lowercased()) ?? (-1, -1, -1)
-            case .otherAttribute(let item): return HTMLElementAttribute.Extra.memoryLayout(for: item.lowercased()) ?? (-1, -1, -1)
+            case .cssUnit: return get(CSSUnit.self)
+            case .attribute: return HTMLAttribute.Extra.memoryLayout(for: name.lowercased()) ?? (-1, -1, -1)
+            case .otherAttribute(let item): return HTMLAttribute.Extra.memoryLayout(for: item.lowercased()) ?? (-1, -1, -1)
             case .custom(let s):
                 switch s {
                     case "HTMLEncoding": return get(HTMLEncoding.self)
@@ -413,20 +416,20 @@ func get(
         return (-1, -1, -1)
     }
     switch valueType {
-        case .bool, .string, .int, .float, .cssUnit, .attribute, .custom(_): (alignment, size, stride) = layout(vt: valueType)
+        case .bool, .string, .int, .float, .cssUnit, .attribute, .custom: (alignment, size, stride) = layout(vt: valueType)
         case .optional(let innerVT):
             switch innerVT {
-                case .bool, .booleanDefaultValue(_): (alignment, size, stride) = get(Bool.self)
+                case .bool, .booleanDefaultValue: (alignment, size, stride) = get(Bool.self)
                 case .string: (alignment, size, stride) = get(String?.self)
                 case .int: (alignment, size, stride) = get(Int?.self)
                 case .float: (alignment, size, stride) = get(Float?.self)
-                case .cssUnit: (alignment, size, stride) = get(HTMLElementAttribute.CSSUnit?.self)
-                case .attribute: (alignment, size, stride) = HTMLElementAttribute.Extra.memoryLayout(for: name.lowercased()) ?? (-1, -1, -1)
-                case .otherAttribute(let item): (alignment, size, stride) = HTMLElementAttribute.Extra.memoryLayout(for: item.lowercased()) ?? (-1, -1, -1)
-                case .array(_): (alignment, size, stride) = (8, 8, 8)
+                case .cssUnit: (alignment, size, stride) = get(CSSUnit?.self)
+                case .attribute: (alignment, size, stride) = HTMLAttribute.Extra.memoryLayout(for: name.lowercased()) ?? (-1, -1, -1)
+                case .otherAttribute(let item): (alignment, size, stride) = HTMLAttribute.Extra.memoryLayout(for: item.lowercased()) ?? (-1, -1, -1)
+                case .array: (alignment, size, stride) = (8, 8, 8)
                 default: break
             }
-        case .array(_): (alignment, size, stride) = (8, 8, 8)
+        case .array: (alignment, size, stride) = (8, 8, 8)
         default: break
     }
     //var documentation:[String] = documentation

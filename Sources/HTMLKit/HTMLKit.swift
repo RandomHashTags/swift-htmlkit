@@ -5,6 +5,7 @@
 //  Created by Evan Anderson on 9/14/24.
 //
 
+@_exported import HTMLAttributes
 @_exported import HTMLKitUtilities
 
 // MARK: StaticString equality

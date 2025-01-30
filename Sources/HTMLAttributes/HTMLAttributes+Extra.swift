@@ -1,17 +1,20 @@
 //
-//  HTMLElementAttributeExtra.swift
+//  HTMLAttributes+Extra.swift
 //
 //
 //  Created by Evan Anderson on 11/21/24.
 //
+
+import CSS
+import HTMLKitUtilities
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax
 import SwiftSyntaxMacros
 #endif
 
-// MARK: HTMLElementAttribute.Extra
-extension HTMLElementAttribute {
+// MARK: HTMLAttribute.Extra
+extension HTMLAttribute {
     public enum Extra {
         public static func memoryLayout(for key: String) -> (alignment: Int, size: Int, stride: Int)? {
             func get<T>(_ dude: T.Type) -> (Int, Int, Int) {
@@ -142,9 +145,9 @@ extension HTMLElementAttribute {
         #endif
     }
 }
-extension HTMLElementAttribute.Extra {
-    public typealias height = HTMLElementAttribute.CSSUnit
-    public typealias width = HTMLElementAttribute.CSSUnit
+extension HTMLAttribute.Extra {
+    public typealias height = CSSUnit
+    public typealias width = CSSUnit
 
     // MARK: aria attributes
     // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes
