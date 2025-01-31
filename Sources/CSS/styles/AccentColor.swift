@@ -9,7 +9,6 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-/*
 extension CSSStyle {
     public enum AccentColor : HTMLInitializable {
         case auto
@@ -49,4 +48,4 @@ extension CSSStyle {
         @inlinable
         public var htmlValueIsVoidable : Bool { false }
     }
-}*/
+}

@@ -20,7 +20,7 @@ extension CSSStyle {
 
 // MARK: Align Content
 extension CSSStyle.Align {
-    public enum Content : String, HTMLInitializable {
+    public enum Content : String, HTMLParsable {
         case baseline
         case end
         case firstBaseline
@@ -63,7 +63,7 @@ extension CSSStyle.Align {
 
 // MARK: Align Items
 extension CSSStyle.Align {
-    public enum Items : String, HTMLInitializable {
+    public enum Items : String, HTMLParsable {
         case anchorCenter
         case baseline
         case center
@@ -105,8 +105,8 @@ extension CSSStyle.Align {
 }
 
 // MARK: Align Self
-extension CSSStyle {
-    public enum AlignSelf : String, HTMLInitializable {
+extension CSSStyle.Align {
+    public enum `Self` : String, HTMLParsable {
         case anchorCenter
         case auto
         case baseline

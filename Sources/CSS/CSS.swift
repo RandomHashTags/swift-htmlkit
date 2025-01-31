@@ -133,7 +133,7 @@ public enum CSSStyle : HTMLParsable {
     //case zIndex(ZIndex?)
     case zoom(Zoom)
 
-    public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
+    public init?(context: HTMLExpansionContext) {
         return nil
     }
     public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {

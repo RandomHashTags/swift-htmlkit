@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 /*
 extension CSSStyle.Word {
-    public enum Wrap : String, HTMLInitializable {
+    public enum Wrap : String, HTMLParsable {
         case breakWord
         case inherit
         case initial

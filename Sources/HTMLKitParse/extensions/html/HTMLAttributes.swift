@@ -10,21 +10,13 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-extension HTMLAttribute {
-    public init?(
-        context: some MacroExpansionContext,
-        isUnchecked: Bool,
-        key: String,
-        arguments: LabeledExprListSyntax
-    ) {
-        guard let expression:ExprSyntax = arguments.first?.expression else { return nil }
-        func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
-        func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-        func enumeration<T : HTMLParsable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
-        func int() -> Int? { expression.int(context: context, key: key) }
-        func array_string() -> [String]? { expression.array_string(context: context, isUnchecked: isUnchecked, key: key) }
-        func array_enumeration<T: HTMLParsable>() -> [T]? { expression.array_enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
-        switch key {
+extension HTMLAttribute : HTMLParsable {
+    public init?(context: HTMLExpansionContext) {
+        func array_string() -> [String]? { context.array_string() }
+        func boolean() -> Bool? { context.boolean() }
+        func enumeration<T: HTMLParsable>() -> T? { context.enumeration() }
+        func string() -> String? { context.string() }
+        switch context.key {
         case "accesskey":             self = .accesskey(string())
         case "ariaattribute":         self = .ariaattribute(enumeration())
         case "role":                  self = .role(enumeration())
@@ -33,10 +25,10 @@ extension HTMLAttribute {
         case "class":                 self = .class(array_string())
         case "contenteditable":       self = .contenteditable(enumeration())
         case "data", "custom":
-            guard let id:String = string(), let value:String = arguments.last?.expression.string(context: context, isUnchecked: isUnchecked, key: key) else {
+            guard let id:String = string(), let value:String = context.arguments.last?.expression.string(context: context) else {
                 return nil
             }
-            if key == "data" {
+            if context.key == "data" {
                 self = .data(id, value)
             } else {
                 self = .custom(id, value)
@@ -63,10 +55,10 @@ extension HTMLAttribute {
         case "spellcheck":            self = .spellcheck(enumeration())
 
         #if canImport(CSS)
-        case "style":                 self = .style(array_enumeration())
+        case "style":                 self = .style(context.array_enumeration())
         #endif
 
-        case "tabindex":              self = .tabindex(int())
+        case "tabindex":              self = .tabindex(context.int())
         case "title":                 self = .title(string())
         case "translate":             self = .translate(enumeration())
         case "virtualkeyboardpolicy": self = .virtualkeyboardpolicy(enumeration())
@@ -74,7 +66,7 @@ extension HTMLAttribute {
         case "trailingSlash":         self = .trailingSlash
         case "htmx":                  self = .htmx(enumeration())
         case "event":
-            guard let event:HTMLEvent = enumeration(), let value:String = arguments.last?.expression.string(context: context, isUnchecked: isUnchecked, key: key) else {
+            guard let event:HTMLEvent = enumeration(), let value:String = context.arguments.last?.expression.string(context: context) else {
                 return nil
             }
             self = .event(event, value)

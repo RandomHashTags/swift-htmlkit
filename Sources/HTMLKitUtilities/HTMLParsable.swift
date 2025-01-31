@@ -10,16 +10,16 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 #endif
 
-public protocol HTMLParsable : HTMLInitializable { // TODO: rename HTMLInitializable to HTMLParsable
+public protocol HTMLParsable : HTMLInitializable {
     #if canImport(SwiftSyntax)
-    init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax)
+    init?(context: HTMLExpansionContext)
     #endif
 }
 
 #if canImport(SwiftSyntax)
-extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
-    public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-        guard let value:Self = .init(rawValue: key) else { return nil }
+extension HTMLParsable where Self: RawRepresentable, RawValue == String {
+    public init?(context: HTMLExpansionContext) {
+        guard let value:Self = .init(rawValue: context.key) else { return nil }
         self = value
     }
 }

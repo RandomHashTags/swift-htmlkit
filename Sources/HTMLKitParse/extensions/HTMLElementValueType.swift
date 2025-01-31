@@ -5,7 +5,8 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 
 extension HTMLElementValueType {
-    package static func parse_element(context: some MacroExpansionContext, encoding: HTMLEncoding, _ function: FunctionCallExprSyntax) -> HTMLElement? {
+    package static func parse_element(context: HTMLExpansionContext, _ function: FunctionCallExprSyntax) -> HTMLElement? {
+        var context:HTMLExpansionContext = context
         let called_expression:ExprSyntax = function.calledExpression
         let key:String
         if let member:MemberAccessExprSyntax = called_expression.memberAccess, member.base?.declRef?.baseName.text == "HTMLKit" {
@@ -15,10 +16,10 @@ extension HTMLElementValueType {
         } else {
             return nil
         }
-        let children:SyntaxChildren = function.arguments.children(viewMode: .all)
+        context.arguments = function.arguments
         func get<T: HTMLElement>(_ bruh: T.Type) -> T {
-            let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, encoding: encoding, children: children, otherAttributes: T.otherAttributes)
-            return T(encoding, data)
+            let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, otherAttributes: T.otherAttributes)
+            return T(context.encoding, data)
         }
         switch key {
         case "a": return get(a.self)

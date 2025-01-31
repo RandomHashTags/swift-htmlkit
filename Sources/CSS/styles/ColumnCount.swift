@@ -10,13 +10,13 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 
 extension CSSStyle {
-    public enum ColumnCount : HTMLInitializable {
+    public enum ColumnCount : HTMLParsable {
         case auto
         case inherit
         case initial
         case int(Int)
 
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: SwiftSyntax.LabeledExprListSyntax) {
+        public init?(context: HTMLExpansionContext) {
             return nil
         }
 

@@ -10,13 +10,13 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 
 extension CSSStyle {
-    public enum HyphenateCharacter : HTMLInitializable {
+    public enum HyphenateCharacter : HTMLParsable {
         case auto
         case char(Character)
         case inherit
         case initial
 
-        public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
+        public init?(context: HTMLExpansionContext) {
             return nil
         }
 

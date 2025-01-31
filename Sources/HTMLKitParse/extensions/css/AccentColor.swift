@@ -10,12 +10,11 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-/*
 extension CSSStyle.AccentColor : HTMLParsable {
-    public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-        switch key {
+    public init?(context: HTMLExpansionContext) {
+        switch context.key {
         case "auto": self = .auto
-        case "color": self = .color(arguments.first!.expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments))
+        case "color": self = .color(context.enumeration())
         case "inherit": self = .inherit
         case "initial": self = .initial
         case "revert": self = .revert
@@ -24,4 +23,4 @@ extension CSSStyle.AccentColor : HTMLParsable {
         default: return nil
         }
     }
-}*/
+}

@@ -129,13 +129,16 @@ public enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/cs
 #if canImport(SwiftSyntax)
 // MARK: HTMLParsable
 extension CSSUnit : HTMLParsable {
-    public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-        let expression:ExprSyntax = arguments.first!.expression
+    public init?(context: HTMLExpansionContext) {
         func float() -> Float? {
-            guard let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text else { return nil }
+            guard let expression:ExprSyntax = context.expression,
+                    let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text
+            else {
+                return nil
+            }
             return Float(s)
         }
-        switch key {
+        switch context.key {
         case "centimeters": self = .centimeters(float())
         case "millimeters": self = .millimeters(float())
         case "inches": self = .inches(float())

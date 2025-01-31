@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Isolation : String, HTMLInitializable {
+    public enum Isolation : String, HTMLParsable {
         case auto
         case inherit
         case initial

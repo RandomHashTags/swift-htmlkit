@@ -12,6 +12,7 @@ import SwiftSyntaxMacros
 
 enum EscapeHTML : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        return "\"\(raw: HTMLKitUtilities.escapeHTML(expansion: node.as(ExprSyntax.self)!.macroExpansion!, context: context))\""
+        let c:HTMLExpansionContext = HTMLExpansionContext(context: context, encoding: .string, key: "", arguments: node.arguments)
+        return "\"\(raw: HTMLKitUtilities.escapeHTML(context: c))\""
     }
 }

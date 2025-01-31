@@ -196,9 +196,20 @@ extension HTMXAttribute {
     }
 
     // MARK: URL
-    public enum URL : HTMLInitializable {
+    public enum URL : HTMLParsable {
         case `true`, `false`
         case url(String)
+        
+        #if canImport(SwiftSyntax)
+        public init?(context: HTMLExpansionContext) {
+            switch context.key {
+            case "true": self = .true
+            case "false": self = .false
+            case "url": self = .url(context.expression!.stringLiteral!.string)
+            default: return nil
+            }
+        }
+        #endif
 
         @inlinable
         public var key : String {

@@ -11,15 +11,14 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 
 extension HTMLAttribute.Extra.ariaattribute : HTMLParsable {
-    public init?(context: some MacroExpansionContext, isUnchecked: Bool, key: String, arguments: LabeledExprListSyntax) {
-        let expression:ExprSyntax = arguments.first!.expression
-        func string() -> String?        { expression.string(context: context, isUnchecked: isUnchecked, key: key) }
-        func boolean() -> Bool?         { expression.boolean(context: context, key: key) }
-        func enumeration<T : HTMLParsable>() -> T? { expression.enumeration(context: context, isUnchecked: isUnchecked, key: key, arguments: arguments) }
-        func int() -> Int? { expression.int(context: context, key: key) }
-        func array_string() -> [String]? { expression.array_string(context: context, isUnchecked: isUnchecked, key: key) }
-        func float() -> Float? { expression.float(context: context, key: key) }
-        switch key {
+    public init?(context: HTMLExpansionContext) {
+        func array_string() -> [String]? { context.array_string() }
+        func boolean() -> Bool? { context.boolean() }
+        func enumeration<T: HTMLParsable>() -> T? { context.enumeration() }
+        func float() -> Float? { context.float() }
+        func int() -> Int? { context.int() }
+        func string() -> String? { context.string() }
+        switch context.key {
         case "activedescendant":       self = .activedescendant(string())
         case "atomic":                 self = .atomic(boolean())
         case "autocomplete":           self = .autocomplete(enumeration())

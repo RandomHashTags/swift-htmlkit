@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Float : String, HTMLInitializable {
+    public enum Float : String, HTMLParsable {
         case inherit
         case initial
         case left
