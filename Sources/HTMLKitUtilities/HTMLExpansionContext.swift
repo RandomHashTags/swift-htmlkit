@@ -11,6 +11,7 @@ import SwiftSyntaxMacros
 /// Data required to process an HTML expansion.
 public struct HTMLExpansionContext {
     public let context:MacroExpansionContext
+    public let expansion:MacroExpansionExprSyntax
     
     /// `HTMLEncoding` of this expansion.
     public var encoding:HTMLEncoding
@@ -22,14 +23,20 @@ public struct HTMLExpansionContext {
     /// Complete file paths used for looking up interpolation (when trying to promote to an equivalent `StaticString`).
     public var lookupFiles:Set<String>
 
+    public let ignoresCompilerWarnings:Bool
+
     public init(
         context: MacroExpansionContext,
+        expansion: MacroExpansionExprSyntax,
+        ignoresCompilerWarnings: Bool,
         encoding: HTMLEncoding,
         key: String,
         arguments: LabeledExprListSyntax,
         lookupFiles: Set<String> = []
     ) {
         self.context = context
+        self.expansion = expansion
+        self.ignoresCompilerWarnings = ignoresCompilerWarnings
         self.encoding = encoding
         self.key = key
         self.arguments = arguments
@@ -39,10 +46,5 @@ public struct HTMLExpansionContext {
     /// First expression in the arguments.
     public var expression : ExprSyntax? {
         arguments.first?.expression
-    }
-
-    /// Whether the encoding is unchecked.
-    public var isUnchecked : Bool {
-        encoding.isUnchecked
     }
 }

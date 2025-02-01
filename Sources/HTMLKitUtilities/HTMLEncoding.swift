@@ -34,13 +34,6 @@ public enum HTMLEncoding : Sendable {
     /// - Returns: `String`/`StaticString`
     case string
 
-    /// Ignores compilation warnings when encoding.
-    /// 
-    /// - Parameters:
-    ///   - encoding: HTMLEncoding you want to encode the result to.
-    /// - Returns: The encoding's returned value.
-    indirect case unchecked(HTMLEncoding)
-
     /// - Returns: `[UInt8]`
     case utf8Bytes
 
@@ -74,12 +67,6 @@ public enum HTMLEncoding : Sendable {
     public init?(rawValue: String) {
         switch rawValue {
         case "string": self = .string
-        case "unchecked(.string)": self = .unchecked(.string)
-        case "unchecked(.utf8Bytes)": self = .unchecked(.utf8Bytes)
-        case "unchecked(.utf8CString)": self = .unchecked(.utf8CString)
-        case "unchecked(.utf16Bytes)": self = .unchecked(.utf16Bytes)
-        case "unchecked(.foundationData)": self = .unchecked(.foundationData)
-        case "unchecked(.byteBuffer)": self = .unchecked(.byteBuffer)
         case "utf8Bytes": self = .utf8Bytes
         case "utf8CString": self = .utf8CString
         case "utf16Bytes": self = .utf16Bytes
@@ -92,23 +79,12 @@ public enum HTMLEncoding : Sendable {
     @inlinable
     public func stringDelimiter(forMacro: Bool) -> String {
         switch self {
-        case .string, .unchecked(.string):
+        case .string:
             return forMacro ? "\\\"" : "\""
-        case .unchecked(.utf8Bytes), .unchecked(.utf16Bytes), .unchecked(.utf8CString), .unchecked(.foundationData), .unchecked(.byteBuffer),
-                .utf8Bytes, .utf16Bytes, .utf8CString, .foundationData, .byteBuffer:
+        case .utf8Bytes, .utf16Bytes, .utf8CString, .foundationData, .byteBuffer:
             return "\""
         case .custom(_, let delimiter):
             return delimiter
-        case .unchecked:
-            return ""
-        }
-    }
-
-    @inlinable
-    public var isUnchecked : Bool {
-        switch self {
-        case .unchecked: return true
-        default: return false
         }
     }
 }

@@ -57,12 +57,10 @@ extension HTMLKitUtilities {
             }
             string = segments.map({ "\($0)" }).joined()
         } else {
-            if !context.isUnchecked {
-                if let function:FunctionCallExprSyntax = expression.functionCall {
-                    warn_interpolation(context: context, node: function.calledExpression)
-                } else {
-                    warn_interpolation(context: context, node: expression)
-                }
+            if let function:FunctionCallExprSyntax = expression.functionCall {
+                warn_interpolation(context: context, node: function.calledExpression)
+            } else {
+                warn_interpolation(context: context, node: expression)
             }
             if let member:MemberAccessExprSyntax = expression.memberAccess {
                 string = "\\(" + member.singleLineDescription + ")"
@@ -131,9 +129,7 @@ extension HTMLKitUtilities {
                     // TODO: lookup and try to promote | need to wait for swift-syntax to update to access SwiftLexicalLookup
                 //}
                 values.append(interpolate(expression))
-                if !context.isUnchecked {
-                    warn_interpolation(context: context, node: expression)
-                }
+                warn_interpolation(context: context, node: expression)
             }
         }
         return values
@@ -201,9 +197,7 @@ extension HTMLKitUtilities {
             return .array(results)
         }
         if let decl:DeclReferenceExprSyntax = expression.declRef {
-            if !context.isUnchecked {
-                warn_interpolation(context: context, node: expression)
-            }
+            warn_interpolation(context: context, node: expression)
             return .interpolation(decl.baseName.text)
         }
         return nil

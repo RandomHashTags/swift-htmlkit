@@ -13,6 +13,7 @@ import SwiftSyntaxMacros
 
 enum HTMLElementMacro : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        return try HTMLKitUtilities.expandHTMLMacro(context: context, macroNode: node.as(ExprSyntax.self)!.macroExpansion!)
+        let ignoresCompilerWarnings:Bool = node.macroName.text == "uncheckedHTML"
+        return try HTMLKitUtilities.expandHTMLMacro(context: HTMLExpansionContext(context: context, expansion: node.as(ExprSyntax.self)!.macroExpansion!, ignoresCompilerWarnings: ignoresCompilerWarnings, encoding: .string, key: "", arguments: node.arguments))
     }
 }

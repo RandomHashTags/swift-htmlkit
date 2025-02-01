@@ -38,16 +38,16 @@ extension HTMLKitUtilities {
     }
     
     // MARK: Expand #html
-    public static func expandHTMLMacro(context: some MacroExpansionContext, macroNode: MacroExpansionExprSyntax) throws -> ExprSyntax {
-        let (string, encoding):(String, HTMLEncoding) = expand_macro(context: HTMLExpansionContext(context: context, encoding: .string, key: "", arguments: macroNode.arguments))
-        return "\(raw: encodingResult(context: context, node: macroNode, string: string, for: encoding))"
+    public static func expandHTMLMacro(context: HTMLExpansionContext) throws -> ExprSyntax {
+        let (string, encoding):(String, HTMLEncoding) = expand_macro(context: context)
+        return "\(raw: encodingResult(context: context, node: context.expansion, string: string, for: encoding))"
     }
-    private static func encodingResult(context: some MacroExpansionContext, node: MacroExpansionExprSyntax, string: String, for encoding: HTMLEncoding) -> String {
+    private static func encodingResult(context: HTMLExpansionContext, node: MacroExpansionExprSyntax, string: String, for encoding: HTMLEncoding) -> String {
         func hasNoInterpolation() -> Bool {
             let has_interpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !has_interpolation else {
-                if !encoding.isUnchecked {
-                    context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
+                if !context.ignoresCompilerWarnings {
+                    context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
                 }
                 return false
             }
@@ -57,9 +57,6 @@ extension HTMLKitUtilities {
             return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
         }
         switch encoding {
-        case .unchecked(let e):
-            return encodingResult(context: context, node: node, string: string, for: e)
-
         case .utf8Bytes:
             guard hasNoInterpolation() else { return "" }
             return bytes([UInt8](string.utf8))
@@ -144,9 +141,6 @@ extension HTMLKitUtilities {
             return HTMLEncoding(rawValue: key)
         } else if let function:FunctionCallExprSyntax = expression.functionCall {
             switch function.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
-            case "unchecked":
-                guard let encoding:HTMLEncoding = parseEncoding(expression: function.arguments.first!.expression) else { break }
-                return .unchecked(encoding)
             case "custom":
                 guard let logic:String = function.arguments.first?.expression.stringLiteral?.string else { break }
                 if function.arguments.count == 1 {
@@ -248,12 +242,13 @@ extension HTMLKitUtilities {
         context: HTMLExpansionContext,
         node: some SyntaxProtocol
     ) {
-        /*if let fix:String = InterpolationLookup.find(context: context, node, files: lookupFiles) {
+        /*if let fix:String = InterpolationLookup.find(context: context, node) {
             let expression:String = "\(node)"
             let ranges:[Range<String.Index>] = string.ranges(of: expression)
             string.replace(expression, with: fix)
             remaining_interpolation -= ranges.count
         } else {*/
+            guard !context.ignoresCompilerWarnings else { return }
             context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
         //}
     }

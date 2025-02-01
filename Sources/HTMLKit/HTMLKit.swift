@@ -23,15 +23,24 @@ extension StringProtocol {
     public static func == (left: StaticString, right: Self) -> Bool { left.description == right }
 }
 
+// MARK: Escape HTML
 @freestanding(expression)
 public macro escapeHTML(
     encoding: HTMLEncoding = .string,
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
-// MARK: HTML Representation
+// MARK: HTML
 @freestanding(expression)
 public macro html<T: CustomStringConvertible>(
+    encoding: HTMLEncoding = .string,
+    lookupFiles: [StaticString] = [],
+    _ innerHTML: CustomStringConvertible & Sendable...
+) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
+
+/// Same as `#html` but ignoring compiler warnings.
+@freestanding(expression)
+public macro uncheckedHTML<T: CustomStringConvertible>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
     _ innerHTML: CustomStringConvertible & Sendable...
