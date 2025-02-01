@@ -7,6 +7,7 @@
 
 #if canImport(Foundation)
 import Foundation
+import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntaxMacros
 import SwiftParser
@@ -15,15 +16,15 @@ import SwiftSyntax
 enum InterpolationLookup {
     private static var cached:[String:CodeBlockItemListSyntax] = [:]
 
-    static func find(context: some MacroExpansionContext, _ node: some ExprSyntaxProtocol, files: Set<String>) -> String? {
-        guard !files.isEmpty, let item:Item = item(node) else { return nil }
+    static func find(context: HTMLExpansionContext, _ node: some ExprSyntaxProtocol, files: Set<String>) -> String? {
+        guard !files.isEmpty, let item:Item = item(context: context, node) else { return nil }
         for file in files {
             if cached[file] == nil {
                 if let string:String = try? String.init(contentsOfFile: file, encoding: .utf8) {
                     let parsed:CodeBlockItemListSyntax = Parser.parse(source: string).statements
                     cached[file] = parsed
                 } else {
-                    context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "fileNotFound", message: "Could not find file (\(file)) on disk, or was denied disk access (file access is always denied on macOS due to the macro being in a sandbox).", severity: .warning)))
+                    context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "fileNotFound", message: "Could not find file (\(file)) on disk, or was denied disk access (file access is always denied on macOS due to the macro being in a sandbox).", severity: .warning)))
                 }
             }
         }
@@ -31,7 +32,7 @@ enum InterpolationLookup {
         switch item {
         case .literal(let tokens):
             for (_, statements) in cached {
-                if let flattened:String = flatten(tokens, statements: statements) {
+                if let flattened:String = flatten(context: context, tokens: tokens, statements: statements) {
                     return flattened
                 }
             }
@@ -42,7 +43,7 @@ enum InterpolationLookup {
         }
     }
 
-    private static func item(_ node: some ExprSyntaxProtocol) -> Item? {
+    private static func item(context: HTMLExpansionContext, _ node: some ExprSyntaxProtocol) -> Item? {
         if let function:FunctionCallExprSyntax = node.functionCall {
             var array:[String] = []
             if let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
@@ -50,7 +51,7 @@ enum InterpolationLookup {
             }
             var parameters:[String] = []
             for argument in function.arguments {
-                if let string:String = argument.expression.stringLiteral?.string {
+                if let string:String = argument.expression.stringLiteral?.string(encoding: context.encoding) {
                     parameters.append(string)
                 }
             }
@@ -80,7 +81,7 @@ enum InterpolationLookup {
 }
 // MARK: Flatten
 private extension InterpolationLookup {
-    static func flatten(_ tokens: [String], statements: CodeBlockItemListSyntax) -> String? {
+    static func flatten(context: HTMLExpansionContext, tokens: [String], statements: CodeBlockItemListSyntax) -> String? {
         for statement in statements {
             var index:Int = 0
             let item = statement.item
@@ -90,8 +91,8 @@ private extension InterpolationLookup {
                 }
                 for member in ext.memberBlock.members {
                     if let string:String = parse_function(syntax: member.decl, tokens: tokens, index: index)
-                            ?? parse_enumeration(syntax: member.decl, tokens: tokens, index: index)
-                            ?? parse_variable(syntax: member.decl, tokens: tokens, index: index) {
+                            ?? parse_enumeration(context: context, syntax: member.decl, tokens: tokens, index: index)
+                            ?? parse_variable(context: context, syntax: member.decl, tokens: tokens, index: index) {
                         return string
                     }
                 }
@@ -104,9 +105,9 @@ private extension InterpolationLookup {
                         index -= 1
                     }
                 }
-            } else if let enumeration:String = parse_enumeration(syntax: item, tokens: tokens, index: index) {
+            } else if let enumeration:String = parse_enumeration(context: context, syntax: item, tokens: tokens, index: index) {
                 return enumeration
-            } else if let variable:String = parse_variable(syntax: item, tokens: tokens, index: index) {
+            } else if let variable:String = parse_variable(context: context, syntax: item, tokens: tokens, index: index) {
                 return variable
             }
         }
@@ -118,7 +119,7 @@ private extension InterpolationLookup {
         return nil
     }
     // MARK: Parse enumeration
-    static func parse_enumeration(syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+    static func parse_enumeration(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
         let allowed_inheritances:Set<String?> = ["String", "Int", "Double", "Float"]
         guard let enumeration:EnumDeclSyntax = syntax.enumeration,
             enumeration.name.text == tokens[index]
@@ -138,7 +139,7 @@ private extension InterpolationLookup {
                             return case_name
                         }
                         switch value_type {
-                        case "String":          return enum_case.rawValue?.value.stringLiteral!.string ?? case_name
+                        case "String":          return enum_case.rawValue?.value.stringLiteral!.string(encoding: context.encoding) ?? case_name
                         case "Int":             return enum_case.rawValue?.value.integerLiteral!.literal.text ?? case_name
                         case "Double", "Float": return enum_case.rawValue?.value.floatLiteral!.literal.text ?? case_name
                         default:
@@ -152,11 +153,11 @@ private extension InterpolationLookup {
         return nil
     }
     // MARK: Parse variable
-    static func parse_variable(syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+    static func parse_variable(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
         guard let variable:VariableDeclSyntax = syntax.variableDecl else { return nil }
         for binding in variable.bindings {
             if binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text == tokens[index], let initializer:InitializerClauseSyntax = binding.initializer {
-                return initializer.value.stringLiteral?.string
+                return initializer.value.stringLiteral?.string(encoding: context.encoding)
                         ?? initializer.value.integerLiteral?.literal.text
                         ?? initializer.value.floatLiteral?.literal.text
             }

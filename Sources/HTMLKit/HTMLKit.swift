@@ -38,6 +38,7 @@ public macro html<T: CustomStringConvertible>(
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
+// MARK: Unchecked
 /// Same as `#html` but ignoring compiler warnings.
 @freestanding(expression)
 public macro uncheckedHTML<T: CustomStringConvertible>(

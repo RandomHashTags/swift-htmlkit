@@ -205,7 +205,7 @@ extension HTMXAttribute {
             switch context.key {
             case "true": self = .true
             case "false": self = .false
-            case "url": self = .url(context.expression!.stringLiteral!.string)
+            case "url": self = .url(context.expression!.stringLiteral!.string(encoding: context.encoding))
             default: return nil
             }
         }

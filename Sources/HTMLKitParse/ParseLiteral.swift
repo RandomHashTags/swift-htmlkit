@@ -107,7 +107,7 @@ extension HTMLKitUtilities {
                 let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
                 if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
                     remaining_interpolation -= 1
-                    values.append(create(stringLiteral.string))
+                    values.append(create(stringLiteral.string(encoding: context.encoding)))
                 } else {
                     for segment in segments {
                         if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
@@ -143,7 +143,7 @@ extension HTMLKitUtilities {
             return nil
         }
         if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
-            let string:String = stringLiteral.string
+            let string:String = stringLiteral.string(encoding: context.encoding)
             if stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 {
                 return .string(string)
             } else {
@@ -154,7 +154,7 @@ extension HTMLKitUtilities {
             if let decl:String = function.calledExpression.declRef?.baseName.text {
                 switch decl {
                 case "StaticString":
-                    let string:String = function.arguments.first!.expression.stringLiteral!.string
+                    let string:String = function.arguments.first!.expression.stringLiteral!.string(encoding: context.encoding)
                     return .string(string)
                 default:
                     break

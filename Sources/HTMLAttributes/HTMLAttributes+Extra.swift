@@ -569,7 +569,7 @@ extension HTMLAttribute.Extra {
             case "showPopover":   self = .showPopover
             case "hidePopover":   self = .hidePopover
             case "togglePopover": self = .togglePopover
-            case "custom":        self = .custom(context.expression!.stringLiteral!.string)
+            case "custom":        self = .custom(context.expression!.stringLiteral!.string(encoding: context.encoding))
             default:              return nil
             }
         }
@@ -665,7 +665,7 @@ extension HTMLAttribute.Extra {
         public init?(context: HTMLExpansionContext) {
             switch context.key {
             case "empty":    self = .empty
-            case "filename": self = .filename(context.expression!.stringLiteral!.string)
+            case "filename": self = .filename(context.expression!.stringLiteral!.string(encoding: context.encoding))
             default:         return nil
             }
         }

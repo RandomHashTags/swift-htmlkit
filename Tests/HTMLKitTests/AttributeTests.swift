@@ -44,7 +44,7 @@ struct AttributeTests {
     }
 
     // MARK: class
-    @Test func class_attribute() {
+    @Test func classAttribute() {
         let string:StaticString = #html(a(attributes: [.class(["womp", "donk", "g2-esports"])]))
         #expect(string == "<a class=\"womp donk g2-esports\"></a>")
     }
@@ -65,7 +65,7 @@ struct AttributeTests {
     }
 
     // MARK: custom
-    @Test func custom_attribute() {
+    @Test func customAttribute() {
         var string:StaticString = #html(div(attributes: [.custom("potofgold", "north")]))
         #expect(string == "<div potofgold=\"north\"></div>")
         

@@ -76,7 +76,19 @@ extension SyntaxChildren.Element {
     package var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
 }
 extension StringLiteralExprSyntax {
-    package var string : String { "\(segments)" }
+    package func string(encoding: HTMLEncoding) -> String {
+        if openingQuote.debugDescription.hasPrefix("multilineStringQuote") {
+            var value:String = segments.compactMap({ $0.as(StringSegmentSyntax.self)?.content.text }).joined()
+            switch encoding {
+            case .string:
+                value.replace("\n", with: "\\n")
+            default:
+                break
+            }
+            return value
+        }
+        return "\(segments)"
+    }
 }
 extension LabeledExprListSyntax {
     package func get(_ index: Int) -> Element? {

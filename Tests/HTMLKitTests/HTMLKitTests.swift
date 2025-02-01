@@ -105,7 +105,7 @@ struct HTMLKitTests {
 
 // MARK: StaticString Example
 extension HTMLKitTests {
-    @Test func example_1() {
+    @Test func example1() {
         let test:StaticString = #html(
             html(
                 body(

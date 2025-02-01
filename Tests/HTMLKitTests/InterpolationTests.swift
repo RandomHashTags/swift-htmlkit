@@ -28,7 +28,7 @@ struct InterpolationTests {
     }
 
     // MARK: dynamic
-    @Test func dynamic_interpolation() {
+    @Test func interpolationDynamic() {
         var expected_result:String = #html(
             ul(
                 li(attributes: [.id("one")], "one"),
@@ -58,7 +58,7 @@ struct InterpolationTests {
     }
 
     // MARK: multi-line decl
-    @Test func multiline_decl_interpolation() {
+    @Test func interpolationMultilineDecl() {
         let test:String = "prophecy"
         let string:String = #html(
             div(
@@ -70,7 +70,7 @@ struct InterpolationTests {
     }
 
     // MARK: multi-line func
-    @Test func multiline_func_interpolation() {
+    @Test func interpolationMultilineFunc() {
         var expected_result:String = "<div>Bikini Bottom: Spongebob Squarepants, Patrick Star, Squidward Tentacles, Mr. Krabs, Sandy Cheeks, Pearl Krabs</div>"
         var string:String = #html(
             div(
@@ -130,7 +130,7 @@ struct InterpolationTests {
     }
 
     // MARK: multi-line closure
-    @Test func multiline_closure_interpolation() {
+    @Test func interpolationMultilineClosure() {
         var expected_result:String = "<div>Mrs. Puff</div>"
         var string:String = #html(div(InterpolationTests.character2 {
             var bro = ""
@@ -152,7 +152,7 @@ struct InterpolationTests {
     }
 
     // MARK: multi-line member
-    @Test func multiline_member_interpolation() {
+    @Test func interpolationMultilineMember() {
         var string:String = #html(
             div(
                 "Shrek ",
@@ -176,7 +176,7 @@ struct InterpolationTests {
     }
 
     // MARK: closure
-    @Test func closure_interpolation() {
+    @Test func interpolationClosure() {
         let expected_result:String = "<div>Mrs. Puff</div>"
         var string:String = #html(div(InterpolationTests.character1(body: { "Mrs. Puff" })))
         #expect(string == expected_result)
@@ -204,7 +204,7 @@ struct InterpolationTests {
     }
 
     // MARK: inferred type
-    @Test func inferred_type_interpolation() {
+    @Test func interpolationInferredType() {
         var array:[String] = ["toothless", "hiccup"]
         var string:String = array.map({
             #html(option(value: $0))
@@ -219,7 +219,7 @@ struct InterpolationTests {
     }
 
     // MARK: force unwrap
-    @Test func force_unwrap_interpolation() {
+    @Test func interpolationForceUnwrap() {
         let optionals:[String?] = ["stormfly", "sneaky"]
         var string:String = optionals.map({
             #html(option(value: $0!))
@@ -238,7 +238,7 @@ struct InterpolationTests {
     }
 
     // MARK: promote
-    @Test func flatten() {
+    @Test func interpolationPromotion() {
         let title:String = "flattening"
         var string:String = #html(meta(content: "\("interpolation \(title)")", name: "description"))
         #expect(string == "<meta content=\"interpolation \(title)\" name=\"description\">")
@@ -260,7 +260,7 @@ struct InterpolationTests {
     }
     
     // MARK: promote w/lookup files
-    @Test func flatten_with_lookup_files() {
+    @Test func interpolationPromotionWithLookupFiles() {
         //var string:StaticString = #html(lookupFiles: ["/home/paradigm/Desktop/GitProjects/swift-htmlkit/Tests/HTMLKitTests/InterpolationTests.swift"], attributes: [.title(InterpolationTests.spongebob)])
         //var string:String = #html(lookupFiles: ["/Users/randomhashtags/GitProjects/swift-htmlkit/Tests/HTMLKitTests/InterpolationTests.swift"], attributes: [.title(InterpolationTests.spongebob)])
     }
@@ -277,7 +277,7 @@ extension InterpolationTests {
     enum Shrek : String {
         case isLove, isLife
     }
-    @Test func third_party_enum() {
+    @Test func interpolationEnum() {
         var string:String = #html(a(attributes: [.title(Shrek.isLove.rawValue)]))
         #expect(string == "<a title=\"isLove\"></a>")
 
@@ -314,7 +314,7 @@ extension InterpolationTests {
         return "Spongeboob"
     }
     
-    @Test func third_party_literal() {
+    @Test func interpolationLiteral() {
         var string:String = #html(div(attributes: [.title(InterpolationTests.spongebob)]))
         #expect(string == "<div title=\"Spongebob Squarepants\"></div>")
 
@@ -327,7 +327,7 @@ extension InterpolationTests {
         static_string = #html(div(attributes: [.title("Mr. Krabs")]))
         #expect(static_string == "<div title=\"Mr. Krabs\"></div>")
     }
-    @Test func third_party_func() {
+    @Test func interpolationFunc() {
         let string:String = #html(div(attributes: [.title(InterpolationTests.spongebobCharacter("patrick"))]))
         #expect(string == "<div title=\"Patrick Star\"></div>")
     }

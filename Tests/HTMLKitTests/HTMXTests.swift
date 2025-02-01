@@ -12,7 +12,7 @@ import HTMLKit
 
 struct HTMXTests {
     // MARK: boost
-    @Test func boost() {
+    @Test func htmxBoost() {
         var string:StaticString = #html(div(attributes: [.htmx(.boost(.true))]))
         #expect(string == "<div hx-boost=\"true\"></div>")
 
@@ -21,7 +21,7 @@ struct HTMXTests {
     }
 
     // MARK: disable
-    @Test func disable() {
+    @Test func htmxDisable() {
         var string:StaticString = #html(div(attributes: [.htmx(.disable(true))]))
         #expect(string == "<div hx-disable></div>")
 
@@ -30,7 +30,7 @@ struct HTMXTests {
     }
 
     // MARK: get
-    @Test func get() {
+    @Test func htmxGet() {
         var string:StaticString = #html(div(attributes: [.htmx(.get("/test"))]))
         #expect(string == "<div hx-get=\"/test\"></div>")
 
@@ -39,7 +39,7 @@ struct HTMXTests {
     }
 
     // MARK: headers
-    @Test func headers() {
+    @Test func htmxHeaders() {
         let set:Set<String> = Self.dictionary_json_results(tag: "div", closingTag: true, attribute: "hx-headers", delimiter: "'", ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"])
         let string:StaticString = #html(div(attributes: [.htmx(.headers(js: false, ["womp":"womp", "ding dong":"d1tched", "EASY":"C,L.a;P!"]))]))
         #expect(set.contains(string.description), Comment(rawValue: "string=\(string)\nset=\(set)"))
@@ -82,7 +82,7 @@ struct HTMXTests {
     }
 
     // MARK: history-elt
-    @Test func historyElt() {
+    @Test func htmxHistoryElt() {
         var string:StaticString = #html(div(attributes: [.htmx(.historyElt(true))]))
         #expect(string == "<div hx-history-elt></div>")
 
@@ -91,7 +91,7 @@ struct HTMXTests {
     }
 
     // MARK: on
-    @Test func on() {
+    @Test func htmxOn() {
         var string:StaticString = #html(div(attributes: [.htmx(.on(.abort, "bruh"))]))
         #expect(string == "<div hx-on::abort=\"bruh\"></div>")
 
@@ -100,7 +100,7 @@ struct HTMXTests {
     }
 
     // MARK: onevent
-    @Test func onevent() {
+    @Test func htmxOnEvent() {
         var string:StaticString = #html(div(attributes: [.htmx(.onevent(.click, "thing()"))]))
         #expect(string == "<div hx-on:click=\"thing()\"></div>")
 
@@ -109,13 +109,13 @@ struct HTMXTests {
     }
 
     // MARK: post
-    @Test func post() {
+    @Test func htmxPost() {
         let string:StaticString = #html(div(attributes: [.htmx(.post("https://github.com/RandomHashTags"))]))
         #expect(string == "<div hx-post=\"https://github.com/RandomHashTags\"></div>")
     }
 
     // MARK: preserve
-    @Test func preserve() {
+    @Test func htmxPreserve() {
         var string:StaticString = #html(div(attributes: [.htmx(.preserve(true))]))
         #expect(string == "<div hx-preserve></div>")
 
@@ -124,7 +124,7 @@ struct HTMXTests {
     }
 
     // MARK: replaceURL
-    @Test func replaceURL() {
+    @Test func htmxReplaceURL() {
         var string:StaticString = #html(div(attributes: [.htmx(.replaceURL(.true))]))
         #expect(string == "<div hx-replace-url=\"true\"></div>")
 
@@ -133,7 +133,7 @@ struct HTMXTests {
     }
 
     // MARK: request
-    @Test func request() {
+    @Test func htmxRequest() {
         var string:StaticString = #html(div(attributes: [.htmx(.request(js: false, timeout: "5", credentials: nil, noHeaders: nil))]))
         #expect(string == "<div hx-request='{\"timeout\":5}'></div>")
 
@@ -148,7 +148,7 @@ struct HTMXTests {
     }
 
     // MARK: sync
-    @Test func sync() {
+    @Test func htmxSync() {
         var string:StaticString = #html(div(attributes: [.htmx(.sync("closest form", strategy: .abort))]))
         #expect(string == "<div hx-sync=\"closest form:abort\"></div>")
 
@@ -157,7 +157,7 @@ struct HTMXTests {
     }
 
     // MARK: sse
-    @Test func sse() {
+    @Test func htmxSse() {
         var string:StaticString = #html(div(attributes: [.htmx(.sse(.connect("/connect")))]))
         #expect(string == "<div sse-connect=\"/connect\"></div>")
 
@@ -169,13 +169,13 @@ struct HTMXTests {
     }
 
     // MARK: trigger
-    @Test func trigger() {
+    @Test func htmxTrigger() {
         let string:StaticString = #html(div(attributes: [.htmx(.trigger("sse:chatter"))]))
         #expect(string == "<div hx-trigger=\"sse:chatter\"></div>")
     }
 
     // MARK: ws
-    @Test func ws() {
+    @Test func htmxWebSocket() {
         var string:StaticString = #html(div(attributes: [.htmx(.ws(.connect("/chatroom")))]))
         #expect(string == "<div ws-connect=\"/chatroom\"></div>")
 

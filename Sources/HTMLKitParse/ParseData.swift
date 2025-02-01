@@ -100,7 +100,7 @@ extension HTMLKitUtilities {
                     if key == "encoding" {
                         context.encoding = parseEncoding(expression: child.expression) ?? .string
                     } else if key == "lookupFiles" {
-                        context.lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string }))
+                        context.lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string(encoding: context.encoding) }))
                     } else if key == "attributes" {
                         (global_attributes, trailingSlash) = parseGlobalAttributes(context: context, array: child.expression.array!.elements)
                     } else {
@@ -142,11 +142,11 @@ extension HTMLKitUtilities {
         } else if let function:FunctionCallExprSyntax = expression.functionCall {
             switch function.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
             case "custom":
-                guard let logic:String = function.arguments.first?.expression.stringLiteral?.string else { break }
+                guard let logic:String = function.arguments.first?.expression.stringLiteral?.string(encoding: .string) else { break }
                 if function.arguments.count == 1 {
                     return .custom(logic)
                 } else {
-                    return .custom(logic, stringDelimiter: function.arguments.last!.expression.stringLiteral!.string)
+                    return .custom(logic, stringDelimiter: function.arguments.last!.expression.stringLiteral!.string(encoding: .string))
                 }
             default:
                 break
