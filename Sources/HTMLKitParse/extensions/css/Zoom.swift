@@ -7,8 +7,6 @@
 
 import CSS
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 extension CSSStyle.Zoom : HTMLParsable {
     public init?(context: HTMLExpansionContext) {
@@ -21,7 +19,7 @@ extension CSSStyle.Zoom : HTMLParsable {
         case "reset": self = .reset
         case "revert": self = .revert
         case "revertLayer": self = .revertLayer
-        case "unset": self = .revertLayer
+        case "unset": self = .unset
         default: return nil
         }
     }

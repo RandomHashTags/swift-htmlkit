@@ -1,3 +1,9 @@
+//
+//  HTMLElementValueType.swift
+//
+//
+//  Created by Evan Anderson on 1/30/25.
+//
 
 import HTMLElements
 import HTMLKitUtilities
@@ -138,6 +144,7 @@ extension HTMLElementValueType {
         case "wbr": return get(wbr.self)
 
         case "custom": return get(custom.self)
+        case "svg": return get(svg.self)
         default: return nil
         }
     }

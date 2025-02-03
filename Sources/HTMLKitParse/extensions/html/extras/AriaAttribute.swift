@@ -7,8 +7,6 @@
 
 import HTMLAttributes
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 extension HTMLAttribute.Extra.ariaattribute : HTMLParsable {
     public init?(context: HTMLExpansionContext) {

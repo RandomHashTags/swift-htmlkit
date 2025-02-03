@@ -7,8 +7,6 @@
 
 import CSS
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 extension CSSStyle.Opacity : HTMLParsable {
     public init?(context: HTMLExpansionContext) {

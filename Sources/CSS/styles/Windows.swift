@@ -1,15 +1,14 @@
 //
-//  ZIndex.swift
+//  Windows.swift
 //
 //
-//  Created by Evan Anderson on 1/30/25.
+//  Created by Evan Anderson on 2/3/25.
 //
 
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ZIndex : HTMLInitializable {
-        case auto
+    public enum Windows : HTMLInitializable {
         case inherit
         case initial
         case int(Int?)
@@ -17,14 +16,13 @@ extension CSSStyle {
         case revertLayer
         case unset
 
-        public var key : String { "" }
+        public var key: String { "" }
 
         @inlinable public var htmlValueIsVoidable : Bool { false }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .auto: return "auto"
             case .inherit: return "inherit"
             case .initial: return "initial"
             case .int(let v): guard let v:Int = v else { return nil }; return "\(v)"

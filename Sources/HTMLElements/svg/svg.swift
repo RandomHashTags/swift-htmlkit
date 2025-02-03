@@ -2,7 +2,7 @@
 //  CustomElements.swift
 //
 //
-//  Created by Evan Anderson on 1/30/26.
+//  Created by Evan Anderson on 1/30/25.
 //
 
 import HTMLAttributes
@@ -10,17 +10,24 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-// MARK: custom
-/// A custom HTML element.
-public struct custom : HTMLElement {
+// MARK: svg
+/// The `svg` HTML element.
+// TODO: finish
+struct svg : HTMLElement {
     public static let otherAttributes:[String:String] = [:]
     
-    public let tag:String
+    public let tag:String = "svg"
     public var attributes:[HTMLAttribute]
     public var innerHTML:[CustomStringConvertible & Sendable]
+    public var height:String?
+    public var preserveAspectRatio:Attributes.PreserveAspectRatio?
+    public var viewBox:String?
+    public var width:String?
+    public var x:String?
+    public var y:String?
 
     @usableFromInline internal var encoding:HTMLEncoding = .string
-    public var isVoid:Bool
+    public let isVoid:Bool = false
     public var trailingSlash:Bool
     public var escaped:Bool = false
 
@@ -29,20 +36,14 @@ public struct custom : HTMLElement {
     public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {
         self.encoding = encoding
         fromMacro = true
-        tag = data.attributes["tag"] as? String ?? ""
-        isVoid = data.attributes["isVoid"] as? Bool ?? false
         trailingSlash = data.trailingSlash
         attributes = data.globalAttributes
         innerHTML = data.innerHTML
     }
     public init(
-        tag: String,
-        isVoid: Bool,
         attributes: [HTMLAttribute] = [],
         _ innerHTML: CustomStringConvertible...
     ) {
-        self.tag = tag
-        self.isVoid = isVoid
         trailingSlash = attributes.contains(.trailingSlash)
         self.attributes = attributes
         self.innerHTML = innerHTML
@@ -64,5 +65,48 @@ public struct custom : HTMLElement {
             g = ">"
         }
         return l + tag + (isVoid && trailingSlash ? " /" : "") + g + (attributes_string.isEmpty ? "" : " " + attributes_string) + (isVoid ? "" : l + "/" + tag + g)
+    }
+}
+
+// MARK: Attributes
+extension svg {
+    public enum Attributes {
+        public enum PreserveAspectRatio : HTMLInitializable {
+            case none
+            case xMinYMin(Keyword?)
+            case xMidYMin(Keyword?)
+            case xMaxYMin(Keyword?)
+            case xMinYMid(Keyword?)
+            case xMidYMid(Keyword?)
+            case xMaxYMid(Keyword?)
+            case xMinYMax(Keyword?)
+            case xMidYMax(Keyword?)
+            case xMaxYMax(Keyword?)
+
+            public var key : String { "" }
+            @inlinable public var htmlValueIsVoidable : Bool { false }
+
+            @inlinable
+            public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+                switch self {
+                case .none: return "none"
+                case .xMinYMin(let v),
+                        .xMidYMin(let v),
+                        .xMaxYMin(let v),
+                        .xMinYMid(let v),
+                        .xMidYMid(let v),
+                        .xMaxYMid(let v),
+                        .xMinYMax(let v),
+                        .xMidYMax(let v),
+                        .xMaxYMax(let v):
+                    return v?.rawValue
+                }
+            }
+        }
+
+        public enum Keyword : String, HTMLParsable {
+            case meet
+            case slice
+        }
     }
 }

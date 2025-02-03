@@ -9,12 +9,12 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public enum CSSStyle : HTMLParsable {
+public enum CSSStyle : HTMLInitializable {
     public typealias SFloat = Swift.Float
 
     //case accentColor(AccentColor?)
     //case align(Align?)
-    case all
+    case all(All?)
     //case animation(Animation?)
     case appearance(Appearance?)
     case aspectRatio
@@ -28,7 +28,7 @@ public enum CSSStyle : HTMLParsable {
     case box(Box?)
     case `break`(Break?)
 
-    case captionSide
+    case captionSide(CaptionSide?)
     case caretColor
     case clear(Clear?)
     case clipPath
@@ -56,7 +56,7 @@ public enum CSSStyle : HTMLParsable {
     case grid
 
     case hangingPunctuation
-    case height(CSSUnit)
+    case height(CSSUnit?)
     case hyphens(Hyphens?)
     case hypenateCharacter
 
@@ -122,23 +122,17 @@ public enum CSSStyle : HTMLParsable {
     case userSelect
 
     case verticalAlign
-    case visibility
+    case visibility(Visibility?)
 
-    case whiteSpace
-    case windows
-    case width(CSSUnit)
+    case whiteSpace(WhiteSpace?)
+    case whiteSpaceCollapse(WhiteSpaceCollapse?)
+    case windows(Windows?)
+    case width(CSSUnit?)
     //case word(Word?)
     case writingMode(WritingMode?)
 
-    //case zIndex(ZIndex?)
-    case zoom(Zoom)
-
-    public init?(context: HTMLExpansionContext) {
-        return nil
-    }
-    public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
-        return nil
-    }
+    case zIndex(ZIndex?)
+    case zoom(Zoom?)
 
     // MARK: Key
     @inlinable
@@ -257,12 +251,13 @@ public enum CSSStyle : HTMLParsable {
         case .visibility: return "visibility"
 
         case .whiteSpace: return "white-space"
+        case .whiteSpaceCollapse: return "white-space-collapse"
         case .windows: return "windows"
         case .width: return "width"
         //case .word: return "word"
         case .writingMode: return "writing-mode"
 
-        //case .zIndex: return "z-index"
+        case .zIndex: return "z-index"
         case .zoom: return "zoom"
         }
     }
@@ -270,4 +265,56 @@ public enum CSSStyle : HTMLParsable {
     // MARK: HTML value is voidable
     @inlinable
     public var htmlValueIsVoidable : Bool { false }
+}
+
+// MARK: HTML value
+extension CSSStyle {
+    @inlinable
+    public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+        func get<T : HTMLInitializable>(_ value: T?) -> String? {
+            guard let v:String = value?.htmlValue(encoding: encoding, forMacro: forMacro) else { return nil }
+            return key + ":" + v
+        }
+        switch self {
+        case .all(let v): return get(v)
+        case .appearance(let v): return get(v)
+
+        case .backfaceVisibility(let v): return get(v)
+        case .box(let v): return get(v)
+        case .break(let v): return get(v)
+
+        case .captionSide(let v): return get(v)
+        case .clear(let v): return get(v)
+        case .color(let v): return get(v)
+        case .colorScheme(let v): return get(v)
+
+        case .direction(let v): return get(v)
+        case .display(let v): return get(v)
+
+        case .emptyCells(let v): return get(v)
+
+        case .float(let v): return get(v)
+
+        case .height(let v): return get(v)
+        case .hyphens(let v): return get(v)
+
+        case .imageRendering(let v): return get(v)
+        case .isolation(let v): return get(v)
+
+        case .objectFit(let v): return get(v)
+        case .opacity(let v): return get(v)
+
+        case .visibility(let v): return get(v)
+
+        case .whiteSpace(let v): return get(v)
+        case .whiteSpaceCollapse(let v): return get(v)
+        case .width(let v): return get(v)
+        case .windows(let v): return get(v)
+        case .writingMode(let v): return get(v)
+
+        case .zoom(let v): return get(v)
+        case .zIndex(let v): return get(v)
+        default: return nil
+        }
+    }
 }
