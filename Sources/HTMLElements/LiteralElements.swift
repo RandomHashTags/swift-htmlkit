@@ -8,8 +8,6 @@
 import CSS
 import HTMLAttributes
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 @freestanding(
     declaration,

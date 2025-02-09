@@ -9,7 +9,6 @@
 import Foundation
 import HTMLKitUtilities
 import SwiftDiagnostics
-import SwiftSyntaxMacros
 import SwiftParser
 import SwiftSyntax
 

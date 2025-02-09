@@ -9,7 +9,6 @@ import HTMLAttributes
 import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
-import SwiftSyntaxMacros
 
 extension HTMLKitUtilities {
     // MARK: Parse Literal Value

@@ -10,7 +10,6 @@ import HTMLElements
 import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
-import SwiftSyntaxMacros
 
 extension HTMLKitUtilities {
     // MARK: Escape HTML

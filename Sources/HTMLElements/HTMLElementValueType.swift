@@ -6,8 +6,6 @@
 //
 
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 package indirect enum HTMLElementValueType {
     case string

@@ -15,7 +15,6 @@ import HTMLKitUtilities
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax
-import SwiftSyntaxMacros
 #endif
 
 // MARK: HTMLAttribute.Extra

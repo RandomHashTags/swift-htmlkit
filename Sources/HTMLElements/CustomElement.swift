@@ -7,8 +7,6 @@
 
 import HTMLAttributes
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 // MARK: custom
 /// A custom HTML element.

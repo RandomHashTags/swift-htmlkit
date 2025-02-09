@@ -5,8 +5,10 @@
 //  Created by Evan Anderson on 1/31/25.
 //
 
+#if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
 import SwiftSyntax
 import SwiftSyntaxMacros
+#endif
 
 /// Data required to process an HTML expansion.
 public struct HTMLExpansionContext {
@@ -43,8 +45,10 @@ public struct HTMLExpansionContext {
         self.lookupFiles = lookupFiles
     }
 
+    #if canImport(SwiftSyntax)
     /// First expression in the arguments.
     public var expression : ExprSyntax? {
         arguments.first?.expression
     }
+    #endif
 }

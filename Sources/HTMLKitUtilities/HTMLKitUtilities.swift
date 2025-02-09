@@ -5,8 +5,9 @@
 //  Created by Evan Anderson on 9/19/24.
 //
 
+#if canImport(SwiftSyntax)
 import SwiftSyntax
-import SwiftSyntaxMacros
+#endif
 
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
@@ -59,6 +60,7 @@ extension String {
     }
 }
 
+#if canImport(SwiftSyntax)
 // MARK: Misc
 extension ExprSyntaxProtocol {
     package var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
@@ -95,3 +97,4 @@ extension LabeledExprListSyntax {
         return index < count ? self[self.index(at: index)] : nil
     }
 }
+#endif

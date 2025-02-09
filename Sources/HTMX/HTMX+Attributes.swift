@@ -9,11 +9,6 @@
 import HTMLKitUtilities
 #endif
 
-#if canImport(SwiftSyntax)
-import SwiftSyntax
-import SwiftSyntaxMacros
-#endif
-
 extension HTMXAttribute {
     // MARK: TrueOrFalse
     public enum TrueOrFalse : String, HTMLParsable {
@@ -71,54 +66,56 @@ extension HTMXAttribute {
         case xhrProgress
 
         @inlinable
-        public var key : String {
-            func slug() -> String {
-                switch self {
-                case .afterOnLoad:           return "after-on-load"
-                case .afterProcessNode:      return "after-process-node"
-                case .afterRequest:          return "after-request"
-                case .afterSettle:           return "after-settle"
-                case .afterSwap:             return "after-swap"
-                case .beforeCleanupElement:  return "before-cleanup-element"
-                case .beforeOnLoad:          return "before-on-load"
-                case .beforeProcessNode:     return "before-process-node"
-                case .beforeRequest:         return "before-request"
-                case .beforeSend:            return "before-send"
-                case .beforeSwap:            return "before-swap"
-                case .beforeTransition:      return "before-transition"
-                case .configRequest:         return "config-request"
-                case .historyCacheError:     return "history-cache-error"
-                case .historyCacheMiss:      return "history-cache-miss"
-                case .historyCacheMissError: return "history-cache-miss-error"
-                case .historyCacheMissLoad:  return "history-cache-miss-load"
-                case .historyRestore:        return "history-restore"
-                case .beforeHistorySave:     return "before-history-save"
-                case .noSSESourceError:      return "no-sse-source-error"
-                case .onLoadError:           return "on-load-error"
-                case .oobAfterSwap:          return "oob-after-swap"
-                case .oobBeforeSwap:         return "oob-before-swap"
-                case .oobErrorNoTarget:      return "oob-error-no-target"
-                case .beforeHistoryUpdate:   return "before-history-update"
-                case .pushedIntoHistory:     return "pushed-into-history"
-                case .replacedInHistory:     return "replaced-in-history"
-                case .responseError:         return "response-error"
-                case .sendError:             return "send-error"
-                case .sseError:              return "sse-error"
-                case .sseOpen:               return "sse-open"
-                case .swapError:             return "swap-error"
-                case .targetError:           return "target-error"
-                case .validateURL:           return "validate-url"
-                case .validationValidate:    return "validation:validate"
-                case .validationFailed:      return "validation:failed"
-                case .validationHalted:      return "validation:halted"
-                case .xhrAbort:              return "xhr:abort"
-                case .xhrLoadEnd:            return "xhr:loadend"
-                case .xhrLoadStart:          return "xhr:loadstart"
-                case .xhrProgress:           return "xhr:progress"
-                default:                     return rawValue
-                }
+        var slug : String {
+            switch self {
+            case .afterOnLoad:           return "after-on-load"
+            case .afterProcessNode:      return "after-process-node"
+            case .afterRequest:          return "after-request"
+            case .afterSettle:           return "after-settle"
+            case .afterSwap:             return "after-swap"
+            case .beforeCleanupElement:  return "before-cleanup-element"
+            case .beforeOnLoad:          return "before-on-load"
+            case .beforeProcessNode:     return "before-process-node"
+            case .beforeRequest:         return "before-request"
+            case .beforeSend:            return "before-send"
+            case .beforeSwap:            return "before-swap"
+            case .beforeTransition:      return "before-transition"
+            case .configRequest:         return "config-request"
+            case .historyCacheError:     return "history-cache-error"
+            case .historyCacheMiss:      return "history-cache-miss"
+            case .historyCacheMissError: return "history-cache-miss-error"
+            case .historyCacheMissLoad:  return "history-cache-miss-load"
+            case .historyRestore:        return "history-restore"
+            case .beforeHistorySave:     return "before-history-save"
+            case .noSSESourceError:      return "no-sse-source-error"
+            case .onLoadError:           return "on-load-error"
+            case .oobAfterSwap:          return "oob-after-swap"
+            case .oobBeforeSwap:         return "oob-before-swap"
+            case .oobErrorNoTarget:      return "oob-error-no-target"
+            case .beforeHistoryUpdate:   return "before-history-update"
+            case .pushedIntoHistory:     return "pushed-into-history"
+            case .replacedInHistory:     return "replaced-in-history"
+            case .responseError:         return "response-error"
+            case .sendError:             return "send-error"
+            case .sseError:              return "sse-error"
+            case .sseOpen:               return "sse-open"
+            case .swapError:             return "swap-error"
+            case .targetError:           return "target-error"
+            case .validateURL:           return "validate-url"
+            case .validationValidate:    return "validation:validate"
+            case .validationFailed:      return "validation:failed"
+            case .validationHalted:      return "validation:halted"
+            case .xhrAbort:              return "xhr:abort"
+            case .xhrLoadEnd:            return "xhr:loadend"
+            case .xhrLoadStart:          return "xhr:loadstart"
+            case .xhrProgress:           return "xhr:progress"
+            default:                     return rawValue
             }
-            return ":" + slug()
+        }
+
+        @inlinable
+        public var key : String {
+            return ":" + slug
         }
     }
 

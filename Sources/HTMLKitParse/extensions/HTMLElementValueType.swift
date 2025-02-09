@@ -5,10 +5,10 @@
 //  Created by Evan Anderson on 1/30/25.
 //
 
+#if canImport(HTMLElements) && canImport(HTMLKitUtilities) && canImport(SwiftSyntax)
 import HTMLElements
 import HTMLKitUtilities
 import SwiftSyntax
-import SwiftSyntaxMacros
 
 extension HTMLElementValueType {
     package static func parse_element(context: HTMLExpansionContext, _ function: FunctionCallExprSyntax) -> HTMLElement? {
@@ -144,8 +144,9 @@ extension HTMLElementValueType {
         case "wbr": return get(wbr.self)
 
         case "custom": return get(custom.self)
-        case "svg": return get(svg.self)
+        //case "svg": return get(svg.self)
         default: return nil
         }
     }
 }
+#endif

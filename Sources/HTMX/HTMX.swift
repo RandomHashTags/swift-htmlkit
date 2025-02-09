@@ -9,11 +9,6 @@
 import HTMLKitUtilities
 #endif
 
-#if canImport(SwiftSyntax)
-import SwiftSyntax
-import SwiftSyntaxMacros
-#endif
-
 public enum HTMXAttribute : HTMLInitializable {
     case boost(TrueOrFalse?)
     case confirm(String?)

@@ -11,7 +11,6 @@ import HTMLKitUtilities
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax
-import SwiftSyntaxMacros
 #endif
 
 public enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/css_units.php

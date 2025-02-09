@@ -6,8 +6,6 @@
 //
 
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 /*
 extension CSSStyle {

@@ -19,7 +19,6 @@ import HTMX
 
 #if canImport(SwiftSyntax)
 import SwiftSyntax
-import SwiftSyntaxMacros
 #endif
 
 // MARK: HTMLGlobalAttributes

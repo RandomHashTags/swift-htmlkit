@@ -7,8 +7,6 @@
 
 import HTMLKitUtilities
 import HTMX
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 // MARK: init
 extension HTMXAttribute : HTMLParsable {

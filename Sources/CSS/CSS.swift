@@ -6,8 +6,6 @@
 //
 
 import HTMLKitUtilities
-import SwiftSyntax
-import SwiftSyntaxMacros
 
 public enum CSSStyle : HTMLInitializable {
     public typealias SFloat = Swift.Float

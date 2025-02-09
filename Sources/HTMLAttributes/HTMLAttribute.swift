@@ -17,11 +17,6 @@ import HTMLKitUtilities
 import HTMX
 #endif
 
-#if canImport(SwiftSyntax)
-import SwiftSyntax
-import SwiftSyntaxMacros
-#endif
-
 // MARK: HTMLAttribute
 public enum HTMLAttribute : HTMLInitializable {
     case accesskey(String? = nil)

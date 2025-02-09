@@ -5,11 +5,6 @@
 //  Created by Evan Anderson on 1/30/25.
 //
 
-#if canImport(SwiftSyntax)
-import SwiftSyntax
-import SwiftSyntaxMacros
-#endif
-
 public protocol HTMLParsable : HTMLInitializable {
     #if canImport(SwiftSyntax)
     init?(context: HTMLExpansionContext)
