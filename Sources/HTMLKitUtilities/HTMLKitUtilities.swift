@@ -61,7 +61,7 @@ extension String {
 }
 
 #if canImport(SwiftSyntax)
-// MARK: Misc
+// MARK: SwiftSyntax
 extension ExprSyntaxProtocol {
     package var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
     package var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }

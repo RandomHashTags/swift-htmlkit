@@ -12,15 +12,17 @@ import SwiftSyntaxMacros
 
 /// Data required to process an HTML expansion.
 public struct HTMLExpansionContext {
+    #if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
     public let context:MacroExpansionContext
     public let expansion:MacroExpansionExprSyntax
+    public var arguments:LabeledExprListSyntax
+    #endif
     
     /// `HTMLEncoding` of this expansion.
     public var encoding:HTMLEncoding
 
     /// Associated attribute key responsible for the arguments.
     public var key:String
-    public var arguments:LabeledExprListSyntax
 
     /// Complete file paths used for looking up interpolation (when trying to promote to an equivalent `StaticString`).
     public var lookupFiles:Set<String>

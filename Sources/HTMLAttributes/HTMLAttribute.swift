@@ -52,6 +52,8 @@ public enum HTMLAttribute : HTMLInitializable {
 
     #if canImport(CSS)
     case style([CSSStyle]? = nil)
+    #else
+    case style(String? = nil)
     #endif
 
     case tabindex(Int? = nil)
@@ -108,11 +110,7 @@ public enum HTMLAttribute : HTMLInitializable {
         case .popover:               return "popover"
         case .slot:                  return "slot"
         case .spellcheck:            return "spellcheck"
-
-        #if canImport(CSS)
         case .style:                 return "style"
-        #endif
-
         case .tabindex:              return "tabindex"
         case .title:                 return "title"
         case .translate:             return "translate"
@@ -173,6 +171,8 @@ public enum HTMLAttribute : HTMLInitializable {
 
         #if canImport(CSS)
         case .style(let value):                 return value?.compactMap({ $0.htmlValue(encoding: encoding, forMacro: forMacro) }).joined(separator: ";")
+        #else
+        case .style(let value): return value
         #endif
         
         case .tabindex(let value):              return value?.description
@@ -217,7 +217,7 @@ public enum HTMLAttribute : HTMLInitializable {
         #if canImport(HTMX)
         case .htmx(let v):
             switch v {
-            case .request(_, _, _, _), .headers(_, _): return "'"
+            case .request, .headers: return "'"
             default: return encoding.stringDelimiter(forMacro: forMacro)
             }
         #endif
