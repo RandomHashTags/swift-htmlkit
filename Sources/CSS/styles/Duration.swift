@@ -16,7 +16,7 @@ extension CSSStyle {
         indirect case multiple([Duration])
         case revert
         case revertLayer
-        case s(SFloat?)
+        case s(Swift.Float?)
         case unset
 
         public var key : String { "" }

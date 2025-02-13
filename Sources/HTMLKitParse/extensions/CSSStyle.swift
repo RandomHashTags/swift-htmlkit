@@ -23,6 +23,7 @@ extension CSSStyle : HTMLParsable {
         case "clear": self = .clear(enumeration())
         case "color": self = .color(enumeration())
         case "colorScheme": self = .colorScheme(enumeration())
+        case "cursor": self = .cursor(enumeration())
 
         case "direction": self = .direction(enumeration())
         case "display": self = .display(enumeration())
@@ -39,12 +40,13 @@ extension CSSStyle : HTMLParsable {
 
         case "objectFit": self = .objectFit(enumeration())
         case "opacity": self = .opacity(enumeration())
+        case "order": self = .order(enumeration())
 
         case "visibility": self = .visibility(enumeration())
 
         case "whiteSpace": self = .whiteSpace(enumeration())
         case "width": self = .width(enumeration())
-        case "windows": self = .windows(enumeration())
+        case "widows": self = .widows(enumeration())
         case "writingMode": self = .writingMode(enumeration())
 
         case "zoom": self = .zoom(enumeration())

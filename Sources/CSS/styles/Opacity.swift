@@ -7,12 +7,13 @@
 
 import HTMLKitUtilities
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/opacity
 extension CSSStyle {
     public enum Opacity : HTMLInitializable {
-        case float(SFloat?)
+        case float(Swift.Float?)
         case inherit
         case initial
-        case percent(SFloat?)
+        case percent(Swift.Float?)
         case revert
         case revertLayer
         case unset

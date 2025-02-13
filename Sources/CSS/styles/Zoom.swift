@@ -9,11 +9,11 @@ import HTMLKitUtilities
 
 extension CSSStyle {
     public enum Zoom : HTMLInitializable {
-        case float(SFloat?)
+        case float(Swift.Float?)
         case inherit
         case initial
         case normal
-        case percent(SFloat?)
+        case percent(Swift.Float?)
         case reset
         case revert
         case revertLayer

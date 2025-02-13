@@ -8,8 +8,6 @@
 import HTMLKitUtilities
 
 public enum CSSStyle : HTMLInitializable {
-    public typealias SFloat = Swift.Float
-
     //case accentColor(AccentColor?)
     //case align(Align?)
     case all(All?)
@@ -38,7 +36,7 @@ public enum CSSStyle : HTMLInitializable {
     case counterIncrement
     case counterReset
     case counterSet
-    //case cursor(Cursor?)
+    case cursor(Cursor?)
     
     case direction(Direction?)
     case display(Display?)
@@ -82,7 +80,7 @@ public enum CSSStyle : HTMLInitializable {
     case objectPosition
     case offset
     case opacity(Opacity?)
-    //case order(Order?)
+    case order(Order?)
     case orphans
     case outline
     case overflow
@@ -124,7 +122,7 @@ public enum CSSStyle : HTMLInitializable {
 
     case whiteSpace(WhiteSpace?)
     case whiteSpaceCollapse(WhiteSpaceCollapse?)
-    case windows(Windows?)
+    case widows(Widows?)
     case width(CSSUnit?)
     //case word(Word?)
     case writingMode(WritingMode?)
@@ -164,7 +162,7 @@ public enum CSSStyle : HTMLInitializable {
         case .counterIncrement: return "counter-increment"
         case .counterReset: return "counter-reset"
         case .counterSet: return "counter-set"
-        //case .cursor: return "cursor"
+        case .cursor: return "cursor"
         
         case .direction: return "direction"
         case .display: return "display"
@@ -208,7 +206,7 @@ public enum CSSStyle : HTMLInitializable {
         case .objectPosition: return "object-position"
         case .offset: return "offset"
         case .opacity: return "opacity"
-        //case .order: return "order"
+        case .order: return "order"
         case .orphans: return "orphans"
         case .outline: return "outline"
         case .overflow: return "overflow"
@@ -250,7 +248,7 @@ public enum CSSStyle : HTMLInitializable {
 
         case .whiteSpace: return "white-space"
         case .whiteSpaceCollapse: return "white-space-collapse"
-        case .windows: return "windows"
+        case .widows: return "widows"
         case .width: return "width"
         //case .word: return "word"
         case .writingMode: return "writing-mode"
@@ -285,6 +283,7 @@ extension CSSStyle {
         case .clear(let v): return get(v)
         case .color(let v): return get(v)
         case .colorScheme(let v): return get(v)
+        case .cursor(let v): return get(v)
 
         case .direction(let v): return get(v)
         case .display(let v): return get(v)
@@ -301,13 +300,14 @@ extension CSSStyle {
 
         case .objectFit(let v): return get(v)
         case .opacity(let v): return get(v)
+        case .order(let v): return get(v)
 
         case .visibility(let v): return get(v)
 
         case .whiteSpace(let v): return get(v)
         case .whiteSpaceCollapse(let v): return get(v)
         case .width(let v): return get(v)
-        case .windows(let v): return get(v)
+        case .widows(let v): return get(v)
         case .writingMode(let v): return get(v)
 
         case .zoom(let v): return get(v)

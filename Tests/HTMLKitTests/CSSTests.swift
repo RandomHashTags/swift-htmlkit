@@ -17,6 +17,13 @@ struct CSSTests {
         let result:String = #html(div(attributes: [.style([.whiteSpace(.normal)])]))
         #expect(expected == result)
     }
+
+    @Test func cssDefaultAttribute() {
+        let expected:String = "unset"
+        let result:String? = CSSStyle.Order.unset.htmlValue(encoding: .string, forMacro: false)
+        #expect(expected == result)
+        #expect("\(CSSStyle.Order.unset)" == expected)
+    }
 }
 
 

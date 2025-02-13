@@ -1,5 +1,5 @@
 //
-//  Windows.swift
+//  Widows.swift
 //
 //
 //  Created by Evan Anderson on 2/3/25.
@@ -7,8 +7,9 @@
 
 import HTMLKitUtilities
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/widows
 extension CSSStyle {
-    public enum Windows : HTMLInitializable {
+    public enum Widows : HTMLInitializable {
         case inherit
         case initial
         case int(Int?)
