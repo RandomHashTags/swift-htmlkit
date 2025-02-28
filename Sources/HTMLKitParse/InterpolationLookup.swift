@@ -13,8 +13,9 @@ import SwiftParser
 import SwiftSyntax
 
 enum InterpolationLookup {
-    private static var cached:[String:CodeBlockItemListSyntax] = [:]
+    @MainActor private static var cached:[String:CodeBlockItemListSyntax] = [:]
 
+    @MainActor
     static func find(context: HTMLExpansionContext, _ node: some ExprSyntaxProtocol, files: Set<String>) -> String? {
         guard !files.isEmpty, let item:Item = item(context: context, node) else { return nil }
         for file in files {

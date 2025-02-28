@@ -97,7 +97,7 @@ enum HTMLElements : DeclarationMacro {
             for (key, value_type, default_value) in attributes {
                 initializers += key + ": " + value_type + default_value + ",\n"
             }
-            initializers += "_ innerHTML: CustomStringConvertible...\n) {\n"
+            initializers += "_ innerHTML: CustomStringConvertible & Sendable...\n) {\n"
             initializers += "self.attributes = attributes\n"
             for (key, _, _) in attributes {
                 var key_literal:String = key

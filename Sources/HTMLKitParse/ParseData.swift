@@ -88,8 +88,8 @@ extension HTMLKitUtilities {
     ) -> ElementData {
         var context:HTMLExpansionContext = context
         var global_attributes:[HTMLAttribute] = []
-        var attributes:[String:Any] = [:]
-        var innerHTML:[CustomStringConvertible] = []
+        var attributes:[String:Sendable] = [:]
+        var innerHTML:[CustomStringConvertible & Sendable] = []
         var trailingSlash:Bool = false
         for element in context.arguments.children(viewMode: .all) {
             if let child:LabeledExprSyntax = element.labeled {
@@ -126,7 +126,7 @@ extension HTMLKitUtilities {
                         }
                     }
                 // inner html
-                } else if let inner_html:CustomStringConvertible = parseInnerHTML(context: context, child: child) {
+                } else if let inner_html:CustomStringConvertible & Sendable = parseInnerHTML(context: context, child: child) {
                     innerHTML.append(inner_html)
                 }
             }
@@ -194,7 +194,7 @@ extension HTMLKitUtilities {
     public static func parseInnerHTML(
         context: HTMLExpansionContext,
         child: LabeledExprSyntax
-    ) -> CustomStringConvertible? {
+    ) -> (CustomStringConvertible & Sendable)? {
         if let expansion:MacroExpansionExprSyntax = child.expression.macroExpansion {
             if expansion.macroName.text == "escapeHTML" {
                 var c:HTMLExpansionContext = context

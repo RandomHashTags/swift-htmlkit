@@ -229,18 +229,18 @@ public enum HTMLAttribute : HTMLInitializable {
 
 // MARK: ElementData
 extension HTMLKitUtilities {
-    public struct ElementData {
+    public struct ElementData : Sendable {
         public let encoding:HTMLEncoding
         public let globalAttributes:[HTMLAttribute]
-        public let attributes:[String:Any]
-        public let innerHTML:[CustomStringConvertible]
+        public let attributes:[String:Sendable]
+        public let innerHTML:[CustomStringConvertible & Sendable]
         public let trailingSlash:Bool
 
         package init(
             _ encoding: HTMLEncoding,
             _ globalAttributes: [HTMLAttribute],
-            _ attributes: [String:Any],
-            _ innerHTML: [CustomStringConvertible],
+            _ attributes: [String:Sendable],
+            _ innerHTML: [CustomStringConvertible & Sendable],
             _ trailingSlash: Bool
         ) {
             self.encoding = encoding

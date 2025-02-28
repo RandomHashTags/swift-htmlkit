@@ -174,7 +174,7 @@ extension HTMLKitUtilities {
             default:
                 separator = " "
             }
-            var results:[Any] = []
+            var results:[Sendable] = []
             for element in array.elements {
                 if let attribute:any HTMLInitializable = HTMLAttribute.Extra.parse(context: context, expr: element.expression) {
                     results.append(attribute)
@@ -210,7 +210,7 @@ public enum LiteralReturnType {
     case int(Int)
     case float(Float)
     case interpolation(String)
-    case array([Any])
+    case array([Sendable])
 
     public var isInterpolation : Bool {
         switch self {

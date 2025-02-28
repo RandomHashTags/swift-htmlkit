@@ -37,7 +37,7 @@ public struct custom : HTMLElement {
         tag: String,
         isVoid: Bool,
         attributes: [HTMLAttribute] = [],
-        _ innerHTML: CustomStringConvertible...
+        _ innerHTML: CustomStringConvertible & Sendable...
     ) {
         self.tag = tag
         self.isVoid = isVoid

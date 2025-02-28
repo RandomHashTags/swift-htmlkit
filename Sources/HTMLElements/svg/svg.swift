@@ -40,7 +40,7 @@ struct svg : HTMLElement {
     }
     public init(
         attributes: [HTMLAttribute] = [],
-        _ innerHTML: CustomStringConvertible...
+        _ innerHTML: CustomStringConvertible & Sendable...
     ) {
         trailingSlash = attributes.contains(.trailingSlash)
         self.attributes = attributes

@@ -11,7 +11,7 @@ import SwiftSyntaxMacros
 #endif
 
 /// Data required to process an HTML expansion.
-public struct HTMLExpansionContext {
+public struct HTMLExpansionContext : @unchecked Sendable {
     #if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
     public let context:MacroExpansionContext
     public let expansion:MacroExpansionExprSyntax
