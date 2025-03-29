@@ -268,7 +268,7 @@ extension CSSStyle {
     @inlinable
     public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
         func get<T : HTMLInitializable>(_ value: T?) -> String? {
-            guard let v:String = value?.htmlValue(encoding: encoding, forMacro: forMacro) else { return nil }
+            guard let v = value?.htmlValue(encoding: encoding, forMacro: forMacro) else { return nil }
             return key + ":" + v
         }
         switch self {

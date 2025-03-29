@@ -16,6 +16,17 @@ import struct FoundationEssentials.Data
 import struct Foundation.Data
 #endif
 
+// MARK: StaticString equality
+extension StaticString {
+    static func == (left: Self, right: Self) -> Bool { left.description == right.description }
+    static func != (left: Self, right: Self) -> Bool { left.description != right.description }
+}
+// MARK: StaticString and StringProtocol equality
+extension StringProtocol {
+    static func == (left: Self, right: StaticString) -> Bool { left == right.description }
+    static func == (left: StaticString, right: Self) -> Bool { left.description == right }
+}
+
 // MARK: Representations
 struct HTMLKitTests {
     @Test
@@ -58,12 +69,19 @@ struct HTMLKitTests {
 
     @Test
     func representations() {
+        let _ = #anyHTML(p("sheesh"))
+        let _ = #anyHTML(encoding: .string, p("sheesh"))
+        let _ = #anyHTML(encoding: .utf8Bytes, p("sheesh"))
+        let _ = #anyHTML(encoding: .utf16Bytes, p("sheesh"))
+
         let _:StaticString = #html()
         let _:StaticString = #html(encoding: .string)
         let _:String = #html()
         let _:String = #html(encoding: .string)
         let _:[UInt8] = #html(encoding: .utf8Bytes, p())
+        let _:ContiguousArray<UInt8> = #html(encoding: .utf8Bytes, p())
         let _:[UInt16] = #html(encoding: .utf16Bytes, p())
+        let _:ContiguousArray<UInt16> = #html(encoding: .utf16Bytes, p())
         let _:ContiguousArray<CChar> = #html(encoding: .utf8CString, p())
         #if canImport(FoundationEssentials) || canImport(Foundation)
         let _:Data = #html(encoding: .foundationData, p())
@@ -88,12 +106,20 @@ struct HTMLKitTests {
         #html(encoding: .utf16Bytes, p(123))
     }
     @Test
-    func representation5() -> ContiguousArray<CChar> {
+    func representation5() -> ContiguousArray<UInt8> {
+        #html(encoding: .utf8Bytes, p(123))
+    }
+    @Test
+    func representation6() -> ContiguousArray<UInt16> {
+        #html(encoding: .utf16Bytes, p(123))
+    }
+    @Test
+    func representation7() -> ContiguousArray<CChar> {
         #html(encoding: .utf8CString, p(123))
     }
     #if canImport(FoundationEssentials) || canImport(Foundation)
     @Test
-    func representation6() -> Data {
+    func representation8() -> Data {
         #html(encoding: .foundationData, p(123))
     }
     #endif

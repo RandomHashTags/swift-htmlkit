@@ -10,7 +10,7 @@ import HTMLKitUtilities
 
 extension HTMLAttribute : HTMLParsable {
     public init?(context: HTMLExpansionContext) {
-        func array_string() -> [String]? { context.array_string() }
+        func arrayString() -> [String]? { context.arrayString() }
         func boolean() -> Bool? { context.boolean() }
         func enumeration<T: HTMLParsable>() -> T? { context.enumeration() }
         func string() -> String? { context.string() }
@@ -20,10 +20,10 @@ extension HTMLAttribute : HTMLParsable {
         case "role":                  self = .role(enumeration())
         case "autocapitalize":        self = .autocapitalize(enumeration())
         case "autofocus":             self = .autofocus(boolean())
-        case "class":                 self = .class(array_string())
+        case "class":                 self = .class(arrayString())
         case "contenteditable":       self = .contenteditable(enumeration())
         case "data", "custom":
-            guard let id:String = string(), let value:String = context.arguments.last?.expression.string(context: context) else {
+            guard let id = string(), let value = context.arguments.last?.expression.string(context: context) else {
                 return nil
             }
             if context.key == "data" {
@@ -34,7 +34,7 @@ extension HTMLAttribute : HTMLParsable {
         case "dir":                   self = .dir(enumeration())
         case "draggable":             self = .draggable(enumeration())
         case "enterkeyhint":          self = .enterkeyhint(enumeration())
-        case "exportparts":           self = .exportparts(array_string())
+        case "exportparts":           self = .exportparts(arrayString())
         case "hidden":                self = .hidden(enumeration())
         case "id":                    self = .id(string())
         case "inert":                 self = .inert(boolean())
@@ -47,13 +47,13 @@ extension HTMLAttribute : HTMLParsable {
         case "itemtype":              self = .itemtype(string())
         case "lang":                  self = .lang(string())
         case "nonce":                 self = .nonce(string())
-        case "part":                  self = .part(array_string())
+        case "part":                  self = .part(arrayString())
         case "popover":               self = .popover(enumeration())
         case "slot":                  self = .slot(string())
         case "spellcheck":            self = .spellcheck(enumeration())
 
         #if canImport(CSS)
-        case "style":                 self = .style(context.array_enumeration())
+        case "style":                 self = .style(context.arrayEnumeration())
         #endif
 
         case "tabindex":              self = .tabindex(context.int())
@@ -64,7 +64,7 @@ extension HTMLAttribute : HTMLParsable {
         case "trailingSlash":         self = .trailingSlash
         case "htmx":                  self = .htmx(enumeration())
         case "event":
-            guard let event:HTMLEvent = enumeration(), let value:String = context.arguments.last?.expression.string(context: context) else {
+            guard let event:HTMLEvent = enumeration(), let value = context.arguments.last?.expression.string(context: context) else {
                 return nil
             }
             self = .event(event, value)

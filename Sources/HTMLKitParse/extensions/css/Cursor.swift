@@ -44,7 +44,7 @@ extension CSSStyle.Cursor : HTMLParsable {
         case "seResize": self = .seResize
         case "swResize": self = .swResize
         case "text": self = .text
-        case "urls": self = .urls(context.array_string())
+        case "urls": self = .urls(context.arrayString())
         case "verticalText": self = .verticalText
         case "wResize": self = .wResize
         case "wait": self = .wait

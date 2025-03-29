@@ -12,17 +12,6 @@
 @_exported import HTMLKitParse
 @_exported import HTMX
 
-// MARK: StaticString equality
-extension StaticString {
-    public static func == (left: Self, right: Self) -> Bool { left.description == right.description }
-    public static func != (left: Self, right: Self) -> Bool { left.description != right.description }
-}
-// MARK: StaticString and StringProtocol equality
-extension StringProtocol {
-    public static func == (left: Self, right: StaticString) -> Bool { left == right.description }
-    public static func == (left: StaticString, right: Self) -> Bool { left.description == right }
-}
-
 // MARK: Escape HTML
 @freestanding(expression)
 public macro escapeHTML(
@@ -31,18 +20,50 @@ public macro escapeHTML(
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
 // MARK: HTML
+/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
 @freestanding(expression)
-public macro html<T: CustomStringConvertible>(
+public macro html<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
+/// - Returns: An existential conforming to `CustomStringConvertible & Sendable`.
+@freestanding(expression)
+public macro anyHTML(
+    encoding: HTMLEncoding = .string,
+    lookupFiles: [StaticString] = [],
+    _ innerHTML: CustomStringConvertible & Sendable...
+) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
+
 // MARK: Unchecked
 /// Same as `#html` but ignoring compiler warnings.
+/// 
+/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
 @freestanding(expression)
-public macro uncheckedHTML<T: CustomStringConvertible>(
+public macro uncheckedHTML<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
+
+// MARK: Raw
+/// Does not escape the `innerHTML`.
+/// 
+/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
+@freestanding(expression)
+public macro rawHTML<T: CustomStringConvertible & Sendable>(
+    encoding: HTMLEncoding = .string,
+    lookupFiles: [StaticString] = [],
+    _ innerHTML: CustomStringConvertible & Sendable...
+) -> T = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
+
+/// Does not escape the `innerHTML`.
+/// 
+/// - Returns: An existential conforming to `CustomStringConvertible & Sendable`.
+@freestanding(expression)
+public macro anyRawHTML(
+    encoding: HTMLEncoding = .string,
+    lookupFiles: [StaticString] = [],
+    _ innerHTML: CustomStringConvertible & Sendable...
+) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")

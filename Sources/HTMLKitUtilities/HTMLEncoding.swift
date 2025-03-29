@@ -34,13 +34,13 @@ public enum HTMLEncoding : Sendable {
     /// - Returns: `String`/`StaticString`
     case string
 
-    /// - Returns: `[UInt8]`
+    /// - Returns: An array of `UInt8`
     case utf8Bytes
 
     /// - Returns: `ContiguousArray<CChar>`
     case utf8CString
 
-    /// - Returns: `[UInt16]`
+    /// - Returns: An array of `UInt16`
     case utf16Bytes
 
     /// - Returns: `Foundation.Data`

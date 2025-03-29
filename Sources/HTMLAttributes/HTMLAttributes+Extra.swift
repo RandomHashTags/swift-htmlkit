@@ -84,18 +84,18 @@ extension HTMLAttribute {
 extension HTMLAttribute.Extra {
     public static func parse(context: HTMLExpansionContext, expr: ExprSyntax) -> (any HTMLInitializable)? {
         func get<T : HTMLParsable>(_ type: T.Type) -> T? {
-            let inner_key:String, arguments:LabeledExprListSyntax
-            if let function:FunctionCallExprSyntax = expr.functionCall {
-                inner_key = function.calledExpression.memberAccess!.declName.baseName.text
+            let innerKey:String, arguments:LabeledExprListSyntax
+            if let function = expr.functionCall {
+                innerKey = function.calledExpression.memberAccess!.declName.baseName.text
                 arguments = function.arguments
-            } else if let member:MemberAccessExprSyntax = expr.memberAccess {
-                inner_key = member.declName.baseName.text
+            } else if let member = expr.memberAccess {
+                innerKey = member.declName.baseName.text
                 arguments = LabeledExprListSyntax()
             } else {
                 return nil
             }
-            var c:HTMLExpansionContext = context
-            c.key = inner_key
+            var c = context
+            c.key = innerKey
             c.arguments = arguments
             return T(context: c)
         }

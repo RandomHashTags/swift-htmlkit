@@ -17,11 +17,11 @@ enum InterpolationLookup {
 
     @MainActor
     static func find(context: HTMLExpansionContext, _ node: some ExprSyntaxProtocol, files: Set<String>) -> String? {
-        guard !files.isEmpty, let item:Item = item(context: context, node) else { return nil }
+        guard !files.isEmpty, let item = item(context: context, node) else { return nil }
         for file in files {
             if cached[file] == nil {
-                if let string:String = try? String.init(contentsOfFile: file, encoding: .utf8) {
-                    let parsed:CodeBlockItemListSyntax = Parser.parse(source: string).statements
+                if let string = try? String.init(contentsOfFile: file, encoding: .utf8) {
+                    let parsed = Parser.parse(source: string).statements
                     cached[file] = parsed
                 } else {
                     context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "fileNotFound", message: "Could not find file (\(file)) on disk, or was denied disk access (file access is always denied on macOS due to the macro being in a sandbox).", severity: .warning)))
@@ -32,7 +32,7 @@ enum InterpolationLookup {
         switch item {
         case .literal(let tokens):
             for (_, statements) in cached {
-                if let flattened:String = flatten(context: context, tokens: tokens, statements: statements) {
+                if let flattened = flatten(context: context, tokens: tokens, statements: statements) {
                     return flattened
                 }
             }
@@ -44,20 +44,20 @@ enum InterpolationLookup {
     }
 
     private static func item(context: HTMLExpansionContext, _ node: some ExprSyntaxProtocol) -> Item? {
-        if let function:FunctionCallExprSyntax = node.functionCall {
+        if let function = node.functionCall {
             var array:[String] = []
-            if let member:MemberAccessExprSyntax = function.calledExpression.memberAccess {
+            if let member = function.calledExpression.memberAccess {
                 array.append(contentsOf: test(member))
             }
             var parameters:[String] = []
             for argument in function.arguments {
-                if let string:String = argument.expression.stringLiteral?.string(encoding: context.encoding) {
+                if let string = argument.expression.stringLiteral?.string(encoding: context.encoding) {
                     parameters.append(string)
                 }
             }
             return .function(tokens: array, parameters: parameters)
-        } else if let member:MemberAccessExprSyntax = node.memberAccess {
-            let path:[String] = test(member)
+        } else if let member = node.memberAccess {
+            let path = test(member)
             return .literal(tokens: path)
         }
         return nil
@@ -65,9 +65,9 @@ enum InterpolationLookup {
     
     private static func test(_ member: MemberAccessExprSyntax) -> [String] {
         var array:[String] = []
-        if let base:MemberAccessExprSyntax = member.base?.memberAccess {
+        if let base = member.base?.memberAccess {
             array.append(contentsOf: test(base))
-        } else if let decl:DeclReferenceExprSyntax = member.base?.declRef {
+        } else if let decl = member.base?.declRef {
             array.append(decl.baseName.text)
         }
         array.append(member.declName.baseName.text)
@@ -85,63 +85,63 @@ private extension InterpolationLookup {
         for statement in statements {
             var index:Int = 0
             let item = statement.item
-            if let ext:ExtensionDeclSyntax = item.ext {
+            if let ext = item.ext {
                 if ext.extendedType.identifierType?.name.text == tokens[index] {
                     index += 1
                 }
                 for member in ext.memberBlock.members {
-                    if let string:String = parse_function(syntax: member.decl, tokens: tokens, index: index)
-                            ?? parse_enumeration(context: context, syntax: member.decl, tokens: tokens, index: index)
-                            ?? parse_variable(context: context, syntax: member.decl, tokens: tokens, index: index) {
+                    if let string = parseFunction(syntax: member.decl, tokens: tokens, index: index)
+                            ?? parseEnumeration(context: context, syntax: member.decl, tokens: tokens, index: index)
+                            ?? parseVariable(context: context, syntax: member.decl, tokens: tokens, index: index) {
                         return string
                     }
                 }
-            } else if let structure:StructDeclSyntax = item.structure {
+            } else if let structure = item.structure {
                 for member in structure.memberBlock.members {
-                    if let function:FunctionDeclSyntax = member.functionDecl, function.name.text == tokens[index], function.signature.returnClause?.type.as(IdentifierTypeSyntax.self)?.name.text == "StaticString" {
+                    if let function = member.functionDecl, function.name.text == tokens[index], function.signature.returnClause?.type.as(IdentifierTypeSyntax.self)?.name.text == "StaticString" {
                         index += 1
                         if let body = function.body {
                         }
                         index -= 1
                     }
                 }
-            } else if let enumeration:String = parse_enumeration(context: context, syntax: item, tokens: tokens, index: index) {
+            } else if let enumeration = parseEnumeration(context: context, syntax: item, tokens: tokens, index: index) {
                 return enumeration
-            } else if let variable:String = parse_variable(context: context, syntax: item, tokens: tokens, index: index) {
+            } else if let variable = parseVariable(context: context, syntax: item, tokens: tokens, index: index) {
                 return variable
             }
         }
         return nil
     }
     // MARK: Parse function
-    static func parse_function(syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
-        guard let function:FunctionDeclSyntax = syntax.functionDecl else { return nil }
+    static func parseFunction(syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+        guard let function = syntax.functionDecl else { return nil }
         return nil
     }
     // MARK: Parse enumeration
-    static func parse_enumeration(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+    static func parseEnumeration(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
         let allowed_inheritances:Set<String?> = ["String", "Int", "Double", "Float"]
-        guard let enumeration:EnumDeclSyntax = syntax.enumeration,
+        guard let enumeration = syntax.enumeration,
             enumeration.name.text == tokens[index]
         else {
             return nil
         }
         //print("InterpolationLookup;parse_enumeration;enumeration=\(enumeration.debugDescription)")
-        let value_type:String? = enumeration.inheritanceClause?.inheritedTypes.first(where: { allowed_inheritances.contains($0.type.identifierType?.name.text) })?.type.identifierType!.name.text
+        let valueType:String? = enumeration.inheritanceClause?.inheritedTypes.first(where: { allowed_inheritances.contains($0.type.identifierType?.name.text) })?.type.identifierType!.name.text
         var index:Int = index + 1
         for member in enumeration.memberBlock.members {
-            if let decl:EnumCaseDeclSyntax = member.decl.enumCaseDecl {
+            if let decl = member.decl.enumCaseDecl {
                 for element in decl.elements {
-                    if let enum_case:EnumCaseElementSyntax = element.enumCaseElem, enum_case.name.text == tokens[index] {
+                    if let enumCase = element.enumCaseElem, enumCase.name.text == tokens[index] {
                         index += 1
-                        let case_name:String = enum_case.name.text
+                        let caseName = enumCase.name.text
                         if index == tokens.count {
-                            return case_name
+                            return caseName
                         }
-                        switch value_type {
-                        case "String":          return enum_case.rawValue?.value.stringLiteral!.string(encoding: context.encoding) ?? case_name
-                        case "Int":             return enum_case.rawValue?.value.integerLiteral!.literal.text ?? case_name
-                        case "Double", "Float": return enum_case.rawValue?.value.floatLiteral!.literal.text ?? case_name
+                        switch valueType {
+                        case "String":          return enumCase.rawValue?.value.stringLiteral!.string(encoding: context.encoding) ?? caseName
+                        case "Int":             return enumCase.rawValue?.value.integerLiteral!.literal.text ?? caseName
+                        case "Double", "Float": return enumCase.rawValue?.value.floatLiteral!.literal.text ?? caseName
                         default:
                             // TODO: check body (can have nested enums)
                             break
@@ -153,10 +153,10 @@ private extension InterpolationLookup {
         return nil
     }
     // MARK: Parse variable
-    static func parse_variable(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
+    static func parseVariable(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
         guard let variable:VariableDeclSyntax = syntax.variableDecl else { return nil }
         for binding in variable.bindings {
-            if binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text == tokens[index], let initializer:InitializerClauseSyntax = binding.initializer {
+            if binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text == tokens[index], let initializer = binding.initializer {
                 return initializer.value.stringLiteral?.string(encoding: context.encoding)
                         ?? initializer.value.integerLiteral?.literal.text
                         ?? initializer.value.floatLiteral?.literal.text

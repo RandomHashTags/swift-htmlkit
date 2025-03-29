@@ -27,7 +27,7 @@ public struct HTMLExpansionContext : @unchecked Sendable {
     /// Complete file paths used for looking up interpolation (when trying to promote to an equivalent `StaticString`).
     public var lookupFiles:Set<String>
 
-    public let ignoresCompilerWarnings:Bool
+    public package(set) var ignoresCompilerWarnings:Bool
 
     public init(
         context: MacroExpansionContext,

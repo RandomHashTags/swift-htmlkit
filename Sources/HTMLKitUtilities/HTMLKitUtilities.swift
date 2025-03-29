@@ -22,7 +22,7 @@ extension String {
     /// - Returns: A new `String` escaping source-breaking HTML.
     @inlinable
     public func escapingHTML(escapeAttributes: Bool) -> String {
-        var string:String = self
+        var string = self
         string.escapeHTML(escapeAttributes: escapeAttributes)
         return string
     }
@@ -46,7 +46,7 @@ extension String {
     /// - Returns: A new `String` escaping source-breaking HTML attribute characters.
     @inlinable
     public func escapingHTMLAttributes() -> String {
-        var string:String = self
+        var string = self
         string.escapeHTMLAttributes()
         return string
     }
@@ -80,7 +80,7 @@ extension SyntaxChildren.Element {
 extension StringLiteralExprSyntax {
     package func string(encoding: HTMLEncoding) -> String {
         if openingQuote.debugDescription.hasPrefix("multilineStringQuote") {
-            var value:String = segments.compactMap({ $0.as(StringSegmentSyntax.self)?.content.text }).joined()
+            var value = segments.compactMap({ $0.as(StringSegmentSyntax.self)?.content.text }).joined()
             switch encoding {
             case .string:
                 value.replace("\n", with: "\\n")

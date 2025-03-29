@@ -1,8 +1,8 @@
 //
-//  EscapeHTML.swift
+//  RawHTML.swift
 //
 //
-//  Created by Evan Anderson on 11/23/24.
+//  Created by Evan Anderson on 3/29/25.
 //
 
 import HTMLKitParse
@@ -10,9 +10,9 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-enum EscapeHTML : ExpressionMacro {
+enum RawHTML : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         let c = HTMLExpansionContext(context: context, expansion: node.as(ExprSyntax.self)!.macroExpansion!, ignoresCompilerWarnings: false, encoding: .string, key: "", arguments: node.arguments)
-        return "\"\(raw: HTMLKitUtilities.escapeHTML(context: c))\""
+        return "\"\(raw: HTMLKitUtilities.rawHTML(context: c))\""
     }
 }

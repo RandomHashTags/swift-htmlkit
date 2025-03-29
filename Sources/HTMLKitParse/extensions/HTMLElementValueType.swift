@@ -11,20 +11,20 @@ import HTMLKitUtilities
 import SwiftSyntax
 
 extension HTMLElementValueType {
-    package static func parse_element(context: HTMLExpansionContext, _ function: FunctionCallExprSyntax) -> HTMLElement? {
-        var context:HTMLExpansionContext = context
-        let called_expression:ExprSyntax = function.calledExpression
+    package static func parseElement(context: HTMLExpansionContext, _ function: FunctionCallExprSyntax) -> HTMLElement? {
+        var context = context
+        let called_expression = function.calledExpression
         let key:String
-        if let member:MemberAccessExprSyntax = called_expression.memberAccess, member.base?.declRef?.baseName.text == "HTMLKit" {
+        if let member = called_expression.memberAccess, member.base?.declRef?.baseName.text == "HTMLKit" {
             key = member.declName.baseName.text
-        } else if let ref:DeclReferenceExprSyntax = called_expression.declRef {
+        } else if let ref = called_expression.declRef {
             key = ref.baseName.text
         } else {
             return nil
         }
         context.arguments = function.arguments
         func get<T: HTMLElement>(_ bruh: T.Type) -> T {
-            let data:HTMLKitUtilities.ElementData = HTMLKitUtilities.parseArguments(context: context, otherAttributes: T.otherAttributes)
+            let data = HTMLKitUtilities.parseArguments(context: context, otherAttributes: T.otherAttributes)
             return T(context.encoding, data)
         }
         switch key {

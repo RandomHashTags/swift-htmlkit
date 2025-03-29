@@ -48,9 +48,9 @@ public struct custom : HTMLElement {
 
     @inlinable
     public var description : String {
-        let attributes_string:String = self.attributes.compactMap({
-            guard let v:String = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }
-            let delimiter:String = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)
+        let attributesString = self.attributes.compactMap({
+            guard let v = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }
+            let delimiter = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)
             return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=\(delimiter)\(v)\(delimiter)")
         }).joined(separator: " ")
         let l:String, g:String
@@ -61,6 +61,6 @@ public struct custom : HTMLElement {
             l = "<"
             g = ">"
         }
-        return l + tag + (isVoid && trailingSlash ? " /" : "") + g + (attributes_string.isEmpty ? "" : " " + attributes_string) + (isVoid ? "" : l + "/" + tag + g)
+        return l + tag + (isVoid && trailingSlash ? " /" : "") + g + (attributesString.isEmpty ? "" : " " + attributesString) + (isVoid ? "" : l + "/" + tag + g)
     }
 }

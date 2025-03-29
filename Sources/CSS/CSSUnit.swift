@@ -88,7 +88,7 @@ public enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/cs
             .viewportMax(let v),
             .percent(let v):
             guard let v:Float = v else { return nil }
-            var s:String = String(describing: v)
+            var s = String(describing: v)
             while s.last == "0" {
                 s.removeLast()
             }
@@ -131,7 +131,7 @@ extension CSSUnit : HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         func float() -> Float? {
             guard let expression:ExprSyntax = context.expression,
-                    let s:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text
+                    let s = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text
             else {
                 return nil
             }

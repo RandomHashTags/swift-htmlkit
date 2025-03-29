@@ -16,12 +16,12 @@ import Foundation
 import HTMLKit
 import Testing
 
-extension [UInt8] {
+extension Collection where Element == UInt8 {
     static func == (left: Self, right: String) -> Bool {
         return String(decoding: left, as: UTF8.self) == right
     }
 }
-extension [UInt16] {
+extension Collection where Element == UInt16 {
     static func == (left: Self, right: String) -> Bool {
         return String(decoding: left, as: UTF16.self) == right
     }
@@ -32,18 +32,18 @@ struct EncodingTests {
 
     // MARK: utf8Array
     @Test func encodingUTF8Array() {
-        var expected_result:String = #html(option(attributes: [.class(["row"])], value: "wh'at?"))
+        var expected:String = #html(option(attributes: [.class(["row"])], value: "wh'at?"))
         var uint8Array:[UInt8] = #html(encoding: .utf8Bytes,
             option(attributes: [.class(["row"])], value: "wh'at?")
         )
-        #expect(uint8Array == expected_result)
+        #expect(uint8Array == expected)
         #expect(uint8Array.firstIndex(of: backslash) == nil)
 
-        expected_result = #html(div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))]))
+        expected = #html(div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))]))
         uint8Array = #html(encoding: .utf8Bytes,
             div(attributes: [.htmx(.request(js: false, timeout: nil, credentials: "true", noHeaders: nil))])
         )
-        #expect(uint8Array == expected_result)
+        #expect(uint8Array == expected)
         #expect(uint8Array.firstIndex(of: backslash) == nil)
 
         uint8Array = #html(encoding: .utf8Bytes,
@@ -62,12 +62,12 @@ struct EncodingTests {
 
         // MARK: foundationData
         @Test func encodingFoundationData() {
-            let expected_result:String = #html(option(attributes: [.class(["row"])], value: "what?"))
+            let expected:String = #html(option(attributes: [.class(["row"])], value: "what?"))
 
             let foundationData:Data = #html(encoding: .foundationData,
                 option(attributes: [.class(["row"])], value: "what?")
             )
-            #expect(foundationData == expected_result.data(using: .utf8))
+            #expect(foundationData == expected.data(using: .utf8))
             #expect(foundationData.firstIndex(of: backslash) == nil)
         }
 
@@ -75,11 +75,11 @@ struct EncodingTests {
 
     // MARK: custom
     @Test func encodingCustom() {
-        let expected_result:String = "<option class=!row! value=!bro!></option>"
+        let expected:String = "<option class=!row! value=!bro!></option>"
         let result:String = #html(encoding: .custom(#""$0""#, stringDelimiter: "!"),
             option(attributes: [.class(["row"])], value: "bro")
         )
-        #expect(result == expected_result)
+        #expect(result == expected)
     }
 }
 

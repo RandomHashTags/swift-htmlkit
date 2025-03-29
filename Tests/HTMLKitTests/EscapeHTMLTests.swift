@@ -21,42 +21,42 @@ struct EscapeHTMLTests {
 
     // MARK: macro
     @Test func escapeHTML() {
-        var expected_result:String = "&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;"
-        var escaped:String = #escapeHTML(html("Test"))
-        #expect(escaped == expected_result)
+        var expected = "&lt;!DOCTYPE html&gt;&lt;html&gt;Test&lt;/html&gt;"
+        var escaped = #escapeHTML(html("Test"))
+        #expect(escaped == expected)
 
         escaped = #html(#escapeHTML(html("Test")))
-        #expect(escaped == expected_result)
+        #expect(escaped == expected)
 
-        expected_result = #escapeHTML("<>\"")
+        expected = #escapeHTML("<>\"")
         escaped = #escapeHTML(encoding: .utf8Bytes, "<>\"")
-        #expect(escaped == expected_result)
+        #expect(escaped == expected)
 
-        expected_result = #escapeHTML("<>\"")
+        expected = #escapeHTML("<>\"")
         escaped = #escapeHTML(encoding: .utf16Bytes, "<>\"")
-        #expect(escaped == expected_result)
+        #expect(escaped == expected)
 
-        expected_result = #escapeHTML("<>\"")
+        expected = #escapeHTML("<>\"")
         escaped = #escapeHTML(encoding: .utf8CString, "<>\"")
-        #expect(escaped == expected_result)
+        #expect(escaped == expected)
 
-        expected_result = #escapeHTML("<>\"")
+        expected = #escapeHTML("<>\"")
         escaped = #escapeHTML(encoding: .foundationData, "<>\"")
-        #expect(escaped == expected_result)
+        #expect(escaped == expected)
 
-        expected_result = #escapeHTML("<>\"")
+        expected = #escapeHTML("<>\"")
         escaped = #escapeHTML(encoding: .byteBuffer, "<>\"")
-        #expect(escaped == expected_result)
+        #expect(escaped == expected)
     }
     
     // MARK: string
     @Test func escapeEncodingString() throws {
         let unescaped:String = #html(html("Test"))
         let escaped:String = #escapeHTML(html("Test"))
-        var expected_result:String = "<p>\(escaped)</p>"
+        var expected:String = "<p>\(escaped)</p>"
 
         var string:String = #html(p("<!DOCTYPE html><html>Test</html>"))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #escapeHTML("<!DOCTYPE html><html>Test</html>")
         #expect(string == escaped)
@@ -65,79 +65,79 @@ struct EscapeHTMLTests {
         #expect(string == escaped)
 
         string = #html(p(#escapeHTML(html("Test"))))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(p(unescaped.escapingHTML(escapeAttributes: false)))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
-        expected_result = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
+        expected = "<div title=\"&lt;p&gt;\">&lt;p&gt;&lt;/p&gt;</div>"
         string = #html(div(attributes: [.title("<p>")], StaticString("<p></p>")))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(attributes: [.title("<p>")], "<p></p>"))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(p("What's 9 + 10? \"21\"!"))
         #expect(string == "<p>What&#39s 9 + 10? &quot;21&quot;!</p>")
 
         string = #html(option(value: "bad boy <html>"))
-        expected_result = "<option value=\"bad boy &lt;html&gt;\"></option>"
-        #expect(string == expected_result)
+        expected = "<option value=\"bad boy &lt;html&gt;\"></option>"
+        #expect(string == expected)
     }
 
     // MARK: utf8Array
     @Test func escapeEncodingUTF8Array() {
-        var expected_result:String = #html(option(value: "juice WRLD <<<&>>> 999"))
+        var expected:String = #html(option(value: "juice WRLD <<<&>>> 999"))
         var value:[UInt8] = #html(encoding: .utf8Bytes, option(value: "juice WRLD <<<&>>> 999"))
-        #expect(value == expected_result)
+        #expect(value == expected)
         #expect(value.firstIndex(of: backslash) == nil)
 
-        expected_result = #html(option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
+        expected = #html(option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
         value = #html(encoding: .utf8Bytes, option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
-        #expect(value == expected_result)
+        #expect(value == expected)
         #expect(value.firstIndex(of: backslash) == nil)
 
-        expected_result = #html(div(attributes: [.id("test")]))
+        expected = #html(div(attributes: [.id("test")]))
         value = #html(encoding: .utf8Bytes, div(attributes: [.id("test")]))
-        #expect(value == expected_result)
+        #expect(value == expected)
         #expect(value.firstIndex(of: backslash) == nil)
     }
 
     // MARK: utf16Array
     @Test func escapeEncodingUTF16Array() {
         let backslash:UInt16 = UInt16(backslash)
-        var expected_result:String = #html(option(value: "juice WRLD <<<&>>> 999"))
+        var expected:String = #html(option(value: "juice WRLD <<<&>>> 999"))
         var value:[UInt16] = #html(encoding: .utf16Bytes, option(value: "juice WRLD <<<&>>> 999"))
-        #expect(value == expected_result)
+        #expect(value == expected)
         #expect(value.firstIndex(of: backslash) == nil)
 
-        expected_result = #html(option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
+        expected = #html(option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
         value = #html(encoding: .utf16Bytes, option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
-        #expect(value == expected_result)
+        #expect(value == expected)
         #expect(value.firstIndex(of: backslash) == nil)
 
-        expected_result = #html(div(attributes: [.id("test")]))
+        expected = #html(div(attributes: [.id("test")]))
         value = #html(encoding: .utf16Bytes, div(attributes: [.id("test")]))
-        #expect(value == expected_result)
+        #expect(value == expected)
         #expect(value.firstIndex(of: backslash) == nil)
     }
 
     #if canImport(FoundationEssentials) || canImport(Foundation)
     // MARK: data
     @Test func escapeEncodingData() {
-        var expected_result:String = #html(option(value: "juice WRLD <<<&>>> 999"))
+        var expected:String = #html(option(value: "juice WRLD <<<&>>> 999"))
         var value:Data = #html(encoding: .foundationData, option(value: "juice WRLD <<<&>>> 999"))
-        #expect(String(data: value, encoding: .utf8) == expected_result)
+        #expect(String(data: value, encoding: .utf8) == expected)
         #expect(value.firstIndex(of: backslash) == nil)
 
-        expected_result = #html(option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
+        expected = #html(option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
         value = #html(encoding: .foundationData, option(#escapeHTML(option(value: "juice WRLD <<<&>>> 999"))))
-        #expect(String(data: value, encoding: .utf8) == expected_result)
+        #expect(String(data: value, encoding: .utf8) == expected)
         #expect(value.firstIndex(of: backslash) == nil)
 
-        expected_result = #html(div(attributes: [.id("test")]))
+        expected = #html(div(attributes: [.id("test")]))
         value = #html(encoding: .foundationData, div(attributes: [.id("test")]))
-        #expect(String(data: value, encoding: .utf8) == expected_result)
+        #expect(String(data: value, encoding: .utf8) == expected)
         #expect(value.firstIndex(of: backslash) == nil)
     }
     #endif

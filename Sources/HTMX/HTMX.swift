@@ -109,8 +109,8 @@ public enum HTMXAttribute : HTMLInitializable {
         case .encoding(let value): return value
         case .ext(let value): return value
         case .headers(let js, let headers):
-            let delimiter:String = encoding.stringDelimiter(forMacro: forMacro)
-            let value:String = headers.map({ item in
+            let delimiter = encoding.stringDelimiter(forMacro: forMacro)
+            let value = headers.map({ item in
                 delimiter + item.key + delimiter + ":" + delimiter + item.value + delimiter
             }).joined(separator: ",")
             return (js ? "js:" : "") + "{" + value + "}"
@@ -126,12 +126,12 @@ public enum HTMXAttribute : HTMLInitializable {
         case .put(let value): return value
         case .replaceURL(let url): return url?.htmlValue(encoding: encoding, forMacro: forMacro)
         case .request(let js, let timeout, let credentials, let noHeaders):
-            let delimiter:String = encoding.stringDelimiter(forMacro: forMacro)
-            if let timeout:String = timeout {
+            let delimiter = encoding.stringDelimiter(forMacro: forMacro)
+            if let timeout = timeout {
                 return js ? "js: timeout:\(timeout)" : "{" + delimiter + "timeout" + delimiter + ":\(timeout)}"
-            } else if let credentials:String = credentials {
+            } else if let credentials = credentials {
                 return js ? "js: credentials:\(credentials)" : "{" + delimiter + "credentials" + delimiter + ":\(credentials)}"
-            } else if let noHeaders:String = noHeaders {
+            } else if let noHeaders = noHeaders {
                 return js ? "js: noHeaders:\(noHeaders)" : "{" + delimiter + "noHeaders" + delimiter + ":\(noHeaders)}"
             } else {
                 return ""

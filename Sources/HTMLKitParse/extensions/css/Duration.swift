@@ -15,7 +15,7 @@ extension CSSStyle.Duration : HTMLParsable {
         case "inherit": self = .inherit
         case "initial": self = .initial
         case "ms": self = .ms(context.int())
-        case "multiple": self = .multiple(context.array_enumeration() ?? [])
+        case "multiple": self = .multiple(context.arrayEnumeration() ?? [])
         case "revert": self = .revert
         case "revertLayer": self = .revertLayer
         case "s": self = .s(context.float())

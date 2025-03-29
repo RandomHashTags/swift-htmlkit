@@ -175,8 +175,8 @@ extension CSSStyle {
             switch self {
             case .hex(let hex): return "#" + hex
             case .rgb(let r, let g, let b, let a):
-                var string:String = "rbg(\(r),\(g),\(b)"
-                if let a:Swift.Float = a {
+                var string = "rbg(\(r),\(g),\(b)"
+                if let a {
                     string += ",\(a)"
                 }
                 return string + ")"

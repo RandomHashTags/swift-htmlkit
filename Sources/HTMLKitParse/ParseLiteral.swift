@@ -12,39 +12,39 @@ import SwiftSyntax
 
 extension HTMLKitUtilities {
     // MARK: Parse Literal Value
-    static func parse_literal_value(
+    static func parseLiteralValue(
         context: HTMLExpansionContext,
         expression: ExprSyntax
     ) -> LiteralReturnType? {
-        if let boolean:String = expression.booleanLiteral?.literal.text {
+        if let boolean = expression.booleanLiteral?.literal.text {
             return .boolean(boolean == "true")
         }
-        if let string:String = expression.integerLiteral?.literal.text {
+        if let string = expression.integerLiteral?.literal.text {
             return .int(Int(string)!)
         }
-        if let string:String = expression.floatLiteral?.literal.text {
+        if let string = expression.floatLiteral?.literal.text {
             return .float(Float(string)!)
         }
-        guard var returnType:LiteralReturnType = extract_literal(context: context, expression: expression) else {
+        guard var returnType = extractLiteral(context: context, expression: expression) else {
             return nil
         }
         guard returnType.isInterpolation else { return returnType }
-        var remaining_interpolation:Int = 1
+        var remainingInterpolation:Int = 1
         var string:String
-        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
-            remaining_interpolation = 0
+        if let stringLiteral = expression.stringLiteral {
+            remainingInterpolation = 0
             var interpolation:[ExpressionSegmentSyntax] = []
             var segments:[any (SyntaxProtocol & SyntaxHashable)] = []
             for segment in stringLiteral.segments {
                 segments.append(segment)
-                if let expression:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
+                if let expression = segment.as(ExpressionSegmentSyntax.self) {
                     interpolation.append(expression)
                 }
-                remaining_interpolation += segment.is(StringSegmentSyntax.self) ? 0 : 1
+                remainingInterpolation += segment.is(StringSegmentSyntax.self) ? 0 : 1
             }
             var minimum:Int = 0
             for expr in interpolation {
-                let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: expr)
+                let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remainingInterpolation: &remainingInterpolation, expr: expr)
                 for (i, segment) in segments.enumerated() {
                     if i >= minimum && segment.as(ExpressionSegmentSyntax.self) == expr {
                         segments.remove(at: i)
@@ -56,26 +56,26 @@ extension HTMLKitUtilities {
             }
             string = segments.map({ "\($0)" }).joined()
         } else {
-            if let function:FunctionCallExprSyntax = expression.functionCall {
-                warn_interpolation(context: context, node: function.calledExpression)
+            if let function = expression.functionCall {
+                warnInterpolation(context: context, node: function.calledExpression)
             } else {
-                warn_interpolation(context: context, node: expression)
+                warnInterpolation(context: context, node: expression)
             }
-            if let member:MemberAccessExprSyntax = expression.memberAccess {
+            if let member = expression.memberAccess {
                 string = "\\(" + member.singleLineDescription + ")"
             } else {
-                var expression_string:String = "\(expression)"
-                while expression_string.first?.isWhitespace ?? false {
-                    expression_string.removeFirst()
+                var expressionString = "\(expression)"
+                while expressionString.first?.isWhitespace ?? false {
+                    expressionString.removeFirst()
                 }
-                while expression_string.last?.isWhitespace ?? false {
-                    expression_string.removeLast()
+                while expressionString.last?.isWhitespace ?? false {
+                    expressionString.removeLast()
                 }
-                string = "\" + String(describing: " + expression_string + ") + \""
+                string = "\" + String(describing: " + expressionString + ") + \""
             }
         }
-        // TODO: promote interpolation via lookupFiles here (remove `warn_interpolation` above and from `promoteInterpolation`)
-        if remaining_interpolation > 0 {
+        // TODO: promote interpolation via lookupFiles here (remove `warnInterpolation` above and from `promoteInterpolation`)
+        if remainingInterpolation > 0 {
             returnType = .interpolation(string)
         } else {
             returnType = .string(string)
@@ -85,34 +85,34 @@ extension HTMLKitUtilities {
     // MARK: Promote Interpolation
     static func promoteInterpolation(
         context: HTMLExpansionContext,
-        remaining_interpolation: inout Int,
+        remainingInterpolation: inout Int,
         expr: ExpressionSegmentSyntax
     ) -> [any (SyntaxProtocol & SyntaxHashable)] {
         func create(_ string: String) -> StringLiteralExprSyntax {
-            var s:StringLiteralExprSyntax = StringLiteralExprSyntax(content: string)
+            var s = StringLiteralExprSyntax(content: string)
             s.openingQuote = TokenSyntax(stringLiteral: "")
             s.closingQuote = TokenSyntax(stringLiteral: "")
             return s
         }
         func interpolate(_ syntax: ExprSyntaxProtocol) -> ExpressionSegmentSyntax {
-            var list:LabeledExprListSyntax = LabeledExprListSyntax()
+            var list = LabeledExprListSyntax()
             list.append(LabeledExprSyntax(expression: syntax))
             return ExpressionSegmentSyntax(expressions: list)
         }
         var values:[any (SyntaxProtocol & SyntaxHashable)] = []
         for element in expr.expressions {
-            let expression:ExprSyntax = element.expression
-            if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
-                let segments:StringLiteralSegmentListSyntax = stringLiteral.segments
+            let expression = element.expression
+            if let stringLiteral = expression.stringLiteral {
+                let segments = stringLiteral.segments
                 if segments.count(where: { $0.is(StringSegmentSyntax.self) }) == segments.count {
-                    remaining_interpolation -= 1
+                    remainingInterpolation -= 1
                     values.append(create(stringLiteral.string(encoding: context.encoding)))
                 } else {
                     for segment in segments {
-                        if let literal:String = segment.as(StringSegmentSyntax.self)?.content.text {
+                        if let literal = segment.as(StringSegmentSyntax.self)?.content.text {
                             values.append(create(literal))
-                        } else if let interpolation:ExpressionSegmentSyntax = segment.as(ExpressionSegmentSyntax.self) {
-                            let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remaining_interpolation: &remaining_interpolation, expr: interpolation)
+                        } else if let interpolation = segment.as(ExpressionSegmentSyntax.self) {
+                            let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remainingInterpolation: &remainingInterpolation, expr: interpolation)
                             values.append(contentsOf: promotions)
                         } else {
                             context.context.diagnose(Diagnostic(node: segment, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")")))
@@ -120,40 +120,40 @@ extension HTMLKitUtilities {
                         }
                     }
                 }
-            } else if let fix:String = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
-                remaining_interpolation -= 1
+            } else if let fix = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text {
+                remainingInterpolation -= 1
                 values.append(create(fix))
             } else {
                 //if let decl:DeclReferenceExprSyntax = expression.declRef {
                     // TODO: lookup and try to promote | need to wait for swift-syntax to update to access SwiftLexicalLookup
                 //}
                 values.append(interpolate(expression))
-                warn_interpolation(context: context, node: expression)
+                warnInterpolation(context: context, node: expression)
             }
         }
         return values
     }
     // MARK: Extract Literal
-    static func extract_literal(
+    static func extractLiteral(
         context: HTMLExpansionContext,
         expression: ExprSyntax
     ) -> LiteralReturnType? {
-        if let _:NilLiteralExprSyntax = expression.as(NilLiteralExprSyntax.self) {
+        if let _ = expression.as(NilLiteralExprSyntax.self) {
             return nil
         }
-        if let stringLiteral:StringLiteralExprSyntax = expression.stringLiteral {
-            let string:String = stringLiteral.string(encoding: context.encoding)
+        if let stringLiteral = expression.stringLiteral {
+            let string = stringLiteral.string(encoding: context.encoding)
             if stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 {
                 return .string(string)
             } else {
                 return .interpolation(string)
             }
         }
-        if let function:FunctionCallExprSyntax = expression.functionCall {
-            if let decl:String = function.calledExpression.declRef?.baseName.text {
+        if let function = expression.functionCall {
+            if let decl = function.calledExpression.declRef?.baseName.text {
                 switch decl {
                 case "StaticString":
-                    let string:String = function.arguments.first!.expression.stringLiteral!.string(encoding: context.encoding)
+                    let string = function.arguments.first!.expression.stringLiteral!.string(encoding: context.encoding)
                     return .string(string)
                 default:
                     break
@@ -164,7 +164,7 @@ extension HTMLKitUtilities {
         if expression.memberAccess != nil || expression.is(ForceUnwrapExprSyntax.self) {
             return .interpolation("\(expression)")
         }
-        if let array:ArrayExprSyntax = expression.array {
+        if let array = expression.array {
             let separator:String
             switch context.key {
             case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
@@ -176,9 +176,9 @@ extension HTMLKitUtilities {
             }
             var results:[Sendable] = []
             for element in array.elements {
-                if let attribute:any HTMLInitializable = HTMLAttribute.Extra.parse(context: context, expr: element.expression) {
+                if let attribute = HTMLAttribute.Extra.parse(context: context, expr: element.expression) {
                     results.append(attribute)
-                } else if let literal:LiteralReturnType = parse_literal_value(context: context, expression: element.expression) {
+                } else if let literal = parseLiteralValue(context: context, expression: element.expression) {
                     switch literal {
                     case .string(let string), .interpolation(let string):
                         if string.contains(separator) {
@@ -195,8 +195,8 @@ extension HTMLKitUtilities {
             }
             return .array(results)
         }
-        if let decl:DeclReferenceExprSyntax = expression.declRef {
-            warn_interpolation(context: context, node: expression)
+        if let decl = expression.declRef {
+            warnInterpolation(context: context, node: expression)
             return .interpolation(decl.baseName.text)
         }
         return nil
@@ -219,14 +219,24 @@ public enum LiteralReturnType {
         }
     }
 
-    public func value(key: String) -> String? {
+    /// - Parameters:
+    ///   - key: Attribute key associated with the value.
+    ///   - escape: Whether or not to escape source-breaking HTML characters.
+    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters.
+    public func value(
+        key: String,
+        escape: Bool = true,
+        escapeAttributes: Bool = true
+    ) -> String? {
         switch self {
         case .boolean(let b): return b ? key : nil
         case .string(var string):
             if string.isEmpty && key == "attributionsrc" {
                 return ""
             }
-            string.escapeHTML(escapeAttributes: true)
+            if escape {
+                string.escapeHTML(escapeAttributes: escapeAttributes)
+            }
             return string
         case .int(let int):
             return String(describing: int)
@@ -242,7 +252,7 @@ public enum LiteralReturnType {
     public func escapeArray() -> LiteralReturnType {
         switch self {
         case .array(let a):
-            if let array_string:[String] = a as? [String] {
+            if let array_string = a as? [String] {
                 return .array(array_string.map({ $0.escapingHTML(escapeAttributes: true) }))
             }
             return .array(a)
@@ -255,7 +265,7 @@ public enum LiteralReturnType {
 // MARK: Misc
 extension MemberAccessExprSyntax {
     var singleLineDescription : String {
-        var string:String = "\(self)"
+        var string = "\(self)"
         string.removeAll { $0.isWhitespace }
         return string
     }

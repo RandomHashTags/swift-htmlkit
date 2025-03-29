@@ -32,9 +32,9 @@ enum HTMLElements : DeclarationMacro {
         ]
 
         for item in dictionary {
-            let element:String = item.key.as(MemberAccessExprSyntax.self)!.declName.baseName.text
-            let is_void:Bool = void_elements.contains(element)
-            var tag:String = element
+            let element = item.key.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+            let isVoid = void_elements.contains(element)
+            var tag = element
             if element == "variable" {
                 tag = "var"
             }
@@ -45,22 +45,22 @@ enum HTMLElements : DeclarationMacro {
             public var innerHTML:[CustomStringConvertible & Sendable]
             private var encoding:HTMLEncoding = .string
             private var fromMacro:Bool = false
-            public let isVoid:Bool = \(is_void)
+            public let isVoid:Bool = \(isVoid)
             public var trailingSlash:Bool = false
             public var escaped:Bool = false
             """
 
-            var initializers:String = ""
-            var attribute_declarations:String = ""
+            var initializers = ""
+            var attribute_declarations = ""
             var attributes:[(String, String, String)] = []
             var other_attributes:[(String, String)] = []
             if let test = item.value.as(ArrayExprSyntax.self)?.elements {
                 attributes.reserveCapacity(test.count)
                 for element in test {
-                    var key:String = ""
+                    var key = ""
                     let tuple = element.expression.as(TupleExprSyntax.self)!
                     for attribute_element in tuple.elements {
-                        let label:LabeledExprSyntax = attribute_element
+                        let label = attribute_element
                         if let key_element = label.expression.as(StringLiteralExprSyntax.self) {
                             key = "\(key_element)"
                             key.removeFirst()
@@ -72,7 +72,7 @@ enum HTMLElements : DeclarationMacro {
                                 break
                             }
                         } else {
-                            var isArray:Bool = false
+                            var isArray = false
                             let (value_type, default_value, value_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, label.expression)
                             switch value_type_literal {
                             case .otherAttribute(let other):
@@ -87,7 +87,7 @@ enum HTMLElements : DeclarationMacro {
                 }
             }
             if !other_attributes.isEmpty {
-                let oa:String = other_attributes.map({ "\"" + $0.0 + "\":\"" + $0.1 + "\"" }).joined(separator: ",")
+                let oa = other_attributes.map({ "\"" + $0.0 + "\":\"" + $0.1 + "\"" }).joined(separator: ",")
                 string += "\npublic static let otherAttributes:[String:String] = [" + oa + "]\n"
             }
             string += attribute_declarations
@@ -100,7 +100,7 @@ enum HTMLElements : DeclarationMacro {
             initializers += "_ innerHTML: CustomStringConvertible & Sendable...\n) {\n"
             initializers += "self.attributes = attributes\n"
             for (key, _, _) in attributes {
-                var key_literal:String = key
+                var key_literal = key
                 if key_literal.first == "`" {
                     key_literal.removeFirst()
                     key_literal.removeLast()
@@ -112,17 +112,17 @@ enum HTMLElements : DeclarationMacro {
             initializers += "public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {\n"
             initializers += "self.encoding = encoding\n"
             initializers += "self.fromMacro = true\n"
-            if is_void {
+            if isVoid {
                 initializers += "self.trailingSlash = data.trailingSlash\n"
             }
             initializers += "self.attributes = data.globalAttributes\n"
             for (key, value_type, _) in attributes {
-                var key_literal:String = key
+                var key_literal = key
                 if key_literal.first == "`" {
                     key_literal.removeFirst()
                     key_literal.removeLast()
                 }
-                var value:String = "as? \(value_type)"
+                var value = "as? \(value_type)"
                 switch value_type {
                 case "Bool":
                     value += " ?? false"
@@ -135,8 +135,8 @@ enum HTMLElements : DeclarationMacro {
             initializers += "}"
             string += initializers
 
-            var render:String = "\npublic var description : String {\n"
-            var attributes_func:String = "func attributes() -> String {\n"
+            var render = "\npublic var description : String {\n"
+            var attributes_func = "func attributes() -> String {\n"
             if !attributes.isEmpty {
                 attributes_func += "let sd:String = encoding.stringDelimiter(forMacro: fromMacro)\n"
                 attributes_func += "var"
@@ -149,12 +149,12 @@ enum HTMLElements : DeclarationMacro {
             attributes_func += #"return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=" + d + v + d)"#
             attributes_func += "\n})\n"
             for (key, value_type, _) in attributes {
-                var key_literal:String = key
+                var key_literal = key
                 if key_literal.first == "`" {
                     key_literal.removeFirst()
                     key_literal.removeLast()
                 }
-                let variable_name:String = key_literal
+                let variable_name = key_literal
                 if key_literal == "httpEquiv" {
                     key_literal = "http-equiv"
                 } else if key_literal == "acceptCharset" {
@@ -164,7 +164,7 @@ enum HTMLElements : DeclarationMacro {
                     attributes_func += "if \(key) { items.append(\"\(key_literal)\") }\n"
                 } else if value_type.first == "[" {
                     attributes_func += "if let _\(variable_name):String = "
-                    let separator:String = separator(key: key)
+                    let separator = separator(key: key)
                     switch value_type {
                     case "[String]":
                         attributes_func += "\(key)?"
@@ -178,12 +178,12 @@ enum HTMLElements : DeclarationMacro {
                     attributes_func += "\nitems.append(\"\(key_literal)\" + k)"
                     attributes_func += "\n}\n"
                 } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
-                    let value:String = value_type == "String" ? key : "String(describing: \(key))"
+                    let value = value_type == "String" ? key : "String(describing: \(key))"
                     attributes_func += #"if let \#(key) { items.append("\#(key_literal)=" + sd + \#(value) + sd) }"#
                     attributes_func += "\n"
                 } else {
-                    attributes_func += "if let \(key), let v:String = \(key).htmlValue(encoding: encoding, forMacro: fromMacro) {\n"
-                    attributes_func += #"let s:String = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=" + sd + v + sd"#
+                    attributes_func += "if let \(key), let v = \(key).htmlValue(encoding: encoding, forMacro: fromMacro) {\n"
+                    attributes_func += #"let s = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=" + sd + v + sd"#
                     attributes_func += "\nitems.append(\"\(key_literal)\" + s)"
                     attributes_func += "\n}\n"
                 }
@@ -191,7 +191,7 @@ enum HTMLElements : DeclarationMacro {
             attributes_func += "return (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"
             render += attributes_func
             render += "let string:String = innerHTML.map({ String(describing: $0) }).joined()\n"
-            let trailing_slash:String = is_void ? " + (trailingSlash ? \" /\" : \"\")" : ""
+            let trailing_slash = isVoid ? " + (trailingSlash ? \" /\" : \"\")" : ""
             render += """
             let l:String, g:String
             if escaped {
@@ -202,7 +202,7 @@ enum HTMLElements : DeclarationMacro {
                 g = ">"
             }
             """
-            render += "return \(tag == "html" ? "l + \"!DOCTYPE html\" + g + " : "")l + tag + attributes()\(trailing_slash) + g + string" + (is_void ? "" : " + l + \"/\" + tag + g")
+            render += "return \(tag == "html" ? "l + \"!DOCTYPE html\" + g + " : "")l + tag + attributes()\(trailing_slash) + g + string" + (isVoid ? "" : " + l + \"/\" + tag + g")
             render += "}"
 
             string += render
@@ -227,7 +227,7 @@ enum HTMLElements : DeclarationMacro {
         case "attribute":
             return ("HTMLAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)
         case "otherAttribute":
-            var string:String = "\(expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(StringLiteralExprSyntax.self)!)"
+            var string = "\(expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression.as(StringLiteralExprSyntax.self)!)"
             string.removeFirst()
             string.removeLast()
             return ("HTMLAttribute.Extra." + string, isArray ? "" : "? = nil", .otherAttribute(string))
