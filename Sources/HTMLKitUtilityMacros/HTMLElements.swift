@@ -138,14 +138,14 @@ enum HTMLElements : DeclarationMacro {
             var render = "\npublic var description : String {\n"
             var attributes_func = "func attributes() -> String {\n"
             if !attributes.isEmpty {
-                attributes_func += "let sd:String = encoding.stringDelimiter(forMacro: fromMacro)\n"
+                attributes_func += "let sd = encoding.stringDelimiter(forMacro: fromMacro)\n"
                 attributes_func += "var"
             } else {
                 attributes_func += "let"
             }
             attributes_func += " items:[String] = self.attributes.compactMap({\n"
-            attributes_func += "guard let v:String = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }\n"
-            attributes_func += "let d:String = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)\n"
+            attributes_func += "guard let v = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }\n"
+            attributes_func += "let d = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)\n"
             attributes_func += #"return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=" + d + v + d)"#
             attributes_func += "\n})\n"
             for (key, value_type, _) in attributes {

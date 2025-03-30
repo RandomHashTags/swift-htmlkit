@@ -29,6 +29,10 @@ public struct HTMLExpansionContext : @unchecked Sendable {
 
     public package(set) var ignoresCompilerWarnings:Bool
 
+    public package(set) var escape:Bool
+    public package(set) var escapeAttributes:Bool
+    public package(set) var elementsRequireEscaping:Bool
+
     public init(
         context: MacroExpansionContext,
         expansion: MacroExpansionExprSyntax,
@@ -36,7 +40,10 @@ public struct HTMLExpansionContext : @unchecked Sendable {
         encoding: HTMLEncoding,
         key: String,
         arguments: LabeledExprListSyntax,
-        lookupFiles: Set<String> = []
+        lookupFiles: Set<String> = [],
+        escape: Bool = true,
+        escapeAttributes: Bool = true,
+        elementsRequireEscaping: Bool = true
     ) {
         self.context = context
         self.expansion = expansion
@@ -45,6 +52,9 @@ public struct HTMLExpansionContext : @unchecked Sendable {
         self.key = key
         self.arguments = arguments
         self.lookupFiles = lookupFiles
+        self.escape = escape
+        self.escapeAttributes = escapeAttributes
+        self.elementsRequireEscaping = elementsRequireEscaping
     }
 
     #if canImport(SwiftSyntax)

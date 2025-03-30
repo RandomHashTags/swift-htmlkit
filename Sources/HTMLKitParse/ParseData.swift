@@ -13,13 +13,19 @@ import SwiftSyntax
 
 extension HTMLKitUtilities {
     // MARK: Escape HTML
-    public static func escapeHTML(context: HTMLExpansionContext) -> String {
-        return html(context: context, escape: true, escapeAttributes: true, elementsRequireEscaping: true)
+    public static func escapeHTML(context: inout HTMLExpansionContext) -> String {
+        context.escape = true
+        context.escapeAttributes = true
+        context.elementsRequireEscaping = true
+        return html(context: context)
     }
 
     // MARK: Raw HTML
-    public static func rawHTML(context: HTMLExpansionContext) -> String {
-        return html(context: context, escape: false, escapeAttributes: false, elementsRequireEscaping: false)
+    public static func rawHTML(context: inout HTMLExpansionContext) -> String {
+        context.escape = false
+        context.escapeAttributes = false
+        context.elementsRequireEscaping = false
+        return html(context: context)
     }
 
     // MARK: HTML
@@ -29,10 +35,7 @@ extension HTMLKitUtilities {
     ///   - escapeAttributes: Whether or not the escape source-breaking HTML attribute characters.
     ///   - elementsRequireEscaping: Whether or not HTMLKit HTML elements in the inner html should be escaped.
     public static func html(
-        context: HTMLExpansionContext,
-        escape: Bool = true,
-        escapeAttributes: Bool = true,
-        elementsRequireEscaping: Bool = true
+        context: HTMLExpansionContext
     ) -> String {
         var context = context
         let children = context.arguments.children(viewMode: .all)
@@ -44,9 +47,9 @@ extension HTMLKitUtilities {
                     if key == "encoding" {
                         context.encoding = parseEncoding(expression: child.expression) ?? .string
                     }
-                } else if var c = HTMLKitUtilities.parseInnerHTML(context: context, child: child, escape: escape, escapeAttributes: escapeAttributes) {
+                } else if var c = HTMLKitUtilities.parseInnerHTML(context: context, child: child) {
                     if var element = c as? HTMLElement {
-                        element.escaped = elementsRequireEscaping
+                        element.escaped = context.elementsRequireEscaping
                         c = element
                     }
                     innerHTML += String(describing: c)
@@ -130,7 +133,7 @@ extension HTMLKitUtilities {
                         } else if let literal = parseLiteralValue(context: context, expression: child.expression) {
                             switch literal {
                             case .boolean(let b): attributes[key] = b
-                            case .string, .interpolation: attributes[key] = literal.value(key: key)
+                            case .string, .interpolation: attributes[key] = literal.value(key: key, escape: context.escape, escapeAttributes: context.escapeAttributes)
                             case .int(let i): attributes[key] = i
                             case .float(let f): attributes[key] = f
                             case .array:
@@ -210,9 +213,7 @@ extension HTMLKitUtilities {
     // MARK: Parse Inner HTML
     public static func parseInnerHTML(
         context: HTMLExpansionContext,
-        child: LabeledExprSyntax,
-        escape: Bool = true,
-        escapeAttributes: Bool = true
+        child: LabeledExprSyntax
     ) -> (CustomStringConvertible & Sendable)? {
         if let expansion = child.expression.macroExpansion {
             var c = context
@@ -222,15 +223,15 @@ extension HTMLKitUtilities {
                 c.ignoresCompilerWarnings = expansion.macroName.text == "uncheckedHTML"
                 return html(context: c)
             case "escapeHTML":
-                return escapeHTML(context: c)
+                return escapeHTML(context: &c)
             case "rawHTML", "anyRawHTML":
-                return rawHTML(context: c)
+                return rawHTML(context: &c)
             default:
                 return "" // TODO: fix?
             }
         } else if let element = parse_element(context: context, expr: child.expression) {
             return element
-        } else if let string = parseLiteralValue(context: context, expression: child.expression)?.value(key: "", escape: escape, escapeAttributes: escapeAttributes) {
+        } else if let string = parseLiteralValue(context: context, expression: child.expression)?.value(key: "", escape: context.escape, escapeAttributes: context.escapeAttributes) {
             return string
         } else {
             unallowedExpression(context: context, node: child)

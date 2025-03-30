@@ -12,7 +12,16 @@ import SwiftSyntaxMacros
 
 enum RawHTML : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
-        let c = HTMLExpansionContext(context: context, expansion: node.as(ExprSyntax.self)!.macroExpansion!, ignoresCompilerWarnings: false, encoding: .string, key: "", arguments: node.arguments)
-        return "\"\(raw: HTMLKitUtilities.rawHTML(context: c))\""
+        var c = HTMLExpansionContext(
+            context: context,
+            expansion: node.as(ExprSyntax.self)!.macroExpansion!,
+            ignoresCompilerWarnings: false,
+            encoding: .string,
+            key: "",
+            arguments: node.arguments,
+            escape: false,
+            escapeAttributes: false
+        )
+        return "\"\(raw: HTMLKitUtilities.rawHTML(context: &c))\""
     }
 }
