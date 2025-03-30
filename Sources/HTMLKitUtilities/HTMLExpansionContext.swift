@@ -14,7 +14,7 @@ import SwiftSyntaxMacros
 public struct HTMLExpansionContext : @unchecked Sendable {
     #if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
     public let context:MacroExpansionContext
-    public let expansion:MacroExpansionExprSyntax
+    public package(set) var expansion:FreestandingMacroExpansionSyntax
     public var arguments:LabeledExprListSyntax
     #endif
     
@@ -35,7 +35,7 @@ public struct HTMLExpansionContext : @unchecked Sendable {
 
     public init(
         context: MacroExpansionContext,
-        expansion: MacroExpansionExprSyntax,
+        expansion: FreestandingMacroExpansionSyntax,
         ignoresCompilerWarnings: Bool,
         encoding: HTMLEncoding,
         key: String,

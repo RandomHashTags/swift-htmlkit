@@ -14,7 +14,7 @@ enum EscapeHTML : ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         var c = HTMLExpansionContext(
             context: context,
-            expansion: node.as(ExprSyntax.self)!.macroExpansion!,
+            expansion: node,
             ignoresCompilerWarnings: false,
             encoding: .string,
             key: "",

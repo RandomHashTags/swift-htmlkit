@@ -64,7 +64,7 @@ extension HTMLKitUtilities {
         let (string, encoding):(String, HTMLEncoding) = expandMacro(context: context)
         return "\(raw: encodingResult(context: context, node: context.expansion, string: string, for: encoding))"
     }
-    private static func encodingResult(context: HTMLExpansionContext, node: MacroExpansionExprSyntax, string: String, for encoding: HTMLEncoding) -> String {
+    private static func encodingResult(context: HTMLExpansionContext, node: FreestandingMacroExpansionSyntax, string: String, for encoding: HTMLEncoding) -> String {
         func hasNoInterpolation() -> Bool {
             let hasInterpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !hasInterpolation else {
@@ -152,10 +152,12 @@ extension HTMLKitUtilities {
             }
         }
         if let statements = context.expansion.trailingClosure?.statements {
+            var c = context
+            c.expansion.trailingClosure = nil
             for statement in statements {
                 switch statement.item {
                 case .expr(let expr):
-                    if let inner_html = parseInnerHTML(context: context, expr: expr) {
+                    if let inner_html = parseInnerHTML(context: c, expr: expr) {
                         innerHTML.append(inner_html)
                     }
                 default:

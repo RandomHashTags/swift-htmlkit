@@ -19,16 +19,19 @@ extension HTMLElementValueType {
         context: HTMLExpansionContext,
         _ function: FunctionCallExprSyntax
     ) -> HTMLElement? {
-        var c = context
         let calledExpression = function.calledExpression
         let key:String
-        if let member = calledExpression.memberAccess, member.base?.declRef?.baseName.text == "HTMLKit" {
+        switch calledExpression.kind {
+        case .memberAccessExpr:
+            let member = calledExpression.memberAccess!
+            guard member.base?.declRef?.baseName.text == "HTMLKit" else { return nil }
             key = member.declName.baseName.text
-        } else if let ref = calledExpression.declRef {
-            key = ref.baseName.text
-        } else {
+        case .declReferenceExpr:
+            key = calledExpression.declRef!.baseName.text
+        default:
             return nil
         }
+        var c = context
         c.arguments = function.arguments
         switch key {
         case "a": return get(c, a.self)

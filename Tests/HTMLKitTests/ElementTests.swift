@@ -14,17 +14,17 @@ struct ElementTests {
     // MARK: html
     @Test func elementHTML() {
         var expected:String = "<!DOCTYPE html><html></html>"
-        var string:StaticString = #html(html())
+        var string:String = #html(html())
         #expect(string == expected)
 
         expected = "<!DOCTYPE html><html xmlns=\"test\"></html>"
         string = #html(html(xmlns: "test"))
         #expect(string == expected)
 
-        /*string = #html {
+        string = #html {
             html(xmlns: "test")
         }
-        #expect(string == expected)*/
+        #expect(string == expected)
     }
 
     // MARK: HTMLKit.<element>
