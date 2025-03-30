@@ -43,8 +43,8 @@ enum HTMLElements : DeclarationMacro {
             public let tag:String = "\(tag)"
             public var attributes:[HTMLAttribute]
             public var innerHTML:[CustomStringConvertible & Sendable]
-            private var encoding:HTMLEncoding = .string
-            private var fromMacro:Bool = false
+            public private(set) var encoding:HTMLEncoding = .string
+            public private(set) var fromMacro:Bool = false
             public let isVoid:Bool = \(isVoid)
             public var trailingSlash:Bool = false
             public var escaped:Bool = false
@@ -100,12 +100,12 @@ enum HTMLElements : DeclarationMacro {
             initializers += "_ innerHTML: CustomStringConvertible & Sendable...\n) {\n"
             initializers += "self.attributes = attributes\n"
             for (key, _, _) in attributes {
-                var key_literal = key
-                if key_literal.first == "`" {
-                    key_literal.removeFirst()
-                    key_literal.removeLast()
+                var keyLiteral = key
+                if keyLiteral.first == "`" {
+                    keyLiteral.removeFirst()
+                    keyLiteral.removeLast()
                 }
-                initializers += "self.\(key_literal) = \(key)\n"
+                initializers += "self.\(keyLiteral) = \(key)\n"
             }
             initializers += "self.innerHTML = innerHTML\n}\n"
 
@@ -117,10 +117,10 @@ enum HTMLElements : DeclarationMacro {
             }
             initializers += "self.attributes = data.globalAttributes\n"
             for (key, value_type, _) in attributes {
-                var key_literal = key
-                if key_literal.first == "`" {
-                    key_literal.removeFirst()
-                    key_literal.removeLast()
+                var keyLiteral = key
+                if keyLiteral.first == "`" {
+                    keyLiteral.removeFirst()
+                    keyLiteral.removeLast()
                 }
                 var value = "as? \(value_type)"
                 switch value_type {
@@ -129,80 +129,68 @@ enum HTMLElements : DeclarationMacro {
                 default:
                     break
                 }
-                initializers += "self.\(key) = data.attributes[\"\(key_literal)\"] " + value + "\n"
+                initializers += "self.\(key) = data.attributes[\"\(keyLiteral)\"] " + value + "\n"
             }
             initializers += "self.innerHTML = data.innerHTML\n"
             initializers += "}"
             string += initializers
 
             var render = "\npublic var description : String {\n"
-            var attributes_func = "func attributes() -> String {\n"
+            var attributes_func = ""
+            var itemsArray:String = ""
             if !attributes.isEmpty {
                 attributes_func += "let sd = encoding.stringDelimiter(forMacro: fromMacro)\n"
-                attributes_func += "var"
-            } else {
-                attributes_func += "let"
+                itemsArray += "var items:[String] = []\n"
             }
-            attributes_func += " items:[String] = self.attributes.compactMap({\n"
-            attributes_func += "guard let v = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }\n"
-            attributes_func += "let d = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)\n"
-            attributes_func += #"return $0.key + ($0.htmlValueIsVoidable && v.isEmpty ? "" : "=" + d + v + d)"#
-            attributes_func += "\n})\n"
             for (key, value_type, _) in attributes {
-                var key_literal = key
-                if key_literal.first == "`" {
-                    key_literal.removeFirst()
-                    key_literal.removeLast()
+                var keyLiteral = key
+                if keyLiteral.first == "`" {
+                    keyLiteral.removeFirst()
+                    keyLiteral.removeLast()
                 }
-                let variable_name = key_literal
-                if key_literal == "httpEquiv" {
-                    key_literal = "http-equiv"
-                } else if key_literal == "acceptCharset" {
-                    key_literal = "accept-charset"
+                let variable_name = keyLiteral
+                if keyLiteral == "httpEquiv" {
+                    keyLiteral = "http-equiv"
+                } else if keyLiteral == "acceptCharset" {
+                    keyLiteral = "accept-charset"
                 }
                 if value_type == "Bool" {
-                    attributes_func += "if \(key) { items.append(\"\(key_literal)\") }\n"
+                    itemsArray += "if \(key) { items.append(\"\(keyLiteral)\") }\n"
                 } else if value_type.first == "[" {
-                    attributes_func += "if let _\(variable_name):String = "
+                    itemsArray += "if let _\(variable_name):String = "
                     let separator = separator(key: key)
                     switch value_type {
                     case "[String]":
-                        attributes_func += "\(key)?"
+                        itemsArray += "\(key)?"
                     case "[Int]", "[Float]":
-                        attributes_func += "\(key)?.map({ \"\\($0)\" })"
+                        itemsArray += "\(key)?.map({ \"\\($0)\" })"
                     default:
-                        attributes_func += "\(key)?.compactMap({ return $0.htmlValue(encoding: encoding, forMacro: fromMacro) })"
+                        itemsArray += "\(key)?.compactMap({ return $0.htmlValue(encoding: encoding, forMacro: fromMacro) })"
                     }
-                    attributes_func += ".joined(separator: \"\(separator)\") {\n"
-                    attributes_func += #"let k:String = _\#(variable_name).isEmpty ? "" : "=" + sd + _\#(variable_name) + sd"#
-                    attributes_func += "\nitems.append(\"\(key_literal)\" + k)"
-                    attributes_func += "\n}\n"
+                    itemsArray += ".joined(separator: \"\(separator)\") {\n"
+                    itemsArray += #"let k:String = _\#(variable_name).isEmpty ? "" : "=" + sd + _\#(variable_name) + sd"#
+                    itemsArray += "\nitems.append(\"\(keyLiteral)\" + k)"
+                    itemsArray += "\n}\n"
                 } else if value_type == "String" || value_type == "Int" || value_type == "Float" || value_type == "Double" {
                     let value = value_type == "String" ? key : "String(describing: \(key))"
-                    attributes_func += #"if let \#(key) { items.append("\#(key_literal)=" + sd + \#(value) + sd) }"#
-                    attributes_func += "\n"
+                    itemsArray += #"if let \#(key) { items.append("\#(keyLiteral)=" + sd + \#(value) + sd) }"#
+                    itemsArray += "\n"
                 } else {
-                    attributes_func += "if let \(key), let v = \(key).htmlValue(encoding: encoding, forMacro: fromMacro) {\n"
-                    attributes_func += #"let s = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=" + sd + v + sd"#
-                    attributes_func += "\nitems.append(\"\(key_literal)\" + s)"
-                    attributes_func += "\n}\n"
+                    itemsArray += "if let \(key), let v = \(key).htmlValue(encoding: encoding, forMacro: fromMacro) {\n"
+                    itemsArray += #"let s = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=" + sd + v + sd"#
+                    itemsArray += "\nitems.append(\"\(keyLiteral)\" + s)"
+                    itemsArray += "\n}\n"
                 }
             }
-            attributes_func += "return (items.isEmpty ? \"\" : \" \") + items.joined(separator: \" \")\n}\n"
-            render += attributes_func
-            render += "let string:String = innerHTML.map({ String(describing: $0) }).joined()\n"
-            let trailing_slash = isVoid ? " + (trailingSlash ? \" /\" : \"\")" : ""
-            render += """
-            let l:String, g:String
-            if escaped {
-                l = "&lt;"
-                g = "&gt;"
-            } else {
-                l = "<"
-                g = ">"
+            render += attributes_func + itemsArray
+            render += "return render("
+            if tag == "html" {
+                render += "prefix: \"!DOCTYPE html\", "
             }
-            """
-            render += "return \(tag == "html" ? "l + \"!DOCTYPE html\" + g + " : "")l + tag + attributes()\(trailing_slash) + g + string" + (isVoid ? "" : " + l + \"/\" + tag + g")
+            if !isVoid {
+                render += "suffix: \"/\" + tag, "
+            }
+            render += "items: \(itemsArray.isEmpty ? "[]" : "items"))"
             render += "}"
 
             string += render

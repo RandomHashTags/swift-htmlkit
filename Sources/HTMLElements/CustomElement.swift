@@ -17,12 +17,12 @@ public struct custom : HTMLElement {
     public var attributes:[HTMLAttribute]
     public var innerHTML:[CustomStringConvertible & Sendable]
 
-    @usableFromInline internal var encoding:HTMLEncoding = .string
+    public private(set) var encoding:HTMLEncoding = .string
     public var isVoid:Bool
     public var trailingSlash:Bool
     public var escaped:Bool = false
 
-    @usableFromInline internal var fromMacro:Bool = false
+    public private(set) var fromMacro:Bool = false
 
     public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {
         self.encoding = encoding

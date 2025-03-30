@@ -64,7 +64,7 @@ extension HTMLKitUtilities {
         let (string, encoding):(String, HTMLEncoding) = expandMacro(context: context)
         return "\(raw: encodingResult(context: context, node: context.expansion, string: string, for: encoding))"
     }
-    private static func encodingResult(context: HTMLExpansionContext, node: FreestandingMacroExpansionSyntax, string: String, for encoding: HTMLEncoding) -> String {
+    private static func encodingResult(context: HTMLExpansionContext, node: MacroExpansionExprSyntax, string: String, for encoding: HTMLEncoding) -> String {
         func hasNoInterpolation() -> Bool {
             let hasInterpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
             guard !hasInterpolation else {
@@ -237,6 +237,7 @@ extension HTMLKitUtilities {
     ) -> (CustomStringConvertible & Sendable)? {
         if let expansion = expr.macroExpansion {
             var c = context
+            c.expansion = expansion
             c.arguments = expansion.arguments
             switch expansion.macroName.text {
             case "html", "anyHTML", "uncheckedHTML":

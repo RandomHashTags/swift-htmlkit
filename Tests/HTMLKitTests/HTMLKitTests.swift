@@ -39,7 +39,7 @@ struct HTMLKitTests {
         public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {
         }
 
-        private var encoding:HTMLEncoding = .string
+        public private(set) var encoding:HTMLEncoding = .string
         
         /// Causes the browser to treat the linked URL as a download. Can be used with or without a `filename` value.
         /// 
@@ -58,7 +58,7 @@ struct HTMLKitTests {
         public var ping:[String] = []
         public var rel:[HTMLAttribute.Extra.rel] = []
         public var escaped:Bool = false
-        private var fromMacro:Bool = false
+        public private(set) var fromMacro:Bool = false
         public let isVoid:Bool = false
         public var referrerPolicy:HTMLAttribute.Extra.referrerpolicy? = nil
         public var target:HTMLAttribute.Extra.target? = nil
