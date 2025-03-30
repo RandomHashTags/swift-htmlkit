@@ -22,10 +22,20 @@ public macro escapeHTML(
 // MARK: HTML
 /// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
 @freestanding(expression)
+//@available(*, deprecated, message: "innerHTML is now initialized using brackets instead of parentheses")
 public macro html<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
     _ innerHTML: CustomStringConvertible & Sendable...
+) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
+
+// MARK: HTML
+/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
+@freestanding(expression)
+public macro html<T: CustomStringConvertible & Sendable>(
+    encoding: HTMLEncoding = .string,
+    lookupFiles: [StaticString] = [],
+    _ innerHTML: () -> CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 /// - Returns: An existential conforming to `CustomStringConvertible & Sendable`.

@@ -16,14 +16,15 @@ extension HTMLKitUtilities {
         context: HTMLExpansionContext,
         expression: ExprSyntax
     ) -> LiteralReturnType? {
-        if let boolean = expression.booleanLiteral?.literal.text {
-            return .boolean(boolean == "true")
-        }
-        if let string = expression.integerLiteral?.literal.text {
-            return .int(Int(string)!)
-        }
-        if let string = expression.floatLiteral?.literal.text {
-            return .float(Float(string)!)
+        switch expression.kind {
+        case .booleanLiteralExpr:
+            return .boolean(expression.booleanLiteral?.literal.text == "true")
+        case .integerLiteralExpr:
+            return .int(Int(expression.integerLiteral!.literal.text)!)
+        case .floatLiteralExpr:
+            return .float(Float(expression.floatLiteral!.literal.text)!)
+        default:
+            break
         }
         guard var returnType = extractLiteral(context: context, expression: expression) else {
             return nil
@@ -138,18 +139,20 @@ extension HTMLKitUtilities {
         context: HTMLExpansionContext,
         expression: ExprSyntax
     ) -> LiteralReturnType? {
-        if let _ = expression.as(NilLiteralExprSyntax.self) {
-            return nil
-        }
-        if let stringLiteral = expression.stringLiteral {
+        switch expression.kind {
+        case .nilLiteralExpr: return nil
+        case .memberAccessExpr, .forceUnwrapExpr:
+            return .interpolation("\(expression)")
+        case .stringLiteralExpr:
+            let stringLiteral = expression.stringLiteral!
             let string = stringLiteral.string(encoding: context.encoding)
             if stringLiteral.segments.count(where: { $0.is(ExpressionSegmentSyntax.self) }) == 0 {
                 return .string(string)
             } else {
                 return .interpolation(string)
             }
-        }
-        if let function = expression.functionCall {
+        case .functionCallExpr:
+            let function = expression.functionCall!
             if let decl = function.calledExpression.declRef?.baseName.text {
                 switch decl {
                 case "StaticString":
@@ -160,11 +163,7 @@ extension HTMLKitUtilities {
                 }
             }
             return .interpolation("\(function)")
-        }
-        if expression.memberAccess != nil || expression.is(ForceUnwrapExprSyntax.self) {
-            return .interpolation("\(expression)")
-        }
-        if let array = expression.array {
+        case .arrayExpr:
             let separator:String
             switch context.key {
             case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
@@ -175,7 +174,7 @@ extension HTMLKitUtilities {
                 separator = " "
             }
             var results:[Sendable] = []
-            for element in array.elements {
+            for element in expression.array!.elements {
                 if let attribute = HTMLAttribute.Extra.parse(context: context, expr: element.expression) {
                     results.append(attribute)
                 } else if let literal = parseLiteralValue(context: context, expression: element.expression) {
@@ -194,12 +193,12 @@ extension HTMLKitUtilities {
                 }
             }
             return .array(results)
-        }
-        if let decl = expression.declRef {
+        case .declReferenceExpr:
             warnInterpolation(context: context, node: expression)
-            return .interpolation(decl.baseName.text)
+            return .interpolation(expression.declRef!.baseName.text)
+        default:
+            return nil
         }
-        return nil
     }
 }
 

@@ -69,15 +69,15 @@ struct HTMLKitTests {
 
     @Test
     func representations() {
-        let _ = #anyHTML(p("sheesh"))
-        let _ = #anyHTML(encoding: .string, p("sheesh"))
-        let _ = #anyHTML(encoding: .utf8Bytes, p("sheesh"))
-        let _ = #anyHTML(encoding: .utf16Bytes, p("sheesh"))
+        let _ = #anyHTML(p())
+        let _ = #anyHTML(encoding: .string, p())
+        let _ = #anyHTML(encoding: .utf8Bytes, p())
+        let _ = #anyHTML(encoding: .utf16Bytes, p())
 
-        let _:StaticString = #html()
-        let _:StaticString = #html(encoding: .string)
-        let _:String = #html()
-        let _:String = #html(encoding: .string)
+        let _:StaticString = #html(p())
+        let _:StaticString = #html(encoding: .string, p())
+        let _:String = #html(p())
+        let _:String = #html(encoding: .string, p())
         let _:[UInt8] = #html(encoding: .utf8Bytes, p())
         let _:ContiguousArray<UInt8> = #html(encoding: .utf8Bytes, p())
         let _:[UInt16] = #html(encoding: .utf16Bytes, p())

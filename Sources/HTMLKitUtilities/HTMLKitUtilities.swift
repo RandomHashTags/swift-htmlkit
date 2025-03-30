@@ -89,6 +89,19 @@ extension StringLiteralExprSyntax {
             }
             return value
         }
+        /*if segments.count > 1 {
+            var value = segments.compactMap({
+                guard let s = $0.as(StringSegmentSyntax.self)?.content.text, !s.isEmpty else { return nil }
+                return s
+            }).joined()
+            switch encoding {
+            case .string:
+                value.replace("\n", with: "\\n")
+            default:
+                break
+            }
+            return value
+        }*/
         return "\(segments)"
     }
 }

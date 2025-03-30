@@ -151,6 +151,18 @@ extension HTMLKitUtilities {
                 }
             }
         }
+        if let statements = context.expansion.trailingClosure?.statements {
+            for statement in statements {
+                switch statement.item {
+                case .expr(let expr):
+                    if let inner_html = parseInnerHTML(context: context, expr: expr) {
+                        innerHTML.append(inner_html)
+                    }
+                default:
+                    break
+                }
+            }
+        }
         return ElementData(context.encoding, global_attributes, attributes, innerHTML, trailingSlash)
     }
 
@@ -215,7 +227,13 @@ extension HTMLKitUtilities {
         context: HTMLExpansionContext,
         child: LabeledExprSyntax
     ) -> (CustomStringConvertible & Sendable)? {
-        if let expansion = child.expression.macroExpansion {
+        return parseInnerHTML(context: context, expr: child.expression)
+    }
+    public static func parseInnerHTML(
+        context: HTMLExpansionContext,
+        expr: ExprSyntax
+    ) -> (CustomStringConvertible & Sendable)? {
+        if let expansion = expr.macroExpansion {
             var c = context
             c.arguments = expansion.arguments
             switch expansion.macroName.text {
@@ -229,12 +247,12 @@ extension HTMLKitUtilities {
             default:
                 return "" // TODO: fix?
             }
-        } else if let element = parse_element(context: context, expr: child.expression) {
+        } else if let element = parse_element(context: context, expr: expr) {
             return element
-        } else if let string = parseLiteralValue(context: context, expression: child.expression)?.value(key: "", escape: context.escape, escapeAttributes: context.escapeAttributes) {
+        } else if let string = parseLiteralValue(context: context, expression: expr)?.value(key: "", escape: context.escape, escapeAttributes: context.escapeAttributes) {
             return string
         } else {
-            unallowedExpression(context: context, node: child)
+            unallowedExpression(context: context, node: expr)
             return nil
         }
     }
@@ -252,7 +270,7 @@ extension HTMLKitUtilities {
     }
 
     // MARK: Unallowed Expression
-    static func unallowedExpression(context: HTMLExpansionContext, node: LabeledExprSyntax) {
+    static func unallowedExpression(context: HTMLExpansionContext, node: ExprSyntax) {
         context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unallowedExpression", message: "String Interpolation is required when encoding runtime values."), fixIts: [
             FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation."), changes: [
                 FixIt.Change.replace(
