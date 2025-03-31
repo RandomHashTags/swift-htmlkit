@@ -125,9 +125,6 @@ extension HTMLKitUtilities {
                 remainingInterpolation -= 1
                 values.append(create(fix))
             } else {
-                //if let decl:DeclReferenceExprSyntax = expression.declRef {
-                    // TODO: lookup and try to promote | need to wait for swift-syntax to update to access SwiftLexicalLookup
-                //}
                 values.append(interpolate(expression))
                 warnInterpolation(context: context, node: expression)
             }

@@ -5,6 +5,7 @@
 //  Created by Evan Anderson on 11/27/24.
 //
 
+/*
 #if canImport(Foundation)
 import Foundation
 
@@ -60,4 +61,4 @@ extension TranslateHTML {
     }
 }
 
-#endif
+#endif*/

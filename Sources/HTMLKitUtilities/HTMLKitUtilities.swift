@@ -84,6 +84,7 @@ extension StringLiteralExprSyntax {
             switch encoding {
             case .string:
                 value.replace("\n", with: "\\n")
+                value.replace("\"", with: "\\\"")
             default:
                 break
             }

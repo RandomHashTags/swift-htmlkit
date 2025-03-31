@@ -11,6 +11,10 @@ import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
 
+#if canImport(SwiftLexicalLookup)
+import SwiftLexicalLookup
+#endif
+
 extension HTMLKitUtilities {
     // MARK: Escape HTML
     public static func escapeHTML(context: inout HTMLExpansionContext) -> String {
@@ -289,6 +293,21 @@ extension HTMLKitUtilities {
         context: HTMLExpansionContext,
         node: some SyntaxProtocol
     ) {
+        /*#if canImport(SwiftLexicalLookup)
+        for t in node.tokens(viewMode: .fixedUp) {
+            let results = node.lookup(t.identifier)
+            for result in results {
+                switch result {
+                case .lookForMembers(let test):
+                    print("lookForMembers=" + test.debugDescription)
+                case .lookForImplicitClosureParameters(let test):
+                    print("lookForImplicitClosureParameters=" + test.debugDescription)
+                default:
+                    print(result.debugDescription)
+                }
+            }
+        }
+        #endif*/
         /*if let fix:String = InterpolationLookup.find(context: context, node) {
             let expression:String = "\(node)"
             let ranges:[Range<String.Index>] = string.ranges(of: expression)
