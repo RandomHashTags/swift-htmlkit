@@ -32,6 +32,7 @@ extension HTMLElementValueType {
             return nil
         }
         var c = context
+        c.expansion.trailingClosure = function.trailingClosure
         c.arguments = function.arguments
         switch key {
         case "a": return get(c, a.self)

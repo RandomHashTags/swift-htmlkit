@@ -51,6 +51,11 @@ extension ElementTests {
         string = #html(a(href: "test", "Test"))
         #expect(string == "<a href=\"test\">Test</a>")
 
+        string = #html(a(href: "test") {
+            "Test"
+        })
+        #expect(string == "<a href=\"test\">Test</a>")
+
         string = #html(a(href: "", "Test"))
         #expect(string == "<a href=\"\">Test</a>")
         
@@ -430,12 +435,15 @@ extension ElementTests {
     }*/
     
     @Test func multilineInnerHTMLValue() {
-        let string:StaticString = #html(p("""
-        bro
-            dude
-        hermano
-        """
-        ))
+        let string:StaticString = #html(
+            p {
+                """
+                bro
+                    dude
+                hermano
+                """
+            }
+        ) 
         #expect(string == "<p>bro\n    dude\nhermano</p>")
     }
 
