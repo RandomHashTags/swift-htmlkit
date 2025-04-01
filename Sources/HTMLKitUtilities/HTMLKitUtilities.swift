@@ -106,9 +106,14 @@ extension StringLiteralExprSyntax {
         return "\(segments)"
     }
 }
+extension Collection {
+    package func get(_ index: Index) -> Element? {
+        return index >= startIndex && index < endIndex ? self[index] : nil
+    }
+}
 extension LabeledExprListSyntax {
     package func get(_ index: Int) -> Element? {
-        return index < count ? self[self.index(at: index)] : nil
+        return self.get(self.index(at: index))
     }
 }
 #endif
