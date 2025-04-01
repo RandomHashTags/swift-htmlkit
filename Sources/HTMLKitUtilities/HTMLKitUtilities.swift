@@ -107,8 +107,13 @@ extension StringLiteralExprSyntax {
     }
 }
 extension Collection {
+    /// - Returns: The element at the given index, checking if the index is within bounds (`>= startIndex && < endIndex`).
     package func get(_ index: Index) -> Element? {
         return index >= startIndex && index < endIndex ? self[index] : nil
+    }
+    /// - Returns: The element at the given index, only checking if the index is less than `endIndex`.
+    package func getPositive(_ index: Index) -> Element? {
+        return index < endIndex ? self[index] : nil
     }
 }
 extension LabeledExprListSyntax {

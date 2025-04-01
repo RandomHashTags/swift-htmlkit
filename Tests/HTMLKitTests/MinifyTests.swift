@@ -12,7 +12,6 @@ import HTMLKit
 
 struct MinifyTests {
     @Test func minifyHTML() {
-        /////
         var expected = "<html><body><p>\ndude&dude </p>r ly<div>what</div></body></html>"
         var result:String = HTMLKitUtilities.minify(html: "\n<html>\n    <body><p>\ndude&dude </p>r ly\n<div>\nwh  at</div></body>\n</html>")
         #expect(expected == result)
@@ -25,7 +24,7 @@ struct MinifyTests {
             <path d="M3 6h18"></path>
             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-        """#, preservingWhitespaceForTags: ["svg", "path", "circle"])
+        """#)
         #expect(expected == result)
     }
 }

@@ -146,4 +146,12 @@ public enum HTMLElementType : String, CaseIterable, Sendable {
             return false
         }
     }
+
+    @inlinable
+    public var tagName : String {
+        switch self {
+        case .variable: return "var"
+        default: return rawValue
+        }
+    }
 }
