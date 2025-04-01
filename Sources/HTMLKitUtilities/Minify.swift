@@ -45,7 +45,7 @@ extension HTMLKitUtilities {
         for openingRange in openElementRanges {
             let tag = html[openingRange]
             result += tag
-            let closure = Self.defaultPreservedWhitespaceTags.contains(tag) || preservingWhitespaceForTags.contains(tag) ? appendAll : appendIfPreserved
+            let closure = Self.defaultPreservedWhitespaceTags.contains(tag) || preservingWhitespaceForTags.contains(tag) ? appendAll : appendIfPermitted
             let closestClosingRange = closeElementRanges.first(where: { $0.lowerBound > openingRange.upperBound })
             if let nextOpeningRange = openElementRanges.getPositive(openingRangeIndex + 1) {
                 var i = openingRange.upperBound
@@ -95,7 +95,7 @@ extension HTMLKitUtilities {
         result += html[i..<bound]
         i = bound
     }
-    fileprivate static func appendIfPreserved(
+    fileprivate static func appendIfPermitted(
         html: String,
         i: inout String.Index,
         bound: String.Index,
