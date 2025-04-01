@@ -38,79 +38,29 @@ extension HTMLKitUtilities {
     ) -> String {
         var result:String = ""
         result.reserveCapacity(html.count)
-        let tagRegex = "[^/>]+"
-        let openElementRanges = html.ranges(of: try! Regex("(<\(tagRegex)>)"))
-        let closeElementRanges = html.ranges(of: try! Regex("(</\(tagRegex)>)"))
-
-        var openingRangeIndex = 0
-        var ignoredClosingTags:Set<Range<String.Index>> = []
-        for openingRange in openElementRanges {
-            let tag = html[openingRange]
-            result += tag
-            let closure = Self.defaultPreservedWhitespaceTags.contains(tag) || preservingWhitespaceForTags.contains(tag) ? minifyAppendAll : minifyAppendIfPermitted
-            let closestClosingRange = closeElementRanges.first(where: { $0.lowerBound > openingRange.upperBound })
-            if let nextOpeningRange = openElementRanges.getPositive(openingRangeIndex + 1) {
-                var i = openingRange.upperBound
-                var lowerBound = nextOpeningRange.lowerBound
-                if let closestClosingRange {
-                    if closestClosingRange.upperBound < lowerBound {
-                        lowerBound = closestClosingRange.upperBound
-                    }
-                    if closestClosingRange.lowerBound < nextOpeningRange.lowerBound {
-                        ignoredClosingTags.insert(closestClosingRange)
-                    }
-                }
-                // anything after the opening tag, upto the end of the next closing tag
-                closure(html, &i, lowerBound, &result)
-                // anything after the closing tag and before the next opening tag
-                while i < nextOpeningRange.lowerBound {
-                    let char = html[i]
-                    if !char.isNewline {
-                        result.append(char)
-                    }
-                    html.formIndex(after: &i)
-                }
-            } else if let closestClosingRange {
-                // anything after the opening tag and before the next closing tag
-                var i = openingRange.upperBound
-                closure(html, &i, closestClosingRange.lowerBound, &result)
+        let tagRanges = html.ranges(of: try! Regex("(<[^>]+>)"))
+        var tagIndex = 0
+        for tagRange in tagRanges {
+            let originalTag = html[tagRange]
+            var tag = originalTag.split(separator: " ")[0]
+            if tag.last != ">" {
+                tag.append(">")
             }
-            openingRangeIndex += 1
-        }
-        for closingRange in closeElementRanges {
-            if !ignoredClosingTags.contains(closingRange) {
-                result += html[closingRange]
+            result += originalTag
+            if let next = tagRanges.get(tagIndex + 1) {
+                let slice = html[tagRange.upperBound..<next.lowerBound]
+                if !(Self.defaultPreservedWhitespaceTags.contains(tag) || preservingWhitespaceForTags.contains(tag)) {
+                    for char in slice {
+                        if !(char.isWhitespace || char.isNewline) {
+                            result.append(char)
+                        }
+                    }
+                } else {
+                    result += slice
+                }
             }
+            tagIndex += 1
         }
         return result
-    }
-}
-
-// MARK: append
-extension HTMLKitUtilities {
-    @usableFromInline
-    static func minifyAppendAll(
-        html: String,
-        i: inout String.Index,
-        bound: String.Index,
-        result: inout String
-    ) {
-        result += html[i..<bound]
-        i = bound
-    }
-    @usableFromInline
-    static func minifyAppendIfPermitted(
-        html: String,
-        i: inout String.Index,
-        bound: String.Index,
-        result: inout String
-    ) {
-        while i < bound {
-            let char = html[i]
-            if !(char.isWhitespace || char.isNewline) {
-                result.append(char)
-            }
-            html.formIndex(after: &i)
-        }
     }
 }

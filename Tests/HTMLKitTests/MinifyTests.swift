@@ -12,7 +12,7 @@ import HTMLKit
 
 struct MinifyTests {
     @Test func minifyHTML() {
-        var expected = "<html><body><p>\ndude&dude </p>r ly<div>what</div></body></html>"
+        var expected = "<html><body><p>\ndude&dude </p>rly<div>what</div></body></html>"
         var result:String = HTMLKitUtilities.minify(html: "\n<html>\n    <body><p>\ndude&dude </p>r ly\n<div>\nwh  at</div></body>\n</html>")
         #expect(expected == result)
 
