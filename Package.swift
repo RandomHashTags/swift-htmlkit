@@ -103,9 +103,13 @@ let package = Package(
         .target(
             name: "HTMLKit",
             dependencies: [
+                "CSS",
                 "HTMLAttributes",
+                "HTMLElements",
+                "HTMLKitParse",
                 "HTMLKitUtilities",
-                "HTMLKitMacros"
+                "HTMLKitMacros",
+                "HTMX"
             ]
         ),
 

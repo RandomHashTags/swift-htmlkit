@@ -69,36 +69,26 @@ extension HTMLKitUtilities {
         return "\(raw: encodingResult(context: context, node: context.expansion, string: string, for: encoding))"
     }
     private static func encodingResult(context: HTMLExpansionContext, node: MacroExpansionExprSyntax, string: String, for encoding: HTMLEncoding) -> String {
-        func hasNoInterpolation() -> Bool {
-            let hasInterpolation:Bool = !string.ranges(of: try! Regex("\\((.*)\\)")).isEmpty
-            guard !hasInterpolation else {
-                if !context.ignoresCompilerWarnings {
-                    context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the expected result.")))
-                }
-                return false
-            }
-            return true
-        }
         func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
             return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
         }
         switch encoding {
         case .utf8Bytes:
-            guard hasNoInterpolation() else { return "" }
+            guard hasNoInterpolation(context, node, string) else { return "" }
             return bytes([UInt8](string.utf8))
         case .utf16Bytes:
-            guard hasNoInterpolation() else { return "" }
+            guard hasNoInterpolation(context, node, string) else { return "" }
             return bytes([UInt16](string.utf16))
         case .utf8CString:
-            guard hasNoInterpolation() else { return "" }
+            guard hasNoInterpolation(context, node, string) else { return "" }
             return "\(string.utf8CString)"
 
         case .foundationData:
-            guard hasNoInterpolation() else { return "" }
+            guard hasNoInterpolation(context, node, string) else { return "" }
             return "Data(\(bytes([UInt8](string.utf8))))"
 
         case .byteBuffer:
-            guard hasNoInterpolation() else { return "" }
+            guard hasNoInterpolation(context, node, string) else { return "" }
             return "ByteBuffer(bytes: \(bytes([UInt8](string.utf8))))"
 
         case .string:
@@ -107,6 +97,15 @@ extension HTMLKitUtilities {
             return encoded.replacingOccurrences(of: "$0", with: string)
         }
     }
+    private static func hasNoInterpolation(_ context: HTMLExpansionContext, _ node: MacroExpansionExprSyntax, _ string: String) -> Bool {
+        guard string.firstRange(of: try! Regex("\\((.*)\\)")) == nil else {
+            if !context.ignoresCompilerWarnings {
+                context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the intended result.")))
+            }
+            return false
+        }
+        return true
+    }
 
     // MARK: Parse Arguments
     public static func parseArguments(
@@ -114,7 +113,7 @@ extension HTMLKitUtilities {
         otherAttributes: [String:String] = [:]
     ) -> ElementData {
         var context = context
-        var global_attributes:[HTMLAttribute] = []
+        var globalAttributes:[HTMLAttribute] = []
         var attributes:[String:Sendable] = [:]
         var innerHTML:[CustomStringConvertible & Sendable] = []
         var trailingSlash:Bool = false
@@ -129,7 +128,7 @@ extension HTMLKitUtilities {
                     case "lookupFiles":
                         context.lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string(encoding: context.encoding) }))
                     case "attributes":
-                        (global_attributes, trailingSlash) = parseGlobalAttributes(context: context, array: child.expression.array!.elements)
+                        (globalAttributes, trailingSlash) = parseGlobalAttributes(context: context, array: child.expression.array!.elements)
                     default:
                         context.key = otherAttributes[key] ?? key
                         if let test = HTMLAttribute.Extra.parse(context: context, expr: child.expression) {
@@ -141,8 +140,7 @@ extension HTMLKitUtilities {
                             case .int(let i): attributes[key] = i
                             case .float(let f): attributes[key] = f
                             case .array:
-                                let escaped:LiteralReturnType = literal.escapeArray()
-                                switch escaped {
+                                switch literal.escapeArray() {
                                 case .array(let a): attributes[key] = a
                                 default: break
                                 }
@@ -169,27 +167,30 @@ extension HTMLKitUtilities {
                 }
             }
         }
-        return ElementData(context.encoding, global_attributes, attributes, innerHTML, trailingSlash)
+        return ElementData(context.encoding, globalAttributes, attributes, innerHTML, trailingSlash)
     }
 
     // MARK: Parse Encoding
     public static func parseEncoding(expression: ExprSyntax) -> HTMLEncoding? {
-        if let key = expression.memberAccess?.declName.baseName.text {
-            return HTMLEncoding(rawValue: key)
-        } else if let function = expression.functionCall {
+        switch expression.kind {
+        case .memberAccessExpr:
+            return HTMLEncoding(rawValue: expression.memberAccess!.declName.baseName.text)
+        case .functionCallExpr:
+            let function = expression.functionCall!
             switch function.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
             case "custom":
-                guard let logic = function.arguments.first?.expression.stringLiteral?.string(encoding: .string) else { break }
+                guard let logic = function.arguments.first?.expression.stringLiteral?.string(encoding: .string) else { return nil }
                 if function.arguments.count == 1 {
                     return .custom(logic)
                 } else {
                     return .custom(logic, stringDelimiter: function.arguments.last!.expression.stringLiteral!.string(encoding: .string))
                 }
             default:
-                break
+                return nil
             }
+        default:
+            return nil
         }
-        return nil
     }
 
     // MARK: Parse Global Attributes
@@ -328,13 +329,13 @@ extension HTMLKitUtilities {
 
 // MARK: Misc
 extension ExprSyntax {
-    package func string(context: HTMLExpansionContext) -> String? {
+    package func string(_ context: HTMLExpansionContext) -> String? {
         return HTMLKitUtilities.parseLiteralValue(context: context, expression: self)?.value(key: context.key)
     }
-    package func boolean(context: HTMLExpansionContext) -> Bool? {
+    package func boolean(_ context: HTMLExpansionContext) -> Bool? {
         booleanLiteral?.literal.text == "true"
     }
-    package func enumeration<T : HTMLParsable>(context: HTMLExpansionContext) -> T? {
+    package func enumeration<T : HTMLParsable>(_ context: HTMLExpansionContext) -> T? {
         if let function = functionCall, let member = function.calledExpression.memberAccess {
             var c = context
             c.key = member.declName.baseName.text
@@ -348,28 +349,28 @@ extension ExprSyntax {
         }
         return nil
     }
-    package func int(context: HTMLExpansionContext) -> Int? {
+    package func int(_ context: HTMLExpansionContext) -> Int? {
         guard let s = HTMLKitUtilities.parseLiteralValue(context: context, expression: self)?.value(key: context.key) else { return nil }
         return Int(s)
     }
-    package func arrayString(context: HTMLExpansionContext) -> [String]? {
-        array?.elements.compactMap({ $0.expression.string(context: context) })
+    package func arrayString(_ context: HTMLExpansionContext) -> [String]? {
+        array?.elements.compactMap({ $0.expression.string(context) })
     }
-    package func arrayEnumeration<T: HTMLParsable>(context: HTMLExpansionContext) -> [T]? {
-        array?.elements.compactMap({ $0.expression.enumeration(context: context) })
+    package func arrayEnumeration<T: HTMLParsable>(_ context: HTMLExpansionContext) -> [T]? {
+        array?.elements.compactMap({ $0.expression.enumeration(context) })
     }
-    package func dictionaryStringString(context: HTMLExpansionContext) -> [String:String] {
+    package func dictionaryStringString(_ context: HTMLExpansionContext) -> [String:String] {
         var d:[String:String] = [:]
         if let elements = dictionary?.content.as(DictionaryElementListSyntax.self) {
             for element in elements {
-                if let key = element.key.string(context: context), let value = element.value.string(context: context) {
+                if let key = element.key.string(context), let value = element.value.string(context) {
                     d[key] = value
                 }
             }
         }
         return d
     }
-    package func float(context: HTMLExpansionContext) -> Float? {
+    package func float(_ context: HTMLExpansionContext) -> Float? {
         guard let s = HTMLKitUtilities.parseLiteralValue(context: context, expression: self)?.value(key: context.key) else { return nil }
         return Float(s)
     }
@@ -391,11 +392,11 @@ package struct DiagnosticMsg : DiagnosticMessage, FixItMessage {
 
 // MARK: HTMLExpansionContext
 extension HTMLExpansionContext {
-    func string() -> String? { expression?.string(context: self) }
-    func boolean() -> Bool?  { expression?.boolean(context: self) }
-    func enumeration<T : HTMLParsable>() -> T? { expression?.enumeration(context: self) }
-    func int() -> Int? { expression?.int(context: self) }
-    func float() -> Float? { expression?.float(context: self) }
-    func arrayString() -> [String]? { expression?.arrayString(context: self) }
-    func arrayEnumeration<T: HTMLParsable>() -> [T]? { expression?.arrayEnumeration(context: self) }
+    func string() -> String? { expression?.string(self) }
+    func boolean() -> Bool?  { expression?.boolean(self) }
+    func enumeration<T : HTMLParsable>() -> T? { expression?.enumeration(self) }
+    func int() -> Int? { expression?.int(self) }
+    func float() -> Float? { expression?.float(self) }
+    func arrayString() -> [String]? { expression?.arrayString(self) }
+    func arrayEnumeration<T: HTMLParsable>() -> [T]? { expression?.arrayEnumeration(self) }
 }

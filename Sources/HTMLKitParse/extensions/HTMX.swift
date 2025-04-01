@@ -23,7 +23,7 @@ extension HTMXAttribute : HTMLParsable {
         case "disinherit": self = .disinherit(string())
         case "encoding": self = .encoding(string())
         case "ext": self = .ext(string())
-        case "headers": self = .headers(js: boolean() ?? false, context.arguments.last!.expression.dictionaryStringString(context: context))
+        case "headers": self = .headers(js: boolean() ?? false, context.arguments.last!.expression.dictionaryStringString(context))
         case "history": self = .history(enumeration())
         case "historyElt": self = .historyElt(boolean())
         case "include": self = .include(string())
@@ -37,19 +37,19 @@ extension HTMXAttribute : HTMLParsable {
         case "replaceURL": self = .replaceURL(enumeration())
         case "request":
             guard let js = boolean() else { return nil }
-            let timeout = context.arguments.get(1)?.expression.string(context: context)
-            let credentials = context.arguments.get(2)?.expression.string(context: context)
-            let noHeaders = context.arguments.get(3)?.expression.string(context: context)
+            let timeout = context.arguments.getPositive(1)?.expression.string(context)
+            let credentials = context.arguments.getPositive(2)?.expression.string(context)
+            let noHeaders = context.arguments.getPositive(3)?.expression.string(context)
             self = .request(js: js, timeout: timeout, credentials: credentials, noHeaders: noHeaders)
         case "sync":
             guard let s = string() else { return nil }
-            self = .sync(s, strategy: context.arguments.last!.expression.enumeration(context: context))
+            self = .sync(s, strategy: context.arguments.last!.expression.enumeration(context))
         case "validate": self = .validate(enumeration())
 
         case "get": self = .get(string())
         case "post": self = .post(string())
         case "on", "onevent":
-            guard let s = context.arguments.last?.expression.string(context: context) else { return nil }
+            guard let s = context.arguments.last?.expression.string(context) else { return nil }
             if context.key == "on" {
                 self = .on(enumeration(), s)
             } else {

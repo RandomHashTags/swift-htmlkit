@@ -64,6 +64,7 @@ public enum HTMLEncoding : Sendable {
     /// 
     case custom(_ logic: String, stringDelimiter: String = "\\\"")
 
+    @inlinable
     public init?(rawValue: String) {
         switch rawValue {
         case "string": self = .string

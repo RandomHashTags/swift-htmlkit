@@ -23,7 +23,7 @@ extension HTMLAttribute : HTMLParsable {
         case "class":                 self = .class(arrayString())
         case "contenteditable":       self = .contenteditable(enumeration())
         case "data", "custom":
-            guard let id = string(), let value = context.arguments.last?.expression.string(context: context) else {
+            guard let id = string(), let value = context.arguments.last?.expression.string(context) else {
                 return nil
             }
             if context.key == "data" {
@@ -64,7 +64,7 @@ extension HTMLAttribute : HTMLParsable {
         case "trailingSlash":         self = .trailingSlash
         case "htmx":                  self = .htmx(enumeration())
         case "event":
-            guard let event:HTMLEvent = enumeration(), let value = context.arguments.last?.expression.string(context: context) else {
+            guard let event:HTMLEvent = enumeration(), let value = context.arguments.last?.expression.string(context) else {
                 return nil
             }
             self = .event(event, value)

@@ -18,8 +18,9 @@ public protocol HTMLInitializable : Hashable, Sendable {
 }
 
 extension HTMLInitializable {
+    @inlinable
     public func unwrap<T>(_ value: T?, suffix: String? = nil) -> String? {
-        guard let value:T = value else { return nil }
+        guard let value else { return nil }
         return "\(value)" + (suffix ?? "")
     }
 }

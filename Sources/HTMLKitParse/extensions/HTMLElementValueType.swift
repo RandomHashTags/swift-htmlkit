@@ -12,8 +12,7 @@ import SwiftSyntax
 
 extension HTMLElementValueType {
     package static func get<T: HTMLElement>(_ context: HTMLExpansionContext, _ bruh: T.Type) -> T {
-        let data = HTMLKitUtilities.parseArguments(context: context, otherAttributes: T.otherAttributes)
-        return T(context.encoding, data)
+        return T(context.encoding, HTMLKitUtilities.parseArguments(context: context, otherAttributes: T.otherAttributes))
     }
     package static func parseElement(
         context: HTMLExpansionContext,

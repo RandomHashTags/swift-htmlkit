@@ -16,19 +16,7 @@ extension HTMLKitUtilities {
         context: HTMLExpansionContext,
         expression: ExprSyntax
     ) -> LiteralReturnType? {
-        switch expression.kind {
-        case .booleanLiteralExpr:
-            return .boolean(expression.booleanLiteral?.literal.text == "true")
-        case .integerLiteralExpr:
-            return .int(Int(expression.integerLiteral!.literal.text)!)
-        case .floatLiteralExpr:
-            return .float(Float(expression.floatLiteral!.literal.text)!)
-        default:
-            break
-        }
-        guard var returnType = extractLiteral(context: context, expression: expression) else {
-            return nil
-        }
+        guard let returnType = extractLiteral(context: context, expression: expression) else { return nil }
         guard returnType.isInterpolation else { return returnType }
         var remainingInterpolation:Int = 1
         var string:String
@@ -40,8 +28,8 @@ extension HTMLKitUtilities {
                 segments.append(segment)
                 if let expression = segment.as(ExpressionSegmentSyntax.self) {
                     interpolation.append(expression)
+                    remainingInterpolation += 1
                 }
-                remainingInterpolation += segment.is(StringSegmentSyntax.self) ? 0 : 1
             }
             var minimum:Int = 0
             for expr in interpolation {
@@ -77,11 +65,10 @@ extension HTMLKitUtilities {
         }
         // TODO: promote interpolation via lookupFiles here (remove `warnInterpolation` above and from `promoteInterpolation`)
         if remainingInterpolation > 0 {
-            returnType = .interpolation(string)
+            return .interpolation(string)
         } else {
-            returnType = .string(string)
+            return .string(string)
         }
-        return returnType
     }
     // MARK: Promote Interpolation
     static func promoteInterpolation(
@@ -89,17 +76,6 @@ extension HTMLKitUtilities {
         remainingInterpolation: inout Int,
         expr: ExpressionSegmentSyntax
     ) -> [any (SyntaxProtocol & SyntaxHashable)] {
-        func create(_ string: String) -> StringLiteralExprSyntax {
-            var s = StringLiteralExprSyntax(content: string)
-            s.openingQuote = TokenSyntax(stringLiteral: "")
-            s.closingQuote = TokenSyntax(stringLiteral: "")
-            return s
-        }
-        func interpolate(_ syntax: ExprSyntaxProtocol) -> ExpressionSegmentSyntax {
-            var list = LabeledExprListSyntax()
-            list.append(LabeledExprSyntax(expression: syntax))
-            return ExpressionSegmentSyntax(expressions: list)
-        }
         var values:[any (SyntaxProtocol & SyntaxHashable)] = []
         for element in expr.expressions {
             let expression = element.expression
@@ -131,13 +107,32 @@ extension HTMLKitUtilities {
         }
         return values
     }
+    static func create(_ string: String) -> StringLiteralExprSyntax {
+        var s = StringLiteralExprSyntax(content: string)
+        s.openingQuote = TokenSyntax(stringLiteral: "")
+        s.closingQuote = TokenSyntax(stringLiteral: "")
+        return s
+    }
+    static func interpolate(_ syntax: ExprSyntaxProtocol) -> ExpressionSegmentSyntax {
+        var list = LabeledExprListSyntax()
+        list.append(LabeledExprSyntax(expression: syntax))
+        return ExpressionSegmentSyntax(expressions: list)
+    }
+
     // MARK: Extract Literal
     static func extractLiteral(
         context: HTMLExpansionContext,
         expression: ExprSyntax
     ) -> LiteralReturnType? {
         switch expression.kind {
-        case .nilLiteralExpr: return nil
+        case .nilLiteralExpr:
+            return nil
+        case .booleanLiteralExpr:
+            return .boolean(expression.booleanLiteral!.literal.text == "true")
+        case .integerLiteralExpr:
+            return .int(Int(expression.integerLiteral!.literal.text)!)
+        case .floatLiteralExpr:
+            return .float(Float(expression.floatLiteral!.literal.text)!)
         case .memberAccessExpr, .forceUnwrapExpr:
             return .interpolation("\(expression)")
         case .stringLiteralExpr:
@@ -260,6 +255,7 @@ public enum LiteralReturnType {
 
 // MARK: Misc
 extension MemberAccessExprSyntax {
+    @inlinable
     var singleLineDescription : String {
         var string = "\(self)"
         string.removeAll { $0.isWhitespace }

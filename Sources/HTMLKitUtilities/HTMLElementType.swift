@@ -5,7 +5,7 @@
 //  Created by Evan Anderson on 11/21/24.
 //
 
-public enum HTMLElementType : String, CaseIterable, Sendable {
+public enum HTMLElementType : String, Sendable {
     case html
     
     case a

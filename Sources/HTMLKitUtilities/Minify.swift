@@ -6,6 +6,7 @@
 //
 
 extension HTMLKitUtilities {
+    @usableFromInline
     static let defaultPreservedWhitespaceTags:Set<Substring> = Set(Array<HTMLElementType>(arrayLiteral:
         .a, .abbr,
         .b, .bdi, .bdo, .button,
@@ -30,6 +31,7 @@ extension HTMLKitUtilities {
     ).map { "<" + $0.tagName + ">" })
 
     /// Removes whitespace between elements.
+    @inlinable
     public static func minify(
         html: String,
         preservingWhitespaceForTags: Set<Substring> = []
@@ -45,7 +47,7 @@ extension HTMLKitUtilities {
         for openingRange in openElementRanges {
             let tag = html[openingRange]
             result += tag
-            let closure = Self.defaultPreservedWhitespaceTags.contains(tag) || preservingWhitespaceForTags.contains(tag) ? appendAll : appendIfPermitted
+            let closure = Self.defaultPreservedWhitespaceTags.contains(tag) || preservingWhitespaceForTags.contains(tag) ? minifyAppendAll : minifyAppendIfPermitted
             let closestClosingRange = closeElementRanges.first(where: { $0.lowerBound > openingRange.upperBound })
             if let nextOpeningRange = openElementRanges.getPositive(openingRangeIndex + 1) {
                 var i = openingRange.upperBound
@@ -86,7 +88,8 @@ extension HTMLKitUtilities {
 
 // MARK: append
 extension HTMLKitUtilities {
-    fileprivate static func appendAll(
+    @usableFromInline
+    static func minifyAppendAll(
         html: String,
         i: inout String.Index,
         bound: String.Index,
@@ -95,7 +98,8 @@ extension HTMLKitUtilities {
         result += html[i..<bound]
         i = bound
     }
-    fileprivate static func appendIfPermitted(
+    @usableFromInline
+    static func minifyAppendIfPermitted(
         html: String,
         i: inout String.Index,
         bound: String.Index,
