@@ -30,44 +30,6 @@ extension StringProtocol {
 // MARK: Representations
 struct HTMLKitTests {
     @Test
-    func memoryLayout() {
-        //print("before=\((MemoryLayout<a>.alignment, MemoryLayout<a>.size, MemoryLayout<a>.stride))")
-        //print("after=\((MemoryLayout<NewA>.alignment, MemoryLayout<NewA>.size, MemoryLayout<NewA>.stride))")
-    }
-
-    public struct NewA : HTMLElement {
-        public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {
-        }
-
-        public private(set) var encoding:HTMLEncoding = .string
-        
-        /// Causes the browser to treat the linked URL as a download. Can be used with or without a `filename` value.
-        /// 
-        /// Without a value, the browser will suggest a filename/extension, generated from various sources:
-        /// - The [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) HTTP header
-        /// - The final segment in the URL [path](https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname)
-        /// - The [media type](https://developer.mozilla.org/en-US/docs/Glossary/MIME_type) (from the [`Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) header, the start of a [`data:` URL](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data), or [`Blob.type`](https://developer.mozilla.org/en-US/docs/Web/API/Blob/type) for a [`blob:` URL](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static))
-        public var download:HTMLAttribute.Extra.download? = nil
-        public var href:String? = nil
-        public var hrefLang:String? = nil
-        public let tag:String = "a"
-        public var type:String? = nil
-        public var attributes:[HTMLAttribute] = []
-        public var attributionsrc:[String] = []
-        public var innerHTML:[CustomStringConvertible & Sendable] = []
-        public var ping:[String] = []
-        public var rel:[HTMLAttribute.Extra.rel] = []
-        public var escaped:Bool = false
-        public private(set) var fromMacro:Bool = false
-        public let isVoid:Bool = false
-        public var referrerPolicy:HTMLAttribute.Extra.referrerpolicy? = nil
-        public var target:HTMLAttribute.Extra.target? = nil
-        public var trailingSlash:Bool = false
-
-        public var description : String { ""  }
-    }
-
-    @Test
     func representations() {
         let _ = #anyHTML(p())
         let _ = #anyHTML(encoding: .string, p())

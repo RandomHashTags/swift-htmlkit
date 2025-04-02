@@ -105,6 +105,7 @@ enum HTMLElements : DeclarationMacro {
                 initializers += "self.trailingSlash = data.trailingSlash\n"
             }
             initializers += "self.attributes = data.globalAttributes\n"
+            var builders = ""
             for (key, valueType, _) in attributes {
                 var keyLiteral = key
                 if keyLiteral.first == "`" {
@@ -119,6 +120,13 @@ enum HTMLElements : DeclarationMacro {
                     break
                 }
                 initializers += "self.\(key) = data.attributes[\"\(keyLiteral)\"] " + value + "\n"
+                builders += """
+                @inlinable
+                public mutating func \(key)(_ value: \(valueType)\(valueType == "Bool" ? "" : "?")) -> Self {
+                    self.\(key) = value
+                    return self
+                }
+                """
             }
             initializers += "self.innerHTML = data.innerHTML\n"
             initializers += "}"
@@ -186,6 +194,7 @@ enum HTMLElements : DeclarationMacro {
             render += "}"
 
             string += render
+            //string += "\n" + builders
             string += "\n}"
             items.append("\(raw: string)")
         }
@@ -208,7 +217,7 @@ enum HTMLElements : DeclarationMacro {
         innerHTMLValueType: String,
         assignInnerHTML: String
     ) -> String {
-        var initializers = "public init(\n"
+        var initializers = "@discardableResult public init(\n"
         initializers += "attributes: [HTMLAttribute] = [],\n"
         for (key, valueType, defaultValue) in attributes {
             initializers += key + ": " + valueType + defaultValue + ",\n"
