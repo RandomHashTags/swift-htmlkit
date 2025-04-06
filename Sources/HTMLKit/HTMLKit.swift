@@ -65,6 +65,7 @@ public macro uncheckedHTML<T: CustomStringConvertible & Sendable>(
 public macro rawHTML<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
+    minify: Bool = false,
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
 
@@ -75,5 +76,10 @@ public macro rawHTML<T: CustomStringConvertible & Sendable>(
 public macro anyRawHTML(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
+    minify: Bool = false,
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
+
+// MARK: HTML Context
+//@freestanding(expression)
+//public macro htmlContext() = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")

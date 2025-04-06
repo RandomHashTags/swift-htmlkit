@@ -48,8 +48,10 @@ extension HTMLKitUtilities {
         for e in children {
             if let child = e.labeled {
                 if let key = child.label?.text {
-                    if key == "encoding" {
-                        context.encoding = parseEncoding(expression: child.expression) ?? .string
+                    switch key {
+                    case "encoding": context.encoding = parseEncoding(expression: child.expression) ?? .string
+                    case "minify":   context.minify = child.expression.boolean(context) ?? false
+                    default: break
                     }
                 } else if var c = HTMLKitUtilities.parseInnerHTML(context: context, child: child) {
                     if var element = c as? HTMLElement {
@@ -60,6 +62,8 @@ extension HTMLKitUtilities {
                 }
             }
         }
+        guard !context.minify else { return minify(html: innerHTML) }
+        innerHTML.replace(HTMLKitUtilities.lineFeedPlaceholder, with: "\\n")
         return innerHTML
     }
     
@@ -68,10 +72,12 @@ extension HTMLKitUtilities {
         let (string, encoding):(String, HTMLEncoding) = expandMacro(context: context)
         return "\(raw: encodingResult(context: context, node: context.expansion, string: string, for: encoding))"
     }
-    private static func encodingResult(context: HTMLExpansionContext, node: MacroExpansionExprSyntax, string: String, for encoding: HTMLEncoding) -> String {
-        func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
-            return "[" + bytes.map({ "\($0)" }).joined(separator: ",") + "]"
-        }
+    private static func encodingResult(
+        context: HTMLExpansionContext,
+        node: MacroExpansionExprSyntax,
+        string: String,
+        for encoding: HTMLEncoding
+    ) -> String {
         switch encoding {
         case .utf8Bytes:
             guard hasNoInterpolation(context, node, string) else { return "" }
@@ -96,6 +102,14 @@ extension HTMLKitUtilities {
         case .custom(let encoded, _):
             return encoded.replacingOccurrences(of: "$0", with: string)
         }
+    }
+    private static func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
+        var string:String = "["
+        for b in bytes {
+            string += "\(b),"
+        }
+        string.removeLast()
+        return string.isEmpty ? "[]" : string + "]"
     }
     private static func hasNoInterpolation(_ context: HTMLExpansionContext, _ node: MacroExpansionExprSyntax, _ string: String) -> Bool {
         guard string.firstRange(of: try! Regex("\\((.*)\\)")) == nil else {
@@ -323,7 +337,12 @@ extension HTMLKitUtilities {
     // MARK: Expand Macro
     static func expandMacro(context: HTMLExpansionContext) -> (String, HTMLEncoding) {
         let data = HTMLKitUtilities.parseArguments(context: context)
-        return (data.innerHTML.map({ String(describing: $0) }).joined(), data.encoding)
+        var string:String = ""
+        for v in data.innerHTML {
+            string += String(describing: v)
+        }
+        string.replace(HTMLKitUtilities.lineFeedPlaceholder, with: "\\n")
+        return (string, data.encoding)
     }
 }
 

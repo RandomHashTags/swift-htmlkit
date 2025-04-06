@@ -27,6 +27,8 @@ public struct HTMLExpansionContext : @unchecked Sendable {
     /// Complete file paths used for looking up interpolation (when trying to promote to an equivalent `StaticString`).
     public var lookupFiles:Set<String>
 
+    public package(set) var minify:Bool
+
     public package(set) var ignoresCompilerWarnings:Bool
 
     public package(set) var escape:Bool
@@ -41,6 +43,7 @@ public struct HTMLExpansionContext : @unchecked Sendable {
         key: String,
         arguments: LabeledExprListSyntax,
         lookupFiles: Set<String> = [],
+        minify: Bool = false,
         escape: Bool = true,
         escapeAttributes: Bool = true,
         elementsRequireEscaping: Bool = true
@@ -52,6 +55,7 @@ public struct HTMLExpansionContext : @unchecked Sendable {
         self.key = key
         self.arguments = arguments
         self.lookupFiles = lookupFiles
+        self.minify = minify
         self.escape = escape
         self.escapeAttributes = escapeAttributes
         self.elementsRequireEscaping = elementsRequireEscaping

@@ -48,8 +48,9 @@ extension HTMLKitUtilities {
             }
             result += originalTag
             if let next = tagRanges.get(tagIndex + 1) {
-                let slice = html[tagRange.upperBound..<next.lowerBound]
+                var slice = html[tagRange.upperBound..<next.lowerBound]
                 if !(Self.defaultPreservedWhitespaceTags.contains(tag) || preservingWhitespaceForTags.contains(tag)) {
+                    slice.replace(HTMLKitUtilities.lineFeedPlaceholder, with: "")
                     for char in slice {
                         if !(char.isWhitespace || char.isNewline) {
                             result.append(char)

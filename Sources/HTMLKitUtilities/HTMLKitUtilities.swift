@@ -5,12 +5,26 @@
 //  Created by Evan Anderson on 9/19/24.
 //
 
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#elseif canImport(Foundation)
+import Foundation
+#endif
+
 #if canImport(SwiftSyntax)
 import SwiftSyntax
 #endif
 
 // MARK: HTMLKitUtilities
 public enum HTMLKitUtilities {
+    @usableFromInline
+    package static let lineFeedPlaceholder:String = {
+        #if canImport(FoundationEssentials) || canImport(Foundation)
+        return "%\(UUID())%"
+        #else
+        return "%HTMLKitLineFeed\(Int.random(in: Int.min...Int.max))%"
+        #endif
+    }()
 }
 
 // MARK: Escape HTML
@@ -81,10 +95,13 @@ extension StringLiteralExprSyntax {
     @inlinable 
     package func string(encoding: HTMLEncoding) -> String {
         if openingQuote.debugDescription.hasPrefix("multilineStringQuote") {
-            var value = segments.compactMap({ $0.as(StringSegmentSyntax.self)?.content.text }).joined()
+            var value:String = ""
+            for segment in segments {
+                value += segment.as(StringSegmentSyntax.self)?.content.text ?? ""
+            }
             switch encoding {
             case .string:
-                value.replace("\n", with: "\\n")
+                value.replace("\n", with: HTMLKitUtilities.lineFeedPlaceholder)
                 value.replace("\"", with: "\\\"")
             default:
                 break
