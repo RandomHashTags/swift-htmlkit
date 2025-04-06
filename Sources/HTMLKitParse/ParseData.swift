@@ -62,7 +62,9 @@ extension HTMLKitUtilities {
                 }
             }
         }
-        guard !context.minify else { return minify(html: innerHTML) }
+        if context.minify {
+            innerHTML = minify(html: innerHTML)
+        }
         innerHTML.replace(HTMLKitUtilities.lineFeedPlaceholder, with: "\\n")
         return innerHTML
     }
