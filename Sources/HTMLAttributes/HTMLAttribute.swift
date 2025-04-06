@@ -50,11 +50,11 @@ public enum HTMLAttribute : HTMLInitializable {
     case slot(String? = nil)
     case spellcheck(Extra.spellcheck? = nil)
 
-    #if canImport(CSS)
+    /*#if canImport(CSS)
     case style([CSSStyle]? = nil)
-    #else
+    #else*/
     case style(String? = nil)
-    #endif
+    //#endif
 
     case tabindex(Int? = nil)
     case title(String? = nil)
@@ -169,11 +169,11 @@ public enum HTMLAttribute : HTMLInitializable {
         case .slot(let value):                  return value
         case .spellcheck(let value):            return value?.rawValue
 
-        #if canImport(CSS)
+        /*#if canImport(CSS)
         case .style(let value):                 return value?.compactMap({ $0.htmlValue(encoding: encoding, forMacro: forMacro) }).joined(separator: ";")
-        #else
+        #else*/
         case .style(let value): return value
-        #endif
+        //#endif
         
         case .tabindex(let value):              return value?.description
         case .title(let value):                 return value

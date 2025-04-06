@@ -14,7 +14,8 @@ struct CSSTests {
 
     @Test func cssAttribute() {
         let expected:String = "<div style=\"white-space:normal\"></div>"
-        let result:String = #html(div(attributes: [.style([.whiteSpace(.normal)])]))
+        //let result:String = #html(div(attributes: [.style([.whiteSpace(.normal)])]))
+        let result:String = #html(div(attributes: [.style("white-space:normal")]))
         #expect(expected == result)
     }
 

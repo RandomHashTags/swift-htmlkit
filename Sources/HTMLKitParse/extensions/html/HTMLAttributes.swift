@@ -52,9 +52,11 @@ extension HTMLAttribute : HTMLParsable {
         case "slot":                  self = .slot(string())
         case "spellcheck":            self = .spellcheck(enumeration())
 
-        #if canImport(CSS)
+        /*#if canImport(CSS)
         case "style":                 self = .style(context.arrayEnumeration())
-        #endif
+        #else*/
+        case "style":                 self = .style(context.string())
+        //#endif
 
         case "tabindex":              self = .tabindex(context.int())
         case "title":                 self = .title(string())
