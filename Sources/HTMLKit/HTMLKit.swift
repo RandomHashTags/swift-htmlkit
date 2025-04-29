@@ -81,5 +81,7 @@ public macro anyRawHTML(
 ) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
 
 // MARK: HTML Context
-//@freestanding(expression)
-//public macro htmlContext() = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
+@freestanding(expression)
+macro htmlContext<T: CustomStringConvertible & Sendable>(
+    _ value: () -> T
+) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLContext")

@@ -132,7 +132,8 @@ enum HTMLElements : DeclarationMacro {
             initializers += "}"
             string += initializers
 
-            var render = "\npublic var description : String {\n"
+            var referencedStringDelimiter:Bool = false
+            var render = "\n@inlinable public var description : String {\n"
             var attributes_func = ""
             var itemsArray:String = ""
             if !attributes.isEmpty {
@@ -152,6 +153,7 @@ enum HTMLElements : DeclarationMacro {
                 default: break
                 }
                 if valueType.first == "[" {
+                    referencedStringDelimiter = true
                     itemsArray += "if let _\(variableName):String = "
                     let separator = separator(key: key)
                     switch valueType {
@@ -160,7 +162,7 @@ enum HTMLElements : DeclarationMacro {
                     case "[Int]", "[Float]":
                         itemsArray += "\(key)?.map({ \"\\($0)\" })"
                     default:
-                        itemsArray += "\(key)?.compactMap({ return $0.htmlValue(encoding: encoding, forMacro: fromMacro) })"
+                        itemsArray += "\(key)?.compactMap({ $0.htmlValue(encoding: encoding, forMacro: fromMacro) })"
                     }
                     itemsArray += ".joined(separator: \"\(separator)\") {\n"
                     itemsArray += #"let k:String = _\#(variableName).isEmpty ? "" : "=" + sd + _\#(variableName) + sd"#
@@ -171,10 +173,12 @@ enum HTMLElements : DeclarationMacro {
                     case "Bool":
                         itemsArray += "if \(key) { items.append(\"\(keyLiteral)\") }\n"
                     case "String", "Int", "Float", "Double":
+                        referencedStringDelimiter = true
                         let value = valueType == "String" ? key : "String(describing: \(key))"
                         itemsArray += #"if let \#(key) { items.append("\#(keyLiteral)=" + sd + \#(value) + sd) }"#
                         itemsArray += "\n"
                     default:
+                        referencedStringDelimiter = true
                         itemsArray += "if let \(key), let v = \(key).htmlValue(encoding: encoding, forMacro: fromMacro) {\n"
                         itemsArray += #"let s = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=" + sd + v + sd"#
                         itemsArray += "\nitems.append(\"\(keyLiteral)\" + s)"
@@ -182,7 +186,7 @@ enum HTMLElements : DeclarationMacro {
                     }
                 }
             }
-            render += attributes_func + itemsArray
+            render += (!referencedStringDelimiter ? "" : attributes_func) + itemsArray
             render += "return render("
             if tag == "html" {
                 render += "prefix: \"!DOCTYPE html\", "

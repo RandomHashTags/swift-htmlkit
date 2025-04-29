@@ -23,7 +23,7 @@ struct InterpolationTests {
 
         expected_result = #html(div(attributes: [.id("sheesh-dude")], "sheesh-dude"))
         test = "dude"
-        let result:String = #html(div(attributes:[.id("sheesh-\(test)")], "sheesh-\(test)"))
+        let result:String = #html(div(attributes: [.id("sheesh-\(test)")], "sheesh-\(test)"))
         #expect(result == expected_result)
     }
 
