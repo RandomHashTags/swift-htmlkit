@@ -6,11 +6,11 @@ import CompilerPluginSupport
 let package = Package(
     name: "swift-htmlkit",
     platforms: [
-        .macOS(.v14),
-        .iOS(.v17),
-        .tvOS(.v17),
+        .macOS(.v13),
+        .iOS(.v16),
+        .tvOS(.v16),
         .visionOS(.v1),
-        .watchOS(.v10)
+        .watchOS(.v9)
     ],
     products: [
         .library(
