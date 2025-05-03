@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.Order : HTMLParsable {
+extension CSSStyle.Order: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "int": self = .int(context.int())

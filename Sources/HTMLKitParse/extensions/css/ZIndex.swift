@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.ZIndex : HTMLParsable {
+extension CSSStyle.ZIndex: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "auto": self = .auto

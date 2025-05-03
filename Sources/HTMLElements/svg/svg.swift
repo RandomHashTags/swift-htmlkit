@@ -11,7 +11,7 @@ import HTMLKitUtilities
 // MARK: svg
 /// The `svg` HTML element.
 // TODO: finish
-struct svg : HTMLElement {
+struct svg: HTMLElement {
     public static let otherAttributes:[String:String] = [:]
     
     public let tag:String = "svg"
@@ -48,7 +48,7 @@ struct svg : HTMLElement {
     }
 
     @inlinable
-    public var description : String {
+    public var description: String {
         let attributesString = self.attributes.compactMap({
             guard let v = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }
             let delimiter = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)
@@ -69,7 +69,7 @@ struct svg : HTMLElement {
 // MARK: Attributes
 extension svg {
     public enum Attributes {
-        public enum PreserveAspectRatio : HTMLInitializable {
+        public enum PreserveAspectRatio: HTMLInitializable {
             case none
             case xMinYMin(Keyword?)
             case xMidYMin(Keyword?)
@@ -81,8 +81,8 @@ extension svg {
             case xMidYMax(Keyword?)
             case xMaxYMax(Keyword?)
 
-            public var key : String { "" }
-            @inlinable public var htmlValueIsVoidable : Bool { false }
+            public var key: String { "" }
+            @inlinable public var htmlValueIsVoidable: Bool { false }
 
             @inlinable
             public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
@@ -102,7 +102,7 @@ extension svg {
             }
         }
 
-        public enum Keyword : String, HTMLParsable {
+        public enum Keyword: String, HTMLParsable {
             case meet
             case slice
         }

@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 extension CSSStyle {
-    public enum Cursor : HTMLInitializable {
+    public enum Cursor: HTMLInitializable {
         case alias
         case allScroll
         case auto
@@ -52,7 +52,7 @@ extension CSSStyle {
 
         /// - Warning: Never use.
         @inlinable
-        public var key : String { "" }
+        public var key: String { "" }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
@@ -84,6 +84,6 @@ extension CSSStyle {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }

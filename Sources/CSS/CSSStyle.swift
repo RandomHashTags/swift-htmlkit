@@ -7,7 +7,7 @@
 
 import HTMLKitUtilities
 
-public enum CSSStyle : HTMLInitializable {
+public enum CSSStyle: HTMLInitializable {
     //case accentColor(AccentColor?)
     //case align(Align?)
     case all(All?)
@@ -132,7 +132,7 @@ public enum CSSStyle : HTMLInitializable {
 
     // MARK: Key
     @inlinable
-    public var key : String {
+    public var key: String {
         switch self {
         //case .accentColor: return "accentColor"
         //case .align: return "align"
@@ -260,14 +260,14 @@ public enum CSSStyle : HTMLInitializable {
 
     // MARK: HTML value is voidable
     @inlinable
-    public var htmlValueIsVoidable : Bool { false }
+    public var htmlValueIsVoidable: Bool { false }
 }
 
 // MARK: HTML value
 extension CSSStyle {
     @inlinable
     public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
-        func get<T : HTMLInitializable>(_ value: T?) -> String? {
+        func get<T: HTMLInitializable>(_ value: T?) -> String? {
             guard let v = value?.htmlValue(encoding: encoding, forMacro: forMacro) else { return nil }
             return key + ":" + v
         }

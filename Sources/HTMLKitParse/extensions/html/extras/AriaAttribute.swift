@@ -8,7 +8,7 @@
 import HTMLAttributes
 import HTMLKitUtilities
 
-extension HTMLAttribute.Extra.ariaattribute : HTMLParsable {
+extension HTMLAttribute.Extra.ariaattribute: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         func arrayString() -> [String]? { context.arrayString() }
         func boolean() -> Bool? { context.boolean() }

@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.AccentColor : HTMLParsable {
+extension CSSStyle.AccentColor: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "auto": self = .auto

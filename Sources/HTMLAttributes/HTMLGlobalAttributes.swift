@@ -23,7 +23,7 @@ import SwiftSyntax
 
 // MARK: HTMLGlobalAttributes
 // TODO: finish
-struct HTMLGlobalAttributes : CustomStringConvertible {
+struct HTMLGlobalAttributes: CustomStringConvertible {
     public var accesskey:String?
     public var ariaattribute:HTMLAttribute.Extra.ariaattribute?
     public var role:HTMLAttribute.Extra.ariarole?
@@ -34,7 +34,7 @@ struct HTMLGlobalAttributes : CustomStringConvertible {
     }
 
     @inlinable
-    public var description : String {
+    public var description: String {
         ""
     }
 }

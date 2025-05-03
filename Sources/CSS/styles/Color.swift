@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 extension CSSStyle {
     @frozen
-    public enum Color : HTMLParsable {
+    public enum Color: HTMLParsable {
         case currentColor
         case hex(String)
         case hsl(Swift.Float, Swift.Float, Swift.Float, Swift.Float? = nil)
@@ -167,7 +167,7 @@ extension CSSStyle {
         case yellowGreen
 
         /// - Warning: Never use.
-        public var key : String { "" }
+        public var key: String { "" }
 
         // MARK: HTML value
         @inlinable
@@ -185,7 +185,7 @@ extension CSSStyle {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }
 

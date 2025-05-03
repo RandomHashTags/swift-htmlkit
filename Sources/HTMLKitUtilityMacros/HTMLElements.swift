@@ -9,7 +9,7 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-enum HTMLElements : DeclarationMacro {
+enum HTMLElements: DeclarationMacro {
     // MARK: expansion
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> [DeclSyntax] {
         let dictionary:DictionaryElementListSyntax = node.arguments.children(viewMode: .all).first!.as(LabeledExprSyntax.self)!.expression.as(DictionaryExprSyntax.self)!.content.as(DictionaryElementListSyntax.self)!
@@ -28,7 +28,7 @@ enum HTMLElements : DeclarationMacro {
             if element == "variable" {
                 tag = "var"
             }
-            var string:String = "// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element) : HTMLElement {\n"
+            var string:String = "// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element): HTMLElement {\n"
             string += """
             public let tag:String = "\(tag)"
             public var attributes:[HTMLAttribute]
@@ -133,7 +133,7 @@ enum HTMLElements : DeclarationMacro {
             string += initializers
 
             var referencedStringDelimiter:Bool = false
-            var render = "\n@inlinable public var description : String {\n"
+            var render = "\n@inlinable public var description: String {\n"
             var attributes_func = ""
             var itemsArray:String = ""
             if !attributes.isEmpty {
@@ -180,7 +180,7 @@ enum HTMLElements : DeclarationMacro {
                     default:
                         referencedStringDelimiter = true
                         itemsArray += "if let \(key), let v = \(key).htmlValue(encoding: encoding, forMacro: fromMacro) {\n"
-                        itemsArray += #"let s = \#(key).htmlValueIsVoidable && v.isEmpty ? "" : "=" + sd + v + sd"#
+                        itemsArray += #"let s = \#(key).htmlValueIsVoidable && v.isEmpty ? "": "=" + sd + v + sd"#
                         itemsArray += "\nitems.append(\"\(keyLiteral)\" + s)"
                         itemsArray += "\n}\n"
                     }

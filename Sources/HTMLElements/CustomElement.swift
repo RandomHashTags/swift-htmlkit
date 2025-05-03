@@ -10,7 +10,7 @@ import HTMLKitUtilities
 
 // MARK: custom
 /// A custom HTML element.
-public struct custom : HTMLElement {
+public struct custom: HTMLElement {
     public static let otherAttributes:[String:String] = [:]
     
     public let tag:String
@@ -47,7 +47,7 @@ public struct custom : HTMLElement {
     }
 
     @inlinable
-    public var description : String {
+    public var description: String {
         let attributesString = self.attributes.compactMap({
             guard let v = $0.htmlValue(encoding: encoding, forMacro: fromMacro) else { return nil }
             let delimiter = $0.htmlValueDelimiter(encoding: encoding, forMacro: fromMacro)

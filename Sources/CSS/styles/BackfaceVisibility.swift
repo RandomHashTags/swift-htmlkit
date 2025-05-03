@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum BackfaceVisibility : String, HTMLParsable {
+    public enum BackfaceVisibility: String, HTMLParsable {
         case hidden
         case inherit
         case initial

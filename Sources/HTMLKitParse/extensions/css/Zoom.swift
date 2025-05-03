@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.Zoom : HTMLParsable {
+extension CSSStyle.Zoom: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "float": self = .float(context.float())

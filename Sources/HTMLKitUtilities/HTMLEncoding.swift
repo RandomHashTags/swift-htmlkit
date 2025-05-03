@@ -30,7 +30,7 @@
 /// let _:String = #html(div(string)) // ⚠️ promotion cannot be applied; compiles to "<div>" + String(describing: string) + "</div>"
 /// ```
 /// 
-public enum HTMLEncoding : Sendable {
+public enum HTMLEncoding: Sendable {
     /// - Returns: `String`/`StaticString`
     case string
 

@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Zoom : HTMLInitializable {
+    public enum Zoom: HTMLInitializable {
         case float(Swift.Float?)
         case inherit
         case initial
@@ -19,7 +19,7 @@ extension CSSStyle {
         case revertLayer
         case unset
 
-        public var key : String { "" }
+        public var key: String { "" }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
@@ -36,6 +36,6 @@ extension CSSStyle {
             }
         }
 
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }

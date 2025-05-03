@@ -356,7 +356,7 @@ extension ExprSyntax {
     package func boolean(_ context: HTMLExpansionContext) -> Bool? {
         booleanLiteral?.literal.text == "true"
     }
-    package func enumeration<T : HTMLParsable>(_ context: HTMLExpansionContext) -> T? {
+    package func enumeration<T: HTMLParsable>(_ context: HTMLExpansionContext) -> T? {
         if let function = functionCall, let member = function.calledExpression.memberAccess {
             var c = context
             c.key = member.declName.baseName.text
@@ -398,11 +398,11 @@ extension ExprSyntax {
 }
 
 // MARK: DiagnosticMsg
-package struct DiagnosticMsg : DiagnosticMessage, FixItMessage {
+package struct DiagnosticMsg: DiagnosticMessage, FixItMessage {
     package let message:String
     package let diagnosticID:MessageID
     package let severity:DiagnosticSeverity
-    package var fixItID : MessageID { diagnosticID }
+    package var fixItID: MessageID { diagnosticID }
 
     package init(id: String, message: String, severity: DiagnosticSeverity = .error) {
         self.message = message
@@ -415,7 +415,7 @@ package struct DiagnosticMsg : DiagnosticMessage, FixItMessage {
 extension HTMLExpansionContext {
     func string() -> String? { expression?.string(self) }
     func boolean() -> Bool?  { expression?.boolean(self) }
-    func enumeration<T : HTMLParsable>() -> T? { expression?.enumeration(self) }
+    func enumeration<T: HTMLParsable>() -> T? { expression?.enumeration(self) }
     func int() -> Int? { expression?.int(self) }
     func float() -> Float? { expression?.float(self) }
     func arrayString() -> [String]? { expression?.arrayString(self) }

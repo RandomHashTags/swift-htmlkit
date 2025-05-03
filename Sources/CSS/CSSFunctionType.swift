@@ -6,7 +6,7 @@
 //
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Functions
-public enum CSSFunctionType : String {
+public enum CSSFunctionType: String {
     case abs
     case acos
     case anchor
@@ -112,7 +112,7 @@ public enum CSSFunctionType : String {
     case xywh
 
     @inlinable
-    public var key : String {
+    public var key: String {
         switch self {
         case .anchorSize: return "anchor-size"
         case .calcSize: return "calc-size"

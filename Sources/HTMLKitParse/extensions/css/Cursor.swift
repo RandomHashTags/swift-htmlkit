@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.Cursor : HTMLParsable {
+extension CSSStyle.Cursor: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "alias": self = .alias

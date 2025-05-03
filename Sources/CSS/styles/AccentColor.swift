@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum AccentColor : HTMLInitializable {
+    public enum AccentColor: HTMLInitializable {
         case auto
         case color(Color?)
         case inherit
@@ -18,7 +18,7 @@ extension CSSStyle {
         case unset
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .auto: return "auto"
             case .color: return "color"
@@ -44,6 +44,6 @@ extension CSSStyle {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }

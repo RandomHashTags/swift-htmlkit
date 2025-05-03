@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/order
 extension CSSStyle {
-    public enum Order : HTMLInitializable {
+    public enum Order: HTMLInitializable {
         case int(Int?)
         case inherit
         case initial
@@ -31,6 +31,6 @@ extension CSSStyle {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }

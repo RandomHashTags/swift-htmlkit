@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum HyphenateCharacter : HTMLParsable {
+    public enum HyphenateCharacter: HTMLParsable {
         case auto
         case char(Character)
         case inherit
@@ -18,7 +18,7 @@ extension CSSStyle {
             return nil
         }
 
-        public var key : String {
+        public var key: String {
             switch self {
             case .char: return "char"
             default: return "\(self)"
@@ -34,6 +34,6 @@ extension CSSStyle {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }

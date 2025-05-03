@@ -18,7 +18,7 @@ import HTMX
 #endif
 
 // MARK: HTMLAttribute
-public enum HTMLAttribute : HTMLInitializable {
+public enum HTMLAttribute: HTMLInitializable {
     case accesskey(String? = nil)
 
     case ariaattribute(Extra.ariaattribute? = nil)
@@ -78,7 +78,7 @@ public enum HTMLAttribute : HTMLInitializable {
 
     // MARK: key
     @inlinable
-    public var key : String {
+    public var key: String {
         switch self {
         case .accesskey:             return "accesskey"
         case .ariaattribute(let value):
@@ -194,7 +194,7 @@ public enum HTMLAttribute : HTMLInitializable {
 
     // MARK: htmlValueIsVoidable
     @inlinable
-    public var htmlValueIsVoidable : Bool {
+    public var htmlValueIsVoidable: Bool {
         switch self {
         case .autofocus, .hidden, .inert, .itemscope:
             return true
@@ -229,7 +229,7 @@ public enum HTMLAttribute : HTMLInitializable {
 
 // MARK: ElementData
 extension HTMLKitUtilities {
-    public struct ElementData : Sendable {
+    public struct ElementData: Sendable {
         public let encoding:HTMLEncoding
         public let globalAttributes:[HTMLAttribute]
         public let attributes:[String:Sendable]

@@ -5,7 +5,7 @@
 //  Created by Evan Anderson on 1/30/25.
 //
 
-public protocol HTMLParsable : HTMLInitializable {
+public protocol HTMLParsable: HTMLInitializable {
     #if canImport(SwiftSyntax)
     init?(context: HTMLExpansionContext)
     #endif

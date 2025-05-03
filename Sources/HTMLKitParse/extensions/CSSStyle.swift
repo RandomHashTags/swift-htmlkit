@@ -8,9 +8,9 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle : HTMLParsable {
+extension CSSStyle: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
-        func enumeration<T : HTMLParsable>() -> T? { context.enumeration() }
+        func enumeration<T: HTMLParsable>() -> T? { context.enumeration() }
         switch context.key {
         case "all": self = .all(enumeration())
         case "appearance": self = .appearance(enumeration())

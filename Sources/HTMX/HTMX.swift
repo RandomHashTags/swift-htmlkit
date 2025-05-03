@@ -9,7 +9,7 @@
 import HTMLKitUtilities
 #endif
 
-public enum HTMXAttribute : HTMLInitializable {
+public enum HTMXAttribute: HTMLInitializable {
     case boost(TrueOrFalse?)
     case confirm(String?)
     case delete(String?)
@@ -52,7 +52,7 @@ public enum HTMXAttribute : HTMLInitializable {
 
     // MARK: key
     @inlinable
-    public var key : String {
+    public var key: String {
         switch self {
         case .boost: return "boost"
         case .confirm: return "confirm"
@@ -159,7 +159,7 @@ public enum HTMXAttribute : HTMLInitializable {
     }
 
     @inlinable
-    public var htmlValueIsVoidable : Bool {
+    public var htmlValueIsVoidable: Bool {
         switch self {
         case .disable, .historyElt, .preserve:
             return true

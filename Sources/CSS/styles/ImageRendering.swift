@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ImageRendering : String, HTMLParsable {
+    public enum ImageRendering: String, HTMLParsable {
         case auto
         case crispEdges
         case highQuality

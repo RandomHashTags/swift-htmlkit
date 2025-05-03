@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ColumnCount : HTMLParsable {
+    public enum ColumnCount: HTMLParsable {
         case auto
         case inherit
         case initial
@@ -18,7 +18,7 @@ extension CSSStyle {
             return nil
         }
 
-        public var key : String {
+        public var key: String {
             switch self {
             case .int: return "int"
             default: return "\(self)"
@@ -34,6 +34,6 @@ extension CSSStyle {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }

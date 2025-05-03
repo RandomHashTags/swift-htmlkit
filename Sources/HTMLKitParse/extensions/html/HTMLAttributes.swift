@@ -8,7 +8,7 @@
 import HTMLAttributes
 import HTMLKitUtilities
 
-extension HTMLAttribute : HTMLParsable {
+extension HTMLAttribute: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         func arrayString() -> [String]? { context.arrayString() }
         func boolean() -> Bool? { context.boolean() }

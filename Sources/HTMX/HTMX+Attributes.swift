@@ -11,12 +11,12 @@ import HTMLKitUtilities
 
 extension HTMXAttribute {
     // MARK: TrueOrFalse
-    public enum TrueOrFalse : String, HTMLParsable {
+    public enum TrueOrFalse: String, HTMLParsable {
         case `true`, `false`
     }
 
     // MARK: Event
-    public enum Event : String, HTMLParsable {
+    public enum Event: String, HTMLParsable {
         case abort
         case afterOnLoad
         case afterProcessNode
@@ -66,7 +66,7 @@ extension HTMXAttribute {
         case xhrProgress
 
         @inlinable
-        var slug : String {
+        var slug: String {
             switch self {
             case .afterOnLoad:           return "after-on-load"
             case .afterProcessNode:      return "after-process-node"
@@ -114,20 +114,20 @@ extension HTMXAttribute {
         }
 
         @inlinable
-        public var key : String {
+        public var key: String {
             return ":" + slug
         }
     }
 
     // MARK: Params
-    public enum Params : HTMLInitializable {
+    public enum Params: HTMLInitializable {
         case all
         case none
         case not([String]?)
         case list([String]?)
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .all:     return "all"
             case .none:    return "none"
@@ -147,11 +147,11 @@ extension HTMXAttribute {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 
     // MARK: Swap
-    public enum Swap : String, HTMLParsable {
+    public enum Swap: String, HTMLParsable {
         case innerHTML, outerHTML
         case textContent
         case beforebegin, afterbegin
@@ -160,16 +160,16 @@ extension HTMXAttribute {
     }
 
     // MARK: SyncStrategy
-    public enum SyncStrategy : HTMLInitializable {
+    public enum SyncStrategy: HTMLInitializable {
         case drop, abort, replace
         case queue(Queue?)
 
-        public enum Queue : String, HTMLParsable {
+        public enum Queue: String, HTMLParsable {
             case first, last, all
         }
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .drop:     return "drop"
             case .abort:    return "abort"
@@ -189,11 +189,11 @@ extension HTMXAttribute {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 
     // MARK: URL
-    public enum URL : HTMLParsable {
+    public enum URL: HTMLParsable {
         case `true`, `false`
         case url(String)
         
@@ -209,7 +209,7 @@ extension HTMXAttribute {
         #endif
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .true:   return "true"
             case .false:  return "false"
@@ -227,19 +227,19 @@ extension HTMXAttribute {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
 // MARK: Server Sent Events
 extension HTMXAttribute {
-    public enum ServerSentEvents : HTMLInitializable {
+    public enum ServerSentEvents: HTMLInitializable {
         case connect(String?)
         case swap(String?)
         case close(String?)
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .connect: return "connect"
             case .swap: return "swap"
@@ -258,18 +258,18 @@ extension HTMXAttribute {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
 // MARK: WebSocket
 extension HTMXAttribute {
-    public enum WebSocket : HTMLInitializable {
+    public enum WebSocket: HTMLInitializable {
         case connect(String?)
         case send(Bool?)
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .connect: return "connect"
             case .send: return "send"
@@ -285,14 +285,14 @@ extension HTMXAttribute {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool {
+        public var htmlValueIsVoidable: Bool {
             switch self {
             case .send: return true
             default: return false
             }
         }
 
-        public enum Event : String {
+        public enum Event: String {
             case wsConnecting
             case wsOpen
             case wsClose

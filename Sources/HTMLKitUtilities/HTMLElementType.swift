@@ -5,7 +5,7 @@
 //  Created by Evan Anderson on 11/21/24.
 //
 
-public enum HTMLElementType : String, Sendable {
+public enum HTMLElementType: String, Sendable {
     case html
     
     case a
@@ -138,7 +138,7 @@ public enum HTMLElementType : String, Sendable {
     case wbr
 
     @inlinable
-    public var isVoid : Bool {
+    public var isVoid: Bool {
         switch self {
         case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
             return true
@@ -148,7 +148,7 @@ public enum HTMLElementType : String, Sendable {
     }
 
     @inlinable
-    public var tagName : String {
+    public var tagName: String {
         switch self {
         case .variable: return "var"
         default: return rawValue

@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Display : String, HTMLParsable {
+    public enum Display: String, HTMLParsable {
         /// Displays an element as a block element (like `<p>`). It starts on a new line, and takes up the whole width
         case block
 

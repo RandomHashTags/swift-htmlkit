@@ -13,7 +13,7 @@ import HTMLKitUtilities
 import SwiftSyntax
 #endif
 
-public enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/css_units.php
+public enum CSSUnit: HTMLInitializable { // https://www.w3schools.com/cssref/css_units.php
     // absolute
     case centimeters(_ value: Float?)
     case millimeters(_ value: Float?)
@@ -47,7 +47,7 @@ public enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/cs
     case percent(_ value: Float?)
 
     @inlinable
-    public var key : String {
+    public var key: String {
         switch self {
         case .centimeters:    return "centimeters"
         case .millimeters:    return "millimeters"
@@ -100,10 +100,10 @@ public enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/cs
     }
 
     @inlinable
-    public var htmlValueIsVoidable : Bool { false }
+    public var htmlValueIsVoidable: Bool { false }
 
     @inlinable
-    public var suffix : String {
+    public var suffix: String {
         switch self {
         case .centimeters:    return "cm"
         case .millimeters:    return "mm"
@@ -127,7 +127,7 @@ public enum CSSUnit : HTMLInitializable { // https://www.w3schools.com/cssref/cs
 
 #if canImport(SwiftSyntax)
 // MARK: HTMLParsable
-extension CSSUnit : HTMLParsable {
+extension CSSUnit: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         func float() -> Float? {
             guard let expression:ExprSyntax = context.expression,

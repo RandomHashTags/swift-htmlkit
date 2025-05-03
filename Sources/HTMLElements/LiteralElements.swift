@@ -135,7 +135,7 @@ macro HTMLElements(
 
 #HTMLElements([
     // MARK: A
-    .a : [
+    .a: [
         ("attributionsrc", .array(of: .string)),
         ("download", .attribute),
         ("href", .string),
@@ -146,9 +146,9 @@ macro HTMLElements(
         ("target", .attribute),
         ("type", .string)
     ],
-    .abbr : [],
-    .address : [],
-    .area : [
+    .abbr: [],
+    .address: [],
+    .area: [
         ("alt", .string),
         ("coords", .array(of: .int)),
         ("download", .attribute),
@@ -159,9 +159,9 @@ macro HTMLElements(
         ("rel", .array(of: .attribute)),
         ("target", .otherAttribute("formtarget"))
     ],
-    .article : [],
-    .aside : [],
-    .audio : [
+    .article: [],
+    .aside: [],
+    .audio: [
         ("autoplay", .bool),
         ("controls", .booleanDefaultValue(true)),
         ("controlslist", .array(of: .attribute)),
@@ -174,19 +174,19 @@ macro HTMLElements(
     ],
 
     // MARK: B
-    .b : [],
-    .base : [
+    .b: [],
+    .base: [
         ("href", .string),
         ("target", .otherAttribute("formtarget"))
     ],
-    .bdi : [],
-    .bdo : [],
-    .blockquote : [
+    .bdi: [],
+    .bdo: [],
+    .blockquote: [
         ("cite", .string)
     ],
-    .body : [],
-    .br : [],
-    .button : [
+    .body: [],
+    .br: [],
+    .button: [
         ("command", .attribute),
         ("commandfor", .string),
         ("disabled", .bool),
@@ -204,45 +204,45 @@ macro HTMLElements(
     ],
 
     // MARK: C
-    .canvas : [
+    .canvas: [
         ("height", .cssUnit),
         ("width", .cssUnit)
     ],
-    .caption : [],
-    .cite : [],
-    .code : [],
-    .col : [
+    .caption: [],
+    .cite: [],
+    .code: [],
+    .col: [
         ("span", .int)
     ],
-    .colgroup : [
+    .colgroup: [
         ("span", .int)
     ],
 
     // MARK: D
-    .data : [
+    .data: [
         ("value", .string)
     ],
-    .datalist : [],
-    .dd : [],
-    .del : [
+    .datalist: [],
+    .dd: [],
+    .del: [
         ("cite", .string),
         ("datetime", .string)
     ],
-    .details : [
+    .details: [
         ("open", .bool),
         ("name", .string)
     ],
-    .dfn : [],
-    .dialog : [
+    .dfn: [],
+    .dialog: [
         ("open", .bool)
     ],
-    .div : [],
-    .dl : [],
-    .dt : [],
+    .div: [],
+    .dl: [],
+    .dt: [],
 
     // MARK: E
-    .em : [],
-    .embed : [
+    .em: [],
+    .embed: [
         ("height", .cssUnit),
         ("src", .string),
         ("type", .string),
@@ -250,20 +250,20 @@ macro HTMLElements(
     ],
 
     // MARK: F
-    .fencedframe : [
+    .fencedframe: [
         ("allow", .string),
         ("height", .int),
         ("width", .int)
     ],
-    .fieldset : [
+    .fieldset: [
         ("disabled", .bool),
         ("form", .string),
         ("name", .string)
     ],
-    .figcaption : [],
-    .figure : [],
-    .footer : [],
-    .form : [
+    .figcaption: [],
+    .figure: [],
+    .footer: [],
+    .form: [
         ("acceptCharset", .array(of: .string)),
         ("action", .string),
         ("autocomplete", .attribute),
@@ -276,24 +276,24 @@ macro HTMLElements(
     ],
 
     // MARK: H
-    .h1 : [],
-    .h2 : [],
-    .h3 : [],
-    .h4 : [],
-    .h5 : [],
-    .h6 : [],
-    .head : [],
-    .header : [],
-    .hgroup : [],
-    .hr : [],
-    .html : [
+    .h1: [],
+    .h2: [],
+    .h3: [],
+    .h4: [],
+    .h5: [],
+    .h6: [],
+    .head: [],
+    .header: [],
+    .hgroup: [],
+    .hr: [],
+    .html: [
         ("lookupFiles", .array(of: .string)),
         ("xmlns", .string)
     ],
 
     // MARK: I
-    .i : [],
-    .iframe : [
+    .i: [],
+    .iframe: [
         ("allow", .array(of: .string)),
         ("browsingtopics", .bool),
         ("credentialless", .bool),
@@ -307,7 +307,7 @@ macro HTMLElements(
         ("srcdoc", .string),
         ("width", .cssUnit)
     ],
-    .img : [
+    .img: [
         ("alt", .string),
         ("attributionsrc", .array(of: .string)),
         ("crossorigin", .attribute),
@@ -324,7 +324,7 @@ macro HTMLElements(
         ("width", .cssUnit),
         ("usemap", .string)
     ],
-    .input : [
+    .input: [
         ("accept", .array(of: .string)),
         ("alt", .string),
         ("autocomplete", .array(of: .string)),
@@ -359,23 +359,23 @@ macro HTMLElements(
         ("value", .string),
         ("width", .cssUnit)
     ],
-    .ins : [
+    .ins: [
         ("cite", .string),
         ("datetime", .string)
     ],
 
     // MARK: K
-    .kbd : [],
+    .kbd: [],
     
     // MARK: L
-    .label : [
+    .label: [
         ("for", .string)
     ],
-    .legend : [],
-    .li : [
+    .legend: [],
+    .li: [
         ("value", .int)
     ],
-    .link : [
+    .link: [
         ("as", .otherAttribute("`as`")),
         ("blocking", .array(of: .attribute)),
         ("crossorigin", .attribute),
@@ -394,19 +394,19 @@ macro HTMLElements(
     ],
 
     // MARK: M
-    .main : [],
-    .map : [
+    .main: [],
+    .map: [
         ("name", .string)
     ],
-    .mark : [],
-    .menu : [],
-    .meta : [
+    .mark: [],
+    .menu: [],
+    .meta: [
         ("charset", .string),
         ("content", .string),
         ("httpEquiv", .otherAttribute("httpequiv")),
         ("name", .string)
     ],
-    .meter : [
+    .meter: [
         ("value", .float),
         ("min", .float),
         ("max", .float),
@@ -417,11 +417,11 @@ macro HTMLElements(
     ],
 
     // MARK: N
-    .nav : [],
-    .noscript : [],
+    .nav: [],
+    .noscript: [],
 
     // MARK: O
-    .object : [
+    .object: [
         ("archive", .array(of: .string)),
         ("border", .int),
         ("classid", .string),
@@ -437,54 +437,54 @@ macro HTMLElements(
         ("usemap", .string),
         ("width", .cssUnit)
     ],
-    .ol : [
+    .ol: [
         ("reversed", .bool),
         ("start", .int),
         ("type", .otherAttribute("numberingtype"))
     ],
-    .optgroup : [
+    .optgroup: [
         ("disabled", .bool),
         ("label", .string)
     ],
-    .option : [
+    .option: [
         ("disabled", .bool),
         ("label", .string),
         ("selected", .bool),
         ("value", .string)
     ],
-    .output : [
+    .output: [
         ("for", .array(of: .string)),
         ("form", .string),
         ("name", .string)
     ],
 
     // MARK: P
-    .p : [],
-    .picture : [],
-    .portal : [
+    .p: [],
+    .picture: [],
+    .portal: [
         ("referrerpolicy", .attribute),
         ("src", .string)
     ],
-    .pre : [],
-    .progress : [
+    .pre: [],
+    .progress: [
         ("max", .float),
         ("value", .float)
     ],
 
     // MARK: Q
-    .q : [
+    .q: [
         ("cite", .string)
     ],
 
     // MARK: R
-    .rp : [],
-    .rt : [],
-    .ruby : [],
+    .rp: [],
+    .rt: [],
+    .ruby: [],
 
     // MARK: S
-    .s : [],
-    .samp : [],
-    .script : [
+    .s: [],
+    .samp: [],
+    .script: [
         ("async", .bool),
         ("attributionsrc", .array(of: .string)),
         ("blocking", .attribute),
@@ -497,9 +497,9 @@ macro HTMLElements(
         ("src", .string),
         ("type", .otherAttribute("scripttype"))
     ],
-    .search : [],
-    .section : [],
-    .select : [
+    .search: [],
+    .section: [],
+    .select: [
         ("disabled", .bool),
         ("form", .string),
         ("multiple", .bool),
@@ -507,11 +507,11 @@ macro HTMLElements(
         ("required", .bool),
         ("size", .int)
     ],
-    .slot : [
+    .slot: [
         ("name", .string)
     ],
-    .small : [],
-    .source : [
+    .small: [],
+    .source: [
         ("type", .string),
         ("src", .string),
         ("srcset", .array(of: .string)),
@@ -520,31 +520,31 @@ macro HTMLElements(
         ("height", .int),
         ("width", .int)
     ],
-    .span : [],
-    .strong : [],
-    .style : [
+    .span: [],
+    .strong: [],
+    .style: [
         ("blocking", .attribute),
         ("media", .string)
     ],
-    .sub : [],
-    .summary : [],
-    .sup : [],
+    .sub: [],
+    .summary: [],
+    .sup: [],
 
     // MARK: T
-    .table : [],
-    .tbody : [],
-    .td : [
+    .table: [],
+    .tbody: [],
+    .td: [
         ("colspan", .int),
         ("headers", .array(of: .string)),
         ("rowspan", .int)
     ],
-    .template : [
+    .template: [
         ("shadowrootclonable", .attribute),
         ("shadowrootdelegatesfocus", .bool),
         ("shadowrootmode", .attribute),
         ("shadowrootserializable", .bool)
     ],
-    .textarea : [
+    .textarea: [
         ("autocomplete", .array(of: .string)),
         ("autocorrect", .attribute),
         ("cols", .int),
@@ -560,21 +560,21 @@ macro HTMLElements(
         ("rows", .int),
         ("wrap", .attribute)
     ],
-    .tfoot : [],
-    .th : [
+    .tfoot: [],
+    .th: [
         ("abbr", .string),
         ("colspan", .int),
         ("headers", .array(of: .string)),
         ("rowspan", .int),
         ("scope", .attribute)
     ],
-    .thead : [],
-    .time : [
+    .thead: [],
+    .time: [
         ("datetime", .string)
     ],
-    .title : [],
-    .tr : [],
-    .track : [
+    .title: [],
+    .tr: [],
+    .track: [
         ("default", .booleanDefaultValue(true)),
         ("kind", .attribute),
         ("label", .string),
@@ -583,12 +583,12 @@ macro HTMLElements(
     ],
 
     // MARK: U
-    .u : [],
-    .ul : [],
+    .u: [],
+    .ul: [],
 
     // MARK: V
-    .variable : [],
-    .video : [
+    .variable: [],
+    .video: [
         ("autoplay", .bool),
         ("controls", .bool),
         ("controlslist", .array(of: .attribute)),
@@ -606,5 +606,5 @@ macro HTMLElements(
     ],
 
     // MARK: W
-    .wbr : []
+    .wbr: []
 ])

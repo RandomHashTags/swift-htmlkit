@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ZIndex : HTMLInitializable {
+    public enum ZIndex: HTMLInitializable {
         case auto
         case inherit
         case initial
@@ -17,9 +17,9 @@ extension CSSStyle {
         case revertLayer
         case unset
 
-        public var key : String { "" }
+        public var key: String { "" }
 
-        @inlinable public var htmlValueIsVoidable : Bool { false }
+        @inlinable public var htmlValueIsVoidable: Bool { false }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {

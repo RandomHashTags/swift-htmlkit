@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ObjectFit : String, HTMLParsable {
+    public enum ObjectFit: String, HTMLParsable {
         case contain
         case cover
         case fill

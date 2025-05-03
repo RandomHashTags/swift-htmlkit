@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 /*
 extension CSSStyle {
-    public enum Border : HTMLInitializable {
+    public enum Border: HTMLInitializable {
         case block(Block?)
         case bottom(Bottom?)
         case collapse
@@ -23,7 +23,7 @@ extension CSSStyle {
 
 // MARK: Block
 extension CSSStyle.Border {
-    public enum Block : HTMLInitializable {
+    public enum Block: HTMLInitializable {
         case color(CSSStyle.Color?)
         case end
         case endColor(CSSStyle.Color?)
@@ -42,7 +42,7 @@ extension CSSStyle.Border {
 
 // MARK: Bottom
 extension CSSStyle.Border {
-    public enum Bottom : HTMLInitializable {
+    public enum Bottom: HTMLInitializable {
         case color(CSSStyle.Color?)
         case leftRadius
         case rightRadius
@@ -55,7 +55,7 @@ extension CSSStyle.Border {
 
 // MARK: End
 extension CSSStyle.Border {
-    public enum End : HTMLInitializable {
+    public enum End: HTMLInitializable {
         case endRadius
         case startRadius
     }
@@ -63,7 +63,7 @@ extension CSSStyle.Border {
 
 // MARK: Image
 extension CSSStyle.Border {
-    public enum Image : HTMLInitializable {
+    public enum Image: HTMLInitializable {
         case outset
         case `repeat`
         case slice
@@ -76,7 +76,7 @@ extension CSSStyle.Border {
 
 // MARK: Inline
 extension CSSStyle.Border {
-    public enum Inline : HTMLInitializable {
+    public enum Inline: HTMLInitializable {
         case color(CSSStyle.Color?)
         case end
         case endColor(CSSStyle.Color?)

@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 /*
 extension CSSStyle {
-    public enum Align : HTMLInitializable {
+    public enum Align: HTMLInitializable {
         case content(Content?)
         case items(Items?)
         case `self`(AlignSelf?)
@@ -18,7 +18,7 @@ extension CSSStyle {
 
 // MARK: Align Content
 extension CSSStyle.Align {
-    public enum Content : String, HTMLParsable {
+    public enum Content: String, HTMLParsable {
         case baseline
         case end
         case firstBaseline
@@ -61,7 +61,7 @@ extension CSSStyle.Align {
 
 // MARK: Align Items
 extension CSSStyle.Align {
-    public enum Items : String, HTMLParsable {
+    public enum Items: String, HTMLParsable {
         case anchorCenter
         case baseline
         case center
@@ -104,7 +104,7 @@ extension CSSStyle.Align {
 
 // MARK: Align Self
 extension CSSStyle.Align {
-    public enum `Self` : String, HTMLParsable {
+    public enum `Self`: String, HTMLParsable {
         case anchorCenter
         case auto
         case baseline

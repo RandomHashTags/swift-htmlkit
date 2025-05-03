@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.Opacity : HTMLParsable {
+extension CSSStyle.Opacity: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "float": self = .float(context.float())

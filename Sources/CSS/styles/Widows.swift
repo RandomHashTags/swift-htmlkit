@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/widows
 extension CSSStyle {
-    public enum Widows : HTMLInitializable {
+    public enum Widows: HTMLInitializable {
         case inherit
         case initial
         case int(Int?)
@@ -19,7 +19,7 @@ extension CSSStyle {
 
         public var key: String { "" }
 
-        @inlinable public var htmlValueIsVoidable : Bool { false }
+        @inlinable public var htmlValueIsVoidable: Bool { false }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {

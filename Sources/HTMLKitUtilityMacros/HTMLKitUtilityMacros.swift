@@ -10,7 +10,7 @@ import SwiftSyntaxMacros
 import SwiftDiagnostics
 
 // MARK: DiagnosticMsg
-struct DiagnosticMsg : DiagnosticMessage {
+struct DiagnosticMsg: DiagnosticMessage {
     let message:String
     let diagnosticID:MessageID
     let severity:DiagnosticSeverity
@@ -21,13 +21,13 @@ struct DiagnosticMsg : DiagnosticMessage {
         self.severity = severity
     }
 }
-extension DiagnosticMsg : FixItMessage {
-    var fixItID : MessageID { diagnosticID }
+extension DiagnosticMsg: FixItMessage {
+    var fixItID: MessageID { diagnosticID }
 }
 
 
 @main
-struct HTMLKitUtilityMacros : CompilerPlugin {
+struct HTMLKitUtilityMacros: CompilerPlugin {
     let providingMacros:[any Macro.Type] = [
         HTMLElements.self
     ]

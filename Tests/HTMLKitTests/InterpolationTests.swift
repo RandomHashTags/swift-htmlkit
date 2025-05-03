@@ -14,22 +14,28 @@ struct InterpolationTests {
     // MARK: default/static
     @Test func interpolation() {
         var test:String = "again"
-        var expected_result:String = #html(meta(content: test))
-        #expect(expected_result == "<meta content=\"\(test)\">")
+        var result:String = #html(meta(content: test))
+        var expected:String = "<meta content=\"\(test)\">"
+        #expect(result == expected)
+
+        expected = #html {
+            meta(content: test)
+        }
+        #expect(result == expected)
 
         test = "test"
-        expected_result = #html(a(href: "\(test)", "Test"))
-        #expect(expected_result == "<a href=\"\(test)\">Test</a>")
+        expected = #html(a(href: "\(test)", "Test"))
+        #expect(expected == "<a href=\"\(test)\">Test</a>")
 
-        expected_result = #html(div(attributes: [.id("sheesh-dude")], "sheesh-dude"))
+        expected = #html(div(attributes: [.id("sheesh-dude")], "sheesh-dude"))
         test = "dude"
-        let result:String = #html(div(attributes: [.id("sheesh-\(test)")], "sheesh-\(test)"))
-        #expect(result == expected_result)
+        result = #html(div(attributes: [.id("sheesh-\(test)")], "sheesh-\(test)"))
+        #expect(result == expected)
     }
 
     // MARK: dynamic
     @Test func interpolationDynamic() {
-        var expected_result:String = #html(
+        var expected:String = #html(
             ul(
                 li(attributes: [.id("one")], "one"),
                 li(attributes: [.id("two")], "two"),
@@ -40,9 +46,9 @@ struct InterpolationTests {
             interp += String(describing: li(attributes: [.id(i)], i))
         }
         var result:String = #html(ul(interp))
-        #expect(result == expected_result)
+        #expect(result == expected)
 
-        expected_result = #html(
+        expected = #html(
             ul(
                 li(attributes: [.id("0zero")], "0zero"),
                 li(attributes: [.id("1one")], "1one"),
@@ -54,7 +60,7 @@ struct InterpolationTests {
             interp += li(attributes: [.id("\(i)\(s)")], "\(i)\(s)").description
         }
         result = #html(ul(interp))
-        #expect(result == expected_result)
+        #expect(result == expected)
     }
 
     // MARK: multi-line decl
@@ -71,7 +77,7 @@ struct InterpolationTests {
 
     // MARK: multi-line func
     @Test func interpolationMultilineFunc() {
-        var expected_result:String = "<div>Bikini Bottom: Spongebob Squarepants, Patrick Star, Squidward Tentacles, Mr. Krabs, Sandy Cheeks, Pearl Krabs</div>"
+        var expected:String = "<div>Bikini Bottom: Spongebob Squarepants, Patrick Star, Squidward Tentacles, Mr. Krabs, Sandy Cheeks, Pearl Krabs</div>"
         var string:String = #html(
             div(
                 "Bikini Bottom: ",
@@ -98,9 +104,9 @@ struct InterpolationTests {
                 )
             )
         )
-        #expect(string == expected_result)
+        #expect(string == expected)
         
-        expected_result = "<div>Don&#39t forget Gary!</div>"
+        expected = "<div>Don&#39t forget Gary!</div>"
         string = #html(
             div(
                 "Don't forget ",
@@ -108,9 +114,9 @@ struct InterpolationTests {
                 "!"
             )
         )
-        #expect(string == expected_result)
+        #expect(string == expected)
 
-        expected_result = "<div>Spongeboob</div>"
+        expected = "<div>Spongeboob</div>"
         string = #html(
             div(
                 InterpolationTests
@@ -126,12 +132,12 @@ struct InterpolationTests {
                 )
             )
         )
-        #expect(string == expected_result)
+        #expect(string == expected)
     }
 
     // MARK: multi-line closure
     @Test func interpolationMultilineClosure() {
-        var expected_result:String = "<div>Mrs. Puff</div>"
+        var expected:String = "<div>Mrs. Puff</div>"
         var string:String = #html(div(InterpolationTests.character2 {
             var bro = ""
             let yikes:Bool = true
@@ -148,7 +154,7 @@ struct InterpolationTests {
             }
             return false ? bro : "Mrs. Puff"
         } ))
-        #expect(string == expected_result)
+        #expect(string == expected)
     }
 
     // MARK: multi-line member
@@ -177,30 +183,30 @@ struct InterpolationTests {
 
     // MARK: closure
     @Test func interpolationClosure() {
-        let expected_result:String = "<div>Mrs. Puff</div>"
+        let expected:String = "<div>Mrs. Puff</div>"
         var string:String = #html(div(InterpolationTests.character1(body: { "Mrs. Puff" })))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(InterpolationTests.character2({ "Mrs. Puff" })))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(InterpolationTests.character2 { "Mrs. Puff" } ))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(InterpolationTests.character2 { let test:String = "Mrs. Puff"; return test } ))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(InterpolationTests.character3 { _ in let test:String = "Mrs. Puff"; return test } ))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(InterpolationTests.character3 { isTrue in let test:String = "Mrs. Puff"; return isTrue ? test : "" } ))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(InterpolationTests.character3 { (isTrue:Bool) in let test:String = "Mrs. Puff"; return isTrue ? test : "" } ))
-        #expect(string == expected_result)
+        #expect(string == expected)
 
         string = #html(div(InterpolationTests.character4 { (string, integer, isTrue) in let test:String = "Mrs. Puff"; return (isTrue.first ?? false) ? test : "" } ))
-        #expect(string == expected_result)
+        #expect(string == expected)
     }
 
     // MARK: inferred type
@@ -274,7 +280,7 @@ fileprivate extension Array {
 
 // MARK: 3rd party tests
 extension InterpolationTests {
-    enum Shrek : String {
+    enum Shrek: String {
         case isLove, isLife
     }
     @Test func interpolationEnum() {
@@ -334,6 +340,19 @@ extension InterpolationTests {
 
     @Test func uncheckedInterpolation() {
         let _:String = #uncheckedHTML(encoding: .string, div(InterpolationTests.patrick))
+    }
+
+    @Test func closureInterpolation() {
+        let bro:String = "bro"
+        let _:String = #html {
+            div {
+                p {
+                    bro
+                }
+                p(bro)
+                bro
+            }
+        }
     }
 }
 

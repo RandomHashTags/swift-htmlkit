@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 /*
 extension CSSStyle.Word {
-    public enum Spacing : HTMLInitializable {
+    public enum Spacing: HTMLInitializable {
         case inherit
         case initial
         case normal

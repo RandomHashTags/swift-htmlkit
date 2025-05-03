@@ -15,7 +15,7 @@ import SwiftSyntax
 /// Content within each `<a>` _should_ indicate the link's destination. If the `href` attribute is present, pressing the enter key while focused on the `<a>` element will activate it.
 ///  
 /// [Read more](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a).
-public struct a : HTMLElement {
+public struct a: HTMLElement {
     @usableFromInline internal var encoding:HTMLEncoding = .string
     
     /// Causes the browser to treat the linked URL as a download. Can be used with or without a `filename` value.
@@ -42,7 +42,7 @@ public struct a : HTMLElement {
     public var trailingSlash:Bool = false
 
     @inlinable
-    public var description : String {
+    public var description: String {
         func attributes() -> String {
             let sd:String = encoding.stringDelimiter(forMacro: fromMacro)
             var items:[String] = self.attributes.compactMap({

@@ -9,7 +9,7 @@ import SwiftCompilerPlugin
 import SwiftSyntaxMacros
 
 @main
-struct HTMLKitMacros : CompilerPlugin {
+struct HTMLKitMacros: CompilerPlugin {
     let providingMacros:[any Macro.Type] = [
         HTMLElementMacro.self,
         EscapeHTML.self,

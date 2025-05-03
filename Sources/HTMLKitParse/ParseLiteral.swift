@@ -203,7 +203,7 @@ public enum LiteralReturnType {
     case interpolation(String)
     case array([Sendable])
 
-    public var isInterpolation : Bool {
+    public var isInterpolation: Bool {
         switch self {
         case .interpolation: return true
         default: return false
@@ -256,7 +256,7 @@ public enum LiteralReturnType {
 // MARK: Misc
 extension MemberAccessExprSyntax {
     @inlinable
-    var singleLineDescription : String {
+    var singleLineDescription: String {
         var string = "\(self)"
         string.removeAll { $0.isWhitespace }
         return string

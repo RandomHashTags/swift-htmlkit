@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum EmptyCells : String, HTMLParsable {
+    public enum EmptyCells: String, HTMLParsable {
         case hide
         case inherit
         case initial

@@ -5,16 +5,16 @@
 //  Created by Evan Anderson on 12/1/24.
 //
 
-public protocol HTMLInitializable : Hashable, Sendable {
+public protocol HTMLInitializable: Hashable, Sendable {
 
     @inlinable
-    var key : String { get }
+    var key: String { get }
 
     @inlinable
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String?
 
     @inlinable
-    var htmlValueIsVoidable : Bool { get }
+    var htmlValueIsVoidable: Bool { get }
 }
 
 extension HTMLInitializable {
@@ -27,11 +27,11 @@ extension HTMLInitializable {
 
 extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
     @inlinable
-    public var key : String { rawValue }
+    public var key: String { rawValue }
 
     @inlinable
     public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? { rawValue }
 
     @inlinable
-    public var htmlValueIsVoidable : Bool { false }
+    public var htmlValueIsVoidable: Bool { false }
 }

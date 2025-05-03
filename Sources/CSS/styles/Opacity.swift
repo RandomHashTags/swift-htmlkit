@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/opacity
 extension CSSStyle {
-    public enum Opacity : HTMLInitializable {
+    public enum Opacity: HTMLInitializable {
         case float(Swift.Float?)
         case inherit
         case initial
@@ -18,7 +18,7 @@ extension CSSStyle {
         case revertLayer
         case unset
 
-        public var key : String { "" }
+        public var key: String { "" }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
@@ -34,6 +34,6 @@ extension CSSStyle {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }

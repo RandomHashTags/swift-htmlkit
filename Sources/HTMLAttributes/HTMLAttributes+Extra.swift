@@ -83,7 +83,7 @@ extension HTMLAttribute {
 #if canImport(SwiftSyntax)
 extension HTMLAttribute.Extra {
     public static func parse(context: HTMLExpansionContext, expr: ExprSyntax) -> (any HTMLInitializable)? {
-        func get<T : HTMLParsable>(_ type: T.Type) -> T? {
+        func get<T: HTMLParsable>(_ type: T.Type) -> T? {
             let innerKey:String, arguments:LabeledExprListSyntax
             if let function = expr.functionCall {
                 innerKey = function.calledExpression.memberAccess!.declName.baseName.text
@@ -161,7 +161,7 @@ extension HTMLAttribute.Extra {
 
     // MARK: aria attributes
     // https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes
-    public enum ariaattribute : HTMLInitializable {
+    public enum ariaattribute: HTMLInitializable {
         case activedescendant(String?)
         case atomic(Bool?)
         case autocomplete(Autocomplete?)
@@ -234,7 +234,7 @@ extension HTMLAttribute.Extra {
         case valuetext(String?)
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .activedescendant: return "activedescendant"
             case .atomic: return "atomic"
@@ -351,51 +351,51 @@ extension HTMLAttribute.Extra {
             }
         }
 
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
 
-        public enum Autocomplete : String, HTMLParsable {
+        public enum Autocomplete: String, HTMLParsable {
             case none, inline, list, both
         }
-        public enum Checked : String, HTMLParsable {
+        public enum Checked: String, HTMLParsable {
             case `false`, `true`, mixed, undefined
         }
-        public enum Current : String, HTMLParsable {
+        public enum Current: String, HTMLParsable {
             case page, step, location, date, time, `true`, `false`
         }
-        public enum DropEffect : String, HTMLParsable {
+        public enum DropEffect: String, HTMLParsable {
             case copy, execute, link, move, none, popup
         }
-        public enum Expanded : String, HTMLParsable {
+        public enum Expanded: String, HTMLParsable {
             case `false`, `true`, undefined
         }
-        public enum Grabbed : String, HTMLParsable {
+        public enum Grabbed: String, HTMLParsable {
             case `true`, `false`, undefined
         }
-        public enum HasPopup : String, HTMLParsable {
+        public enum HasPopup: String, HTMLParsable {
             case `false`, `true`, menu, listbox, tree, grid, dialog
         }
-        public enum Hidden : String, HTMLParsable {
+        public enum Hidden: String, HTMLParsable {
             case `false`, `true`, undefined
         }
-        public enum Invalid : String, HTMLParsable {
+        public enum Invalid: String, HTMLParsable {
             case grammar, `false`, spelling, `true`
         }
-        public enum Live : String, HTMLParsable {
+        public enum Live: String, HTMLParsable {
             case assertive, off, polite
         }
-        public enum Orientation : String, HTMLParsable {
+        public enum Orientation: String, HTMLParsable {
             case horizontal, undefined, vertical
         }
-        public enum Pressed : String, HTMLParsable {
+        public enum Pressed: String, HTMLParsable {
             case `false`, mixed, `true`, undefined
         }
-        public enum Relevant : String, HTMLParsable {
+        public enum Relevant: String, HTMLParsable {
             case additions, all, removals, text
         }
-        public enum Selected : String, HTMLParsable {
+        public enum Selected: String, HTMLParsable {
             case `true`, `false`, undefined
         }
-        public enum Sort : String, HTMLParsable {
+        public enum Sort: String, HTMLParsable {
             case ascending, descending, none, other
         }
     }
@@ -412,7 +412,7 @@ extension HTMLAttribute.Extra {
     /// It is also important to test your authored ARIA with actual assistive technology. This is because browser emulators and simulators are not really effective for testing full support. Similarly, proxy assistive technology solutions are not sufficient to fully guarantee functionality.
     ///
     /// Learn more at https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA .
-    public enum ariarole : String, HTMLParsable {
+    public enum ariarole: String, HTMLParsable {
         case alert, alertdialog
         case application
         case article
@@ -515,44 +515,44 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: as
-    public enum `as` : String, HTMLParsable {
+    public enum `as`: String, HTMLParsable {
         case audio, document, embed, fetch, font, image, object, script, style, track, video, worker
     }
 
     // MARK: autocapitalize
-    public enum autocapitalize : String, HTMLParsable {
+    public enum autocapitalize: String, HTMLParsable {
         case on, off
         case none
         case sentences, words, characters
     }
 
     // MARK: autocomplete
-    public enum autocomplete : String, HTMLParsable {
+    public enum autocomplete: String, HTMLParsable {
         case off, on
     }
 
     // MARK: autocorrect
-    public enum autocorrect : String, HTMLParsable {
+    public enum autocorrect: String, HTMLParsable {
         case off, on
     }
 
     // MARK: blocking
-    public enum blocking : String, HTMLParsable {
+    public enum blocking: String, HTMLParsable {
         case render
     }
 
     // MARK: buttontype
-    public enum buttontype : String, HTMLParsable {
+    public enum buttontype: String, HTMLParsable {
         case submit, reset, button
     }
 
     // MARK: capture
-    public enum capture : String, HTMLParsable{
+    public enum capture: String, HTMLParsable{
         case user, environment
     }
 
     // MARK: command
-    public enum command : HTMLParsable {
+    public enum command: HTMLParsable {
         case showModal
         case close
         case showPopover
@@ -575,7 +575,7 @@ extension HTMLAttribute.Extra {
         #endif
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .showModal:          return "showModal"
             case .close:              return "close"
@@ -599,11 +599,11 @@ extension HTMLAttribute.Extra {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 
     // MARK: contenteditable
-    public enum contenteditable : String, HTMLParsable {
+    public enum contenteditable: String, HTMLParsable {
         case `true`, `false`
         case plaintextOnly
 
@@ -617,12 +617,12 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: controlslist
-    public enum controlslist : String, HTMLParsable {
+    public enum controlslist: String, HTMLParsable {
         case nodownload, nofullscreen, noremoteplayback
     }
 
     // MARK: crossorigin
-    public enum crossorigin : String, HTMLParsable {
+    public enum crossorigin: String, HTMLParsable {
         case anonymous
         case useCredentials
 
@@ -636,27 +636,27 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: decoding
-    public enum decoding : String, HTMLParsable {
+    public enum decoding: String, HTMLParsable {
         case sync, async, auto
     }
 
     // MARK: dir
-    public enum dir : String, HTMLParsable {
+    public enum dir: String, HTMLParsable {
         case auto, ltr, rtl
     }
 
     // MARK: dirname
-    public enum dirname : String, HTMLParsable {
+    public enum dirname: String, HTMLParsable {
         case ltr, rtl
     }
 
     // MARK: draggable
-    public enum draggable : String, HTMLParsable {
+    public enum draggable: String, HTMLParsable {
         case `true`, `false`
     }
 
     // MARK: download
-    public enum download : HTMLParsable {
+    public enum download: HTMLParsable {
         case empty
         case filename(String)
 
@@ -671,7 +671,7 @@ extension HTMLAttribute.Extra {
         #endif
 
         @inlinable
-        public var key : String {
+        public var key: String {
             switch self {
             case .empty:    return "empty"
             case .filename: return "filename"
@@ -687,7 +687,7 @@ extension HTMLAttribute.Extra {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool {
+        public var htmlValueIsVoidable: Bool {
             switch self {
             case .empty: return true
             default: return false
@@ -696,17 +696,17 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: enterkeyhint
-    public enum enterkeyhint : String, HTMLParsable {
+    public enum enterkeyhint: String, HTMLParsable {
         case enter, done, go, next, previous, search, send
     }
 
     // MARK: fetchpriority
-    public enum fetchpriority : String, HTMLParsable {
+    public enum fetchpriority: String, HTMLParsable {
         case high, low, auto
     }
 
     // MARK: formenctype
-    public enum formenctype : String, HTMLParsable {
+    public enum formenctype: String, HTMLParsable {
         case applicationXWWWFormURLEncoded
         case multipartFormData
         case textPlain
@@ -722,17 +722,17 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: formmethod
-    public enum formmethod : String, HTMLParsable {
+    public enum formmethod: String, HTMLParsable {
         case get, post, dialog
     }
 
     // MARK: formtarget
-    public enum formtarget : String, HTMLParsable {
+    public enum formtarget: String, HTMLParsable {
         case _self, _blank, _parent, _top
     }
 
     // MARK: hidden
-    public enum hidden : String, HTMLParsable {
+    public enum hidden: String, HTMLParsable {
         case `true`
         case untilFound
 
@@ -746,7 +746,7 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: httpequiv
-    public enum httpequiv : String, HTMLParsable {
+    public enum httpequiv: String, HTMLParsable {
         case contentSecurityPolicy
         case contentType
         case defaultStyle
@@ -766,12 +766,12 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: inputmode
-    public enum inputmode : String, HTMLParsable {
+    public enum inputmode: String, HTMLParsable {
         case none, text, decimal, numeric, tel, search, email, url
     }
     
     // MARK: inputtype
-    public enum inputtype : String, HTMLParsable {
+    public enum inputtype: String, HTMLParsable {
         case button, checkbox, color, date
         case datetimeLocal
         case email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week
@@ -786,17 +786,17 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: kind
-    public enum kind : String, HTMLParsable {
+    public enum kind: String, HTMLParsable {
         case subtitles, captions, chapters, metadata
     }
 
     // MARK: loading
-    public enum loading : String, HTMLParsable {
+    public enum loading: String, HTMLParsable {
         case eager, lazy
     }
 
     // MARK: numberingtype
-    public enum numberingtype : String, HTMLParsable {
+    public enum numberingtype: String, HTMLParsable {
         case a, A, i, I, one
 
         @inlinable
@@ -809,22 +809,22 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: popover
-    public enum popover : String, HTMLParsable {
+    public enum popover: String, HTMLParsable {
         case auto, manual
     }
 
     // MARK: popovertargetaction
-    public enum popovertargetaction : String, HTMLParsable {
+    public enum popovertargetaction: String, HTMLParsable {
         case hide, show, toggle
     }
 
     // MARK: preload
-    public enum preload : String, HTMLParsable {
+    public enum preload: String, HTMLParsable {
         case none, metadata, auto
     }
 
     // MARK: referrerpolicy
-    public enum referrerpolicy : String, HTMLParsable {
+    public enum referrerpolicy: String, HTMLParsable {
         case noReferrer
         case noReferrerWhenDowngrade
         case origin
@@ -849,7 +849,7 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: rel
-    public enum rel : String, HTMLParsable {
+    public enum rel: String, HTMLParsable {
         case alternate, author, bookmark, canonical
         case dnsPrefetch
         case external, expect, help, icon, license
@@ -871,7 +871,7 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: sandbox
-    public enum sandbox : String, HTMLParsable {
+    public enum sandbox: String, HTMLParsable {
         case allowDownloads
         case allowForms
         case allowModals
@@ -909,57 +909,57 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: scripttype
-    public enum scripttype : String, HTMLParsable {
+    public enum scripttype: String, HTMLParsable {
         case importmap, module, speculationrules
     }
 
     // MARK: scope
-    public enum scope : String, HTMLParsable {
+    public enum scope: String, HTMLParsable {
         case row, col, rowgroup, colgroup
     }
 
     // MARK: shadowrootmode
-    public enum shadowrootmode : String, HTMLParsable {
+    public enum shadowrootmode: String, HTMLParsable {
         case open, closed
     }
 
     // MARK: shadowrootclonable
-    public enum shadowrootclonable : String, HTMLParsable {
+    public enum shadowrootclonable: String, HTMLParsable {
         case `true`, `false`
     }
 
     // MARK: shape
-    public enum shape : String, HTMLParsable {
+    public enum shape: String, HTMLParsable {
         case rect, circle, poly, `default`
     }
 
     // MARK: spellcheck
-    public enum spellcheck : String, HTMLParsable {
+    public enum spellcheck: String, HTMLParsable {
         case `true`, `false`
     }
 
     // MARK: target
-    public enum target : String, HTMLParsable {
+    public enum target: String, HTMLParsable {
         case _self, _blank, _parent, _top, _unfencedTop
     }
 
     // MARK: translate
-    public enum translate : String, HTMLParsable {
+    public enum translate: String, HTMLParsable {
         case yes, no
     }
 
     // MARK: virtualkeyboardpolicy
-    public enum virtualkeyboardpolicy : String, HTMLParsable {
+    public enum virtualkeyboardpolicy: String, HTMLParsable {
         case auto, manual
     }
 
     // MARK: wrap
-    public enum wrap : String, HTMLParsable {
+    public enum wrap: String, HTMLParsable {
         case hard, soft
     }
 
     // MARK: writingsuggestions
-    public enum writingsuggestions : String, HTMLParsable {
+    public enum writingsuggestions: String, HTMLParsable {
         case `true`, `false`
     }
 }

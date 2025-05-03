@@ -10,7 +10,7 @@ import HTMLKitUtilities
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-enum EscapeHTML : ExpressionMacro {
+enum EscapeHTML: ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         var c = HTMLExpansionContext(
             context: context,

@@ -9,7 +9,7 @@ import HTMLKitUtilities
 import HTMX
 
 // MARK: init
-extension HTMXAttribute : HTMLParsable {
+extension HTMXAttribute: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         func boolean() -> Bool? { context.boolean() }
         func enumeration<T: HTMLParsable>() -> T? { context.enumeration() }
@@ -72,7 +72,7 @@ extension HTMXAttribute : HTMLParsable {
 }
 
 // MARK: Params
-extension HTMXAttribute.Params : HTMLParsable {
+extension HTMXAttribute.Params: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "all":  self = .all
@@ -85,7 +85,7 @@ extension HTMXAttribute.Params : HTMLParsable {
 }
 
 // MARK: SyncStrategy
-extension HTMXAttribute.SyncStrategy : HTMLParsable {
+extension HTMXAttribute.SyncStrategy: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "drop":    self = .drop
@@ -99,7 +99,7 @@ extension HTMXAttribute.SyncStrategy : HTMLParsable {
 }
 
 // MARK: Server Sent Events
-extension HTMXAttribute.ServerSentEvents : HTMLParsable {
+extension HTMXAttribute.ServerSentEvents: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "connect": self = .connect(context.string())
@@ -111,7 +111,7 @@ extension HTMXAttribute.ServerSentEvents : HTMLParsable {
 }
 
 // MARK: WebSocket
-extension HTMXAttribute.WebSocket : HTMLParsable {
+extension HTMXAttribute.WebSocket: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "connect": self = .connect(context.string())

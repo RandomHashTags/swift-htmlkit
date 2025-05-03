@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 /*
 extension CSSStyle.Text {
-    public enum Align : String, HTMLParsable {
+    public enum Align: String, HTMLParsable {
         case center
         case end
         case inherit

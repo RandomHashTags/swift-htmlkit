@@ -11,7 +11,7 @@ import SwiftSyntaxMacros
 #endif
 
 /// Data required to process an HTML expansion.
-public struct HTMLExpansionContext : @unchecked Sendable {
+public struct HTMLExpansionContext: @unchecked Sendable {
     #if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
     public let context:MacroExpansionContext
     public var expansion:MacroExpansionExprSyntax
@@ -63,7 +63,7 @@ public struct HTMLExpansionContext : @unchecked Sendable {
 
     #if canImport(SwiftSyntax)
     /// First expression in the arguments.
-    public var expression : ExprSyntax? {
+    public var expression: ExprSyntax? {
         arguments.first?.expression
     }
     #endif

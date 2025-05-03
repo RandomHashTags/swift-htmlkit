@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Hyphens : String, HTMLParsable {
+    public enum Hyphens: String, HTMLParsable {
         case auto
         case inherit
         case initial

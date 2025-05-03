@@ -5,7 +5,7 @@
 //  Created by Evan Anderson on 2/13/25.
 //
 
-public struct CSSFunction : Hashable {
+public struct CSSFunction: Hashable {
     public var value:String
     public var type:CSSFunctionType
 

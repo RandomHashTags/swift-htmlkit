@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.Duration : HTMLParsable {
+extension CSSStyle.Duration: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "auto": self = .auto

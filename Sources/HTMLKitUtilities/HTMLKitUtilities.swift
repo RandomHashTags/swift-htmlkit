@@ -77,19 +77,19 @@ extension String {
 #if canImport(SwiftSyntax)
 // MARK: SwiftSyntax
 extension ExprSyntaxProtocol {
-    @inlinable package var booleanLiteral : BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
-    @inlinable package var stringLiteral : StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
-    @inlinable package var integerLiteral : IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
-    @inlinable package var floatLiteral : FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
-    @inlinable package var array : ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
-    @inlinable package var dictionary : DictionaryExprSyntax? { self.as(DictionaryExprSyntax.self) }
-    @inlinable package var memberAccess : MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
-    @inlinable package var macroExpansion : MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
-    @inlinable package var functionCall : FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
-    @inlinable package var declRef : DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
+    @inlinable package var booleanLiteral: BooleanLiteralExprSyntax? { self.as(BooleanLiteralExprSyntax.self) }
+    @inlinable package var stringLiteral: StringLiteralExprSyntax? { self.as(StringLiteralExprSyntax.self) }
+    @inlinable package var integerLiteral: IntegerLiteralExprSyntax? { self.as(IntegerLiteralExprSyntax.self) }
+    @inlinable package var floatLiteral: FloatLiteralExprSyntax? { self.as(FloatLiteralExprSyntax.self) }
+    @inlinable package var array: ArrayExprSyntax? { self.as(ArrayExprSyntax.self) }
+    @inlinable package var dictionary: DictionaryExprSyntax? { self.as(DictionaryExprSyntax.self) }
+    @inlinable package var memberAccess: MemberAccessExprSyntax? { self.as(MemberAccessExprSyntax.self) }
+    @inlinable package var macroExpansion: MacroExpansionExprSyntax? { self.as(MacroExpansionExprSyntax.self) }
+    @inlinable package var functionCall: FunctionCallExprSyntax? { self.as(FunctionCallExprSyntax.self) }
+    @inlinable package var declRef: DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
 }
 extension SyntaxChildren.Element {
-    package var labeled : LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
+    package var labeled: LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
 }
 extension StringLiteralExprSyntax {
     @inlinable 

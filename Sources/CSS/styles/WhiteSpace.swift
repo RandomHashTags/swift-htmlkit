@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
 extension CSSStyle {
-    public enum WhiteSpace : String, HTMLParsable {
+    public enum WhiteSpace: String, HTMLParsable {
         case collapse
         case inherit
         case initial

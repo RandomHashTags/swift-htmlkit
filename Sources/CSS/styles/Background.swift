@@ -7,7 +7,7 @@
 
 /*
 extension CSSStyle {
-    public enum Background : HTMLInitializable {
+    public enum Background: HTMLInitializable {
         case attachment
         case blendMode
         case clip

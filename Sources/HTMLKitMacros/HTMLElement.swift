@@ -11,7 +11,7 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-enum HTMLElementMacro : ExpressionMacro {
+enum HTMLElementMacro: ExpressionMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> ExprSyntax {
         let c = HTMLExpansionContext(
             context: context,

@@ -9,7 +9,7 @@ import HTMLKitUtilities
 
 /*
 extension CSSStyle {
-    public enum Animation : HTMLInitializable {
+    public enum Animation: HTMLInitializable {
         case delay(CSSStyle.Duration?)
         case direction(Direction?)
         case duration(CSSStyle.Duration?)
@@ -25,7 +25,7 @@ extension CSSStyle {
 
 // MARK: Direction
 extension CSSStyle.Animation {
-    public enum Direction : HTMLInitializable {
+    public enum Direction: HTMLInitializable {
         case alternate
         case alternateReverse
         case inherit
@@ -53,7 +53,7 @@ extension CSSStyle.Animation {
             }
         }
 
-        public var key : String { "" }
+        public var key: String { "" }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
@@ -72,13 +72,13 @@ extension CSSStyle.Animation {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
 // MARK: Fill Mode
 extension CSSStyle.Animation {
-    public enum FillMode : HTMLInitializable {
+    public enum FillMode: HTMLInitializable {
         case backwards
         case both
         case forwards
@@ -106,7 +106,7 @@ extension CSSStyle.Animation {
             }
         }
 
-        public var key : String { "" }
+        public var key: String { "" }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
@@ -125,13 +125,13 @@ extension CSSStyle.Animation {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
 // MARK: Play State
 extension CSSStyle.Animation {
-    public enum PlayState : HTMLInitializable {
+    public enum PlayState: HTMLInitializable {
         case inherit
         case initial
         indirect case multiple([PlayState])
@@ -155,7 +155,7 @@ extension CSSStyle.Animation {
             }
         }
 
-        public var key : String { "" }
+        public var key: String { "" }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
@@ -172,6 +172,6 @@ extension CSSStyle.Animation {
         }
 
         @inlinable
-        public var htmlValueIsVoidable : Bool { false }
+        public var htmlValueIsVoidable: Bool { false }
     }
 }*/

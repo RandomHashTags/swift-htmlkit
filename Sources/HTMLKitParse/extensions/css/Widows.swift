@@ -8,7 +8,7 @@
 import CSS
 import HTMLKitUtilities
 
-extension CSSStyle.Widows : HTMLParsable {
+extension CSSStyle.Widows: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "inherit": self = .inherit

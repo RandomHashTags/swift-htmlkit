@@ -170,16 +170,16 @@ private extension InterpolationLookup {
 // MARK: Misc
 // copy & paste `HTMLKitTests.swift` into https://swift-ast-explorer.com/ to get this working
 extension TypeSyntax {
-    var identifierType : IdentifierTypeSyntax? { self.as(IdentifierTypeSyntax.self) }
+    var identifierType: IdentifierTypeSyntax? { self.as(IdentifierTypeSyntax.self) }
 }
 
 extension SyntaxProtocol {
-    var enumCaseDecl : EnumCaseDeclSyntax? { self.as(EnumCaseDeclSyntax.self) }
-    var enumCaseElem : EnumCaseElementSyntax? { self.as(EnumCaseElementSyntax.self) }
-    var functionDecl : FunctionDeclSyntax? { self.as(FunctionDeclSyntax.self) }
-    var variableDecl : VariableDeclSyntax? { self.as(VariableDeclSyntax.self) }
+    var enumCaseDecl: EnumCaseDeclSyntax? { self.as(EnumCaseDeclSyntax.self) }
+    var enumCaseElem: EnumCaseElementSyntax? { self.as(EnumCaseElementSyntax.self) }
+    var functionDecl: FunctionDeclSyntax? { self.as(FunctionDeclSyntax.self) }
+    var variableDecl: VariableDeclSyntax? { self.as(VariableDeclSyntax.self) }
 
-    var ext : ExtensionDeclSyntax? { self.as(ExtensionDeclSyntax.self) }
-    var structure : StructDeclSyntax? { self.as(StructDeclSyntax.self) }
-    var enumeration : EnumDeclSyntax? { self.as(EnumDeclSyntax.self) }
+    var ext: ExtensionDeclSyntax? { self.as(ExtensionDeclSyntax.self) }
+    var structure: StructDeclSyntax? { self.as(StructDeclSyntax.self) }
+    var enumeration: EnumDeclSyntax? { self.as(EnumDeclSyntax.self) }
 }

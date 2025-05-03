@@ -8,7 +8,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Appearance : String, HTMLParsable {
+    public enum Appearance: String, HTMLParsable {
         case auto
         case button
         case checkbox

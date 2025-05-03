@@ -180,7 +180,7 @@ extension HTMLKitTests {
             self.array_string = array.map({ "\($0)" }).joined()
         }
 
-        var html : String { #html(p(name, array_string)) }
+        var html: String { #html(p(name, array_string)) }
     }
 }
 
