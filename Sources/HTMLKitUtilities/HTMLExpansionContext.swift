@@ -15,6 +15,7 @@ public struct HTMLExpansionContext: @unchecked Sendable {
     #if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
     public let context:MacroExpansionContext
     public var expansion:MacroExpansionExprSyntax
+    public var trailingClosure:ClosureExprSyntax?
     public var arguments:LabeledExprListSyntax
     #endif
     
@@ -50,6 +51,7 @@ public struct HTMLExpansionContext: @unchecked Sendable {
     ) {
         self.context = context
         self.expansion = expansion.as(ExprSyntax.self)!.macroExpansion!
+        trailingClosure = expansion.trailingClosure
         self.ignoresCompilerWarnings = ignoresCompilerWarnings
         self.encoding = encoding
         self.key = key

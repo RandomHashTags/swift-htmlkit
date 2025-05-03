@@ -169,9 +169,9 @@ extension HTMLKitUtilities {
                 }
             }
         }
-        if let statements = context.expansion.trailingClosure?.statements {
+        if let statements = context.trailingClosure?.statements {
             var c = context
-            c.expansion.trailingClosure = nil
+            c.trailingClosure = nil
             for statement in statements {
                 switch statement.item {
                 case .expr(let expr):
@@ -259,6 +259,7 @@ extension HTMLKitUtilities {
         if let expansion = expr.macroExpansion {
             var c = context
             c.expansion = expansion
+            c.trailingClosure = expansion.trailingClosure
             c.arguments = expansion.arguments
             switch expansion.macroName.text {
             case "html", "anyHTML", "uncheckedHTML":
