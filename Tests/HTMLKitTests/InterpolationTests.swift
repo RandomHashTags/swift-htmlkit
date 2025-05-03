@@ -343,6 +343,7 @@ extension InterpolationTests {
     }
 
     @Test func closureInterpolation() {
+        // TODO: fix | where are the warning diagnostics?
         let bro:String = "bro"
         let _:String = #html {
             div {
