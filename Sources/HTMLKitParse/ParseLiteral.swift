@@ -54,9 +54,13 @@ extension HTMLKitUtilities {
                 string = "\\(" + member.singleLineDescription + ")"
             } else {
                 var expressionString = "\(expression)"
-                while expressionString.first?.isWhitespace ?? false {
-                    expressionString.removeFirst()
+                var removed = 0
+                var index = expressionString.startIndex
+                while index < expressionString.endIndex, expressionString[index].isWhitespace {
+                    removed += 1
+                    expressionString.formIndex(after: &index)
                 }
+                expressionString.removeFirst(removed)
                 while expressionString.last?.isWhitespace ?? false {
                     expressionString.removeLast()
                 }

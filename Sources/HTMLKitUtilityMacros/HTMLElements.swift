@@ -63,7 +63,7 @@ enum HTMLElements: DeclarationMacro {
                             }
                         } else {
                             var isArray = false
-                            let (value_type, default_value, value_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, label.expression)
+                            let (value_type, default_value, value_type_literal) = parse_value_type(isArray: &isArray, key: key, label.expression)
                             switch value_type_literal {
                             case .otherAttribute(let other):
                                 other_attributes.append((key, other))
