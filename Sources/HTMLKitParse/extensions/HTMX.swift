@@ -1,9 +1,3 @@
-//
-//  HTMX.swift
-//
-//
-//  Created by Evan Anderson on 11/12/24.
-//
 
 import HTMLKitUtilities
 import HTMX

@@ -1,9 +1,3 @@
-//
-//  RawHTML.swift
-//
-//
-//  Created by Evan Anderson on 3/29/25.
-//
 
 import HTMLKitParse
 import HTMLKitUtilities

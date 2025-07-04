@@ -1,9 +1,3 @@
-//
-//  HTMLKitTests.swift
-//
-//
-//  Created by Evan Anderson on 9/16/24.
-//
 
 #if compiler(>=6.0)
 

@@ -1,9 +1,3 @@
-//
-//  Background.swift
-//
-//
-//  Created by Evan Anderson on 1/30/25.
-//
 
 /*
 extension CSSStyle {

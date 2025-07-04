@@ -1,9 +1,3 @@
-//
-//  HTMLKitUtilities.swift
-//
-//
-//  Created by Evan Anderson on 9/19/24.
-//
 
 #if canImport(FoundationEssentials)
 import FoundationEssentials

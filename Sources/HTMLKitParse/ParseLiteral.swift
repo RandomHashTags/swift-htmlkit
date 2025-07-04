@@ -1,9 +1,3 @@
-//
-//  ParseLiteral.swift
-//
-//
-//  Created by Evan Anderson on 11/27/24.
-//
 
 import HTMLAttributes
 import HTMLKitUtilities
@@ -209,8 +203,8 @@ public enum LiteralReturnType {
 
     public var isInterpolation: Bool {
         switch self {
-        case .interpolation: return true
-        default: return false
+        case .interpolation: true
+        default: false
         }
     }
 
@@ -224,7 +218,8 @@ public enum LiteralReturnType {
         escapeAttributes: Bool = true
     ) -> String? {
         switch self {
-        case .boolean(let b): return b ? key : nil
+        case .boolean(let b):
+            return b ? key : nil
         case .string(var string):
             if string.isEmpty && key == "attributionsrc" {
                 return ""
@@ -247,8 +242,8 @@ public enum LiteralReturnType {
     public func escapeArray() -> LiteralReturnType {
         switch self {
         case .array(let a):
-            if let array_string = a as? [String] {
-                return .array(array_string.map({ $0.escapingHTML(escapeAttributes: true) }))
+            if let arrayString = a as? [String] {
+                return .array(arrayString.map({ $0.escapingHTML(escapeAttributes: true) }))
             }
             return .array(a)
         default:

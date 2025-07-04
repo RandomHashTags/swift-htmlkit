@@ -1,9 +1,3 @@
-//
-//  EncodingTests.swift
-//
-//
-//  Created by Evan Anderson on 11/27/24.
-//
 
 #if compiler(>=6.0)
 

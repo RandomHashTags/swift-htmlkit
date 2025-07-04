@@ -1,9 +1,3 @@
-//
-//  HTMLElementValueType.swift
-//
-//
-//  Created by Evan Anderson on 11/21/24.
-//
 
 import HTMLKitUtilities
 

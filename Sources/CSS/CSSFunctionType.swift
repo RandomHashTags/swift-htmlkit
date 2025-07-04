@@ -1,9 +1,3 @@
-//
-//  CSSFunctionType.swift
-//
-//
-//  Created by Evan Anderson on 2/13/25.
-//
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Functions
 public enum CSSFunctionType: String {

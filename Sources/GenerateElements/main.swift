@@ -1,9 +1,3 @@
-//
-//  main.swift
-//
-//
-//  Created by Evan Anderson on 12/22/24.
-//
 
 // generate the html element files using the following command:
 /*

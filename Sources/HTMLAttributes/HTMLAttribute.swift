@@ -1,9 +1,3 @@
-//
-//  HTMLAttribute.swift
-//
-//
-//  Created by Evan Anderson on 11/19/24.
-//
 
 #if canImport(CSS)
 import CSS

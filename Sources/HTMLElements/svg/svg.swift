@@ -1,9 +1,3 @@
-//
-//  CustomElements.swift
-//
-//
-//  Created by Evan Anderson on 1/30/25.
-//
 
 import HTMLAttributes
 import HTMLKitUtilities

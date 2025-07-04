@@ -1,9 +1,3 @@
-//
-//  HTMLElement.swift
-//
-//
-//  Created by Evan Anderson on 11/16/24.
-//
 
 import HTMLAttributes
 import HTMLKitUtilities

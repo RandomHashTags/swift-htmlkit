@@ -1,9 +1,3 @@
-//
-//  Minify.swift
-//
-//
-//  Created by Evan Anderson on 3/31/25.
-//
 
 extension HTMLKitUtilities {
     @usableFromInline
@@ -36,7 +30,7 @@ extension HTMLKitUtilities {
         html: String,
         preservingWhitespaceForTags: Set<Substring> = []
     ) -> String {
-        var result:String = ""
+        var result = ""
         result.reserveCapacity(html.count)
         let tagRanges = html.ranges(of: try! Regex("(<[^>]+>)"))
         var tagIndex = 0

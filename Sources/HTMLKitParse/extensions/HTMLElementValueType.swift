@@ -1,9 +1,3 @@
-//
-//  HTMLElementValueType.swift
-//
-//
-//  Created by Evan Anderson on 1/30/25.
-//
 
 #if canImport(HTMLElements) && canImport(HTMLKitUtilities) && canImport(SwiftSyntax)
 import HTMLElements
@@ -22,8 +16,7 @@ extension HTMLElementValueType {
         let key:String
         switch calledExpression.kind {
         case .memberAccessExpr:
-            let member = calledExpression.memberAccess!
-            guard member.base?.declRef?.baseName.text == "HTMLKit" else { return nil }
+            guard let member = calledExpression.memberAccess, member.base?.declRef?.baseName.text == "HTMLKit" else { return nil }
             key = member.declName.baseName.text
         case .declReferenceExpr:
             key = calledExpression.declRef!.baseName.text

@@ -1,9 +1,3 @@
-//
-//  HTMLGlobalAttributes.swift
-//
-//
-//  Created by Evan Anderson on 2/3/25.
-//
 
 #if canImport(CSS)
 import CSS

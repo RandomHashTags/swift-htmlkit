@@ -1,9 +1,3 @@
-//
-//  HTMLKitUtilityMacros.swift
-//
-//
-//  Created by Evan Anderson on 11/16/24.
-//
 
 import SwiftCompilerPlugin
 import SwiftSyntaxMacros

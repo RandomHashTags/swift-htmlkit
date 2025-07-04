@@ -1,9 +1,3 @@
-//
-//  HTMXTests.swift
-//
-//
-//  Created by Evan Anderson on 11/12/24.
-//
 
 #if compiler(>=6.0)
 

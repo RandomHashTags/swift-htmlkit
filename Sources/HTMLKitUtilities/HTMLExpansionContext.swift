@@ -1,9 +1,3 @@
-//
-//  HTMLExpansionContext.swift
-//
-//
-//  Created by Evan Anderson on 1/31/25.
-//
 
 #if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
 import SwiftSyntax

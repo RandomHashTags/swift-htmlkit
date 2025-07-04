@@ -1,9 +1,3 @@
-//
-//  HTMLParsable.swift
-//
-//
-//  Created by Evan Anderson on 1/30/25.
-//
 
 public protocol HTMLParsable: HTMLInitializable {
     #if canImport(SwiftSyntax)

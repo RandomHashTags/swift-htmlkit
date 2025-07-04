@@ -1,9 +1,3 @@
-//
-//  HTMLAttributes+Extra.swift
-//
-//
-//  Created by Evan Anderson on 11/21/24.
-//
 
 #if canImport(CSS)
 import CSS
@@ -84,9 +78,14 @@ extension HTMLAttribute {
 extension HTMLAttribute.Extra {
     public static func parse(context: HTMLExpansionContext, expr: ExprSyntax) -> (any HTMLInitializable)? {
         func get<T: HTMLParsable>(_ type: T.Type) -> T? {
-            let innerKey:String, arguments:LabeledExprListSyntax
+            let innerKey:String
+            let arguments:LabeledExprListSyntax
             if let function = expr.functionCall {
-                innerKey = function.calledExpression.memberAccess!.declName.baseName.text
+                if let ik = function.calledExpression.memberAccess?.declName.baseName.text {
+                    innerKey = ik
+                } else {
+                    return nil
+                }
                 arguments = function.arguments
             } else if let member = expr.memberAccess {
                 innerKey = member.declName.baseName.text
@@ -236,118 +235,118 @@ extension HTMLAttribute.Extra {
         @inlinable
         public var key: String {
             switch self {
-            case .activedescendant: return "activedescendant"
-            case .atomic: return "atomic"
-            case .autocomplete: return "autocomplete"
-            case .braillelabel: return "braillelabel"
-            case .brailleroledescription: return "brailleroledescription"
-            case .busy: return "busy"
-            case .checked: return "checked"
-            case .colcount: return "colcount"
-            case .colindex: return "colindex"
-            case .colindextext: return "colindextext"
-            case .colspan: return "colspan"
-            case .controls: return "controls"
-            case .current: return "current"
-            case .describedby: return "describedby"
-            case .description: return "description"
-            case .details: return "details"
-            case .disabled: return "disabled"
-            case .dropeffect: return "dropeffect"
-            case .errormessage: return "errormessage"
-            case .expanded: return "expanded"
-            case .flowto: return "flowto"
-            case .grabbed: return "grabbed"
-            case .haspopup: return "haspopup"
-            case .hidden: return "hidden"
-            case .invalid: return "invalid"
-            case .keyshortcuts: return "keyshortcuts"
-            case .label: return "label"
-            case .labelledby: return "labelledby"
-            case .level: return "level"
-            case .live: return "live"
-            case .modal: return "modal"
-            case .multiline: return "multiline"
-            case .multiselectable: return "multiselectable"
-            case .orientation: return "orientation"
-            case .owns: return "owns"
-            case .placeholder: return "placeholder"
-            case .posinset: return "posinset"
-            case .pressed: return "pressed"
-            case .readonly: return "readonly"
-            case .relevant: return "relevant"
-            case .required: return "required"
-            case .roledescription: return "roledescription"
-            case .rowcount: return "rowcount"
-            case .rowindex: return "rowindex"
-            case .rowindextext: return "rowindextext"
-            case .rowspan: return "rowspan"
-            case .selected: return "selected"
-            case .setsize: return "setsize"
-            case .sort: return "sort"
-            case .valuemax: return "valuemax"
-            case .valuemin: return "valuemin"
-            case .valuenow: return "valuenow"
-            case .valuetext: return "valuetext"
+            case .activedescendant: "activedescendant"
+            case .atomic: "atomic"
+            case .autocomplete: "autocomplete"
+            case .braillelabel: "braillelabel"
+            case .brailleroledescription: "brailleroledescription"
+            case .busy: "busy"
+            case .checked: "checked"
+            case .colcount: "colcount"
+            case .colindex: "colindex"
+            case .colindextext: "colindextext"
+            case .colspan: "colspan"
+            case .controls: "controls"
+            case .current: "current"
+            case .describedby: "describedby"
+            case .description: "description"
+            case .details: "details"
+            case .disabled: "disabled"
+            case .dropeffect: "dropeffect"
+            case .errormessage: "errormessage"
+            case .expanded: "expanded"
+            case .flowto: "flowto"
+            case .grabbed: "grabbed"
+            case .haspopup: "haspopup"
+            case .hidden: "hidden"
+            case .invalid: "invalid"
+            case .keyshortcuts: "keyshortcuts"
+            case .label: "label"
+            case .labelledby: "labelledby"
+            case .level: "level"
+            case .live: "live"
+            case .modal: "modal"
+            case .multiline: "multiline"
+            case .multiselectable: "multiselectable"
+            case .orientation: "orientation"
+            case .owns: "owns"
+            case .placeholder: "placeholder"
+            case .posinset: "posinset"
+            case .pressed: "pressed"
+            case .readonly: "readonly"
+            case .relevant: "relevant"
+            case .required: "required"
+            case .roledescription: "roledescription"
+            case .rowcount: "rowcount"
+            case .rowindex: "rowindex"
+            case .rowindextext: "rowindextext"
+            case .rowspan: "rowspan"
+            case .selected: "selected"
+            case .setsize: "setsize"
+            case .sort: "sort"
+            case .valuemax: "valuemax"
+            case .valuemin: "valuemin"
+            case .valuenow: "valuenow"
+            case .valuetext: "valuetext"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .activedescendant(let value): return value
-            case .atomic(let value): return unwrap(value)
-            case .autocomplete(let value): return value?.rawValue
-            case .braillelabel(let value): return value
-            case .brailleroledescription(let value): return value
-            case .busy(let value): return unwrap(value)
-            case .checked(let value): return value?.rawValue
-            case .colcount(let value): return unwrap(value)
-            case .colindex(let value): return unwrap(value)
-            case .colindextext(let value): return value
-            case .colspan(let value): return unwrap(value)
-            case .controls(let value): return value?.joined(separator: " ")
-            case .current(let value): return value?.rawValue
-            case .describedby(let value): return value?.joined(separator: " ")
-            case .description(let value): return value
-            case .details(let value): return value?.joined(separator: " ")
-            case .disabled(let value): return unwrap(value)
-            case .dropeffect(let value): return value?.rawValue
-            case .errormessage(let value): return value
-            case .expanded(let value): return value?.rawValue
-            case .flowto(let value): return value?.joined(separator: " ")
-            case .grabbed(let value): return value?.rawValue
-            case .haspopup(let value): return value?.rawValue
-            case .hidden(let value): return value?.rawValue
-            case .invalid(let value): return value?.rawValue
-            case .keyshortcuts(let value): return value
-            case .label(let value): return value
-            case .labelledby(let value): return value?.joined(separator: " ")
-            case .level(let value): return unwrap(value)
-            case .live(let value): return value?.rawValue
-            case .modal(let value): return unwrap(value)
-            case .multiline(let value): return unwrap(value)
-            case .multiselectable(let value): return unwrap(value)
-            case .orientation(let value): return value?.rawValue
-            case .owns(let value): return value?.joined(separator: " ")
-            case .placeholder(let value): return value
-            case .posinset(let value): return unwrap(value)
-            case .pressed(let value): return value?.rawValue
-            case .readonly(let value): return unwrap(value)
-            case .relevant(let value): return value?.rawValue
-            case .required(let value): return unwrap(value)
-            case .roledescription(let value): return value
-            case .rowcount(let value): return unwrap(value)
-            case .rowindex(let value): return unwrap(value)
-            case .rowindextext(let value): return value
-            case .rowspan(let value): return unwrap(value)
-            case .selected(let value): return value?.rawValue
-            case .setsize(let value): return unwrap(value)
-            case .sort(let value): return value?.rawValue
-            case .valuemax(let value): return unwrap(value)
-            case .valuemin(let value): return unwrap(value)
-            case .valuenow(let value): return unwrap(value)
-            case .valuetext(let value): return value
+            case .activedescendant(let value): value
+            case .atomic(let value): unwrap(value)
+            case .autocomplete(let value): value?.rawValue
+            case .braillelabel(let value): value
+            case .brailleroledescription(let value): value
+            case .busy(let value): unwrap(value)
+            case .checked(let value): value?.rawValue
+            case .colcount(let value): unwrap(value)
+            case .colindex(let value): unwrap(value)
+            case .colindextext(let value): value
+            case .colspan(let value): unwrap(value)
+            case .controls(let value): value?.joined(separator: " ")
+            case .current(let value): value?.rawValue
+            case .describedby(let value): value?.joined(separator: " ")
+            case .description(let value): value
+            case .details(let value): value?.joined(separator: " ")
+            case .disabled(let value): unwrap(value)
+            case .dropeffect(let value): value?.rawValue
+            case .errormessage(let value): value
+            case .expanded(let value): value?.rawValue
+            case .flowto(let value): value?.joined(separator: " ")
+            case .grabbed(let value): value?.rawValue
+            case .haspopup(let value): value?.rawValue
+            case .hidden(let value): value?.rawValue
+            case .invalid(let value): value?.rawValue
+            case .keyshortcuts(let value): value
+            case .label(let value): value
+            case .labelledby(let value): value?.joined(separator: " ")
+            case .level(let value): unwrap(value)
+            case .live(let value): value?.rawValue
+            case .modal(let value): unwrap(value)
+            case .multiline(let value): unwrap(value)
+            case .multiselectable(let value): unwrap(value)
+            case .orientation(let value): value?.rawValue
+            case .owns(let value): value?.joined(separator: " ")
+            case .placeholder(let value): value
+            case .posinset(let value): unwrap(value)
+            case .pressed(let value): value?.rawValue
+            case .readonly(let value): unwrap(value)
+            case .relevant(let value): value?.rawValue
+            case .required(let value): unwrap(value)
+            case .roledescription(let value): value
+            case .rowcount(let value): unwrap(value)
+            case .rowindex(let value): unwrap(value)
+            case .rowindextext(let value): value
+            case .rowspan(let value): unwrap(value)
+            case .selected(let value): value?.rawValue
+            case .setsize(let value): unwrap(value)
+            case .sort(let value): value?.rawValue
+            case .valuemax(let value): unwrap(value)
+            case .valuemin(let value): unwrap(value)
+            case .valuenow(let value): unwrap(value)
+            case .valuetext(let value): value
             }
         }
 
@@ -577,24 +576,24 @@ extension HTMLAttribute.Extra {
         @inlinable
         public var key: String {
             switch self {
-            case .showModal:          return "showModal"
-            case .close:              return "close"
-            case .showPopover:        return "showPopover"
-            case .hidePopover:        return "hidePopover"
-            case .togglePopover:      return "togglePopover"
-            case .custom:          return "custom"
+            case .showModal:       "showModal"
+            case .close:           "close"
+            case .showPopover:     "showPopover"
+            case .hidePopover:     "hidePopover"
+            case .togglePopover:   "togglePopover"
+            case .custom:          "custom"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .showModal:          return "show-modal"
-            case .close:              return "close"
-            case .showPopover:        return "show-popover"
-            case .hidePopover:        return "hide-popover"
-            case .togglePopover:      return "toggle-popover"
-            case .custom(let value): return "--" + value
+            case .showModal:          "show-modal"
+            case .close:              "close"
+            case .showPopover:        "show-popover"
+            case .hidePopover:        "hide-popover"
+            case .togglePopover:      "toggle-popover"
+            case .custom(let value): "--" + value
             }
         }
 
@@ -610,8 +609,8 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .plaintextOnly: return "plaintext-only"
-            default:             return rawValue
+            case .plaintextOnly: "plaintext-only"
+            default:             rawValue
             }
         }
     }
@@ -629,8 +628,8 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .useCredentials: return "use-credentials"
-            default:              return rawValue
+            case .useCredentials: "use-credentials"
+            default:              rawValue
             }
         }
     }
@@ -673,24 +672,24 @@ extension HTMLAttribute.Extra {
         @inlinable
         public var key: String {
             switch self {
-            case .empty:    return "empty"
-            case .filename: return "filename"
+            case .empty:    "empty"
+            case .filename: "filename"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .empty: return ""
-            case .filename(let value): return value
+            case .empty: ""
+            case .filename(let value): value
             }
         }
 
         @inlinable
         public var htmlValueIsVoidable: Bool {
             switch self {
-            case .empty: return true
-            default: return false
+            case .empty: true
+            default: false
             }
         }
     }
@@ -714,9 +713,9 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .applicationXWWWFormURLEncoded: return "application/x-www-form-urlencoded"
-            case .multipartFormData:             return "multipart/form-data"
-            case .textPlain:                     return "text/plain"
+            case .applicationXWWWFormURLEncoded: "application/x-www-form-urlencoded"
+            case .multipartFormData:             "multipart/form-data"
+            case .textPlain:                     "text/plain"
             }
         }
     }
@@ -739,8 +738,8 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .true: return ""
-            case .untilFound: return "until-found"
+            case .true: ""
+            case .untilFound: "until-found"
             }
         }
     }
@@ -756,11 +755,11 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .contentSecurityPolicy: return "content-security-policy"
-            case .contentType:           return "content-type"
-            case .defaultStyle:          return "default-style"
-            case .xUACompatible:         return "x-ua-compatible"
-            default:                     return rawValue
+            case .contentSecurityPolicy: "content-security-policy"
+            case .contentType:           "content-type"
+            case .defaultStyle:          "default-style"
+            case .xUACompatible:         "x-ua-compatible"
+            default:                     rawValue
             }
         }
     }
@@ -779,8 +778,8 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .datetimeLocal: return "datetime-local"
-            default: return rawValue
+            case .datetimeLocal: "datetime-local"
+            default: rawValue
             }
         }
     }
@@ -802,8 +801,8 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .one: return "1"
-            default:   return rawValue
+            case .one: "1"
+            default:   rawValue
             }
         }
     }
@@ -837,35 +836,39 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .noReferrer:                  return "no-referrer"
-            case .noReferrerWhenDowngrade:     return "no-referrer-when-downgrade"
-            case .originWhenCrossOrigin:       return "origin-when-cross-origin"
-            case .strictOrigin:                return "strict-origin"
-            case .strictOriginWhenCrossOrigin: return "strict-origin-when-cross-origin"
-            case .unsafeURL:                   return "unsafe-url"
-            default:                           return rawValue
+            case .noReferrer:                  "no-referrer"
+            case .noReferrerWhenDowngrade:     "no-referrer-when-downgrade"
+            case .originWhenCrossOrigin:       "origin-when-cross-origin"
+            case .strictOrigin:                "strict-origin"
+            case .strictOriginWhenCrossOrigin: "strict-origin-when-cross-origin"
+            case .unsafeURL:                   "unsafe-url"
+            default:                           rawValue
             }
         }
     }
 
     // MARK: rel
     public enum rel: String, HTMLParsable {
-        case alternate, author, bookmark, canonical
+        case alternate, author
+        case bookmark
+        case canonical, compressionDictionary
         case dnsPrefetch
         case external, expect, help, icon, license
-        case manifest, me, modulepreload, next, nofollow, noopener, noreferrer
-        case opener, pingback, preconnect, prefetch, preload, prerender, prev
-        case privacyPolicy
-        case search, stylesheet, tag
-        case termsOfService
+        case manifest, me, modulepreload
+        case next, nofollow, noopener, noreferrer
+        case opener
+        case pingback, preconnect, prefetch, preload, prerender, prev, privacyPolicy
+        case search, stylesheet
+        case tag, termsOfService
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .dnsPrefetch:    return "dns-prefetch"
-            case .privacyPolicy:  return "privacy-policy"
-            case .termsOfService: return "terms-of-service"
-            default:               return rawValue
+            case .compressionDictionary: "compression-dictionary"
+            case .dnsPrefetch:           "dns-prefetch"
+            case .privacyPolicy:         "privacy-policy"
+            case .termsOfService:        "terms-of-service"
+            default:                     rawValue
             }
         }
     }
@@ -890,20 +893,20 @@ extension HTMLAttribute.Extra {
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .allowDownloads:                      return "allow-downloads"
-            case .allowForms:                          return "allow-forms"
-            case .allowModals:                         return "allow-modals"
-            case .allowOrientationLock:                return "allow-orientation-lock"
-            case .allowPointerLock:                    return "allow-pointer-lock"
-            case .allowPopups:                         return "allow-popups"
-            case .allowPopupsToEscapeSandbox:          return "allow-popups-to-escape-sandbox"
-            case .allowPresentation:                   return "allow-presentation"
-            case .allowSameOrigin:                     return "allow-same-origin"
-            case .allowScripts:                        return "allow-scripts"
-            case .allowStorageAccessByUserActiviation: return "allow-storage-access-by-user-activation"
-            case .allowTopNavigation:                  return "allow-top-navigation"
-            case .allowTopNavigationByUserActivation:  return "allow-top-navigation-by-user-activation"
-            case .allowTopNavigationToCustomProtocols: return "allow-top-navigation-to-custom-protocols"
+            case .allowDownloads:                      "allow-downloads"
+            case .allowForms:                          "allow-forms"
+            case .allowModals:                         "allow-modals"
+            case .allowOrientationLock:                "allow-orientation-lock"
+            case .allowPointerLock:                    "allow-pointer-lock"
+            case .allowPopups:                         "allow-popups"
+            case .allowPopupsToEscapeSandbox:          "allow-popups-to-escape-sandbox"
+            case .allowPresentation:                   "allow-presentation"
+            case .allowSameOrigin:                     "allow-same-origin"
+            case .allowScripts:                        "allow-scripts"
+            case .allowStorageAccessByUserActiviation: "allow-storage-access-by-user-activation"
+            case .allowTopNavigation:                  "allow-top-navigation"
+            case .allowTopNavigationByUserActivation:  "allow-top-navigation-by-user-activation"
+            case .allowTopNavigationToCustomProtocols: "allow-top-navigation-to-custom-protocols"
             }
         }
     }

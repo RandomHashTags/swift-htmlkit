@@ -1,9 +1,3 @@
-//
-//  main.swift
-//
-//
-//  Created by Evan Anderson on 10/10/24.
-//
 
 import HTTPTypes
 import ServiceLifecycle

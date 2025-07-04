@@ -1,9 +1,3 @@
-//
-//  Tokamak.swift
-//
-//
-//  Created by Evan Anderson on 10/13/24.
-//
 
 import Utilities
 //import TokamakDOM

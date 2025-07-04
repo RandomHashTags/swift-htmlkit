@@ -1,9 +1,3 @@
-//
-//  CSSTests.swift
-//
-//
-//  Created by Evan Anderson on 2/3/25.
-//
 
 #if compiler(>=6.0)
 

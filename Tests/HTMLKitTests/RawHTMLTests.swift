@@ -1,9 +1,3 @@
-//
-//  RawHTMLTests.swift
-//
-//
-//  Created by Evan Anderson on 3/29/25.
-//
 
 #if compiler(>=6.0)
 

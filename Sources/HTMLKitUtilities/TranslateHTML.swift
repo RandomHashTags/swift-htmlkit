@@ -1,9 +1,3 @@
-//
-//  TranslateHTML.swift
-//
-//
-//  Created by Evan Anderson on 11/27/24.
-//
 
 /*
 #if canImport(Foundation)

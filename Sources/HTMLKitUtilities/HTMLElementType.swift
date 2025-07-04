@@ -1,9 +1,3 @@
-//
-//  HTMLElementType.swift
-//
-//
-//  Created by Evan Anderson on 11/21/24.
-//
 
 public enum HTMLElementType: String, Sendable {
     case html
@@ -141,17 +135,17 @@ public enum HTMLElementType: String, Sendable {
     public var isVoid: Bool {
         switch self {
         case .area, .base, .br, .col, .embed, .hr, .img, .input, .link, .meta, .source, .track, .wbr:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 
     @inlinable
     public var tagName: String {
         switch self {
-        case .variable: return "var"
-        default: return rawValue
+        case .variable: "var"
+        default:        rawValue
         }
     }
 }

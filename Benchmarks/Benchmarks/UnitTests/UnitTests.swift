@@ -1,9 +1,3 @@
-//
-//  UnitTests.swift
-//
-//
-//  Created by Evan Anderson on 10/6/24.
-//
 
 #if compiler(>=6.0)
 

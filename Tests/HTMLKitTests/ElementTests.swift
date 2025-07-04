@@ -1,9 +1,3 @@
-//
-//  ElementTests.swift
-//
-//
-//  Created by Evan Anderson on 11/3/24.
-//
 
 #if compiler(>=6.0)
 

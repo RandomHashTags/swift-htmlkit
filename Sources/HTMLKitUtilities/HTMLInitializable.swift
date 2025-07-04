@@ -1,9 +1,3 @@
-//
-//  HTMLInitializable.swift
-//
-//
-//  Created by Evan Anderson on 12/1/24.
-//
 
 public protocol HTMLInitializable: Hashable, Sendable {
 

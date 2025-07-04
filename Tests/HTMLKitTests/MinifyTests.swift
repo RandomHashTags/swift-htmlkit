@@ -1,9 +1,3 @@
-//
-//  MinifyTests.swift
-//
-//
-//  Created by Evan Anderson on 3/31/25.
-//
 
 #if compiler(>=6.0)
 

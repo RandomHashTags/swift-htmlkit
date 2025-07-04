@@ -1,9 +1,3 @@
-//
-//  EscapeHTML.swift
-//
-//
-//  Created by Evan Anderson on 11/23/24.
-//
 
 import HTMLKitParse
 import HTMLKitUtilities

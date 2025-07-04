@@ -1,9 +1,3 @@
-//
-//  EscapeHTMLTests.swift
-//
-//
-//  Created by Evan Anderson on 11/29/24.
-//
 
 #if compiler(>=6.0)
 

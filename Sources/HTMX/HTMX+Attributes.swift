@@ -1,9 +1,3 @@
-//
-//  HTMXAttributes.swift
-//
-//
-//  Created by Evan Anderson on 11/19/24.
-//
 
 #if canImport(HTMLKitUtilities)
 import HTMLKitUtilities
@@ -68,54 +62,54 @@ extension HTMXAttribute {
         @inlinable
         var slug: String {
             switch self {
-            case .afterOnLoad:           return "after-on-load"
-            case .afterProcessNode:      return "after-process-node"
-            case .afterRequest:          return "after-request"
-            case .afterSettle:           return "after-settle"
-            case .afterSwap:             return "after-swap"
-            case .beforeCleanupElement:  return "before-cleanup-element"
-            case .beforeOnLoad:          return "before-on-load"
-            case .beforeProcessNode:     return "before-process-node"
-            case .beforeRequest:         return "before-request"
-            case .beforeSend:            return "before-send"
-            case .beforeSwap:            return "before-swap"
-            case .beforeTransition:      return "before-transition"
-            case .configRequest:         return "config-request"
-            case .historyCacheError:     return "history-cache-error"
-            case .historyCacheMiss:      return "history-cache-miss"
-            case .historyCacheMissError: return "history-cache-miss-error"
-            case .historyCacheMissLoad:  return "history-cache-miss-load"
-            case .historyRestore:        return "history-restore"
-            case .beforeHistorySave:     return "before-history-save"
-            case .noSSESourceError:      return "no-sse-source-error"
-            case .onLoadError:           return "on-load-error"
-            case .oobAfterSwap:          return "oob-after-swap"
-            case .oobBeforeSwap:         return "oob-before-swap"
-            case .oobErrorNoTarget:      return "oob-error-no-target"
-            case .beforeHistoryUpdate:   return "before-history-update"
-            case .pushedIntoHistory:     return "pushed-into-history"
-            case .replacedInHistory:     return "replaced-in-history"
-            case .responseError:         return "response-error"
-            case .sendError:             return "send-error"
-            case .sseError:              return "sse-error"
-            case .sseOpen:               return "sse-open"
-            case .swapError:             return "swap-error"
-            case .targetError:           return "target-error"
-            case .validateURL:           return "validate-url"
-            case .validationValidate:    return "validation:validate"
-            case .validationFailed:      return "validation:failed"
-            case .validationHalted:      return "validation:halted"
-            case .xhrAbort:              return "xhr:abort"
-            case .xhrLoadEnd:            return "xhr:loadend"
-            case .xhrLoadStart:          return "xhr:loadstart"
-            case .xhrProgress:           return "xhr:progress"
-            default:                     return rawValue
+            case .afterOnLoad:           "after-on-load"
+            case .afterProcessNode:      "after-process-node"
+            case .afterRequest:          "after-request"
+            case .afterSettle:           "after-settle"
+            case .afterSwap:             "after-swap"
+            case .beforeCleanupElement:  "before-cleanup-element"
+            case .beforeOnLoad:          "before-on-load"
+            case .beforeProcessNode:     "before-process-node"
+            case .beforeRequest:         "before-request"
+            case .beforeSend:            "before-send"
+            case .beforeSwap:            "before-swap"
+            case .beforeTransition:      "before-transition"
+            case .configRequest:         "config-request"
+            case .historyCacheError:     "history-cache-error"
+            case .historyCacheMiss:      "history-cache-miss"
+            case .historyCacheMissError: "history-cache-miss-error"
+            case .historyCacheMissLoad:  "history-cache-miss-load"
+            case .historyRestore:        "history-restore"
+            case .beforeHistorySave:     "before-history-save"
+            case .noSSESourceError:      "no-sse-source-error"
+            case .onLoadError:           "on-load-error"
+            case .oobAfterSwap:          "oob-after-swap"
+            case .oobBeforeSwap:         "oob-before-swap"
+            case .oobErrorNoTarget:      "oob-error-no-target"
+            case .beforeHistoryUpdate:   "before-history-update"
+            case .pushedIntoHistory:     "pushed-into-history"
+            case .replacedInHistory:     "replaced-in-history"
+            case .responseError:         "response-error"
+            case .sendError:             "send-error"
+            case .sseError:              "sse-error"
+            case .sseOpen:               "sse-open"
+            case .swapError:             "swap-error"
+            case .targetError:           "target-error"
+            case .validateURL:           "validate-url"
+            case .validationValidate:    "validation:validate"
+            case .validationFailed:      "validation:failed"
+            case .validationHalted:      "validation:halted"
+            case .xhrAbort:              "xhr:abort"
+            case .xhrLoadEnd:            "xhr:loadend"
+            case .xhrLoadStart:          "xhr:loadstart"
+            case .xhrProgress:           "xhr:progress"
+            default:                     rawValue
             }
         }
 
         @inlinable
         public var key: String {
-            return ":" + slug
+            ":" + slug
         }
     }
 
@@ -129,20 +123,20 @@ extension HTMXAttribute {
         @inlinable
         public var key: String {
             switch self {
-            case .all:     return "all"
-            case .none:    return "none"
-            case .not:  return "not"
-            case .list: return "list"
+            case .all:  "all"
+            case .none: "none"
+            case .not:  "not"
+            case .list: "list"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .all:             return "*"
-            case .none:            return "none"
-            case .not(let list):  return "not " + (list?.joined(separator: ",") ?? "")
-            case .list(let list): return list?.joined(separator: ",")
+            case .all:             "*"
+            case .none:            "none"
+            case .not(let list):  "not " + (list?.joined(separator: ",") ?? "")
+            case .list(let list): list?.joined(separator: ",")
             }
         }
 
@@ -171,20 +165,20 @@ extension HTMXAttribute {
         @inlinable
         public var key: String {
             switch self {
-            case .drop:     return "drop"
-            case .abort:    return "abort"
-            case .replace:  return "replace"
-            case .queue: return "queue"
+            case .drop:    "drop"
+            case .abort:   "abort"
+            case .replace: "replace"
+            case .queue:   "queue"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .drop:             return "drop"
-            case .abort:            return "abort"
-            case .replace:          return "replace"
-            case .queue(let queue): return (queue != nil ? "queue " + queue!.rawValue : nil)
+            case .drop:             "drop"
+            case .abort:            "abort"
+            case .replace:          "replace"
+            case .queue(let queue): (queue != nil ? "queue " + queue!.rawValue : nil)
             }
         }
 
@@ -211,18 +205,18 @@ extension HTMXAttribute {
         @inlinable
         public var key: String {
             switch self {
-            case .true:   return "true"
-            case .false:  return "false"
-            case .url: return "url"
+            case .true:  "true"
+            case .false: "false"
+            case .url:   "url"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .true: return "true"
-            case .false: return "false"
-            case .url(let url): return url.hasPrefix("http://") || url.hasPrefix("https://") ? url : (url.first == "/" ? "" : "/") + url
+            case .true: "true"
+            case .false: "false"
+            case .url(let url): url.hasPrefix("http://") || url.hasPrefix("https://") ? url : (url.first == "/" ? "" : "/") + url
             }
         }
 
@@ -241,9 +235,9 @@ extension HTMXAttribute {
         @inlinable
         public var key: String {
             switch self {
-            case .connect: return "connect"
-            case .swap: return "swap"
-            case .close: return "close"
+            case .connect: "connect"
+            case .swap:    "swap"
+            case .close:   "close"
             }
         }
 
@@ -271,24 +265,24 @@ extension HTMXAttribute {
         @inlinable
         public var key: String {
             switch self {
-            case .connect: return "connect"
-            case .send: return "send"
+            case .connect: "connect"
+            case .send:    "send"
             }
         }
 
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {
-            case .connect(let value): return value
-            case .send(let value): return value ?? false ? "" : nil
+            case .connect(let value): value
+            case .send(let value):      value ?? false ? "" : nil
             }
         }
 
         @inlinable
         public var htmlValueIsVoidable: Bool {
             switch self {
-            case .send: return true
-            default: return false
+            case .send: true
+            default:    false
             }
         }
 

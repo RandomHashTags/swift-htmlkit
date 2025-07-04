@@ -1,9 +1,3 @@
-//
-//  HTMX.swift
-//
-//
-//  Created by Evan Anderson on 11/12/24.
-//
 
 #if canImport(HTMLKitUtilities)
 import HTMLKitUtilities
@@ -54,45 +48,45 @@ public enum HTMXAttribute: HTMLInitializable {
     @inlinable
     public var key: String {
         switch self {
-        case .boost: return "boost"
-        case .confirm: return "confirm"
-        case .delete: return "delete"
-        case .disable: return "disable"
-        case .disabledElt: return "disabled-elt"
-        case .disinherit: return "disinherit"
-        case .encoding: return "encoding"
-        case .ext: return "ext"
-        case .headers(_, _): return "headers"
-        case .history: return "history"
-        case .historyElt: return "history-elt"
-        case .include: return "include"
-        case .indicator: return "indicator"
-        case .inherit: return "inherit"
-        case .params: return "params"
-        case .patch: return "patch"
-        case .preserve: return "preserve"
-        case .prompt: return "prompt"
-        case .put: return "put"
-        case .replaceURL: return "replace-url"
-        case .request(_, _, _, _): return "request"
-        case .sync(_, _): return "sync"
-        case .validate: return "validate"
+        case .boost: "boost"
+        case .confirm: "confirm"
+        case .delete: "delete"
+        case .disable: "disable"
+        case .disabledElt: "disabled-elt"
+        case .disinherit: "disinherit"
+        case .encoding: "encoding"
+        case .ext: "ext"
+        case .headers: "headers"
+        case .history: "history"
+        case .historyElt: "history-elt"
+        case .include: "include"
+        case .indicator: "indicator"
+        case .inherit: "inherit"
+        case .params: "params"
+        case .patch: "patch"
+        case .preserve: "preserve"
+        case .prompt: "prompt"
+        case .put: "put"
+        case .replaceURL: "replace-url"
+        case .request: "request"
+        case .sync: "sync"
+        case .validate: "validate"
 
-        case .get: return "get"
-        case .post: return "post"
-        case .on(let event, _): return (event != nil ? "on:" + event!.key : "")
-        case .onevent(let event, _): return (event != nil ? "on:" + event!.rawValue : "")
-        case .pushURL: return "push-url"
-        case .select: return "select"
-        case .selectOOB: return "select-oob"
-        case .swap: return "swap"
-        case .swapOOB: return "swap-oob"
-        case .target: return "target"
-        case .trigger: return "trigger"
-        case .vals: return "vals"
+        case .get: "get"
+        case .post: "post"
+        case .on(let event, _): (event != nil ? "on:" + event!.key : "")
+        case .onevent(let event, _): (event != nil ? "on:" + event!.rawValue : "")
+        case .pushURL: "push-url"
+        case .select: "select"
+        case .selectOOB: "select-oob"
+        case .swap: "swap"
+        case .swapOOB: "swap-oob"
+        case .target: "target"
+        case .trigger: "trigger"
+        case .vals: "vals"
 
-        case .sse(let event): return (event != nil ? "sse-" + event!.key : "")
-        case .ws(let value): return (value != nil ? "ws-" + value!.key : "")
+        case .sse(let event): (event != nil ? "sse-" + event!.key : "")
+        case .ws(let value): (value != nil ? "ws-" + value!.key : "")
         }
     }
 

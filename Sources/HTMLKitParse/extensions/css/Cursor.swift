@@ -1,9 +1,3 @@
-//
-//  Cursor.swift
-//
-//
-//  Created by Evan Anderson on 2/13/25.
-//
 
 import CSS
 import HTMLKitUtilities

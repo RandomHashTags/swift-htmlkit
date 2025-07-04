@@ -1,9 +1,3 @@
-//
-//  HTMLKit.swift
-//
-//
-//  Created by Evan Anderson on 9/14/24.
-//
 
 @_exported import CSS
 @_exported import HTMLAttributes

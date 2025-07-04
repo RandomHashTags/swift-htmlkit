@@ -1,9 +1,3 @@
-//
-//  ParseData.swift
-//
-//
-//  Created by Evan Anderson on 11/21/24.
-//
 
 import HTMLAttributes
 import HTMLElements
@@ -198,8 +192,10 @@ extension HTMLKitUtilities {
                 guard let logic = function.arguments.first?.expression.stringLiteral?.string(encoding: .string) else { return nil }
                 if function.arguments.count == 1 {
                     return .custom(logic)
+                } else if let delimiter = function.arguments.last!.expression.stringLiteral?.string(encoding: .string) {
+                    return .custom(logic, stringDelimiter: delimiter)
                 } else {
-                    return .custom(logic, stringDelimiter: function.arguments.last!.expression.stringLiteral!.string(encoding: .string))
+                    return nil
                 }
             default:
                 return nil
@@ -214,24 +210,24 @@ extension HTMLKitUtilities {
         context: HTMLExpansionContext,
         array: ArrayElementListSyntax
     ) -> (attributes: [HTMLAttribute], trailingSlash: Bool) {
-        var keys:Set<String> = []
-        var attributes:[HTMLAttribute] = []
-        var trailingSlash:Bool = false
+        var keys = Set<String>()
+        var attributes = [HTMLAttribute]()
+        var trailingSlash = false
         for element in array {
             if let function = element.expression.functionCall {
-                let firstExpression = function.arguments.first!.expression
-                var key = function.calledExpression.memberAccess!.declName.baseName.text
-                var c = context
-                c.key = key
-                c.arguments = function.arguments
-                if key.contains(" ") {
-                    context.context.diagnose(Diagnostic(node: firstExpression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
-                } else if keys.contains(key) {
-                    globalAttributeAlreadyDefined(context: context, attribute: key, node: firstExpression)
-                } else if let attr = HTMLAttribute(context: c) {
-                    attributes.append(attr)
-                    key = attr.key
-                    keys.insert(key)
+                if let firstExpression = function.arguments.first?.expression, var key = function.calledExpression.memberAccess?.declName.baseName.text {
+                    var c = context
+                    c.key = key
+                    c.arguments = function.arguments
+                    if key.contains(" ") {
+                        context.context.diagnose(Diagnostic(node: firstExpression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
+                    } else if keys.contains(key) {
+                        globalAttributeAlreadyDefined(context: context, attribute: key, node: firstExpression)
+                    } else if let attr = HTMLAttribute.init(context: c) {
+                        attributes.append(attr)
+                        key = attr.key
+                        keys.insert(key)
+                    }
                 }
             } else if let member = element.expression.memberAccess?.declName.baseName.text, member == "trailingSlash" {
                 if keys.contains(member) {

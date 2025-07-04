@@ -1,9 +1,3 @@
-//
-//  HTMLEncoding.swift
-//
-//
-//  Created by Evan Anderson on 11/21/24.
-//
 
 /// The value type the data should be encoded to when returned from the macro.
 /// 

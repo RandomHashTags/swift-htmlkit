@@ -1,9 +1,3 @@
-//
-//  InterpolationLookup.swift
-//
-//
-//  Created by Evan Anderson on 11/2/24.
-//
 
 #if canImport(Foundation)
 import Foundation

@@ -1,9 +1,3 @@
-//
-//  CSS.swift
-//
-//
-//  Created by Evan Anderson on 12/1/24.
-//
 
 import HTMLKitUtilities
 

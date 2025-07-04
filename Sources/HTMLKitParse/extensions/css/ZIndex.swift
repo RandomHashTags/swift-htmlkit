@@ -1,9 +1,3 @@
-//
-//  ZIndex.swift
-//
-//
-//  Created by Evan Anderson on 2/3/25.
-//
 
 import CSS
 import HTMLKitUtilities
