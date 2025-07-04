@@ -7,6 +7,7 @@ public protocol HTMLInitializable: Hashable, Sendable {
     @inlinable
     func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String?
 
+    /// Default is `false`.
     @inlinable
     var htmlValueIsVoidable: Bool { get }
 }
@@ -17,15 +18,21 @@ extension HTMLInitializable {
         guard let value else { return nil }
         return "\(value)" + (suffix ?? "")
     }
+
+    @inlinable
+    public var htmlValueIsVoidable: Bool {
+        false
+    }
 }
 
 extension HTMLInitializable where Self: RawRepresentable, RawValue == String {
     @inlinable
-    public var key: String { rawValue }
+    public var key: String {
+        rawValue
+    }
 
     @inlinable
-    public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? { rawValue }
-
-    @inlinable
-    public var htmlValueIsVoidable: Bool { false }
+    public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
+        rawValue
+    }
 }

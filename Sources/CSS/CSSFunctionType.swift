@@ -108,25 +108,25 @@ public enum CSSFunctionType: String {
     @inlinable
     public var key: String {
         switch self {
-        case .anchorSize: return "anchor-size"
-        case .calcSize: return "calc-size"
-        case .colorMix: return "color-mix"
-        case .conicGradient: return "conic-gradient"
-        case .crossFade: return "cross-fade"
-        case .cubicBezier: return "cubic-bezier"
-        case .deviceCmyk: return "device-cmyk"
-        case .dropShadow: return "drop-shadow"
-        case .fitContent: return "fit-content"
-        case .hueRotate: return "hue-rotate"
-        case .imageSet: return "image-set"
-        case .lightDark: return "light-dark"
-        case .linearGradient: return "linear-gradient"
-        case .paletteMix: return "palette-mix"
-        case .radialGradient: return "radial-gradient"
-        case .repeatingConicGradient: return "repeating-conic-gradient"
-        case .repeatingLinearGradient: return "repeating-linear-gradient"
-        case .repeatingRadialGradient: return "repeating-radial-gradient"
-        default: return rawValue
+        case .anchorSize: "anchor-size"
+        case .calcSize: "calc-size"
+        case .colorMix: "color-mix"
+        case .conicGradient: "conic-gradient"
+        case .crossFade: "cross-fade"
+        case .cubicBezier: "cubic-bezier"
+        case .deviceCmyk: "device-cmyk"
+        case .dropShadow: "drop-shadow"
+        case .fitContent: "fit-content"
+        case .hueRotate: "hue-rotate"
+        case .imageSet: "image-set"
+        case .lightDark: "light-dark"
+        case .linearGradient: "linear-gradient"
+        case .paletteMix: "palette-mix"
+        case .radialGradient: "radial-gradient"
+        case .repeatingConicGradient: "repeating-conic-gradient"
+        case .repeatingLinearGradient: "repeating-linear-gradient"
+        case .repeatingRadialGradient: "repeating-radial-gradient"
+        default: rawValue
         }
     }
 }

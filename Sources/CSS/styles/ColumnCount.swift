@@ -26,8 +26,5 @@ extension CSSStyle {
             default: return "\(self)"
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 }

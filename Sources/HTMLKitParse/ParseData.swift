@@ -65,7 +65,7 @@ extension HTMLKitUtilities {
     
     // MARK: Expand #html
     public static func expandHTMLMacro(context: HTMLExpansionContext) throws -> ExprSyntax {
-        let (string, encoding):(String, HTMLEncoding) = expandMacro(context: context)
+        let (string, encoding) = expandMacro(context: context)
         return "\(raw: encodingResult(context: context, node: context.expansion, string: string, for: encoding))"
     }
     private static func encodingResult(
@@ -100,7 +100,7 @@ extension HTMLKitUtilities {
         }
     }
     private static func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
-        var string:String = "["
+        var string = "["
         for b in bytes {
             string += "\(b),"
         }
@@ -123,10 +123,10 @@ extension HTMLKitUtilities {
         otherAttributes: [String:String] = [:]
     ) -> ElementData {
         var context = context
-        var globalAttributes:[HTMLAttribute] = []
-        var attributes:[String:Sendable] = [:]
-        var innerHTML:[CustomStringConvertible & Sendable] = []
-        var trailingSlash:Bool = false
+        var globalAttributes = [HTMLAttribute]()
+        var attributes = [String:Sendable]()
+        var innerHTML = [CustomStringConvertible & Sendable]()
+        var trailingSlash = false
         for element in context.arguments.children(viewMode: .all) {
             if let child = element.labeled {
                 context.key = ""

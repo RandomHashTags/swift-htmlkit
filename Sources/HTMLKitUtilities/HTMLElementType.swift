@@ -1,5 +1,5 @@
 
-public enum HTMLElementType: String, Sendable {
+public enum HTMLElementType: String, CaseIterable, Hashable, Sendable {
     case html
     
     case a

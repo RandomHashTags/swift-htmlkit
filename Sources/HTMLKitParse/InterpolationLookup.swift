@@ -25,7 +25,7 @@ enum InterpolationLookup {
         //print("InterpolationLookup;find;item=\(item)")
         switch item {
         case .literal(let tokens):
-            for (_, statements) in cached {
+            for statements in cached.values {
                 if let flattened = flatten(context: context, tokens: tokens, statements: statements) {
                     return flattened
                 }
@@ -39,11 +39,11 @@ enum InterpolationLookup {
 
     private static func item(context: HTMLExpansionContext, _ node: some ExprSyntaxProtocol) -> Item? {
         if let function = node.functionCall {
-            var array:[String] = []
+            var array = [String]()
             if let member = function.calledExpression.memberAccess {
                 array.append(contentsOf: test(member))
             }
-            var parameters:[String] = []
+            var parameters = [String]()
             for argument in function.arguments {
                 if let string = argument.expression.stringLiteral?.string(encoding: context.encoding) {
                     parameters.append(string)
@@ -58,7 +58,7 @@ enum InterpolationLookup {
     }
     
     private static func test(_ member: MemberAccessExprSyntax) -> [String] {
-        var array:[String] = []
+        var array = [String]()
         if let base = member.base?.memberAccess {
             array.append(contentsOf: test(base))
         } else if let decl = member.base?.declRef {
@@ -77,7 +77,7 @@ enum InterpolationLookup {
 private extension InterpolationLookup {
     static func flatten(context: HTMLExpansionContext, tokens: [String], statements: CodeBlockItemListSyntax) -> String? {
         for statement in statements {
-            var index:Int = 0
+            var index = 0
             let item = statement.item
             if let ext = item.ext {
                 if ext.extendedType.identifierType?.name.text == tokens[index] {
@@ -114,15 +114,17 @@ private extension InterpolationLookup {
     }
     // MARK: Parse enumeration
     static func parseEnumeration(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
-        let allowed_inheritances:Set<String?> = ["String", "Int", "Double", "Float"]
+        let allowedInheritances:Set<String?> = ["String", "Int", "Double", "Float"]
         guard let enumeration = syntax.enumeration,
             enumeration.name.text == tokens[index]
         else {
             return nil
         }
         //print("InterpolationLookup;parse_enumeration;enumeration=\(enumeration.debugDescription)")
-        let valueType:String? = enumeration.inheritanceClause?.inheritedTypes.first(where: { allowed_inheritances.contains($0.type.identifierType?.name.text) })?.type.identifierType!.name.text
-        var index:Int = index + 1
+        let valueType:String? = enumeration.inheritanceClause?.inheritedTypes.first(where: {
+            allowedInheritances.contains($0.type.identifierType?.name.text)
+        })?.type.identifierType?.name.text
+        var index = index + 1
         for member in enumeration.memberBlock.members {
             if let decl = member.decl.enumCaseDecl {
                 for element in decl.elements {
@@ -148,7 +150,7 @@ private extension InterpolationLookup {
     }
     // MARK: Parse variable
     static func parseVariable(context: HTMLExpansionContext, syntax: some SyntaxProtocol, tokens: [String], index: Int) -> String? {
-        guard let variable:VariableDeclSyntax = syntax.variableDecl else { return nil }
+        guard let variable = syntax.variableDecl else { return nil }
         for binding in variable.bindings {
             if binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text == tokens[index], let initializer = binding.initializer {
                 return initializer.value.stringLiteral?.string(encoding: context.encoding)

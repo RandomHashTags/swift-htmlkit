@@ -5,18 +5,18 @@ import HTMLKitUtilities
 // MARK: custom
 /// A custom HTML element.
 public struct custom: HTMLElement {
-    public static let otherAttributes:[String:String] = [:]
+    public static let otherAttributes = [String:String]()
     
     public let tag:String
     public var attributes:[HTMLAttribute]
     public var innerHTML:[CustomStringConvertible & Sendable]
 
-    public private(set) var encoding:HTMLEncoding = .string
+    public private(set) var encoding = HTMLEncoding.string
     public var isVoid:Bool
     public var trailingSlash:Bool
-    public var escaped:Bool = false
+    public var escaped = false
 
-    public private(set) var fromMacro:Bool = false
+    public private(set) var fromMacro = false
 
     public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {
         self.encoding = encoding

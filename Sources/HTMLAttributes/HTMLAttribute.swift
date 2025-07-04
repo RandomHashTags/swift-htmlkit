@@ -76,7 +76,7 @@ public enum HTMLAttribute: HTMLInitializable {
         switch self {
         case .accesskey:             return "accesskey"
         case .ariaattribute(let value):
-            guard let value:HTMLAttribute.Extra.ariaattribute = value else { return "" }
+            guard let value else { return "" }
             return "aria-" + value.key
         case .role:                  return "role"
         case .autocapitalize:        return "autocapitalize"

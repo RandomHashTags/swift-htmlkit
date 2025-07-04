@@ -16,7 +16,7 @@ extension HTMLKitUtilities {
         var string:String
         if let stringLiteral = expression.stringLiteral {
             remainingInterpolation = 0
-            var interpolation:[ExpressionSegmentSyntax] = []
+            var interpolation = [ExpressionSegmentSyntax]()
             var segments:[any (SyntaxProtocol & SyntaxHashable)] = []
             for segment in stringLiteral.segments {
                 segments.append(segment)
@@ -25,9 +25,9 @@ extension HTMLKitUtilities {
                     remainingInterpolation += 1
                 }
             }
-            var minimum:Int = 0
+            var minimum = 0
             for expr in interpolation {
-                let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remainingInterpolation: &remainingInterpolation, expr: expr)
+                let promotions = promoteInterpolation(context: context, remainingInterpolation: &remainingInterpolation, expr: expr)
                 for (i, segment) in segments.enumerated() {
                     if i >= minimum && segment.as(ExpressionSegmentSyntax.self) == expr {
                         segments.remove(at: i)
@@ -87,7 +87,7 @@ extension HTMLKitUtilities {
                         if let literal = segment.as(StringSegmentSyntax.self)?.content.text {
                             values.append(create(literal))
                         } else if let interpolation = segment.as(ExpressionSegmentSyntax.self) {
-                            let promotions:[any (SyntaxProtocol & SyntaxHashable)] = promoteInterpolation(context: context, remainingInterpolation: &remainingInterpolation, expr: interpolation)
+                            let promotions = promoteInterpolation(context: context, remainingInterpolation: &remainingInterpolation, expr: interpolation)
                             values.append(contentsOf: promotions)
                         } else {
                             context.context.diagnose(Diagnostic(node: segment, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")")))

@@ -30,9 +30,9 @@ public struct a: HTMLElement {
     public let tag:String = "a"
     public var type:String? = nil
     public var attributes:[HTMLElementAttribute] = []
-    public var attributionsrc:[String] = []
+    public var attributionsrc = [String]()
     public var innerHTML:[CustomStringConvertible] = []
-    public var ping:[String] = []
+    public var ping = [String]()
     public var rel:[HTMLElementAttribute.Extra.rel] = []
     public var escaped:Bool = false
     @usableFromInline internal var fromMacro:Bool = false

@@ -43,22 +43,22 @@ public enum CSSUnit: HTMLInitializable { // https://www.w3schools.com/cssref/css
     @inlinable
     public var key: String {
         switch self {
-        case .centimeters:    return "centimeters"
-        case .millimeters:    return "millimeters"
-        case .inches:         return "inches"
-        case .pixels:         return "pixels"
-        case .points:         return "points"
-        case .picas:          return "picas"
+        case .centimeters:    "centimeters"
+        case .millimeters:    "millimeters"
+        case .inches:         "inches"
+        case .pixels:         "pixels"
+        case .points:         "points"
+        case .picas:          "picas"
 
-        case .em:             return "em"
-        case .ex:             return "ex"
-        case .ch:             return "ch"
-        case .rem:            return "rem"
-        case .viewportWidth:  return "viewportWidth"
-        case .viewportHeight: return "viewportHeight"
-        case .viewportMin:    return "viewportMin"
-        case .viewportMax:    return "viewportMax"
-        case .percent:        return "percent"
+        case .em:             "em"
+        case .ex:             "ex"
+        case .ch:             "ch"
+        case .rem:            "rem"
+        case .viewportWidth:  "viewportWidth"
+        case .viewportHeight: "viewportHeight"
+        case .viewportMin:    "viewportMin"
+        case .viewportMax:    "viewportMax"
+        case .percent:        "percent"
         }
     }
 
@@ -81,7 +81,7 @@ public enum CSSUnit: HTMLInitializable { // https://www.w3schools.com/cssref/css
             .viewportMin(let v),
             .viewportMax(let v),
             .percent(let v):
-            guard let v:Float = v else { return nil }
+            guard let v else { return nil }
             var s = String(describing: v)
             while s.last == "0" {
                 s.removeLast()
@@ -94,27 +94,24 @@ public enum CSSUnit: HTMLInitializable { // https://www.w3schools.com/cssref/css
     }
 
     @inlinable
-    public var htmlValueIsVoidable: Bool { false }
-
-    @inlinable
     public var suffix: String {
         switch self {
-        case .centimeters:    return "cm"
-        case .millimeters:    return "mm"
-        case .inches:         return "in"
-        case .pixels:         return "px"
-        case .points:         return "pt"
-        case .picas:          return "pc"
+        case .centimeters:    "cm"
+        case .millimeters:    "mm"
+        case .inches:         "in"
+        case .pixels:         "px"
+        case .points:         "pt"
+        case .picas:          "pc"
             
-        case .em:             return "em"
-        case .ex:             return "ex"
-        case .ch:             return "ch"
-        case .rem:            return "rem"
-        case .viewportWidth:  return "vw"
-        case .viewportHeight: return "vh"
-        case .viewportMin:    return "vmin"
-        case .viewportMax:    return "vmax"
-        case .percent:        return "%"
+        case .em:             "em"
+        case .ex:             "ex"
+        case .ch:             "ch"
+        case .rem:            "rem"
+        case .viewportWidth:  "vw"
+        case .viewportHeight: "vh"
+        case .viewportMin:    "vmin"
+        case .viewportMax:    "vmax"
+        case .percent:        "%"
         }
     }
 }
@@ -124,7 +121,7 @@ public enum CSSUnit: HTMLInitializable { // https://www.w3schools.com/cssref/css
 extension CSSUnit: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         func float() -> Float? {
-            guard let expression:ExprSyntax = context.expression,
+            guard let expression = context.expression,
                     let s = expression.integerLiteral?.literal.text ?? expression.floatLiteral?.literal.text
             else {
                 return nil

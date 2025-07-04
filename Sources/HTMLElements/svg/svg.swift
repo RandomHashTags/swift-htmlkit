@@ -76,7 +76,6 @@ extension svg {
             case xMaxYMax(Keyword?)
 
             public var key: String { "" }
-            @inlinable public var htmlValueIsVoidable: Bool { false }
 
             @inlinable
             public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {

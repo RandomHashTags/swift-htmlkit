@@ -29,7 +29,5 @@ extension CSSStyle {
             case .unset: return "unset"
             }
         }
-
-        public var htmlValueIsVoidable: Bool { false }
     }
 }

@@ -139,9 +139,6 @@ extension HTMXAttribute {
             case .list(let list): list?.joined(separator: ",")
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 
     // MARK: Swap
@@ -181,9 +178,6 @@ extension HTMXAttribute {
             case .queue(let queue): (queue != nil ? "queue " + queue!.rawValue : nil)
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 
     // MARK: URL
@@ -219,9 +213,6 @@ extension HTMXAttribute {
             case .url(let url): url.hasPrefix("http://") || url.hasPrefix("https://") ? url : (url.first == "/" ? "" : "/") + url
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
@@ -250,9 +241,6 @@ extension HTMXAttribute {
                 return value
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 }
 

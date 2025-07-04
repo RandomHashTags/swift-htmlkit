@@ -1,10 +1,4 @@
 
-#if canImport(FoundationEssentials)
-import FoundationEssentials
-#elseif canImport(Foundation)
-import Foundation
-#endif
-
 #if canImport(SwiftSyntax)
 import SwiftSyntax
 #endif
@@ -13,11 +7,7 @@ import SwiftSyntax
 public enum HTMLKitUtilities {
     @usableFromInline
     package static let lineFeedPlaceholder:String = {
-        #if canImport(FoundationEssentials) || canImport(Foundation)
-        return "%\(UUID())%"
-        #else
         return "%HTMLKitLineFeed\(Int.random(in: Int.min...Int.max))%"
-        #endif
     }()
 }
 
@@ -89,7 +79,7 @@ extension StringLiteralExprSyntax {
     @inlinable 
     package func string(encoding: HTMLEncoding) -> String {
         if openingQuote.debugDescription.hasPrefix("multilineStringQuote") {
-            var value:String = ""
+            var value = ""
             for segment in segments {
                 value += segment.as(StringSegmentSyntax.self)?.content.text ?? ""
             }

@@ -22,22 +22,22 @@ enum HTMLElements: DeclarationMacro {
             if element == "variable" {
                 tag = "var"
             }
-            var string:String = "// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element): HTMLElement {\n"
+            var string = "// MARK: \(tag)\n/// The `\(tag)` HTML element.\npublic struct \(element): HTMLElement {\n"
             string += """
-            public let tag:String = "\(tag)"
+            public let tag = "\(tag)"
             public var attributes:[HTMLAttribute]
             public var innerHTML:[CustomStringConvertible & Sendable]
-            public private(set) var encoding:HTMLEncoding = .string
-            public private(set) var fromMacro:Bool = false
-            public let isVoid:Bool = \(isVoid)
-            public var trailingSlash:Bool = false
-            public var escaped:Bool = false
+            public private(set) var encoding = HTMLEncoding.string
+            public private(set) var fromMacro = false
+            public let isVoid = \(isVoid)
+            public var trailingSlash = false
+            public var escaped = false
             """
 
             var initializers = ""
             var attribute_declarations = ""
-            var attributes:[(String, String, String)] = []
-            var other_attributes:[(String, String)] = []
+            var attributes = [(String, String, String)]()
+            var other_attributes = [(String, String)]()
             if let test = item.value.as(ArrayExprSyntax.self)?.elements {
                 attributes.reserveCapacity(test.count)
                 for element in test {
@@ -57,8 +57,8 @@ enum HTMLElements: DeclarationMacro {
                             }
                         } else {
                             var isArray = false
-                            let (value_type, default_value, value_type_literal) = parse_value_type(isArray: &isArray, key: key, label.expression)
-                            switch value_type_literal {
+                            let (value_type, default_value, valueTypeLiteral) = parseValueType(isArray: &isArray, key: key, label.expression)
+                            switch valueTypeLiteral {
                             case .otherAttribute(let other):
                                 other_attributes.append((key, other))
                             default:
@@ -132,7 +132,7 @@ enum HTMLElements: DeclarationMacro {
             var itemsArray:String = ""
             if !attributes.isEmpty {
                 attributes_func += "let sd = encoding.stringDelimiter(forMacro: fromMacro)\n"
-                itemsArray += "var items:[String] = []\n"
+                itemsArray += "var items = [String]()\n"
             }
             for (key, valueType, _) in attributes {
                 var keyLiteral = key
@@ -198,6 +198,7 @@ enum HTMLElements: DeclarationMacro {
         }
         return items
     }
+
     // MARK: separator
     static func separator(key: String) -> String {
         switch key {
@@ -209,6 +210,7 @@ enum HTMLElements: DeclarationMacro {
             return " "
         }
     }
+
     // MARK: default initializer
     static func defaultInitializer(
         attributes: [(String, String, String)],
@@ -234,17 +236,17 @@ enum HTMLElements: DeclarationMacro {
         return initializers
     }
     // MARK: parse value type
-    static func parse_value_type(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> (value_type: String, default_value: String, value_type_literal: HTMLElementValueType) {
-        let value_type_key:String
-        if let member:MemberAccessExprSyntax = expr.as(MemberAccessExprSyntax.self) {
-            value_type_key = member.declName.baseName.text
+    static func parseValueType(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> (value_type: String, default_value: String, valueTypeLiteral: HTMLElementValueType) {
+        let valueTypeKey:String
+        if let member = expr.as(MemberAccessExprSyntax.self) {
+            valueTypeKey = member.declName.baseName.text
         } else {
-            value_type_key = expr.as(FunctionCallExprSyntax.self)!.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
+            valueTypeKey = expr.as(FunctionCallExprSyntax.self)!.calledExpression.as(MemberAccessExprSyntax.self)!.declName.baseName.text
         }
-        switch value_type_key {
+        switch valueTypeKey {
         case "array":
             isArray = true
-            let (of_type, _, of_type_literal):(String, String, HTMLElementValueType) = parse_value_type(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
+            let (of_type, _, of_type_literal):(String, String, HTMLElementValueType) = parseValueType(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
             return ("[" + of_type + "]", "? = nil", .array(of: of_type_literal))
         case "attribute":
             return ("HTMLAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)

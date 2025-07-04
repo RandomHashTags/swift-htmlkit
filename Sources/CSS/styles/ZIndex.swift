@@ -13,8 +13,6 @@ extension CSSStyle {
 
         public var key: String { "" }
 
-        @inlinable public var htmlValueIsVoidable: Bool { false }
-
         @inlinable
         public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
             switch self {

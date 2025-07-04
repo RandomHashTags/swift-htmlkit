@@ -350,8 +350,6 @@ extension HTMLAttribute.Extra {
             }
         }
 
-        public var htmlValueIsVoidable: Bool { false }
-
         public enum Autocomplete: String, HTMLParsable {
             case none, inline, list, both
         }
@@ -596,9 +594,6 @@ extension HTMLAttribute.Extra {
             case .custom(let value): "--" + value
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 
     // MARK: contenteditable

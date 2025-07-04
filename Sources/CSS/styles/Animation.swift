@@ -64,9 +64,6 @@ extension CSSStyle.Animation {
             case .unset: return "unset"
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
@@ -117,9 +114,6 @@ extension CSSStyle.Animation {
             case .unset: return "unset"
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
@@ -164,8 +158,5 @@ extension CSSStyle.Animation {
             case .unset: return "unset"
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 }*/

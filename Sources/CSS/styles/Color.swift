@@ -177,9 +177,6 @@ extension CSSStyle {
             default: return "\(self)".lowercased()
             }
         }
-
-        @inlinable
-        public var htmlValueIsVoidable: Bool { false }
     }
 }
 
