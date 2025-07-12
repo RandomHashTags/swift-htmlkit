@@ -21,68 +21,105 @@ extension StringProtocol {
     static func == (left: StaticString, right: Self) -> Bool { left.description == right }
 }
 
-// MARK: Representations
+// MARK: Encodings
 struct HTMLKitTests {
     @Test
-    func representations() {
+    func anyHTML() {
         let _ = #anyHTML(p())
         let _ = #anyHTML(encoding: .string, p())
         let _ = #anyHTML(encoding: .utf8Bytes, p())
         let _ = #anyHTML(encoding: .utf16Bytes, p())
-
+    }
+    @Test
+    func encodingStaticStirng() -> StaticString {
         let _:StaticString = #html(p())
         let _:StaticString = #html(encoding: .string, p())
+        return #html(p(123))
+    }
+    @Test
+    func encodingString() -> String {
         let _:String = #html(p())
         let _:String = #html(encoding: .string, p())
+        return #html(p(123))
+    }
+    @Test
+    func encodingUTF8Bytes1() -> [UInt8] {
         let _:[UInt8] = #html(encoding: .utf8Bytes, p())
+        return #html(encoding: .utf8Bytes, p(123))
+    }
+    @Test
+    func encodingUTF8Bytes2() -> ContiguousArray<UInt8> {
         let _:ContiguousArray<UInt8> = #html(encoding: .utf8Bytes, p())
+        return #html(encoding: .utf8Bytes, p(123))
+    }
+    @Test
+    func encodingUTF16Bytes1() -> [UInt16] {
         let _:[UInt16] = #html(encoding: .utf16Bytes, p())
+        return #html(encoding: .utf16Bytes, p(123))
+    }
+    @Test
+    func encodingUTF16Bytes2() -> ContiguousArray<UInt16> {
         let _:ContiguousArray<UInt16> = #html(encoding: .utf16Bytes, p())
+        return #html(encoding: .utf16Bytes, p(123))
+    }
+    @Test
+    func encodingUTF8CString() -> ContiguousArray<CChar> {
         let _:ContiguousArray<CChar> = #html(encoding: .utf8CString, p())
-        #if canImport(FoundationEssentials) || canImport(Foundation)
-        let _:Data = #html(encoding: .foundationData, p())
-        #endif
-        //let _:ByteBuffer = #html(encoding: .byteBuffer, "")
+        return #html(encoding: .utf8CString, p(123))
+    }
+    @Test
+    func encodingCustom() {
         let _:String = #html(encoding: .custom(#""$0""#), p(5))
-    }
-    @Test
-    func representation1() -> StaticString {
-        #html(p(123))
-    }
-    @Test
-    func representation2() -> String {
-        #html(p(123))
-    }
-    @Test
-    func representation3() -> [UInt8] {
-        #html(encoding: .utf8Bytes, p(123))
-    }
-    @Test
-    func representation4() -> [UInt16] {
-        #html(encoding: .utf16Bytes, p(123))
-    }
-    @Test
-    func representation5() -> ContiguousArray<UInt8> {
-        #html(encoding: .utf8Bytes, p(123))
-    }
-    @Test
-    func representation6() -> ContiguousArray<UInt16> {
-        #html(encoding: .utf16Bytes, p(123))
-    }
-    @Test
-    func representation7() -> ContiguousArray<CChar> {
-        #html(encoding: .utf8CString, p(123))
     }
     #if canImport(FoundationEssentials) || canImport(Foundation)
     @Test
-    func representation8() -> Data {
-        #html(encoding: .foundationData, p(123))
+    func encodingData() -> Data {
+        let _:Data = #html(encoding: .foundationData, p())
+        return #html(encoding: .foundationData, p(123))
     }
     #endif
     /*
     func representation7() -> ByteBuffer {
         #htmlByteBuffer("")
     }*/
+}
+
+// MARK: Representations
+extension HTMLKitTests {
+    @Test
+    func representations() {
+        let yeah = "yeah"
+        let _:String = #html(representation: .literal) {
+            div("oh yeah")
+        }
+        let _:String = #html(representation: .literalOptimized) {
+            div("oh yeah")
+        }
+        let _:String = #html(representation: .literalOptimized) {
+            div("oh \(yeah)")
+        }
+        let _:AsyncStream<String> = #html(representation: .streamed()) {
+            div("oh yeah")
+        }
+        let _:AsyncStream<String> = #html(representation: .streamed(chunkSize: 3)) {
+            div("oh yeah")
+        }
+        /*let _:AsyncStream<String> = #html(representation: .streamed(chunkSize: 3)) {
+            div("oh\(yeah)") // TODO: fix
+        }*/
+        let _:AsyncStream<String> = #html(representation: .streamedAsync()) {
+            div("oh yeah")
+        }
+        let _:AsyncStream<String> = #html(representation: .streamedAsync(chunkSize: 3)) {
+            div("oh yeah")
+        }
+        let _:AsyncStream<String> = #html(representation: .streamedAsync(suspendDuration: .milliseconds(50))) {
+            div("oh yeah")
+        }
+        let _:AsyncStream<String> = #html(representation: .streamedAsync(chunkSize: 3, suspendDuration: .milliseconds(50))) {
+            div("oh yeah")
+        }
+    }
 }
 
 // MARK: StaticString Example

@@ -47,6 +47,7 @@ public enum HTMLResultRepresentation: Equatable, Sendable {
     /// - Parameters:
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
+    ///   - suspendDuration: Duration to sleep the `Task` that is yielding the stream results.
     /// - Warning: The values are yielded asynchronously.
-    case streamedAsync(optimized: Bool = true, chunkSize: Int = 1024)
+    case streamedAsync(optimized: Bool = true, chunkSize: Int = 1024, suspendDuration: Duration? = nil)
 }

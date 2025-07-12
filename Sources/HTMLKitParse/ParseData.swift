@@ -189,6 +189,7 @@ extension HTMLKitUtilities {
             let function = expr.functionCall!
             var optimized = true
             var chunkSize = 1024
+            var suspendDuration:Duration? = nil
             for arg in function.arguments {
                 switch arg.label?.text {
                 case "optimized":
@@ -196,6 +197,22 @@ extension HTMLKitUtilities {
                 case "chunkSize":
                     if let s = arg.expression.integerLiteral?.literal.text, let size = Int(s) {
                         chunkSize = size
+                    }
+                case "suspendDuration":
+                    // TODO: support
+                    if let member = arg.expression.memberAccess?.declName.baseName.text {
+                        switch member {
+                        case "milliseconds":
+                            break
+                        case "microseconds":
+                            break
+                        case "nanoseconds":
+                            break
+                        case "seconds":
+                            break
+                        default:
+                            break
+                        }
                     }
                 default:
                     break
@@ -209,7 +226,7 @@ extension HTMLKitUtilities {
             case "streamed":
                 return .streamed(optimized: optimized, chunkSize: chunkSize)
             case "streamedAsync":
-                return .streamedAsync(optimized: optimized, chunkSize: chunkSize)
+                return .streamedAsync(optimized: optimized, chunkSize: chunkSize, suspendDuration: suspendDuration)
             default:
                 return nil
             }
@@ -357,7 +374,6 @@ extension HTMLKitUtilities {
         encodedResult: String,
         representation: HTMLResultRepresentation
     ) -> String {
-        var expandedResult = encodedResult
         switch representation {
         case .literal:
             break
@@ -368,20 +384,21 @@ extension HTMLKitUtilities {
                 // TODO: show compiler diagnostic
             }
         case .streamed(let optimized, let chunkSize):
-            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize)
-        case .streamedAsync(let optimized, let chunkSize):
-            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: true, optimized: optimized, chunkSize: chunkSize)
+            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize, suspendDuration: nil)
+        case .streamedAsync(let optimized, let chunkSize, let suspendDuration):
+            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: true, optimized: optimized, chunkSize: chunkSize, suspendDuration: suspendDuration)
         default:
             break
         }
-        return expandedResult
+        return encodedResult
     }
     static func streamedRepresentation(
         encoding: HTMLEncoding,
         encodedResult: String,
         async: Bool,
         optimized: Bool,
-        chunkSize: Int
+        chunkSize: Int,
+        suspendDuration: Duration?
     ) -> String {
         let typeAnnotation:String
         if optimized {
@@ -417,6 +434,9 @@ extension HTMLKitUtilities {
                 string += d
             }
             string += ")\n"
+            if let suspendDuration {
+                string += "try await Task.sleep(for: \(suspendDuration))\n"
+            }
         }
         string += "continuation.finish()\n}"
         if async {
