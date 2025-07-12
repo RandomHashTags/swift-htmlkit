@@ -42,6 +42,10 @@ extension ElementTests {
         var string:String = #html(a("Test"))
         #expect(string == "<a>Test</a>")
 
+        var stream:AsyncStream<String> = #html(representation: .streamed()) {
+            a("Test")
+        }
+
         string = #html(a(href: "test", "Test"))
         #expect(string == "<a href=\"test\">Test</a>")
 

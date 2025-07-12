@@ -44,6 +44,7 @@ extension HTMLKitUtilities {
                 if let key = child.label?.text {
                     switch key {
                     case "encoding": context.encoding = parseEncoding(expression: child.expression) ?? .string
+                    case "representation": context.representation = parseRepresentation(expr: child.expression) ?? .literalOptimized
                     case "minify":   context.minify = child.expression.boolean(context) ?? false
                     default: break
                     }
@@ -65,56 +66,14 @@ extension HTMLKitUtilities {
     
     // MARK: Expand #html
     public static func expandHTMLMacro(context: HTMLExpansionContext) throws -> ExprSyntax {
-        let (string, encoding) = expandMacro(context: context)
-        return "\(raw: encodingResult(context: context, node: context.expansion, string: string, for: encoding))"
+        var context = context
+        return try expandHTMLMacro(context: &context)
     }
-    private static func encodingResult(
-        context: HTMLExpansionContext,
-        node: MacroExpansionExprSyntax,
-        string: String,
-        for encoding: HTMLEncoding
-    ) -> String {
-        switch encoding {
-        case .utf8Bytes:
-            guard hasNoInterpolation(context, node, string) else { return "" }
-            return bytes([UInt8](string.utf8))
-        case .utf16Bytes:
-            guard hasNoInterpolation(context, node, string) else { return "" }
-            return bytes([UInt16](string.utf16))
-        case .utf8CString:
-            guard hasNoInterpolation(context, node, string) else { return "" }
-            return "\(string.utf8CString)"
-
-        case .foundationData:
-            guard hasNoInterpolation(context, node, string) else { return "" }
-            return "Data(\(bytes([UInt8](string.utf8))))"
-
-        case .byteBuffer:
-            guard hasNoInterpolation(context, node, string) else { return "" }
-            return "ByteBuffer(bytes: \(bytes([UInt8](string.utf8))))"
-
-        case .string:
-            return "\"\(string)\""
-        case .custom(let encoded, _):
-            return encoded.replacingOccurrences(of: "$0", with: string)
-        }
-    }
-    private static func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
-        var string = "["
-        for b in bytes {
-            string += "\(b),"
-        }
-        string.removeLast()
-        return string.isEmpty ? "[]" : string + "]"
-    }
-    private static func hasNoInterpolation(_ context: HTMLExpansionContext, _ node: MacroExpansionExprSyntax, _ string: String) -> Bool {
-        guard string.firstRange(of: try! Regex("\\((.*)\\)")) == nil else {
-            if !context.ignoresCompilerWarnings {
-                context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the intended result.")))
-            }
-            return false
-        }
-        return true
+    public static func expandHTMLMacro(context: inout HTMLExpansionContext) throws -> ExprSyntax {
+        let (string, encoding) = expandMacro(context: &context)
+        let encodingResult = encodingResult(context: context, node: context.expansion, string: string, for: encoding)
+        let expandedResult = representationResult(encoding: encoding, encodedResult: encodingResult, representation: context.representation)
+        return "\(raw: expandedResult)"
     }
 
     // MARK: Parse Arguments
@@ -123,6 +82,12 @@ extension HTMLKitUtilities {
         otherAttributes: [String:String] = [:]
     ) -> ElementData {
         var context = context
+        return parseArguments(context: &context)
+    }
+    public static func parseArguments(
+        context: inout HTMLExpansionContext,
+        otherAttributes: [String:String] = [:]
+    ) -> ElementData {
         var globalAttributes = [HTMLAttribute]()
         var attributes = [String:Sendable]()
         var innerHTML = [CustomStringConvertible & Sendable]()
@@ -135,6 +100,8 @@ extension HTMLKitUtilities {
                     switch key {
                     case "encoding":
                         context.encoding = parseEncoding(expression: child.expression) ?? .string
+                    case "representation":
+                        context.representation = parseRepresentation(expr: child.expression) ?? .literalOptimized
                     case "lookupFiles":
                         context.lookupFiles = Set(child.expression.array!.elements.compactMap({ $0.expression.stringLiteral?.string(encoding: context.encoding) }))
                     case "attributes":
@@ -187,7 +154,7 @@ extension HTMLKitUtilities {
             return HTMLEncoding(rawValue: expression.memberAccess!.declName.baseName.text)
         case .functionCallExpr:
             let function = expression.functionCall!
-            switch function.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text {
+            switch function.calledExpression.memberAccess?.declName.baseName.text {
             case "custom":
                 guard let logic = function.arguments.first?.expression.stringLiteral?.string(encoding: .string) else { return nil }
                 if function.arguments.count == 1 {
@@ -197,6 +164,52 @@ extension HTMLKitUtilities {
                 } else {
                     return nil
                 }
+            default:
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
+
+    // MARK: Parse Representation
+    public static func parseRepresentation(expr: ExprSyntax) -> HTMLResultRepresentation? {
+        switch expr.kind {
+        case .memberAccessExpr:
+            switch expr.memberAccess!.declName.baseName.text {
+            case "literal": return .literal
+            case "literalOptimized": return .literalOptimized
+            case "chunked": return .chunked()
+            case "chunkedInline": return .chunkedInline()
+            case "streamed": return .streamed()
+            case "streamedAsync": return .streamedAsync()
+            default: return nil
+            }
+        case .functionCallExpr:
+            let function = expr.functionCall!
+            var optimized = true
+            var chunkSize = 1024
+            for arg in function.arguments {
+                switch arg.label?.text {
+                case "optimized":
+                    optimized = arg.expression.booleanLiteral?.literal.text == "true"
+                case "chunkSize":
+                    if let s = arg.expression.integerLiteral?.literal.text, let size = Int(s) {
+                        chunkSize = size
+                    }
+                default:
+                    break
+                }
+            }
+            switch function.calledExpression.memberAccess?.declName.baseName.text {
+            case "chunked":
+                return .chunked(optimized: optimized, chunkSize: chunkSize)
+            case "chunkedInline":
+                return .chunkedInline(optimized: optimized, chunkSize: chunkSize)
+            case "streamed":
+                return .streamed(optimized: optimized, chunkSize: chunkSize)
+            case "streamedAsync":
+                return .streamedAsync(optimized: optimized, chunkSize: chunkSize)
             default:
                 return nil
             }
@@ -284,6 +297,135 @@ extension HTMLKitUtilities {
         return HTMLElementValueType.parseElement(context: context, function)
     }
 }
+
+// MARK: Encoding result
+extension HTMLKitUtilities {
+    static func encodingResult(
+        context: HTMLExpansionContext,
+        node: MacroExpansionExprSyntax,
+        string: String,
+        for encoding: HTMLEncoding
+    ) -> String {
+        switch encoding {
+        case .utf8Bytes:
+            guard hasNoInterpolation(context, node, string) else { return "" }
+            return bytes([UInt8](string.utf8))
+        case .utf16Bytes:
+            guard hasNoInterpolation(context, node, string) else { return "" }
+            return bytes([UInt16](string.utf16))
+        case .utf8CString:
+            guard hasNoInterpolation(context, node, string) else { return "" }
+            return "\(string.utf8CString)"
+
+        case .foundationData:
+            guard hasNoInterpolation(context, node, string) else { return "" }
+            return "Data(\(bytes([UInt8](string.utf8))))"
+
+        case .byteBuffer:
+            guard hasNoInterpolation(context, node, string) else { return "" }
+            return "ByteBuffer(bytes: \(bytes([UInt8](string.utf8))))"
+
+        case .string:
+            return "\"\(string)\""
+        case .custom(let encoded, _):
+            return encoded.replacingOccurrences(of: "$0", with: string)
+        }
+    }
+    private static func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
+        var string = "["
+        for b in bytes {
+            string += "\(b),"
+        }
+        string.removeLast()
+        return string.isEmpty ? "[]" : string + "]"
+    }
+    private static func hasNoInterpolation(_ context: HTMLExpansionContext, _ node: MacroExpansionExprSyntax, _ string: String) -> Bool {
+        guard string.firstRange(of: try! Regex("\\((.*)\\)")) == nil else {
+            if !context.ignoresCompilerWarnings {
+                context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the intended result.")))
+            }
+            return false
+        }
+        return true
+    }
+}
+
+// MARK: Representation results
+extension HTMLKitUtilities {
+    static func representationResult(
+        encoding: HTMLEncoding,
+        encodedResult: String,
+        representation: HTMLResultRepresentation
+    ) -> String {
+        var expandedResult = encodedResult
+        switch representation {
+        case .literal:
+            break
+        case .literalOptimized:
+            if encoding == .string {
+                // TODO: implement
+            } else {
+                // TODO: show compiler diagnostic
+            }
+        case .streamed(let optimized, let chunkSize):
+            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize)
+        case .streamedAsync(let optimized, let chunkSize):
+            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: true, optimized: optimized, chunkSize: chunkSize)
+        default:
+            break
+        }
+        return expandedResult
+    }
+    static func streamedRepresentation(
+        encoding: HTMLEncoding,
+        encodedResult: String,
+        async: Bool,
+        optimized: Bool,
+        chunkSize: Int
+    ) -> String {
+        let typeAnnotation:String
+        if optimized {
+            typeAnnotation = encoding.typeAnnotation // TODO: implement
+        } else {
+            typeAnnotation = encoding.typeAnnotation
+        }
+        var string = "AsyncStream<\(typeAnnotation)> { continuation in\n"
+        if async {
+            string += "Task {\n"
+        }
+
+        let delimiter:(Character) -> String? = encoding == .string ? { $0 != "\"" ? "\"" : nil } : { _ in nil }
+        let count = encodedResult.count
+        var i = 0
+        while i < count {
+            var endingIndex = i + chunkSize
+            if i == 0 && encoding == .string {
+                endingIndex += 1
+            }
+            let endIndex = encodedResult.index(encodedResult.startIndex, offsetBy: endingIndex, limitedBy: encodedResult.endIndex) ?? encodedResult.endIndex
+            let slice = encodedResult[encodedResult.index(encodedResult.startIndex, offsetBy: i)..<endIndex]
+            i += chunkSize + (i == 0 && encoding == .string ? 1 : 0)
+            if slice.isEmpty || encoding == .string && slice.count == 1 && slice.first == "\"" {
+                continue
+            }
+            string += "continuation.yield("
+            if let f = slice.first, let d = delimiter(f) {
+                string += d
+            }
+            string += slice
+            if let l = slice.last, let d = delimiter(l) {
+                string += d
+            }
+            string += ")\n"
+        }
+        string += "continuation.finish()\n}"
+        if async {
+            string += "\n}"
+        }
+        return string
+    }
+}
+
 extension HTMLKitUtilities {
     // MARK: GA Already Defined
     static func globalAttributeAlreadyDefined(context: HTMLExpansionContext, attribute: String, node: some SyntaxProtocol) {
@@ -334,9 +476,9 @@ extension HTMLKitUtilities {
     }
 
     // MARK: Expand Macro
-    static func expandMacro(context: HTMLExpansionContext) -> (String, HTMLEncoding) {
-        let data = HTMLKitUtilities.parseArguments(context: context)
-        var string:String = ""
+    static func expandMacro(context: inout HTMLExpansionContext) -> (String, HTMLEncoding) {
+        let data = HTMLKitUtilities.parseArguments(context: &context)
+        var string = ""
         for v in data.innerHTML {
             string += String(describing: v)
         }
@@ -354,15 +496,15 @@ extension ExprSyntax {
         booleanLiteral?.literal.text == "true"
     }
     package func enumeration<T: HTMLParsable>(_ context: HTMLExpansionContext) -> T? {
-        if let function = functionCall, let member = function.calledExpression.memberAccess {
+        if let functionCall, let member = functionCall.calledExpression.memberAccess {
             var c = context
             c.key = member.declName.baseName.text
-            c.arguments = function.arguments
+            c.arguments = functionCall.arguments
             return T(context: c)
         }
-        if let member = memberAccess {
+        if let memberAccess {
             var c = context
-            c.key = member.declName.baseName.text
+            c.key = memberAccess.declName.baseName.text
             return T(context: c)
         }
         return nil

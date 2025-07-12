@@ -24,7 +24,7 @@
 /// let _:String = #html(div(string)) // ⚠️ promotion cannot be applied; compiles to "<div>" + String(describing: string) + "</div>"
 /// ```
 /// 
-public enum HTMLEncoding: Sendable {
+public enum HTMLEncoding: Equatable, Sendable {
     /// - Returns: `String`/`StaticString`
     case string
 
@@ -80,6 +80,29 @@ public enum HTMLEncoding: Sendable {
             return "\""
         case .custom(_, let delimiter):
             return delimiter
+        }
+    }
+
+    @inlinable
+    public var typeAnnotation: String {
+        switch self {
+        case .string:
+            return "String"
+        case .utf8Bytes:
+            return "[UInt8]"
+        case .utf8CString:
+            return "ContiguousArray<CChar>"
+        case .utf16Bytes:
+            return "[UInt16]"
+        case .foundationData:
+            return "Data"
+        case .byteBuffer:
+            return "ByteBuffer"
+        case .custom(let logic, _):
+            if let s = logic.split(separator: "(").first {
+                return String(s)
+            }
+            return "String"
         }
     }
 }

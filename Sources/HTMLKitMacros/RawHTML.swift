@@ -11,6 +11,7 @@ enum RawHTML: ExpressionMacro {
             expansion: node,
             ignoresCompilerWarnings: false,
             encoding: .string,
+            representation: .literalOptimized,
             key: "",
             arguments: node.arguments,
             escape: false,

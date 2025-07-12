@@ -11,6 +11,7 @@ enum EscapeHTML: ExpressionMacro {
             expansion: node,
             ignoresCompilerWarnings: false,
             encoding: .string,
+            representation: .literalOptimized,
             key: "",
             arguments: node.arguments,
             escape: true,

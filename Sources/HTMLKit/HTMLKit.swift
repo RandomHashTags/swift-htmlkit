@@ -10,6 +10,7 @@
 @freestanding(expression)
 public macro escapeHTML(
     encoding: HTMLEncoding = .string,
+    representation: HTMLResultRepresentation = .literalOptimized,
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
@@ -17,8 +18,9 @@ public macro escapeHTML(
 /// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
 @freestanding(expression)
 //@available(*, deprecated, message: "innerHTML is now initialized using brackets instead of parentheses")
-public macro html<T: CustomStringConvertible & Sendable>(
+public macro html<T>(
     encoding: HTMLEncoding = .string,
+    representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -26,8 +28,9 @@ public macro html<T: CustomStringConvertible & Sendable>(
 // MARK: HTML
 /// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
 @freestanding(expression)
-public macro html<T: CustomStringConvertible & Sendable>(
+public macro html<T>(
     encoding: HTMLEncoding = .string,
+    representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     _ innerHTML: () -> CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -36,6 +39,7 @@ public macro html<T: CustomStringConvertible & Sendable>(
 @freestanding(expression)
 public macro anyHTML(
     encoding: HTMLEncoding = .string,
+    representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -47,6 +51,7 @@ public macro anyHTML(
 @freestanding(expression)
 public macro uncheckedHTML<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
+    representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     _ innerHTML: CustomStringConvertible & Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -58,6 +63,7 @@ public macro uncheckedHTML<T: CustomStringConvertible & Sendable>(
 @freestanding(expression)
 public macro rawHTML<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
+    representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
     _ innerHTML: CustomStringConvertible & Sendable...
@@ -69,6 +75,7 @@ public macro rawHTML<T: CustomStringConvertible & Sendable>(
 @freestanding(expression)
 public macro anyRawHTML(
     encoding: HTMLEncoding = .string,
+    representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
     _ innerHTML: CustomStringConvertible & Sendable...
