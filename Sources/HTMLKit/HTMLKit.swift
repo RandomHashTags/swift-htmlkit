@@ -10,7 +10,7 @@
 @freestanding(expression)
 public macro escapeHTML(
     encoding: HTMLEncoding = .string,
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
 // MARK: HTML
@@ -20,7 +20,7 @@ public macro escapeHTML(
 public macro html<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 // MARK: HTML
@@ -29,7 +29,7 @@ public macro html<T: CustomStringConvertible & Sendable>(
 public macro html<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: () -> CustomStringConvertible & Sendable...
+    _ innerHTML: () -> Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 /// - Returns: An existential conforming to `CustomStringConvertible & Sendable`.
@@ -37,7 +37,7 @@ public macro html<T: CustomStringConvertible & Sendable>(
 public macro anyHTML(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 // MARK: Unchecked
@@ -48,7 +48,7 @@ public macro anyHTML(
 public macro uncheckedHTML<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 // MARK: Raw
@@ -60,7 +60,7 @@ public macro rawHTML<T: CustomStringConvertible & Sendable>(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
 
 /// Does not escape the `innerHTML`.
@@ -71,7 +71,7 @@ public macro anyRawHTML(
     encoding: HTMLEncoding = .string,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
 
 // MARK: HTML Context

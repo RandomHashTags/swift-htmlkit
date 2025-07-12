@@ -23,7 +23,7 @@ struct ElementTests {
 
     // MARK: HTMLKit.<element>
     @Test func elementWithLibraryDecl() {
-        let string:StaticString = #html(html(HTMLKit.body()))
+        let string:StaticString = #html(html(body()))
         #expect(string == "<!DOCTYPE html><html><body></body></html>")
     }
 }
@@ -53,10 +53,10 @@ extension ElementTests {
         string = #html(a(href: "", "Test"))
         #expect(string == "<a href=\"\">Test</a>")
         
-        string = #html(a(download: .empty))
+        string = #html(a(download: false))
         #expect(string == "<a download></a>")
         
-        string = #html(a(download: .filename("yippie.json")))
+        string = #html(a(download: "yippie.json"))
         #expect(string == "<a download=\"yippie.json\"></a>")
 
         string = #html(a(ping: ["https://litleagues.com", "https://github.com/RandomHashTags"]))
@@ -65,17 +65,17 @@ extension ElementTests {
         string = #html(a(referrerpolicy: .noReferrer))
         #expect(string == "<a referrerpolicy=\"no-referrer\"></a>")
 
-        string = #html(a(target: ._blank))
+        string = #html(a(target: .blank))
         #expect(string == "<a target=\"_blank\"></a>")
 
-        string = #html(a(rel: [.stylesheet, .alternate, .privacyPolicy, .termsOfService, .dnsPrefetch]))
+        string = #html(a(rel: .init([.stylesheet, .alternate, .privacy_policy, .terms_of_service, .dns_prefetch])))
         #expect(string == "<a rel=\"stylesheet alternate privacy-policy terms-of-service dns-prefetch\"></a>")
     }
 
     // MARK: area
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area
     @Test func elementArea() {
-        var string:StaticString = #html(area(coords: [1, 2, 3]))
+        var string:StaticString = #html(area.circle(x: 1, y: 2, radius: 3, href: "", alt: ""))
         #expect(string == "<area coords=\"1,2,3\">")
 
         string = #html(area(coords: []))
@@ -87,29 +87,29 @@ extension ElementTests {
         string = #html(area(href: "https://github.com/RandomHashTags"))
         #expect(string == "<area href=\"https://github.com/RandomHashTags\">")
 
-        string = #html(area(shape: .poly))
+        string = #html(area(shape: .poly(coords: "")))
         #expect(string == "<area shape=\"poly\">")
 
         string = #html(area(shape: .default))
         #expect(string == "<area shape=\"default\">")
 
-        string = #html(area(target: ._self))
+        string = #html(area(target: .`self`))
         #expect(string == "<area target=\"_self\">")
     }
 
     // MARK: audio
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
     @Test func elementAudio() {
-        var string:StaticString = #html(audio(controlslist: [.nodownload]))
+        var string:StaticString = #html(audio(controlslist: .init(nodownload: true)))
         #expect(string == "<audio controlslist=\"nodownload\"></audio>")
 
-        string = #html(audio(controlslist: [.nodownload, .nofullscreen, .noremoteplayback]))
+        string = #html(audio(controlslist: .init(nodownload: true, nofullscreen: true, noremoteplayback: true)))
         #expect(string == "<audio controlslist=\"nodownload nofullscreen noremoteplayback\"></audio>")
 
         string = #html(audio(autoplay: true))
         #expect(string == "<audio autoplay></audio>")
 
-        string = #html(audio(autoplay: false, controls: true))
+        string = #html(audio(controls: true, autoplay: false))
         #expect(string == "<audio controls></audio>")
 
         string = #html(audio(crossorigin: .anonymous))
@@ -216,13 +216,13 @@ extension ElementTests {
     // MARK: input
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
     @Test func elementInput() {
-        var string:StaticString = #html(input(autocomplete: ["email", "password"], type: .text))
+        var string:StaticString = #html(input.text(autocomplete: ["email", "password"]))
         #expect(string == "<input autocomplete=\"email password\" type=\"text\">")
 
-        string = #html(input(type: .password))
+        string = #html(input.password())
         #expect(string == "<input type=\"password\">")
 
-        string = #html(input(type: .datetimeLocal))
+        string = #html(input.datetimeLocal())
         #expect(string == "<input type=\"datetime-local\">")
 
         string = #html(input(accept: [".docx", ".json"]))
@@ -266,19 +266,19 @@ extension ElementTests {
         var string:StaticString = #html(ol())
         #expect(string == "<ol></ol>")
 
-        string = #html(ol(type: .a))
+        string = #html(ol(type: .lowerAlpha))
         #expect(string == "<ol type=\"a\"></ol>")
 
-        string = #html(ol(type: .A))
+        string = #html(ol(type: .upperAlpha))
         #expect(string == "<ol type=\"A\"></ol>")
 
-        string = #html(ol(type: .i))
+        string = #html(ol(type: .lowerRoman))
         #expect(string == "<ol type=\"i\"></ol>")
 
-        string = #html(ol(type: .I))
+        string = #html(ol(type: .upperRoman))
         #expect(string == "<ol type=\"I\"></ol>")
 
-        string = #html(ol(type: .one))
+        string = #html(ol(type: .decimal))
         #expect(string == "<ol type=\"1\"></ol>")
     }
 
@@ -363,14 +363,14 @@ extension ElementTests {
     // MARK: variable
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/var
     @Test func elementVar() {
-        let string:StaticString = #html(variable("macros don't like `var` bro"))
+        let string:StaticString = #html(Variable("macros don't like `var` bro"))
         #expect(string == "<var>macros don&#39t like `var` bro</var>")
     }
     
     // MARK: video
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
     @Test func elementVideo() {
-        var string:StaticString = #html(video(controlslist: [.nodownload, .nofullscreen, .noremoteplayback]))
+        var string:StaticString = #html(video(controlslist: .combine([.nodownload, .nofullscreen, .noremoteplayback])))
         #expect(string == "<video controlslist=\"nodownload nofullscreen noremoteplayback\"></video>")
 
         string = #html(video(crossorigin: .anonymous))

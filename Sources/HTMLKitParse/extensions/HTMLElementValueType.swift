@@ -1,17 +1,50 @@
 
 #if canImport(HTMLElements) && canImport(HTMLKitUtilities) && canImport(SwiftSyntax)
 import HTMLElements
+import HTMLAttributes
 import HTMLKitUtilities
 import SwiftSyntax
 
 extension HTMLElementValueType {
-    package static func get<T: HTMLElement>(_ context: HTMLExpansionContext, _ bruh: T.Type) -> T {
-        return T(context.encoding, HTMLKitUtilities.parseArguments(context: context, otherAttributes: T.otherAttributes))
+    public struct Test: HTMLElement {
+        public var encoding: HTMLEncoding
+
+        public var fromMacro: Bool
+
+        public var isVoid: Bool
+
+        public var trailingSlash: Bool
+
+        public var escaped: Bool
+
+        public var tag: String
+
+        public var attributes: [HTMLAttributes.HTMLAttribute]
+
+        public var innerHTML: [any CustomStringConvertible & Sendable]
+
+        public init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData) {
+            self.encoding = encoding
+            fromMacro = true
+            isVoid = false
+            trailingSlash = data.trailingSlash
+            escaped = false
+            tag = "unknown"
+            attributes = []
+            innerHTML = []
+        }
+
+        public var description: String {
+            ""
+        }
+    }
+    package static func get<T: Element>(_ context: HTMLExpansionContext, _ bruh: T.Type) -> Test {
+        return Test(context.encoding, HTMLKitUtilities.parseArguments(context: context, otherAttributes: [:]))
     }
     package static func parseElement(
         context: HTMLExpansionContext,
         _ function: FunctionCallExprSyntax
-    ) -> HTMLElement? {
+    ) -> (any HTMLElement)? {
         let calledExpression = function.calledExpression
         let key:String
         switch calledExpression.kind {
@@ -102,7 +135,7 @@ extension HTMLElementValueType {
         case "output": return get(c, output.self)
         case "p": return get(c, p.self)
         case "picture": return get(c, picture.self)
-        case "portal": return get(c, portal.self)
+        //case "portal": return get(c, portal.self)
         case "pre": return get(c, pre.self)
         case "progress": return get(c, progress.self)
         case "q": return get(c, q.self)
@@ -138,11 +171,11 @@ extension HTMLElementValueType {
         case "track": return get(c, track.self)
         case "u": return get(c, u.self)
         case "ul": return get(c, ul.self)
-        case "variable": return get(c, variable.self)
+        case "variable": return get(c, Variable.self)
         case "video": return get(c, video.self)
         case "wbr": return get(c, wbr.self)
 
-        case "custom": return get(c, custom.self)
+        //case "custom": return get(c, custom.self)
         //case "svg": return get(c, svg.self)
         default: return nil
         }
