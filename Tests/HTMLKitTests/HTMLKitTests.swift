@@ -92,6 +92,9 @@ extension HTMLKitTests {
         let _:String = #html(representation: .literal) {
             div("oh yeah")
         }
+        let _:String = #html(representation: .literal) {
+            div("oh \(yeah)")
+        }
         let _:String = #html(representation: .literalOptimized) {
             div("oh yeah")
         }

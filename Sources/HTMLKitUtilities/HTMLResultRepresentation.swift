@@ -5,28 +5,31 @@ public enum HTMLResultRepresentation: Equatable, Sendable {
     // MARK: Literal
 
 
-    /// The result is represented normally as a literal.
+    /// - Returns: The normal encoded literal.
     case literal
-    /// The result is represented as an optimized literal by differentiating the immutable and mutable parts of the literal.
+
+    /// Reduces overhead when working with dynamic content.
+    /// 
+    /// - Returns: An optimized literal by differentiating the immutable and mutable parts of the encoded literal.
     case literalOptimized
 
 
     // MARK: Chunked
 
 
-    /// The result is represented as an `Array` of literals of length up-to `chunkSize`.
-    /// 
     /// - Parameters:
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
+    ///   - Returns: An `Array` of encoded literals of length up-to `chunkSize`.
     case chunked(optimized: Bool = true, chunkSize: Int = 1024)
 
-    /// The result is represented as an `InlineArray` of literals of length up-to `chunkSize`.
-    /// 
+    #if compiler(>=6.2)
     /// - Parameters:
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
+    /// - Returns: An `InlineArray` of encoded literals of length up-to `chunkSize`.
     case chunkedInline(optimized: Bool = true, chunkSize: Int = 1024)
+    #endif
 
 
 
@@ -34,20 +37,18 @@ public enum HTMLResultRepresentation: Equatable, Sendable {
 
 
 
-    /// The result is represented as an `AsyncStream` of literals of length up-to `chunkSize`.
-    /// 
     /// - Parameters:
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
+    /// - Returns: An `AsyncStream` of encoded literals of length up-to `chunkSize`.
     /// - Warning: The values are yielded synchronously.
     case streamed(optimized: Bool = true, chunkSize: Int = 1024)
 
-    /// The result is represented as an `AsyncStream` of literals of length up-to `chunkSize`.
-    /// 
     /// - Parameters:
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
-    ///   - suspendDuration: Duration to sleep the `Task` that is yielding the stream results.
-    /// - Warning: The values are yielded asynchronously.
+    ///   - suspendDuration: Duration to sleep the `Task` that is yielding the stream results. Default is `nil`.
+    /// - Returns: An `AsyncStream` of encoded literals of length up-to `chunkSize`.
+    /// - Warning: The values are yielded synchronously in a new `Task`. Specify a `suspendDuration` to make it completely nonblocking.
     case streamedAsync(optimized: Bool = true, chunkSize: Int = 1024, suspendDuration: Duration? = nil)
 }
