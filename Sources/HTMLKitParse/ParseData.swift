@@ -180,7 +180,9 @@ extension HTMLKitUtilities {
             case "literal": return .literal
             case "literalOptimized": return .literalOptimized
             case "chunked": return .chunked()
+            #if compiler(>=6.2)
             case "chunkedInline": return .chunkedInline()
+            #endif
             case "streamed": return .streamed()
             case "streamedAsync": return .streamedAsync()
             default: return nil
@@ -221,8 +223,10 @@ extension HTMLKitUtilities {
             switch function.calledExpression.memberAccess?.declName.baseName.text {
             case "chunked":
                 return .chunked(optimized: optimized, chunkSize: chunkSize)
+            #if compiler(>=6.2)
             case "chunkedInline":
                 return .chunkedInline(optimized: optimized, chunkSize: chunkSize)
+            #endif
             case "streamed":
                 return .streamed(optimized: optimized, chunkSize: chunkSize)
             case "streamedAsync":
