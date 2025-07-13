@@ -1,5 +1,4 @@
 // swift-tools-version:5.10
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
@@ -9,7 +8,7 @@ let package = Package(
         .macOS(.v14)
     ],
     dependencies: [
-        .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.27.0"),
+        .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.29.3"),
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
         // dsls
         .package(name: "swift-htmlkit", path: "../"),

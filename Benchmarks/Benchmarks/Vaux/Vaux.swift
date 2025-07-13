@@ -5,21 +5,23 @@ import Foundation
 
 // MARK: Custom rendering
 extension HTML {
+    @inlinable
     func render(includeTag: Bool) -> (HTMLType, String) {
-        if let node:HTMLNode = self as? HTMLNode {
+        if let node = self as? HTMLNode {
             return (.node, node.rendered(includeTag: includeTag))
-        } else if let node:MultiNode = self as? MultiNode {
+        } else if let node = self as? MultiNode {
             var string:String = ""
             for child in node.children {
                 string += child.render(includeTag: true).1
             }
             return (.node, string)
-        } else if let node:AttributedNode = self as? AttributedNode {
+        } else if let node = self as? AttributedNode {
             return (.node, node.render)
         } else {
             return (.node, String(describing: self))
         }
     }
+    @inlinable
     func isVoid(_ tag: String) -> Bool {
         switch tag {
         case "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr": return true
@@ -28,31 +30,32 @@ extension HTML {
     }
 }
 
-enum HTMLType {
+public enum HTMLType {
     case node, attribute
 }
 
 extension AttributedNode {
-    var render : String {
-        let tag:String = child.getTag()!
-        let attribute_string:String = " " + attribute.key + (attribute.value != nil ? "=\"" + attribute.value! + "\"" : "")
+    @inlinable
+    var render: String {
+        let tag = child.getTag()!
+        let attribute_string = " " + attribute.key + (attribute.value != nil ? "=\"" + attribute.value! + "\"" : "")
         return "<" + tag + attribute_string + ">" + child.render(includeTag: false).1 + (isVoid(tag) ? "" : "</" + tag + ">")
     }
 }
 
 extension HTMLNode {
+    @inlinable
     func rendered(includeTag: Bool) -> String {
-        guard let tag:String = getTag() else { return String(describing: self) }
-        var attributes:String = "", children:String = ""
+        guard let tag = getTag() else { return String(describing: self) }
+        var attributes = ""
+        var children = ""
         if let child = self.child {
-            let (type, value):(HTMLType, String) = child.render(includeTag: true)
+            let (type, value) = child.render(includeTag: true)
             switch type {
-                case .attribute:
-                    attributes += " " + value
-                    break
-                case .node:
-                    children += value
-                    break
+            case .attribute:
+                attributes += " " + value
+            case .node:
+                children += value
             }
         }
         return (tag == "html" ? "<!DOCTYPE html>" : "") + (includeTag ? "<" + tag + attributes + ">" : "") + children + (!isVoid(tag) && includeTag ? "</" + tag + ">" : "")

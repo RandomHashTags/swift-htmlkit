@@ -11,7 +11,7 @@ public enum HTMLResultRepresentation: Equatable, Sendable {
     /// Reduces overhead when working with dynamic content.
     /// 
     /// - Returns: An optimized literal by differentiating the immutable and mutable parts of the encoded literal.
-    case literalOptimized
+    //case literalOptimized
 
 
     // MARK: Chunked

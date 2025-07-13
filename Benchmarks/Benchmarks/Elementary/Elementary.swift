@@ -2,7 +2,7 @@
 import Utilities
 import Elementary
 
-package struct ElementaryTests : HTMLGenerator {
+package struct ElementaryTests: HTMLGenerator {
     package init() {}
     
     package func staticHTML() -> String {
@@ -14,8 +14,8 @@ package struct ElementaryTests : HTMLGenerator {
     }
 }
 
-struct StaticView : HTML {
-    var content : some HTML {
+struct StaticView: HTML {
+    var content: some HTML {
         HTMLRaw("<!DOCTYPE html>")
         html {
             head {
@@ -28,10 +28,10 @@ struct StaticView : HTML {
     }
 }
 
-struct DynamicView : HTML { 
+struct DynamicView: HTML { 
     let context:HTMLContext
     
-    var content : some HTML {
+    var content: some HTML {
         HTMLRaw("<!DOCTYPE html>")
         html {
             head {

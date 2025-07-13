@@ -54,7 +54,7 @@ extension HTMLKitUtilities {
             if let key = child.label?.text {
                 switch key {
                 case "encoding": context.encoding = parseEncoding(expression: child.expression) ?? .string
-                case "representation": context.representation = parseRepresentation(expr: child.expression) ?? .literalOptimized
+                case "representation": context.representation = parseRepresentation(expr: child.expression) ?? .literal
                 case "minify": context.minify = child.expression.boolean(context) ?? false
                 default: break
                 }
@@ -104,7 +104,7 @@ extension HTMLKitUtilities {
         case .memberAccessExpr:
             switch expr.memberAccess!.declName.baseName.text {
             case "literal": return .literal
-            case "literalOptimized": return .literalOptimized
+            //case "literalOptimized": return .literalOptimized
             case "chunked": return .chunked()
             #if compiler(>=6.2)
             case "chunkedInline": return .chunkedInline()

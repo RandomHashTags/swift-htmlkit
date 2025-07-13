@@ -84,13 +84,15 @@ extension HTMLKitUtilities {
     ) -> String {
         switch representation {
         case .literal:
-            break
-        case .literalOptimized:
+            if encoding == .string {
+                return literal(encodedResult: encodedResult)
+            }
+        /*case .literalOptimized:
             if encoding == .string {
                 return optimizedLiteral(encodedResult: encodedResult)
             } else {
                 // TODO: show compiler diagnostic
-            }
+            }*/
         case .chunked(let optimized, let chunkSize):
             return "[" + chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ", ") + "]"
         #if compiler(>=6.2)
@@ -100,18 +102,61 @@ extension HTMLKitUtilities {
             return "InlineArray<\(chunks.count), \(typeAnnotation)>([\(chunks)])"
         #endif
         case .streamed(let optimized, let chunkSize):
-            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize, suspendDuration: nil)
+            return streamed(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize, suspendDuration: nil)
         case .streamedAsync(let optimized, let chunkSize, let suspendDuration):
-            return streamedRepresentation(encoding: encoding, encodedResult: encodedResult, async: true, optimized: optimized, chunkSize: chunkSize, suspendDuration: suspendDuration)
+            return streamed(encoding: encoding, encodedResult: encodedResult, async: true, optimized: optimized, chunkSize: chunkSize, suspendDuration: suspendDuration)
         default:
             break
         }
         return encodedResult
     }
+}
 
+// MARK: Literal
+extension HTMLKitUtilities {
+    static var interpolationRegex: Regex<AnyRegexOutput> {
+        try! Regex.init(#"( \+ String\(describing: [\x00-\x2A\x2C-\xFF]+\) \+ )"#)
+    }
+    static func literal(encodedResult: String) -> String {
+        var interpolation = encodedResult.matches(of: interpolationRegex)
+        guard !interpolation.isEmpty else {
+            return encodedResult
+        }
+        var index = encodedResult.startIndex
+        var values = [String]()
+        while !interpolation.isEmpty {
+            let interp = interpolation.removeFirst()
+            var left = encodedResult[index..<interp.range.lowerBound]
+            if index != encodedResult.startIndex && left.first == "\"" {
+                left.removeFirst()
+            }
+            if left.last == "\"" {
+                left.removeLast()
+            }
+            values.append(String(left))
+
+            var interpolationValue = encodedResult[interp.range]
+            interpolationValue.removeFirst(22)
+            interpolationValue.removeLast(3)
+            interpolationValue.removeAll(where: { $0.isNewline })
+            values.append(String("\\(" + interpolationValue))
+            index = interp.range.upperBound
+        }
+        if index < encodedResult.endIndex {
+            var slice = encodedResult[index...]
+            if slice.first == "\"" {
+                slice.removeFirst()
+            }
+            values.append(String(slice))
+        }
+        return values.joined()
+    }
+}
+
+// MARK: Optimized literal
+extension HTMLKitUtilities {
     static func optimizedLiteral(encodedResult: String) -> String {
-        let regex = try! Regex.init("( \\+ String\\(describing: [\\.\\w\\s\\(\\)\\[\\]]+\\) \\+ )")
-        var interpolation = encodedResult.matches(of: regex)
+        var interpolation = encodedResult.matches(of: interpolationRegex)
         guard !interpolation.isEmpty else {
             return encodedResult
         }
@@ -124,9 +169,10 @@ extension HTMLKitUtilities {
             values.append("StaticString(\(left))")
 
             var interpolationValue = encodedResult[interp.range]
-            interpolationValue.removeFirst(3)
+            interpolationValue.removeFirst(22)
             interpolationValue.removeLast(3)
-            values.append(String(interpolationValue))
+            interpolationValue.removeAll(where: { $0.isNewline })
+            values.append(String("\"\\(" + interpolationValue + "\""))
             index = interp.range.upperBound
 
             reserveCapacity += left.count + 32
@@ -138,7 +184,10 @@ extension HTMLKitUtilities {
         }
         return "HTMLOptimizedLiteral(reserveCapacity: \(reserveCapacity)).render((\n\(values.joined(separator: ",\n"))\n))"
     }
+}
 
+// MARK: Chunks
+extension HTMLKitUtilities {
     static func chunks(
         encoding: HTMLEncoding,
         encodedResult: String,
@@ -173,8 +222,11 @@ extension HTMLKitUtilities {
         }
         return chunks
     }
+}
 
-    static func streamedRepresentation(
+// MARK: Streamed
+extension HTMLKitUtilities {
+    static func streamed(
         encoding: HTMLEncoding,
         encodedResult: String,
         async: Bool,

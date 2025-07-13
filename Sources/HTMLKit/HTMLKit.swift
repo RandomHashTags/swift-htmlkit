@@ -10,7 +10,7 @@
 @freestanding(expression)
 public macro escapeHTML(
     encoding: HTMLEncoding = .string,
-    representation: HTMLResultRepresentation = .literalOptimized,
+    representation: HTMLResultRepresentation = .literal,
     _ innerHTML: Sendable...
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
@@ -20,7 +20,7 @@ public macro escapeHTML(
 //@available(*, deprecated, message: "innerHTML is now initialized using brackets instead of parentheses")
 public macro html<T>(
     encoding: HTMLEncoding = .string,
-    representation: HTMLResultRepresentation = .literalOptimized,
+    representation: HTMLResultRepresentation = .literal,
     lookupFiles: [StaticString] = [],
     _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -30,7 +30,7 @@ public macro html<T>(
 @freestanding(expression)
 public macro html<T>(
     encoding: HTMLEncoding = .string,
-    representation: HTMLResultRepresentation = .literalOptimized,
+    representation: HTMLResultRepresentation = .literal,
     lookupFiles: [StaticString] = [],
     _ innerHTML: () -> Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -39,7 +39,7 @@ public macro html<T>(
 @freestanding(expression)
 public macro anyHTML(
     encoding: HTMLEncoding = .string,
-    representation: HTMLResultRepresentation = .literalOptimized,
+    representation: HTMLResultRepresentation = .literal,
     lookupFiles: [StaticString] = [],
     _ innerHTML: Sendable...
 ) -> any Sendable = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -51,7 +51,7 @@ public macro anyHTML(
 @freestanding(expression)
 public macro uncheckedHTML<T>(
     encoding: HTMLEncoding = .string,
-    representation: HTMLResultRepresentation = .literalOptimized,
+    representation: HTMLResultRepresentation = .literal,
     lookupFiles: [StaticString] = [],
     _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
@@ -63,7 +63,7 @@ public macro uncheckedHTML<T>(
 @freestanding(expression)
 public macro rawHTML<T>(
     encoding: HTMLEncoding = .string,
-    representation: HTMLResultRepresentation = .literalOptimized,
+    representation: HTMLResultRepresentation = .literal,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
     _ innerHTML: Sendable...
@@ -75,7 +75,7 @@ public macro rawHTML<T>(
 @freestanding(expression)
 public macro anyRawHTML(
     encoding: HTMLEncoding = .string,
-    representation: HTMLResultRepresentation = .literalOptimized,
+    representation: HTMLResultRepresentation = .literal,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
     _ innerHTML: Sendable...

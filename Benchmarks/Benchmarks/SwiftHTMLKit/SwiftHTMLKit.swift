@@ -3,7 +3,7 @@ import Utilities
 import SwiftHTMLKit
 import NIOCore
 
-package struct SwiftHTMLKitTests : HTMLGenerator {
+package struct SwiftHTMLKitTests: HTMLGenerator {
     package init() {}
 
     package func staticHTML() -> String {
@@ -67,9 +67,9 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
     package func dynamicHTML(_ context: HTMLContext) -> String {
         var qualities:String = ""
         for quality in context.user.qualities {
-            qualities += #html(li(quality))
+            qualities += #html(representation: .literal, li(quality))
         }
-        return #html {
+        return #html(representation: .literal) {
             html {
                 head {
                     meta(charset: context.charset)

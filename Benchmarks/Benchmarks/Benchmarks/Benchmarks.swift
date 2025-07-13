@@ -36,7 +36,7 @@ let benchmarks = {
         }
     }*/
 
-    let context:HTMLContext = HTMLContext()
+    let context = HTMLContext()
     for (key, value) in libraries {
         Benchmark(key) {
             for _ in $0.scaledIterations {

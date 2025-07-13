@@ -28,7 +28,7 @@ extension HTMLKitUtilities {
                 case "encoding":
                     context.encoding = parseEncoding(expression: child.expression) ?? .string
                 case "representation":
-                    context.representation = parseRepresentation(expr: child.expression) ?? .literalOptimized
+                    context.representation = parseRepresentation(expr: child.expression) ?? .literal
                 case "lookupFiles":
                     if let elements = child.expression.array?.elements {
                         context.lookupFiles = Set(elements.compactMap({ $0.expression.stringLiteral?.string(encoding: context.encoding) }))

@@ -2,7 +2,7 @@
 import Utilities
 import Plot
 
-package struct PlotTests : HTMLGenerator {
+package struct PlotTests: HTMLGenerator {
     package init() {}
 
     package func staticHTML() -> String {

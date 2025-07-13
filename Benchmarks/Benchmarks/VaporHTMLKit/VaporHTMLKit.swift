@@ -2,9 +2,10 @@
 import Utilities
 import VaporHTMLKit
 
-package struct VaporHTMLKitTests : HTMLGenerator {
+package struct VaporHTMLKitTests: HTMLGenerator {
 
     let renderer:Renderer
+
     package init() {
         renderer = Renderer()
         try! renderer.add(layout: StaticView())
@@ -20,7 +21,7 @@ package struct VaporHTMLKitTests : HTMLGenerator {
 }
 
 struct StaticView : View {
-    var body : AnyContent {
+    var body: AnyContent {
         Document(.html5)
         Html {
             Head {
@@ -36,7 +37,7 @@ struct StaticView : View {
 struct DynamicView : View {
     let context:Utilities.HTMLContext
 
-    var body : AnyContent {
+    var body: AnyContent {
         Document(.html5)
         Html {
             Head {

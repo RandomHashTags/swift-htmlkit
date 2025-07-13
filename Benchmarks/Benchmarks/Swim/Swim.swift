@@ -3,11 +3,11 @@ import Utilities
 import Swim
 import HTML
 
-package struct SwimTests : HTMLGenerator {
+package struct SwimTests: HTMLGenerator {
     package init() {}
 
     package func staticHTML() -> String {
-        var string:String = ""
+        var string = ""
         html {
             head {
                 title { "StaticView" }
@@ -22,8 +22,9 @@ package struct SwimTests : HTMLGenerator {
     }
 
     package func dynamicHTML(_ context: HTMLContext) -> String {
-        var string:String = ""
-        var test:[Node] = []
+        var string = ""
+        var test = [Node]()
+        test.reserveCapacity(context.user.qualities.count)
         for quality in context.user.qualities {
             test.append(li { quality } )
         }

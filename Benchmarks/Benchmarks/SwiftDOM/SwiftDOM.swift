@@ -3,7 +3,7 @@
 import Utilities
 import DOM
 
-package struct SwiftDOMTests : HTMLGenerator {
+package struct SwiftDOMTests: HTMLGenerator {
     package init() {}
 
     package func staticHTML() -> String {
@@ -57,9 +57,5 @@ package struct SwiftDOMTests : HTMLGenerator {
 }
 
 // required to compile
-extension String:HTML.OutputStreamable
-{
-}
-extension String:SVG.OutputStreamable
-{
-}
+extension String: HTML.OutputStreamable {}
+extension String: SVG.OutputStreamable {}

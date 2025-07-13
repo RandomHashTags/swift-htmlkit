@@ -28,8 +28,7 @@ extension StaticString: @retroactive TextOutputStreamable {
     @inlinable
     public func write<Target: TextOutputStream>(to target: inout Target) {
         self.withUTF8Buffer { buffer in
-            let decoded = String(decoding: buffer, as: UTF8.self)
-            target.write(decoded)
+            target.write(String(decoding: buffer, as: UTF8.self))
         }
     }
 }

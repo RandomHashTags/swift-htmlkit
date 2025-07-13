@@ -12,7 +12,7 @@ enum HTMLElementMacro: ExpressionMacro {
             expansion: node,
             ignoresCompilerWarnings: node.macroName.text == "uncheckedHTML",
             encoding: .string,
-            representation: .literalOptimized,
+            representation: .literal,
             key: "",
             arguments: node.arguments,
             escape: true,

@@ -72,7 +72,7 @@ struct InterpolationTests {
     // MARK: multi-line func
     @Test func interpolationMultilineFunc() {
         var expected:String = "<div>Bikini Bottom: Spongebob Squarepants, Patrick Star, Squidward Tentacles, Mr. Krabs, Sandy Cheeks, Pearl Krabs</div>"
-        var string:String = #html(representation: .literal, // TODO: fix (get HTMLResultRepresentation.literalOptimized to work here)
+        var string:String = #html(representation: .literal,
             div(
                 "Bikini Bottom: ",
                 InterpolationTests.spongebobCharacter(
@@ -133,20 +133,20 @@ struct InterpolationTests {
     @Test func interpolationMultilineClosure() {
         var expected:String = "<div>Mrs. Puff</div>"
         var string:String = #html(div(InterpolationTests.character2 {
-            var bro = ""
-            let yikes:Bool = true
+            var bro = "";
+            let yikes:Bool = true;
             if yikes {
             } else if false {
-                bro = "bruh"
+                bro = "bruh";
             } else {
-            }
+            };
             switch bro {
             case "um":
-                break
+                break;
             default:
-                break
-            }
-            return false ? bro : "Mrs. Puff"
+                break;
+            };
+            return false ? bro : "Mrs. Puff";
         } ))
         #expect(string == expected)
     }

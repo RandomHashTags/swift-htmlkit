@@ -2,7 +2,7 @@
 import Utilities
 import SwiftHtml
 
-package struct SwiftHTMLBBTests : HTMLGenerator {
+package struct SwiftHTMLBBTests: HTMLGenerator {
     let renderer:DocumentRenderer
     package init() {
         renderer = DocumentRenderer(minify: true, indent: 0)
