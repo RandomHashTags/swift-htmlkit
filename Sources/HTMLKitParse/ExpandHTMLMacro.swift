@@ -238,16 +238,47 @@ extension HTMLKitUtilities {
         if async {
             string += "Task {\n"
         }
+        let duration:String?
+        if let suspendDuration {
+            duration = durationDebugDescription(suspendDuration)
+        } else {
+            duration = nil
+        }
         let chunks = chunks(encoding: encoding, encodedResult: encodedResult, async: async, optimized: optimized, chunkSize: chunkSize)
         for chunk in chunks {
             string += "continuation.yield(" + chunk + ")\n"
-            if let suspendDuration {
-                string += "try await Task.sleep(for: \(suspendDuration))\n"
+            if let duration {
+                string += "try await Task.sleep(for: \(duration))\n"
             }
         }
         string += "continuation.finish()\n}"
         if async {
             string += "\n}"
+        }
+        return string
+    }
+    static func durationDebugDescription(_ duration: Duration) -> String {
+        let (seconds, attoseconds) = duration.components
+        var string:String
+        if attoseconds == 0 {
+            string = ".seconds(\(seconds))"
+        } else {
+            var nanoseconds = attoseconds / 1_000_000_000
+            nanoseconds += seconds * 1_000_000_000
+            string = "\(nanoseconds)"
+            if seconds == 0 {
+                if string.hasSuffix("000000") {
+                    string.removeLast(6)
+                    string = ".milliseconds(\(string))"
+                } else if string.hasSuffix("000") {
+                    string.removeLast(3)
+                    string = ".microseconds(\(string))"
+                } else {
+                    string = ".nanoseconds(\(string))"
+                }
+            } else {
+                string = ".nanoseconds(\(nanoseconds))"
+            }
         }
         return string
     }

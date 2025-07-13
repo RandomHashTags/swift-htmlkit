@@ -127,20 +127,41 @@ extension HTMLKitUtilities {
                         chunkSize = size
                     }
                 case "suspendDuration":
-                    // TODO: support
-                    if let member = arg.expression.memberAccess?.declName.baseName.text {
-                        switch member {
-                        case "milliseconds":
-                            break
-                        case "microseconds":
-                            break
-                        case "nanoseconds":
-                            break
-                        case "seconds":
-                            break
-                        default:
-                            break
+                    guard let function = arg.expression.functionCall else { break }
+                    var intValue:UInt64? = nil
+                    var doubleValue:Double? = nil
+                    if let v = function.arguments.first?.expression.integerLiteral?.literal.text, let i = UInt64(v) {
+                        intValue = i
+                    } else if let v = function.arguments.first?.expression.as(FloatLiteralExprSyntax.self)?.literal.text, let d = Double(v) {
+                        doubleValue = d
+                    } else {
+                        break
+                    }
+                    switch function.calledExpression.memberAccess?.declName.baseName.text {
+                    case "milliseconds":
+                        if let intValue {
+                            suspendDuration = .milliseconds(intValue)
+                        } else if let doubleValue {
+                            suspendDuration = .milliseconds(doubleValue)
                         }
+                    case "microseconds":
+                        if let intValue {
+                            suspendDuration = .microseconds(intValue)
+                        } else if let doubleValue {
+                            suspendDuration = .microseconds(doubleValue)
+                        }
+                    case "nanoseconds":
+                        if let intValue {
+                            suspendDuration = .nanoseconds(intValue)
+                        }
+                    case "seconds":
+                        if let intValue {
+                            suspendDuration = .seconds(intValue)
+                        } else if let doubleValue {
+                            suspendDuration = .seconds(doubleValue)
+                        }
+                    default:
+                        break
                     }
                 default:
                     break
