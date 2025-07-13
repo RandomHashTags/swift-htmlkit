@@ -7,7 +7,6 @@ struct HTMLKitMacros: CompilerPlugin {
     let providingMacros:[any Macro.Type] = [
         HTMLElementMacro.self,
         EscapeHTML.self,
-        RawHTML.self,
-        HTMLContext.self
+        RawHTML.self
     ]
 }

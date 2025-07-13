@@ -5,7 +5,7 @@ import SwiftSyntax
 // MARK: Misc
 extension ExprSyntax {
     package func string(_ context: HTMLExpansionContext) -> String? {
-        return HTMLKitUtilities.parseLiteralValue(context: context, expr: self)?.value(key: context.key)
+        return HTMLKitUtilities.parseLiteral(context: context, expr: self)?.value(key: context.key)
     }
     package func boolean(_ context: HTMLExpansionContext) -> Bool? {
         booleanLiteral?.literal.text == "true"
@@ -25,7 +25,7 @@ extension ExprSyntax {
         return nil
     }
     package func int(_ context: HTMLExpansionContext) -> Int? {
-        guard let s = HTMLKitUtilities.parseLiteralValue(context: context, expr: self)?.value(key: context.key) else { return nil }
+        guard let s = HTMLKitUtilities.parseLiteral(context: context, expr: self)?.value(key: context.key) else { return nil }
         return Int(s)
     }
     package func arrayString(_ context: HTMLExpansionContext) -> [String]? {
@@ -46,7 +46,7 @@ extension ExprSyntax {
         return d
     }
     package func float(_ context: HTMLExpansionContext) -> Float? {
-        guard let s = HTMLKitUtilities.parseLiteralValue(context: context, expr: self)?.value(key: context.key) else { return nil }
+        guard let s = HTMLKitUtilities.parseLiteral(context: context, expr: self)?.value(key: context.key) else { return nil }
         return Float(s)
     }
 }

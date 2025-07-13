@@ -31,7 +31,7 @@ private enum TranslateHTML { // TODO: finish
 
                 let end_index:String.Index = string.firstIndex(of: ">")!
                 let input:String = String(string[index...])
-                if let element:String = parse_element(input: input) {
+                if let element:String = parseElement(input: input) {
                     result += element
                     index = string.index(index, offsetBy: element.count)
                 }
@@ -43,7 +43,7 @@ private enum TranslateHTML { // TODO: finish
 
 extension TranslateHTML {
     /// input: "<[HTML ELEMENT TAG NAME] [attributes]>[innerHTML]"
-    static func parse_element(input: String) -> String? {
+    static func parseElement(input: String) -> String? {
         let tag_name_ends:String.Index = input.firstIndex(of: " ") ?? input.firstIndex(of: ">")!
         let tag_name:String = String(input[input.index(after: input.startIndex)..<tag_name_ends])
         if let type:HTMLElementType = HTMLElementType(rawValue: tag_name) {

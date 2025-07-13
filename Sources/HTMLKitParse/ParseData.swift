@@ -6,24 +6,42 @@ import SwiftSyntax
 
 extension HTMLKitUtilities {
     // MARK: Escape HTML
-    public static func escapeHTML(context: inout HTMLExpansionContext) -> String {
+    public static func escapeHTML(
+        context: HTMLExpansionContext
+    ) -> String {
+        var context = context
+        return escapeHTML(context: &context)
+    }
+    public static func escapeHTML(
+        context: inout HTMLExpansionContext
+    ) -> String {
         context.escape = true
         context.escapeAttributes = true
         context.elementsRequireEscaping = true
-        return html(context: context)
+        return html(
+            context: context
+        )
     }
 
     // MARK: Raw HTML
-    public static func rawHTML(context: inout HTMLExpansionContext) -> String {
+    public static func rawHTML(
+        context: HTMLExpansionContext
+    ) -> String {
+        var context = context
+        return rawHTML(context: &context)
+    }
+    public static func rawHTML(
+        context: inout HTMLExpansionContext
+    ) -> String {
         context.escape = false
         context.escapeAttributes = false
         context.elementsRequireEscaping = false
-        return html(context: context)
+        return html(
+            context: context
+        )
     }
 
     // MARK: HTML
-    /// - Parameters:
-    ///   - context: `HTMLExpansionContext`.
     public static func html(
         context: HTMLExpansionContext
     ) -> String {
@@ -32,21 +50,20 @@ extension HTMLKitUtilities {
         var innerHTML = ""
         innerHTML.reserveCapacity(children.count)
         for e in children {
-            if let child = e.labeled {
-                if let key = child.label?.text {
-                    switch key {
-                    case "encoding": context.encoding = parseEncoding(expression: child.expression) ?? .string
-                    case "representation": context.representation = parseRepresentation(expr: child.expression) ?? .literalOptimized
-                    case "minify": context.minify = child.expression.boolean(context) ?? false
-                    default: break
-                    }
-                } else if var c = HTMLKitUtilities.parseInnerHTML(context: context, child: child) {
-                    if var element = c as? HTMLElement {
-                        element.escaped = context.elementsRequireEscaping
-                        c = element
-                    }
-                    innerHTML += String(describing: c)
+            guard let child = e.labeled else { continue }
+            if let key = child.label?.text {
+                switch key {
+                case "encoding": context.encoding = parseEncoding(expression: child.expression) ?? .string
+                case "representation": context.representation = parseRepresentation(expr: child.expression) ?? .literalOptimized
+                case "minify": context.minify = child.expression.boolean(context) ?? false
+                default: break
                 }
+            } else if var c = HTMLKitUtilities.parseInnerHTML(context: context, expr: child.expression) {
+                if var element = c as? HTMLElement {
+                    element.escaped = context.elementsRequireEscaping
+                    c = element
+                }
+                innerHTML += String(describing: c)
             }
         }
         if context.minify {

@@ -13,9 +13,7 @@ enum RawHTML: ExpressionMacro {
             encoding: .string,
             representation: .literalOptimized,
             key: "",
-            arguments: node.arguments,
-            escape: false,
-            escapeAttributes: false
+            arguments: node.arguments
         )
         return "\"\(raw: HTMLKitUtilities.rawHTML(context: &c))\""
     }

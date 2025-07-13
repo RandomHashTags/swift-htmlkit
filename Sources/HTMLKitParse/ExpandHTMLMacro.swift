@@ -6,9 +6,6 @@ import SwiftSyntax
 extension HTMLKitUtilities {
     public static func expandHTMLMacro(context: HTMLExpansionContext) throws -> ExprSyntax {
         var context = context
-        return try expandHTMLMacro(context: &context)
-    }
-    public static func expandHTMLMacro(context: inout HTMLExpansionContext) throws -> ExprSyntax {
         let (string, encoding) = expandMacro(context: &context)
         let encodingResult = encodingResult(context: context, node: context.expansion, string: string, for: encoding)
         let expandedResult = representationResult(encoding: encoding, encodedResult: encodingResult, representation: context.representation)
@@ -90,7 +87,7 @@ extension HTMLKitUtilities {
             break
         case .literalOptimized:
             if encoding == .string {
-                // TODO: implement
+                return optimizedLiteral(encodedResult: encodedResult)
             } else {
                 // TODO: show compiler diagnostic
             }
@@ -110,6 +107,36 @@ extension HTMLKitUtilities {
             break
         }
         return encodedResult
+    }
+
+    static func optimizedLiteral(encodedResult: String) -> String {
+        let regex = try! Regex.init("( \\+ String\\(describing: [\\w\\s\\(\\)\\[\\]]+\\) \\+ )")
+        var interpolation = encodedResult.matches(of: regex)
+        guard !interpolation.isEmpty else {
+            return encodedResult
+        }
+        var index = encodedResult.startIndex
+        var reserveCapacity = 0
+        var values = [String]()
+        while !interpolation.isEmpty {
+            let interp = interpolation.removeFirst()
+            let left = encodedResult[index..<interp.range.lowerBound]
+            values.append("StaticString(\(left))")
+
+            var interpolationValue = encodedResult[interp.range]
+            interpolationValue.removeFirst(3)
+            interpolationValue.removeLast(3)
+            values.append(String(interpolationValue))
+            index = interp.range.upperBound
+
+            reserveCapacity += left.count + 32
+        }
+        if index < encodedResult.endIndex {
+            let slice = encodedResult[index...]
+            reserveCapacity += slice.count
+            values.append("StaticString(\(slice))")
+        }
+        return "HTMLOptimizedLiteral(reserveCapacity: \(reserveCapacity)).render((\n\(values.joined(separator: ",\n"))\n))"
     }
 
     static func chunks(

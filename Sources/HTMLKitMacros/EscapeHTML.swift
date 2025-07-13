@@ -13,9 +13,7 @@ enum EscapeHTML: ExpressionMacro {
             encoding: .string,
             representation: .literalOptimized,
             key: "",
-            arguments: node.arguments,
-            escape: true,
-            escapeAttributes: true
+            arguments: node.arguments
         )
         return "\"\(raw: HTMLKitUtilities.escapeHTML(context: &c))\""
     }

@@ -1,18 +1,17 @@
 
-// MARK: LiteralReturnType
-public enum LiteralReturnType {
+public enum LiteralReturnType: Sendable {
     case boolean(Bool)
     case string(String)
     case int(Int)
     case float(Float)
     case interpolation(String)
-    case interpolationDescribed(String)
+
     indirect case arrayOfLiterals([LiteralReturnType])
     case array([Sendable])
 
     public var isInterpolation: Bool {
         switch self {
-        case .interpolation, .interpolationDescribed:   
+        case .interpolation:   
             return true
         case .arrayOfLiterals(let literals):
             return literals.first(where: { $0.isInterpolation }) == nil
@@ -45,12 +44,15 @@ public enum LiteralReturnType {
             return String(describing: int)
         case .float(let float):
             return String(describing: float)
-        case .interpolation(let string):
+        /*case .interpolation(let string):
             if string.hasPrefix("\\(") && string.last == ")" {
                 return string
             }
-            return "\\(\(string))"
-        case .interpolationDescribed(let string):
+            return "\\(\(string))"*/
+        case .interpolation(var string):
+            if string.hasPrefix("\\(") && string.last == ")" {
+                string = String(string[string.index(string.startIndex, offsetBy: 2)..<string.index(before: string.endIndex)])
+            }
             return "\" + String(describing: \(string)) + \""
         case .arrayOfLiterals(let literals):
             return literals.compactMap({ $0.value(key: key, escape: escape, escapeAttributes: escapeAttributes) }).joined()

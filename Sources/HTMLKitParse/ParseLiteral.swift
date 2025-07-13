@@ -4,9 +4,9 @@ import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
 
+// MARK: Parse Literal Value
 extension HTMLKitUtilities {
-    // MARK: Parse Literal Value
-    static func parseLiteralValue(
+    static func parseLiteral(
         context: HTMLExpansionContext,
         expr: ExprSyntax
     ) -> LiteralReturnType? {
@@ -66,11 +66,14 @@ extension HTMLKitUtilities {
                 while expressionString.last?.isWhitespace ?? false {
                     expressionString.removeLast()
                 }
-                return .interpolationDescribed(expressionString)
+                return .interpolation(expressionString)
             }
         }
     }
-    // MARK: Promote Interpolation
+}
+
+// MARK: Promote Interpolation
+extension HTMLKitUtilities {
     static func promoteInterpolation(
         context: HTMLExpansionContext,
         remainingInterpolation: inout Int,
@@ -118,8 +121,10 @@ extension HTMLKitUtilities {
         list.append(LabeledExprSyntax(expression: syntax))
         return ExpressionSegmentSyntax(expressions: list)
     }
+}
 
-    // MARK: Extract Literal
+// MARK: Extract Literal
+extension HTMLKitUtilities {
     static func extractLiteral(
         context: HTMLExpansionContext,
         expression: ExprSyntax
@@ -148,8 +153,9 @@ extension HTMLKitUtilities {
             if let decl = function.calledExpression.declRef?.baseName.text {
                 switch decl {
                 case "StaticString":
-                    let string = function.arguments.first!.expression.stringLiteral!.string(encoding: context.encoding)
-                    return .string(string)
+                    if let string = function.arguments.first?.expression.stringLiteral?.string(encoding: context.encoding) {
+                        return .string(string)
+                    }
                 default:
                     break
                 }
@@ -166,11 +172,11 @@ extension HTMLKitUtilities {
                 separator = " "
             }
             var results = [Sendable]()
-            for element in expression.array!.elements {
-                if let attribute = HTMLAttribute.Extra.parse(context: context, expr: element.expression) {
+            for e in expression.array!.elements {
+                if let attribute = HTMLAttribute.Extra.parse(context: context, expr: e.expression) {
                     results.append(attribute)
-                } else if let literal = parseLiteralValue(context: context, expr: element.expression) {
-                    if let sendable = literalToSendable(context: context, expr: element.expression, separator: separator, literal: literal) {
+                } else if let literal = parseLiteral(context: context, expr: e.expression) {
+                    if let sendable = literalToSendable(context: context, expr: e.expression, separator: separator, literal: literal) {
                         results.append(sendable)
                     }
                 }
@@ -190,7 +196,7 @@ extension HTMLKitUtilities {
         literal: LiteralReturnType
     ) -> (any Sendable)? {
         switch literal {
-        case .string(let string), .interpolation(let string), .interpolationDescribed(let string):
+        case .string(let string), .interpolation(let string):
             if string.contains(separator) {
                 context.context.diagnose(Diagnostic(node: expr, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + context.key + "\".")))
                 return nil
@@ -198,10 +204,14 @@ extension HTMLKitUtilities {
             return string
         case .arrayOfLiterals(let literals):
             return literals.compactMap({ literalToSendable(context: context, expr: expr, separator: separator, literal: $0) })
-        case .int(let i): return i
-        case .float(let f): return f
-        case .array(let a): return a
-        case .boolean(let b): return b
+        case .int(let i):
+            return i
+        case .float(let f):
+            return f
+        case .array(let a):
+            return a
+        case .boolean(let b):
+            return b
         }
     }
 }

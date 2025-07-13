@@ -6,13 +6,6 @@ import SwiftSyntax
 extension HTMLKitUtilities {
     public static func parseInnerHTML(
         context: HTMLExpansionContext,
-        child: LabeledExprSyntax
-    ) -> (any Sendable)? {
-        return parseInnerHTML(context: context, expr: child.expression)
-    }
-
-    public static func parseInnerHTML(
-        context: HTMLExpansionContext,
         expr: ExprSyntax
     ) -> (any Sendable)? {
         if let expansion = expr.macroExpansion {
@@ -31,9 +24,9 @@ extension HTMLKitUtilities {
             default:
                 return "" // TODO: fix?
             }
-        } else if let element = parse_element(context: context, expr: expr) {
+        } else if let element = parseElement(context: context, expr: expr) {
             return element
-        } else if let literal = parseLiteralValue(context: context, expr: expr) {
+        } else if let literal = parseLiteral(context: context, expr: expr) {
             return literal.value(key: "", escape: context.escape, escapeAttributes: context.escapeAttributes)
         } else {
             unallowedExpression(context: context, node: expr)
@@ -44,7 +37,10 @@ extension HTMLKitUtilities {
 
 // MARK: Parse element
 extension HTMLKitUtilities {
-    public static func parse_element(context: HTMLExpansionContext, expr: ExprSyntax) -> (any HTMLElement)? {
+    public static func parseElement(
+        context: HTMLExpansionContext,
+        expr: ExprSyntax
+    ) -> (any HTMLElement)? {
         guard let function = expr.functionCall else { return nil }
         return HTMLElementValueType.parseElement(context: context, function)
     }

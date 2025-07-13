@@ -8,16 +8,16 @@ enum HTMLElements: DeclarationMacro {
     static func expansion(of node: some FreestandingMacroExpansionSyntax, in context: some MacroExpansionContext) throws -> [DeclSyntax] {
         let dictionary:DictionaryElementListSyntax = node.arguments.children(viewMode: .all).first!.as(LabeledExprSyntax.self)!.expression.as(DictionaryExprSyntax.self)!.content.as(DictionaryElementListSyntax.self)!
         
-        var items:[DeclSyntax] = []
+        var items = [DeclSyntax]()
         items.reserveCapacity(dictionary.count)
 
-        let void_elements:Set<String> = [
+        let voidElementTags:Set<String> = [
             "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"
         ]
 
         for item in dictionary {
             let element = item.key.as(MemberAccessExprSyntax.self)!.declName.baseName.text
-            let isVoid = void_elements.contains(element)
+            let isVoid = voidElementTags.contains(element)
             var tag = element
             if element == "variable" {
                 tag = "var"
@@ -41,8 +41,8 @@ enum HTMLElements: DeclarationMacro {
             if let test = item.value.as(ArrayExprSyntax.self)?.elements {
                 attributes.reserveCapacity(test.count)
                 for element in test {
+                    guard let tuple = element.expression.as(TupleExprSyntax.self) else { continue }
                     var key = ""
-                    let tuple = element.expression.as(TupleExprSyntax.self)!
                     for attribute_element in tuple.elements {
                         let label = attribute_element
                         if let key_element = label.expression.as(StringLiteralExprSyntax.self) {
@@ -126,10 +126,10 @@ enum HTMLElements: DeclarationMacro {
             initializers += "}"
             string += initializers
 
-            var referencedStringDelimiter:Bool = false
+            var referencedStringDelimiter = false
             var render = "\n@inlinable public var description: String {\n"
             var attributes_func = ""
-            var itemsArray:String = ""
+            var itemsArray = ""
             if !attributes.isEmpty {
                 attributes_func += "let sd = encoding.stringDelimiter(forMacro: fromMacro)\n"
                 itemsArray += "var items = [String]()\n"
@@ -203,11 +203,11 @@ enum HTMLElements: DeclarationMacro {
     static func separator(key: String) -> String {
         switch key {
         case "accept", "coords", "exportparts", "imagesizes", "imagesrcset", "sizes", "srcset":
-            return ","
+            ","
         case "allow":
-            return ";"
+            ";"
         default:
-            return " "
+            " "
         }
     }
 
@@ -235,8 +235,13 @@ enum HTMLElements: DeclarationMacro {
         initializers += "self.innerHTML = \(assignInnerHTML)\n}\n"
         return initializers
     }
+
     // MARK: parse value type
-    static func parseValueType(isArray: inout Bool, key: String, _ expr: ExprSyntax) -> (value_type: String, default_value: String, valueTypeLiteral: HTMLElementValueType) {
+    static func parseValueType(
+        isArray: inout Bool,
+        key: String,
+        _ expr: ExprSyntax
+    ) -> (value_type: String, default_value: String, valueTypeLiteral: HTMLElementValueType) {
         let valueTypeKey:String
         if let member = expr.as(MemberAccessExprSyntax.self) {
             valueTypeKey = member.declName.baseName.text
@@ -246,7 +251,7 @@ enum HTMLElements: DeclarationMacro {
         switch valueTypeKey {
         case "array":
             isArray = true
-            let (of_type, _, of_type_literal):(String, String, HTMLElementValueType) = parseValueType(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
+            let (of_type, _, of_type_literal) = parseValueType(isArray: &isArray, key: key, expr.as(FunctionCallExprSyntax.self)!.arguments.first!.expression)
             return ("[" + of_type + "]", "? = nil", .array(of: of_type_literal))
         case "attribute":
             return ("HTMLAttribute.Extra.\(key)", isArray ? "" : "? = nil", .attribute)

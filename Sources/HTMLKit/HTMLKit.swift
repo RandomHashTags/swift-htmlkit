@@ -80,9 +80,3 @@ public macro anyRawHTML(
     minify: Bool = false,
     _ innerHTML: Sendable...
 ) -> any Sendable = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
-
-// MARK: HTML Context
-@freestanding(expression)
-macro htmlContext<T: Sendable>(
-    _ value: () -> T
-) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLContext")

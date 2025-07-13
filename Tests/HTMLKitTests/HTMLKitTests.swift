@@ -199,7 +199,7 @@ extension HTMLKitTests {
                     ),
                     h2("\("Details")"),
                     h3("\("Qualities")"),
-                    ul(attributes: [.id("user-qualities")], String(describing: qualities))
+                    ul(attributes: [.id("user-qualities")], qualities)
                 )
             )
         )
