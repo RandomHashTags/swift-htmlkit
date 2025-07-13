@@ -13,9 +13,9 @@ let package = Package(
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
         // dsls
         .package(name: "swift-htmlkit", path: "../"),
-        .package(url: "https://github.com/sliemeobn/elementary", exact: "0.4.1"),
+        .package(url: "https://github.com/sliemeobn/elementary", exact: "0.5.3"),
         .package(url: "https://github.com/vapor-community/HTMLKit", exact: "2.8.1"),
-        .package(url: "https://github.com/pointfreeco/swift-html", exact: "0.4.1"),
+        .package(url: "https://github.com/pointfreeco/swift-html", exact: "0.5.0"),
         .package(url: "https://github.com/RandomHashTags/fork-bb-swift-html", branch: "main"),
         .package(url: "https://github.com/JohnSundell/Plot", exact: "0.14.0"),
         //.package(url: "https://github.com/toucansites/toucan", from: "1.0.0-alpha.1"), // unstable
@@ -27,9 +27,9 @@ let package = Package(
         //.package(url: "https://github.com/vapor/leaf", exact: "4.4.0"), // tight integration with Vapor
 
         // networking
-        .package(url: "https://github.com/apple/swift-nio", from: "2.75.0"),
-        .package(url: "https://github.com/vapor/vapor", from: "4.106.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.1.0")
+        .package(url: "https://github.com/apple/swift-nio", from: "2.84.0"),
+        .package(url: "https://github.com/vapor/vapor", from: "4.115.0"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.15.0")
     ],
     targets: [
         .target(

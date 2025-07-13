@@ -69,24 +69,24 @@ package struct SwiftHTMLKitTests : HTMLGenerator {
         for quality in context.user.qualities {
             qualities += #html(li(quality))
         }
-        return #html(
-            html(
-                head(
-                    meta(charset: "\(context.charset)"),
-                    title("\(context.title)"),
-                    meta(content: "\(context.meta_description)", name: "description"),
-                    meta(content: "\(context.keywords_string)", name: "keywords")
-                ),
-                body(
-                    h1("\(context.heading)"),
-                    div(attributes: [.id(context.desc_id)],
-                        p("\(context.string)")
-                    ),
-                    h2("\(context.user.details_heading)"),
-                    h3("\(context.user.qualities_heading)"),
-                    ul(attributes: [.id(context.user.qualities_id)], "\(qualities)")
-                )
-            )
-        )
+        return #html {
+            html {
+                head {
+                    meta(charset: context.charset)
+                    title(context.title)
+                    meta(content: context.meta_description, name: "description")
+                    meta(content: context.keywords_string, name: "keywords")
+                }
+                body {
+                    h1(context.heading)
+                    div(attributes: [.id(context.desc_id)]) {
+                        p(context.string)
+                    }
+                    h2(context.user.details_heading)
+                    h3(context.user.qualities_heading)
+                    ul(attributes: [.id(context.user.qualities_id)], qualities)
+                }
+            }
+        }
     }
 }

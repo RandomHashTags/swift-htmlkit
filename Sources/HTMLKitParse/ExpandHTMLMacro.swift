@@ -110,7 +110,7 @@ extension HTMLKitUtilities {
     }
 
     static func optimizedLiteral(encodedResult: String) -> String {
-        let regex = try! Regex.init("( \\+ String\\(describing: [\\w\\s\\(\\)\\[\\]]+\\) \\+ )")
+        let regex = try! Regex.init("( \\+ String\\(describing: [\\.\\w\\s\\(\\)\\[\\]]+\\) \\+ )")
         var interpolation = encodedResult.matches(of: regex)
         guard !interpolation.isEmpty else {
             return encodedResult
