@@ -11,78 +11,78 @@
 public macro escapeHTML(
     encoding: HTMLEncoding = .string,
     representation: HTMLResultRepresentation = .literalOptimized,
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> String = #externalMacro(module: "HTMLKitMacros", type: "EscapeHTML")
 
 // MARK: HTML
-/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
+/// - Returns: The inferred concrete type.
 @freestanding(expression)
 //@available(*, deprecated, message: "innerHTML is now initialized using brackets instead of parentheses")
 public macro html<T>(
     encoding: HTMLEncoding = .string,
     representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 // MARK: HTML
-/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
+/// - Returns: The inferred concrete type.
 @freestanding(expression)
 public macro html<T>(
     encoding: HTMLEncoding = .string,
     representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: () -> CustomStringConvertible & Sendable...
+    _ innerHTML: () -> Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
-/// - Returns: An existential conforming to `CustomStringConvertible & Sendable`.
+/// - Returns: `any Sendable`.
 @freestanding(expression)
 public macro anyHTML(
     encoding: HTMLEncoding = .string,
     representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible & Sendable...
-) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
+    _ innerHTML: Sendable...
+) -> any Sendable = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 // MARK: Unchecked
 /// Same as `#html` but ignoring compiler warnings.
 /// 
-/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
+/// - Returns: The inferred concrete type.
 @freestanding(expression)
-public macro uncheckedHTML<T: CustomStringConvertible & Sendable>(
+public macro uncheckedHTML<T>(
     encoding: HTMLEncoding = .string,
     representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
 // MARK: Raw
 /// Does not escape the `innerHTML`.
 /// 
-/// - Returns: The inferred concrete type that conforms to `CustomStringConvertible & Sendable`.
+/// - Returns: The inferred concrete type.
 @freestanding(expression)
-public macro rawHTML<T: CustomStringConvertible & Sendable>(
+public macro rawHTML<T>(
     encoding: HTMLEncoding = .string,
     representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
-    _ innerHTML: CustomStringConvertible & Sendable...
+    _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
 
 /// Does not escape the `innerHTML`.
 /// 
-/// - Returns: An existential conforming to `CustomStringConvertible & Sendable`.
+/// - Returns: `any Sendable`.
 @freestanding(expression)
 public macro anyRawHTML(
     encoding: HTMLEncoding = .string,
     representation: HTMLResultRepresentation = .literalOptimized,
     lookupFiles: [StaticString] = [],
     minify: Bool = false,
-    _ innerHTML: CustomStringConvertible & Sendable...
-) -> any CustomStringConvertible & Sendable = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
+    _ innerHTML: Sendable...
+) -> any Sendable = #externalMacro(module: "HTMLKitMacros", type: "RawHTML")
 
 // MARK: HTML Context
 @freestanding(expression)
-macro htmlContext<T: CustomStringConvertible & Sendable>(
+macro htmlContext<T: Sendable>(
     _ value: () -> T
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLContext")

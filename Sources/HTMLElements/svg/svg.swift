@@ -10,7 +10,7 @@ struct svg: HTMLElement {
     
     public let tag:String = "svg"
     public var attributes:[HTMLAttribute]
-    public var innerHTML:[CustomStringConvertible & Sendable]
+    public var innerHTML:[Sendable]
     public var height:String?
     public var preserveAspectRatio:Attributes.PreserveAspectRatio?
     public var viewBox:String?
@@ -34,7 +34,7 @@ struct svg: HTMLElement {
     }
     public init(
         attributes: [HTMLAttribute] = [],
-        _ innerHTML: CustomStringConvertible & Sendable...
+        _ innerHTML: Sendable...
     ) {
         trailingSlash = attributes.contains(.trailingSlash)
         self.attributes = attributes

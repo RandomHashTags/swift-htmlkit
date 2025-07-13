@@ -26,7 +26,7 @@ public protocol HTMLElement: CustomStringConvertible, Sendable {
     var attributes: [HTMLAttribute] { get }
 
     /// The inner HTML content of this element.
-    var innerHTML: [CustomStringConvertible & Sendable] { get }
+    var innerHTML: [Sendable] { get }
 
     init(_ encoding: HTMLEncoding, _ data: HTMLKitUtilities.ElementData)
 }

@@ -8,13 +8,12 @@ extension HTMLKitUtilities {
     // MARK: Parse Literal Value
     static func parseLiteralValue(
         context: HTMLExpansionContext,
-        expression: ExprSyntax
+        expr: ExprSyntax
     ) -> LiteralReturnType? {
-        guard let returnType = extractLiteral(context: context, expression: expression) else { return nil }
+        guard let returnType = extractLiteral(context: context, expression: expr) else { return nil }
         guard returnType.isInterpolation else { return returnType }
-        var remainingInterpolation:Int = 1
-        var string:String
-        if let stringLiteral = expression.stringLiteral {
+        var remainingInterpolation = 1
+        if let stringLiteral = expr.stringLiteral {
             remainingInterpolation = 0
             var interpolation = [ExpressionSegmentSyntax]()
             var segments:[any (SyntaxProtocol & SyntaxHashable)] = []
@@ -37,17 +36,26 @@ extension HTMLKitUtilities {
                     }
                 }
             }
-            string = segments.map({ "\($0)" }).joined()
+            let literals:[LiteralReturnType] = segments.compactMap({
+                let string = "\($0)"
+                guard !string.isEmpty else { return nil }
+                if $0.is(ExpressionSegmentSyntax.self) {
+                    return .interpolation(string)
+                } else {
+                    return .string(string)
+                }
+            })
+            return .arrayOfLiterals(literals)
         } else {
-            if let function = expression.functionCall {
+            if let function = expr.functionCall {
                 warnInterpolation(context: context, node: function.calledExpression)
             } else {
-                warnInterpolation(context: context, node: expression)
+                warnInterpolation(context: context, node: expr)
             }
-            if let member = expression.memberAccess {
-                string = "\\(" + member.singleLineDescription + ")"
+            if let member = expr.memberAccess {
+                return .interpolation(member.singleLineDescription)
             } else {
-                var expressionString = "\(expression)"
+                var expressionString = "\(expr)"
                 var removed = 0
                 var index = expressionString.startIndex
                 while index < expressionString.endIndex, expressionString[index].isWhitespace {
@@ -58,14 +66,8 @@ extension HTMLKitUtilities {
                 while expressionString.last?.isWhitespace ?? false {
                     expressionString.removeLast()
                 }
-                string = "\" + String(describing: " + expressionString + ") + \""
+                return .interpolationDescribed(expressionString)
             }
-        }
-        // TODO: promote interpolation via lookupFiles here (remove `warnInterpolation` above and from `promoteInterpolation`)
-        if remainingInterpolation > 0 {
-            return .interpolation(string)
-        } else {
-            return .string(string)
         }
     }
     // MARK: Promote Interpolation
@@ -126,7 +128,7 @@ extension HTMLKitUtilities {
         case .nilLiteralExpr:
             return nil
         case .booleanLiteralExpr:
-            return .boolean(expression.booleanLiteral!.literal.text == "true")
+            return .boolean(expression.booleanIsTrue)
         case .integerLiteralExpr:
             return .int(Int(expression.integerLiteral!.literal.text)!)
         case .floatLiteralExpr:
@@ -163,22 +165,13 @@ extension HTMLKitUtilities {
             default:
                 separator = " "
             }
-            var results:[Sendable] = []
+            var results = [Sendable]()
             for element in expression.array!.elements {
                 if let attribute = HTMLAttribute.Extra.parse(context: context, expr: element.expression) {
                     results.append(attribute)
-                } else if let literal = parseLiteralValue(context: context, expression: element.expression) {
-                    switch literal {
-                    case .string(let string), .interpolation(let string):
-                        if string.contains(separator) {
-                            context.context.diagnose(Diagnostic(node: element.expression, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + context.key + "\".")))
-                            return nil
-                        }
-                        results.append(string)
-                    case .int(let i): results.append(i)
-                    case .float(let f): results.append(f)
-                    case .array(let a): results.append(a)
-                    case .boolean(let b): results.append(b)
+                } else if let literal = parseLiteralValue(context: context, expr: element.expression) {
+                    if let sendable = literalToSendable(context: context, expr: element.expression, separator: separator, literal: literal) {
+                        results.append(sendable)
                     }
                 }
             }
@@ -190,64 +183,25 @@ extension HTMLKitUtilities {
             return nil
         }
     }
-}
-
-// MARK: LiteralReturnType
-public enum LiteralReturnType {
-    case boolean(Bool)
-    case string(String)
-    case int(Int)
-    case float(Float)
-    case interpolation(String)
-    case array([Sendable])
-
-    public var isInterpolation: Bool {
-        switch self {
-        case .interpolation: true
-        default: false
-        }
-    }
-
-    /// - Parameters:
-    ///   - key: Attribute key associated with the value.
-    ///   - escape: Whether or not to escape source-breaking HTML characters.
-    ///   - escapeAttributes: Whether or not to escape source-breaking HTML attribute characters.
-    public func value(
-        key: String,
-        escape: Bool = true,
-        escapeAttributes: Bool = true
-    ) -> String? {
-        switch self {
-        case .boolean(let b):
-            return b ? key : nil
-        case .string(var string):
-            if string.isEmpty && key == "attributionsrc" {
-                return ""
-            }
-            if escape {
-                string.escapeHTML(escapeAttributes: escapeAttributes)
+    static func literalToSendable(
+        context: HTMLExpansionContext,
+        expr: ExprSyntax,
+        separator: String,
+        literal: LiteralReturnType
+    ) -> (any Sendable)? {
+        switch literal {
+        case .string(let string), .interpolation(let string), .interpolationDescribed(let string):
+            if string.contains(separator) {
+                context.context.diagnose(Diagnostic(node: expr, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + context.key + "\".")))
+                return nil
             }
             return string
-        case .int(let int):
-            return String(describing: int)
-        case .float(let float):
-            return String(describing: float)
-        case .interpolation(let string):
-            return string
-        case .array:
-            return nil
-        }
-    }
-
-    public func escapeArray() -> LiteralReturnType {
-        switch self {
-        case .array(let a):
-            if let arrayString = a as? [String] {
-                return .array(arrayString.map({ $0.escapingHTML(escapeAttributes: true) }))
-            }
-            return .array(a)
-        default:
-            return self
+        case .arrayOfLiterals(let literals):
+            return literals.compactMap({ literalToSendable(context: context, expr: expr, separator: separator, literal: $0) })
+        case .int(let i): return i
+        case .float(let f): return f
+        case .array(let a): return a
+        case .boolean(let b): return b
         }
     }
 }

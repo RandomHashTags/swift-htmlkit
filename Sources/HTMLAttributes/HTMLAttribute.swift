@@ -227,14 +227,14 @@ extension HTMLKitUtilities {
         public let encoding:HTMLEncoding
         public let globalAttributes:[HTMLAttribute]
         public let attributes:[String:Sendable]
-        public let innerHTML:[CustomStringConvertible & Sendable]
+        public let innerHTML:[Sendable]
         public let trailingSlash:Bool
 
         package init(
             _ encoding: HTMLEncoding,
             _ globalAttributes: [HTMLAttribute],
             _ attributes: [String:Sendable],
-            _ innerHTML: [CustomStringConvertible & Sendable],
+            _ innerHTML: [Sendable],
             _ trailingSlash: Bool
         ) {
             self.encoding = encoding

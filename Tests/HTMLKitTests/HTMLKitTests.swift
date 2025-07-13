@@ -101,15 +101,33 @@ extension HTMLKitTests {
         let _:String = #html(representation: .literalOptimized) {
             div("oh \(yeah)")
         }
+
+        let _:[String] = #html(representation: .chunked()) {
+            div("oh yeah")
+        }
+        let _:[StaticString] = #html(representation: .chunked()) {
+            div("oh yeah")
+        }
+        /*let _:[String] = #html(representation: .chunked(chunkSize: 3)) { // TODO: fix
+            div("oh \(yeah)")
+        }*/
+
         let _:AsyncStream<String> = #html(representation: .streamed()) {
+            div("oh yeah")
+        }
+        let _:AsyncStream<StaticString> = #html(representation: .streamed()) {
             div("oh yeah")
         }
         let _:AsyncStream<String> = #html(representation: .streamed(chunkSize: 3)) {
             div("oh yeah")
         }
+        let _:AsyncStream<StaticString> = #html(representation: .streamed(chunkSize: 3)) {
+            div("oh yeah")
+        }
         /*let _:AsyncStream<String> = #html(representation: .streamed(chunkSize: 3)) {
             div("oh\(yeah)") // TODO: fix
         }*/
+
         let _:AsyncStream<String> = #html(representation: .streamedAsync()) {
             div("oh yeah")
         }

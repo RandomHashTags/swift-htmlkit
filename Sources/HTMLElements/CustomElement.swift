@@ -9,7 +9,7 @@ public struct custom: HTMLElement {
     
     public let tag:String
     public var attributes:[HTMLAttribute]
-    public var innerHTML:[CustomStringConvertible & Sendable]
+    public var innerHTML:[Sendable]
 
     public private(set) var encoding = HTMLEncoding.string
     public var isVoid:Bool
@@ -31,7 +31,7 @@ public struct custom: HTMLElement {
         tag: String,
         isVoid: Bool,
         attributes: [HTMLAttribute] = [],
-        _ innerHTML: CustomStringConvertible & Sendable...
+        _ innerHTML: Sendable...
     ) {
         self.tag = tag
         self.isVoid = isVoid

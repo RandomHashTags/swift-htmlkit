@@ -26,7 +26,7 @@ enum HTMLElements: DeclarationMacro {
             string += """
             public let tag = "\(tag)"
             public var attributes:[HTMLAttribute]
-            public var innerHTML:[CustomStringConvertible & Sendable]
+            public var innerHTML:[Sendable]
             public private(set) var encoding = HTMLEncoding.string
             public private(set) var fromMacro = false
             public let isVoid = \(isVoid)
@@ -78,17 +78,17 @@ enum HTMLElements: DeclarationMacro {
 
             initializers += "\n" + defaultInitializer(
                 attributes: attributes,
-                innerHTMLValueType: "[CustomStringConvertible & Sendable] = []",
+                innerHTMLValueType: "[Sendable] = []",
                 assignInnerHTML: "innerHTML"
             )
             initializers += "\n" + defaultInitializer(
                 attributes: attributes,
-                innerHTMLValueType: "CustomStringConvertible & Sendable...",
+                innerHTMLValueType: "Sendable...",
                 assignInnerHTML: "innerHTML"
             )
             initializers += "\n" + defaultInitializer(
                 attributes: attributes,
-                innerHTMLValueType: "() -> CustomStringConvertible & Sendable...",
+                innerHTMLValueType: "() -> Sendable...",
                 assignInnerHTML: "innerHTML.map { $0() }"
             )
 
