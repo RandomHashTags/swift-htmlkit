@@ -184,11 +184,7 @@ extension HTMLKitUtilities {
             let left = encodedResult[index..<interp.range.lowerBound]
             values.append("StaticString(\(left))")
 
-            var interpolationValue = encodedResult[interp.range]
-            interpolationValue.removeFirst(22)
-            interpolationValue.removeLast(3)
-            interpolationValue.removeAll(where: { $0.isNewline })
-            values.append(String("\"\\(" + interpolationValue + "\""))
+            values.append(normalizeInterpolation(encodedResult[interp.range]))
             index = interp.range.upperBound
 
             reserveCapacity += left.count + 32
@@ -199,6 +195,13 @@ extension HTMLKitUtilities {
             values.append("StaticString(\(slice))")
         }
         return "HTMLOptimizedLiteral(reserveCapacity: \(reserveCapacity)).render((\n\(values.joined(separator: ",\n"))\n))"
+    }
+    static func normalizeInterpolation(_ value: Substring) -> String {
+        var value = value
+        value.removeFirst(22) // ` + String(describing: `.count
+        value.removeLast(3) // ` + `.count
+        value.removeAll(where: { $0.isNewline })
+        return String("\"\\(" + value + "\"")
     }
 }
 
@@ -211,28 +214,57 @@ extension HTMLKitUtilities {
         optimized: Bool,
         chunkSize: Int,
     ) -> [String] {
+        var interpolationMatches = encodedResult.matches(of: interpolationRegex)
         var chunks = [String]()
         let delimiter:(Character) -> String? = encoding == .string ? { $0 != "\"" ? "\"" : nil } : { _ in nil }
         let count = encodedResult.count
         var i = 0
         while i < count {
             var endingIndex = i + chunkSize
+            var offset = 0
             if i == 0 && encoding == .string {
                 endingIndex += 1
+                offset = 1
             }
-            let endIndex = encodedResult.index(encodedResult.startIndex, offsetBy: endingIndex, limitedBy: encodedResult.endIndex) ?? encodedResult.endIndex
-            let slice = encodedResult[encodedResult.index(encodedResult.startIndex, offsetBy: i)..<endIndex]
-            i += chunkSize + (i == 0 && encoding == .string ? 1 : 0)
-            if slice.isEmpty || encoding == .string && slice.count == 1 && slice.first == "\"" {
+            var endIndex = encodedResult.index(encodedResult.startIndex, offsetBy: endingIndex, limitedBy: encodedResult.endIndex) ?? encodedResult.endIndex
+            let range = encodedResult.index(encodedResult.startIndex, offsetBy: i)..<endIndex
+            var slice = encodedResult[range]
+            var interpolation:String?
+            if let interp = interpolationMatches.first, range.contains(interp.range.lowerBound) { // chunk contains interpolation
+                var normalized = normalizeInterpolation(encodedResult[interp.range])
+                normalized.removeFirst()
+                interpolation = normalized
+                if !range.contains(interp.range.upperBound) {
+                    endIndex = encodedResult.index(before: interp.range.lowerBound)
+                    slice = slice[slice.startIndex..<endIndex]
+                    i += encodedResult.distance(from: range.upperBound, to: interp.range.upperBound)
+                } else {
+                    interpolation = nil
+                    normalized.removeLast()
+                    slice.remove(at: interp.range.upperBound) // "
+                    slice.replaceSubrange(interp.range, with: normalized)
+                    slice.remove(at: slice.index(before: interp.range.lowerBound)) // "
+                }
+                interpolationMatches.removeFirst()
+            } else {
+                interpolation = nil
+            }
+            i += chunkSize + offset
+            if slice.isEmpty || encoding == .string && slice.count == 1 && slice[slice.startIndex] == "\"" {
                 continue
             }
             var string = ""
             if let f = slice.first, let d = delimiter(f) {
                 string += d
             }
-            string += slice
-            if let l = slice.last, let d = delimiter(l) {
-                string += d
+            if let interpolation {
+                string += slice
+                string += interpolation
+            } else {
+                string += slice
+                if let l = slice.last, let d = delimiter(l) {
+                    string += d
+                }
             }
             chunks.append(string)
         }
