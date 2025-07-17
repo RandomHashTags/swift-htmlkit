@@ -80,7 +80,7 @@ extension HTMLKitUtilities {
     static func representationResult(
         encoding: HTMLEncoding,
         encodedResult: String,
-        representation: HTMLResultRepresentation
+        representation: HTMLResultRepresentationAST
     ) -> String {
         switch representation {
         case .literal:
@@ -102,9 +102,25 @@ extension HTMLKitUtilities {
             return "InlineArray<\(chunks.count), \(typeAnnotation)>([\(chunks)])"
         #endif
         case .streamed(let optimized, let chunkSize):
-            return streamed(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize, suspendDuration: nil)
-        case .streamedAsync(let optimized, let chunkSize, let suspendDuration):
-            return streamed(encoding: encoding, encodedResult: encodedResult, async: true, optimized: optimized, chunkSize: chunkSize, suspendDuration: suspendDuration)
+            return streamed(
+                encoding: encoding,
+                encodedResult: encodedResult,
+                async: false,
+                optimized: optimized,
+                chunkSize: chunkSize,
+                yieldVariableName: nil,
+                afterYield: nil
+            )
+        case .streamedAsync(let optimized, let chunkSize, let yieldVariableName, let afterYield):
+            return streamed(
+                encoding: encoding,
+                encodedResult: encodedResult,
+                async: true,
+                optimized: optimized,
+                chunkSize: chunkSize,
+                yieldVariableName: yieldVariableName,
+                afterYield: afterYield
+            )
         default:
             break
         }
@@ -232,53 +248,39 @@ extension HTMLKitUtilities {
         async: Bool,
         optimized: Bool,
         chunkSize: Int,
-        suspendDuration: Duration?
+        yieldVariableName: String?,
+        afterYield: String?
     ) -> String {
         var string = "AsyncStream { continuation in\n"
         if async {
             string += "Task {\n"
         }
-        let duration:String?
-        if let suspendDuration {
-            duration = durationDebugDescription(suspendDuration)
+        var yieldVariableName:String? = yieldVariableName
+        if yieldVariableName == "_" {
+            yieldVariableName = nil
+        }
+        var afterYieldLogic:String?
+        if let afterYield {
+            if let yieldVariableName {
+                string += "var \(yieldVariableName) = 0\n"
+            }
+            afterYieldLogic = afterYield
         } else {
-            duration = nil
+            afterYieldLogic = nil
         }
         let chunks = chunks(encoding: encoding, encodedResult: encodedResult, async: async, optimized: optimized, chunkSize: chunkSize)
         for chunk in chunks {
             string += "continuation.yield(" + chunk + ")\n"
-            if let duration {
-                string += "try await Task.sleep(for: \(duration))\n"
+            if let afterYieldLogic {
+                string += "\(afterYieldLogic)\n"
+            }
+            if let yieldVariableName {
+                string += "\(yieldVariableName) += 1\n"
             }
         }
         string += "continuation.finish()\n}"
         if async {
             string += "\n}"
-        }
-        return string
-    }
-    static func durationDebugDescription(_ duration: Duration) -> String {
-        let (seconds, attoseconds) = duration.components
-        var string:String
-        if attoseconds == 0 {
-            string = ".seconds(\(seconds))"
-        } else {
-            var nanoseconds = attoseconds / 1_000_000_000
-            nanoseconds += seconds * 1_000_000_000
-            string = "\(nanoseconds)"
-            if seconds == 0 {
-                if string.hasSuffix("000000") {
-                    string.removeLast(6)
-                    string = ".milliseconds(\(string))"
-                } else if string.hasSuffix("000") {
-                    string.removeLast(3)
-                    string = ".microseconds(\(string))"
-                } else {
-                    string = ".nanoseconds(\(string))"
-                }
-            } else {
-                string = ".nanoseconds(\(nanoseconds))"
-            }
         }
         return string
     }

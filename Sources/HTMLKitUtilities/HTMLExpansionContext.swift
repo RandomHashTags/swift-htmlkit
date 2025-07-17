@@ -17,7 +17,7 @@ public struct HTMLExpansionContext: @unchecked Sendable {
     public var encoding:HTMLEncoding
 
     /// `HTMLResultRepresentation` of this expansion.
-    public var representation:HTMLResultRepresentation
+    public var representation:HTMLResultRepresentationAST
 
     /// Associated attribute key responsible for the arguments.
     public var key:String
@@ -38,7 +38,7 @@ public struct HTMLExpansionContext: @unchecked Sendable {
         expansion: FreestandingMacroExpansionSyntax,
         ignoresCompilerWarnings: Bool,
         encoding: HTMLEncoding,
-        representation: HTMLResultRepresentation,
+        representation: HTMLResultRepresentationAST,
         key: String,
         arguments: LabeledExprListSyntax,
         lookupFiles: Set<String> = [],

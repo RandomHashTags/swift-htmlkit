@@ -134,10 +134,14 @@ extension HTMLKitTests {
         let _:AsyncStream<String> = #html(representation: .streamedAsync(chunkSize: 3)) {
             div("oh yeah")
         }
-        let _:AsyncStream<String> = #html(representation: .streamedAsync(suspendDuration: .milliseconds(50))) {
+        let _:AsyncStream<String> = #html(representation: .streamedAsync({ _ in
+            try await Task.sleep(for: .milliseconds(50))
+        })) {
             div("oh yeah")
         }
-        let _:AsyncStream<String> = #html(representation: .streamedAsync(chunkSize: 3, suspendDuration: .milliseconds(50))) {
+        let _:AsyncStream<String> = #html(representation: .streamedAsync(chunkSize: 3, { _ in
+            try await Task.sleep(for: .milliseconds(50))
+        })) {
             div("oh yeah")
         }
     }

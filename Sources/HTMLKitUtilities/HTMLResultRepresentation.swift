@@ -1,5 +1,5 @@
 
-public enum HTMLResultRepresentation: Equatable, Sendable {
+public enum HTMLResultRepresentation: Sendable {
 
 
     // MARK: Literal
@@ -47,8 +47,32 @@ public enum HTMLResultRepresentation: Equatable, Sendable {
     /// - Parameters:
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
-    ///   - suspendDuration: Duration to sleep the `Task` that is yielding the stream results. Default is `nil`.
+    ///   - afterYield: Work to execute after yielding a result. The `Int` closure parameter is the index of the yielded result.
     /// - Returns: An `AsyncStream` of encoded literals of length up-to `chunkSize`.
-    /// - Warning: The values are yielded synchronously in a new `Task`. Specify a `suspendDuration` to make it completely nonblocking.
-    case streamedAsync(optimized: Bool = true, chunkSize: Int = 1024, suspendDuration: Duration? = nil)
+    /// - Warning: The values are yielded synchronously in a new `Task`. Populate `afterYield` with async work to make it completely asynchronous.
+    case streamedAsync(
+        optimized: Bool = true,
+        chunkSize: Int = 1024,
+        _ afterYield: @Sendable (Int) async throws -> Void = { yieldIndex in }
+    )
+}
+
+// MARK: HTMLResultRepresentationAST
+public enum HTMLResultRepresentationAST: Sendable {
+    case literal
+    //case literalOptimized
+
+    case chunked(optimized: Bool = true, chunkSize: Int = 1024)
+
+    #if compiler(>=6.2)
+    case chunkedInline(optimized: Bool = true, chunkSize: Int = 1024)
+    #endif
+
+    case streamed(optimized: Bool = true, chunkSize: Int = 1024)
+    case streamedAsync(
+        optimized: Bool = true,
+        chunkSize: Int = 1024,
+        yieldVariableName: String? = nil,
+        afterYield: String? = nil
+    )
 }

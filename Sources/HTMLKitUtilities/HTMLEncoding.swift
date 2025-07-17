@@ -21,7 +21,7 @@
 /// ```swift
 /// let string:StaticString = "Test"
 /// let _:StaticString = #html(div(string)) // ❌ promotion cannot be applied; StaticString not allowed
-/// let _:String = #html(div(string)) // ⚠️ promotion cannot be applied; compiles to "<div>" + String(describing: string) + "</div>"
+/// let _:String = #html(div(string)) // ⚠️ promotion cannot be applied; compiles to "<div>\(string)</div>"
 /// ```
 /// 
 public enum HTMLEncoding: Equatable, Sendable {

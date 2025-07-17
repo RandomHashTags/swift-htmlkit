@@ -99,7 +99,7 @@ extension HTMLKitUtilities {
     }
 
     // MARK: Parse Representation
-    public static func parseRepresentation(expr: ExprSyntax) -> HTMLResultRepresentation? {
+    public static func parseRepresentation(expr: ExprSyntax) -> HTMLResultRepresentationAST? {
         switch expr.kind {
         case .memberAccessExpr:
             switch expr.memberAccess!.declName.baseName.text {
@@ -117,7 +117,8 @@ extension HTMLKitUtilities {
             let function = expr.functionCall!
             var optimized = true
             var chunkSize = 1024
-            var suspendDuration:Duration? = nil
+            var yieldVariableName:String? = nil
+            var afterYield:String? = nil
             for arg in function.arguments {
                 switch arg.label?.text {
                 case "optimized":
@@ -126,45 +127,19 @@ extension HTMLKitUtilities {
                     if let s = arg.expression.integerLiteral?.literal.text, let size = Int(s) {
                         chunkSize = size
                     }
-                case "suspendDuration":
-                    guard let function = arg.expression.functionCall else { break }
-                    var intValue:UInt64? = nil
-                    var doubleValue:Double? = nil
-                    if let v = function.arguments.first?.expression.integerLiteral?.literal.text, let i = UInt64(v) {
-                        intValue = i
-                    } else if let v = function.arguments.first?.expression.as(FloatLiteralExprSyntax.self)?.literal.text, let d = Double(v) {
-                        doubleValue = d
-                    } else {
-                        break
+                default: // afterYield
+                    guard let closure = arg.expression.as(ClosureExprSyntax.self) else { break }
+                    if let parameters = closure.signature?.parameterClause {
+                        switch parameters {
+                        case .simpleInput(let shorthand):
+                            yieldVariableName = shorthand.first?.name.text
+                        case .parameterClause(let parameterSyntax):
+                            if let parameter = parameterSyntax.parameters.first {
+                                yieldVariableName = (parameter.secondName ?? parameter.firstName).text
+                            }
+                        }
                     }
-                    switch function.calledExpression.memberAccess?.declName.baseName.text {
-                    case "milliseconds":
-                        if let intValue {
-                            suspendDuration = .milliseconds(intValue)
-                        } else if let doubleValue {
-                            suspendDuration = .milliseconds(doubleValue)
-                        }
-                    case "microseconds":
-                        if let intValue {
-                            suspendDuration = .microseconds(intValue)
-                        } else if let doubleValue {
-                            suspendDuration = .microseconds(doubleValue)
-                        }
-                    case "nanoseconds":
-                        if let intValue {
-                            suspendDuration = .nanoseconds(intValue)
-                        }
-                    case "seconds":
-                        if let intValue {
-                            suspendDuration = .seconds(intValue)
-                        } else if let doubleValue {
-                            suspendDuration = .seconds(doubleValue)
-                        }
-                    default:
-                        break
-                    }
-                default:
-                    break
+                    afterYield = closure.statements.description
                 }
             }
             switch function.calledExpression.memberAccess?.declName.baseName.text {
@@ -177,7 +152,7 @@ extension HTMLKitUtilities {
             case "streamed":
                 return .streamed(optimized: optimized, chunkSize: chunkSize)
             case "streamedAsync":
-                return .streamedAsync(optimized: optimized, chunkSize: chunkSize, suspendDuration: suspendDuration)
+                return .streamedAsync(optimized: optimized, chunkSize: chunkSize, yieldVariableName: yieldVariableName, afterYield: afterYield)
             default:
                 return nil
             }
