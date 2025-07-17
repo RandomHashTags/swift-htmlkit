@@ -19,9 +19,10 @@ extension HTMLKitUtilities {
                     c.key = key
                     c.arguments = function.arguments
                     if key.contains(" ") {
-                        context.context.diagnose(Diagnostic(node: firstExpression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
+                        //context.diagnose(DiagnosticMsg.stringLiteralContainsIllegalCharacter(expr: firstExpression, char: " "))
+                        context.diagnose(Diagnostic(node: firstExpression, message: DiagnosticMsg(id: "spacesNotAllowedInAttributeDeclaration", message: "Spaces are not allowed in attribute declaration.")))
                     } else if keys.contains(key) {
-                        globalAttributeAlreadyDefined(context: context, attribute: key, node: firstExpression)
+                        context.diagnose(DiagnosticMsg.globalAttributeAlreadyDefined(context: context, attribute: key, node: firstExpression))
                     } else if let attr = HTMLAttribute.init(context: c) {
                         attributes.append(attr)
                         key = attr.key
@@ -30,7 +31,7 @@ extension HTMLKitUtilities {
                 }
             } else if let member = element.expression.memberAccess?.declName.baseName.text, member == "trailingSlash" {
                 if keys.contains(member) {
-                    globalAttributeAlreadyDefined(context: context, attribute: member, node: element.expression)
+                    context.diagnose(DiagnosticMsg.globalAttributeAlreadyDefined(context: context, attribute: member, node: element.expression))
                 } else {
                     trailingSlash = true
                     keys.insert(member)

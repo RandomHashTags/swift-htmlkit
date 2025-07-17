@@ -18,7 +18,7 @@ enum InterpolationLookup {
                     let parsed = Parser.parse(source: string).statements
                     cached[file] = parsed
                 } else {
-                    context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "fileNotFound", message: "Could not find file (\(file)) on disk, or was denied disk access (file access is always denied on macOS due to the macro being in a sandbox).", severity: .warning)))
+                    context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "fileNotFound", message: "Could not find file (\(file)) on disk, or was denied disk access (file access is always denied on macOS due to the macro being in a sandbox).", severity: .warning)))
                 }
             }
         }

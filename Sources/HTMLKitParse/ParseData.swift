@@ -1,50 +1,35 @@
 
 import HTMLElements
 import HTMLKitUtilities
-import SwiftDiagnostics
 import SwiftSyntax
 
 extension HTMLKitUtilities {
     // MARK: Escape HTML
-    public static func escapeHTML(
-        context: HTMLExpansionContext
-    ) -> String {
+    public static func escapeHTML(context: HTMLExpansionContext) -> String {
         var context = context
         return escapeHTML(context: &context)
     }
-    public static func escapeHTML(
-        context: inout HTMLExpansionContext
-    ) -> String {
+    public static func escapeHTML(context: inout HTMLExpansionContext) -> String {
         context.escape = true
         context.escapeAttributes = true
         context.elementsRequireEscaping = true
-        return html(
-            context: context
-        )
+        return html(context: context)
     }
 
     // MARK: Raw HTML
-    public static func rawHTML(
-        context: HTMLExpansionContext
-    ) -> String {
+    public static func rawHTML(context: HTMLExpansionContext) -> String {
         var context = context
         return rawHTML(context: &context)
     }
-    public static func rawHTML(
-        context: inout HTMLExpansionContext
-    ) -> String {
+    public static func rawHTML(context: inout HTMLExpansionContext) -> String {
         context.escape = false
         context.escapeAttributes = false
         context.elementsRequireEscaping = false
-        return html(
-            context: context
-        )
+        return html(context: context)
     }
 
     // MARK: HTML
-    public static func html(
-        context: HTMLExpansionContext
-    ) -> String {
+    public static func html(context: HTMLExpansionContext) -> String {
         var context = context
         let children = context.arguments.children(viewMode: .all)
         var innerHTML = ""
@@ -53,7 +38,7 @@ extension HTMLKitUtilities {
             guard let child = e.labeled else { continue }
             if let key = child.label?.text {
                 switch key {
-                case "encoding": context.encoding = parseEncoding(expression: child.expression) ?? .string
+                case "encoding": context.encoding = parseEncoding(expr: child.expression) ?? .string
                 case "representation": context.representation = parseRepresentation(expr: child.expression) ?? .literal
                 case "minify": context.minify = child.expression.boolean(context) ?? false
                 default: break
@@ -74,12 +59,12 @@ extension HTMLKitUtilities {
     }
 
     // MARK: Parse Encoding
-    public static func parseEncoding(expression: ExprSyntax) -> HTMLEncoding? {
-        switch expression.kind {
+    public static func parseEncoding(expr: some ExprSyntaxProtocol) -> HTMLEncoding? {
+        switch expr.kind {
         case .memberAccessExpr:
-            return HTMLEncoding(rawValue: expression.memberAccess!.declName.baseName.text)
+            return HTMLEncoding(rawValue: expr.memberAccess!.declName.baseName.text)
         case .functionCallExpr:
-            let function = expression.functionCall!
+            let function = expr.functionCall!
             switch function.calledExpression.memberAccess?.declName.baseName.text {
             case "custom":
                 guard let logic = function.arguments.first?.expression.stringLiteral?.string(encoding: .string) else { return nil }
@@ -159,69 +144,5 @@ extension HTMLKitUtilities {
         default:
             return nil
         }
-    }
-}
-
-extension HTMLKitUtilities {
-    // MARK: GA Already Defined
-    static func globalAttributeAlreadyDefined(context: HTMLExpansionContext, attribute: String, node: some SyntaxProtocol) {
-        context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "globalAttributeAlreadyDefined", message: "Global attribute \"" + attribute + "\" is already defined.")))
-    }
-
-    // MARK: Unallowed Expression
-    static func unallowedExpression(context: HTMLExpansionContext, node: ExprSyntax) {
-        context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unallowedExpression", message: "String Interpolation is required when encoding runtime values."), fixIts: [
-            FixIt(message: DiagnosticMsg(id: "useStringInterpolation", message: "Use String Interpolation."), changes: [
-                FixIt.Change.replace(
-                    oldNode: Syntax(node),
-                    newNode: Syntax(StringLiteralExprSyntax(content: "\\(\(node))"))
-                )
-            ])
-        ]))
-    }
-
-    // MARK: Warn Interpolation
-    static func warnInterpolation(
-        context: HTMLExpansionContext,
-        node: some SyntaxProtocol
-    ) {
-        /*#if canImport(SwiftLexicalLookup)
-        for t in node.tokens(viewMode: .fixedUp) {
-            let results = node.lookup(t.identifier)
-            for result in results {
-                switch result {
-                case .lookForMembers(let test):
-                    print("lookForMembers=" + test.debugDescription)
-                case .lookForImplicitClosureParameters(let test):
-                    print("lookForImplicitClosureParameters=" + test.debugDescription)
-                default:
-                    print(result.debugDescription)
-                }
-            }
-        }
-        #endif*/
-        /*if let fix:String = InterpolationLookup.find(context: context, node) {
-            let expression:String = "\(node)"
-            let ranges:[Range<String.Index>] = string.ranges(of: expression)
-            string.replace(expression, with: fix)
-            remaining_interpolation -= ranges.count
-        } else {*/
-            guard !context.ignoresCompilerWarnings else { return }
-            context.context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "unsafeInterpolation", message: "Interpolation may introduce raw HTML.", severity: .warning)))
-        //}
-    }
-}
-
-// MARK: DiagnosticMsg
-package struct DiagnosticMsg: DiagnosticMessage, FixItMessage {
-    package let message:String
-    package let diagnosticID:MessageID
-    package let severity:DiagnosticSeverity
-    package var fixItID: MessageID { diagnosticID }
-
-    package init(id: String, message: String, severity: DiagnosticSeverity = .error) {
-        self.message = message
-        self.diagnosticID = MessageID(domain: "HTMLKitMacros", id: id)
-        self.severity = severity
     }
 }

@@ -1,7 +1,6 @@
 
 import HTMLAttributes
 import HTMLKitUtilities
-import SwiftDiagnostics
 import SwiftSyntax
 
 // MARK: Parse Literal Value
@@ -48,9 +47,9 @@ extension HTMLKitUtilities {
             return .arrayOfLiterals(literals)
         } else {
             if let function = expr.functionCall {
-                warnInterpolation(context: context, node: function.calledExpression)
+                DiagnosticMsg.warnInterpolation(context: context, node: function.calledExpression)
             } else {
-                warnInterpolation(context: context, node: expr)
+                DiagnosticMsg.warnInterpolation(context: context, node: expr)
             }
             if let member = expr.memberAccess {
                 return .interpolation(member.singleLineDescription)
@@ -95,7 +94,7 @@ extension HTMLKitUtilities {
                             let promotions = promoteInterpolation(context: context, remainingInterpolation: &remainingInterpolation, expr: interpolation)
                             values.append(contentsOf: promotions)
                         } else {
-                            context.context.diagnose(Diagnostic(node: segment, message: DiagnosticMsg(id: "somethingWentWrong", message: "Something went wrong. (" + expression.debugDescription + ")")))
+                            DiagnosticMsg.somethingWentWrong(context: context, node: segment, expr: expression)
                             return values
                         }
                     }
@@ -105,7 +104,7 @@ extension HTMLKitUtilities {
                 values.append(create(fix))
             } else {
                 values.append(interpolate(expression))
-                warnInterpolation(context: context, node: expression)
+                DiagnosticMsg.warnInterpolation(context: context, node: expression)
             }
         }
         return values
@@ -116,7 +115,7 @@ extension HTMLKitUtilities {
         s.closingQuote = TokenSyntax(stringLiteral: "")
         return s
     }
-    static func interpolate(_ syntax: ExprSyntaxProtocol) -> ExpressionSegmentSyntax {
+    static func interpolate(_ syntax: some ExprSyntaxProtocol) -> ExpressionSegmentSyntax {
         var list = LabeledExprListSyntax()
         list.append(LabeledExprSyntax(expression: syntax))
         return ExpressionSegmentSyntax(expressions: list)
@@ -183,7 +182,7 @@ extension HTMLKitUtilities {
             }
             return .array(results)
         case .declReferenceExpr:
-            warnInterpolation(context: context, node: expression)
+            DiagnosticMsg.warnInterpolation(context: context, node: expression)
             return .interpolation(expression.declRef!.baseName.text)
         default:
             return nil
@@ -198,7 +197,7 @@ extension HTMLKitUtilities {
         switch literal {
         case .string(let string), .interpolation(let string):
             if string.contains(separator) {
-                context.context.diagnose(Diagnostic(node: expr, message: DiagnosticMsg(id: "characterNotAllowedInDeclaration", message: "Character \"\(separator)\" is not allowed when declaring values for \"" + context.key + "\".")))
+                context.diagnose(DiagnosticMsg.stringLiteralContainsIllegalCharacter(expr: expr, char: separator))
                 return nil
             }
             return string

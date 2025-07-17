@@ -73,10 +73,14 @@ extension ExprSyntaxProtocol {
     package var declRef: DeclReferenceExprSyntax? { self.as(DeclReferenceExprSyntax.self) }
 }
 extension ExprSyntaxProtocol {
-    package var booleanIsTrue: Bool { booleanLiteral?.literal.text == "true" }
+    package var booleanIsTrue: Bool {
+        booleanLiteral?.literal.text == "true"
+    }
 }
 extension SyntaxChildren.Element {
-    package var labeled: LabeledExprSyntax? { self.as(LabeledExprSyntax.self) }
+    package var labeled: LabeledExprSyntax? {
+        self.as(LabeledExprSyntax.self)
+    }
 }
 extension StringLiteralExprSyntax {
     @inlinable 

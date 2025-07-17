@@ -26,17 +26,27 @@ extension HTMLKitUtilities {
                 context.key = key
                 switch key {
                 case "encoding":
-                    context.encoding = parseEncoding(expression: child.expression) ?? .string
+                    context.encoding = parseEncoding(expr: child.expression) ?? .string
                 case "representation":
                     context.representation = parseRepresentation(expr: child.expression) ?? .literal
                 case "lookupFiles":
-                    if let elements = child.expression.array?.elements {
-                        context.lookupFiles = Set(elements.compactMap({ $0.expression.stringLiteral?.string(encoding: context.encoding) }))
+                    guard let array = child.expression.array?.elements else {
+                        context.diagnose(DiagnosticMsg.expectedArrayExpr(expr: child.expression))
+                        break
                     }
+                    context.lookupFiles = Set(array.compactMap({
+                        guard let string = $0.expression.stringLiteral?.string(encoding: context.encoding) else {
+                            context.diagnose(DiagnosticMsg.expectedStringLiteral(expr: $0.expression))
+                            return nil
+                        }
+                        return string
+                    }))
                 case "attributes":
-                    if let elements = child.expression.array?.elements {
-                        (globalAttributes, trailingSlash) = parseGlobalAttributes(context: context, array: elements)
+                    guard let array = child.expression.array?.elements else {
+                        context.diagnose(DiagnosticMsg.expectedArrayExpr(expr: child.expression))
+                        break
                     }
+                    (globalAttributes, trailingSlash) = parseGlobalAttributes(context: context, array: array)
                 default:
                     context.key = otherAttributes[key] ?? key
                     if let test = HTMLAttribute.Extra.parse(context: context, expr: child.expression) {

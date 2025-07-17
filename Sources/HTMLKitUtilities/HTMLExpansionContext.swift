@@ -1,5 +1,6 @@
 
-#if canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
+#if canImport(SwiftDiagnostics) && canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
+import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 #endif
@@ -66,6 +67,12 @@ public struct HTMLExpansionContext: @unchecked Sendable {
     /// First expression in the arguments.
     public var expression: ExprSyntax? {
         arguments.first?.expression
+    }
+    #endif
+
+    #if canImport(SwiftDiagnostics)
+    package func diagnose(_ msg: Diagnostic) {
+        context.diagnose(msg)
     }
     #endif
 }

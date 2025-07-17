@@ -22,6 +22,7 @@ extension HTMLKitUtilities {
             case "rawHTML", "anyRawHTML":
                 return rawHTML(context: &c)
             default:
+                DiagnosticMsg.somethingWentWrong(context: context, node: expr, expr: expansion)
                 return "" // TODO: fix?
             }
         } else if let element = parseElement(context: context, expr: expr) {
@@ -29,7 +30,7 @@ extension HTMLKitUtilities {
         } else if let literal = parseLiteral(context: context, expr: expr) {
             return literal.value(key: "", escape: context.escape, escapeAttributes: context.escapeAttributes)
         } else {
-            unallowedExpression(context: context, node: expr)
+            DiagnosticMsg.unallowedExpression(context: context, node: expr)
             return nil
         }
     }
