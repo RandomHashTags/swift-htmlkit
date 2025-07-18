@@ -48,7 +48,7 @@ struct StreamTests {
             receivedHTML += test
         }
         var took = ContinuousClock.now - now
-        #expect(took < .milliseconds(25))
+        #expect(took >= .milliseconds(20) && took < .milliseconds(25))
         #expect(receivedHTML == expected)
 
         test = #html(
@@ -78,7 +78,7 @@ struct StreamTests {
             receivedHTML += test
         }
         took = ContinuousClock.now - now
-        #expect(took < .milliseconds(55))
+        #expect(took >= .milliseconds(50) && took < .milliseconds(55))
         #expect(receivedHTML == expected)
     }
 }
@@ -132,7 +132,7 @@ extension StreamTests {
             receivedHTML += test
         }
         var took = ContinuousClock.now - now
-        #expect(took < .milliseconds(25))
+        #expect(took >= .milliseconds(20) && took < .milliseconds(25))
         #expect(receivedHTML == expected)
 
         test = #html(
@@ -161,7 +161,7 @@ extension StreamTests {
             receivedHTML += test
         }
         took = ContinuousClock.now - now
-        #expect(took < .milliseconds(25))
+        #expect(took >= .milliseconds(10) && took < .milliseconds(15))
         #expect(receivedHTML == expected)
     }
 }
