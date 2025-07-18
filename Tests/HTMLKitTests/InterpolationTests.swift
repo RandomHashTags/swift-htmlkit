@@ -72,7 +72,7 @@ struct InterpolationTests {
     // MARK: multi-line func
     @Test func interpolationMultilineFunc() {
         var expected:String = "<div>Bikini Bottom: Spongebob Squarepants, Patrick Star, Squidward Tentacles, Mr. Krabs, Sandy Cheeks, Pearl Krabs</div>"
-        var string:String = #html(representation: .literal,
+        var string:String = #html(resultType: .literal,
             div(
                 "Bikini Bottom: ",
                 InterpolationTests.spongebobCharacter(

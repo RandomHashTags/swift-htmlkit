@@ -67,9 +67,9 @@ package struct SwiftHTMLKitTests: HTMLGenerator {
     package func dynamicHTML(_ context: HTMLContext) -> String {
         var qualities:String = ""
         for quality in context.user.qualities {
-            qualities += #html(representation: .literal, li(quality))
+            qualities += #html(resultType: .literal, li(quality))
         }
-        return #html(representation: .literal) {
+        return #html(resultType: .literal) {
             html {
                 head {
                     meta(charset: context.charset)

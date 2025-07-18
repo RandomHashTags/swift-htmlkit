@@ -8,7 +8,7 @@ extension HTMLKitUtilities {
         var context = context
         let (string, encoding) = expandMacro(context: &context)
         let encodingResult = encodingResult(context: context, node: context.expansion, string: string, for: encoding)
-        let expandedResult = representationResult(encoding: encoding, encodedResult: encodingResult, representation: context.representation)
+        let expandedResult = representationResult(encoding: encoding, encodedResult: encodingResult, resultType: context.resultType)
         return "\(raw: expandedResult)"
     }
 
@@ -80,9 +80,9 @@ extension HTMLKitUtilities {
     static func representationResult(
         encoding: HTMLEncoding,
         encodedResult: String,
-        representation: HTMLResultRepresentationAST
+        resultType: HTMLExpansionResultTypeAST
     ) -> String {
-        switch representation {
+        switch resultType {
         case .literal:
             if encoding == .string {
                 return literal(encodedResult: encodedResult)

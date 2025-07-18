@@ -39,7 +39,7 @@ extension HTMLKitUtilities {
             if let key = child.label?.text {
                 switch key {
                 case "encoding": context.encoding = parseEncoding(expr: child.expression) ?? .string
-                case "representation": context.representation = parseRepresentation(expr: child.expression) ?? .literal
+                case "resultType": context.resultType = parseRepresentation(expr: child.expression) ?? .literal
                 case "minify": context.minify = child.expression.boolean(context) ?? false
                 default: break
                 }
@@ -84,7 +84,7 @@ extension HTMLKitUtilities {
     }
 
     // MARK: Parse Representation
-    public static func parseRepresentation(expr: ExprSyntax) -> HTMLResultRepresentationAST? {
+    public static func parseRepresentation(expr: ExprSyntax) -> HTMLExpansionResultTypeAST? {
         switch expr.kind {
         case .memberAccessExpr:
             switch expr.memberAccess!.declName.baseName.text {

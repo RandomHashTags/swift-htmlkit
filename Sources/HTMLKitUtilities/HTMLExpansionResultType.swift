@@ -1,5 +1,5 @@
 
-public enum HTMLResultRepresentation: Sendable {
+public enum HTMLExpansionResultType: Sendable {
 
 
     // MARK: Literal
@@ -20,7 +20,7 @@ public enum HTMLResultRepresentation: Sendable {
     /// - Parameters:
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
-    ///   - Returns: An `Array` of encoded literals of length up-to `chunkSize`.
+    ///   - Returns: An array of encoded literals of length up-to `chunkSize`.
     case chunked(optimized: Bool = true, chunkSize: Int = 1024)
 
     #if compiler(>=6.2)
@@ -57,8 +57,8 @@ public enum HTMLResultRepresentation: Sendable {
     )
 }
 
-// MARK: HTMLResultRepresentationAST
-public enum HTMLResultRepresentationAST: Sendable {
+// MARK: HTMLExpansionResultTypeAST
+public enum HTMLExpansionResultTypeAST: Sendable {
     case literal
     //case literalOptimized
 

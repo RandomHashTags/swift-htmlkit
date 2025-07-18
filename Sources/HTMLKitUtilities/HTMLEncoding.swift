@@ -1,5 +1,5 @@
 
-/// The value type the data should be encoded to when returned from the macro.
+/// The data type the result should be encoded to when returned from the macro.
 /// 
 /// ### Interpolation Promotion
 /// 
