@@ -232,13 +232,18 @@ extension HTMLKitUtilities {
             var endIndex = encodedResult.index(encodedResult.startIndex, offsetBy: endingIndex, limitedBy: encodedResult.endIndex) ?? encodedResult.endIndex
             let range = encodedResult.index(encodedResult.startIndex, offsetBy: i)..<endIndex
             var slice = encodedResult[range]
-            var interpolation:String?
+            var interpolation:String? = nil
             if let interp = interpolationMatches.first, range.contains(interp.range.lowerBound) { // chunk contains interpolation
-                let normalized = normalizeInterpolation(encodedResult[interp.range], withQuotationMarks: false)
-                interpolation = normalized
+                var normalized = normalizeInterpolation(encodedResult[interp.range], withQuotationMarks: false)
                 if !range.contains(interp.range.upperBound) {
                     endIndex = encodedResult.index(before: interp.range.lowerBound)
-                    slice = slice[slice.startIndex..<endIndex]
+                    if slice.startIndex < endIndex {
+                        slice = slice[slice.startIndex..<endIndex]
+                    } else {
+                        slice = ""
+                        normalized = "\"\(normalized)\""
+                    }
+                    interpolation = normalized
                     i += encodedResult.distance(from: range.upperBound, to: interp.range.upperBound)
                 } else {
                     interpolation = nil
@@ -251,7 +256,7 @@ extension HTMLKitUtilities {
                 interpolation = nil
             }
             i += chunkSize + offset
-            if slice.isEmpty || encoding == .string && slice.count == 1 && slice[slice.startIndex] == "\"" {
+            if slice.isEmpty && interpolation == nil || encoding == .string && slice.count == 1 && slice[slice.startIndex] == "\"" {
                 continue
             }
             var string = ""

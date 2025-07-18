@@ -108,9 +108,9 @@ extension HTMLKitTests {
         let _:[StaticString] = #html(resultType: .chunks()) {
             div("oh yeah")
         }
-        /*let _:[String] = #html(resultType: .chunks(chunkSize: 3)) { // TODO: fix
+        let _:[String] = #html(resultType: .chunks(chunkSize: 3)) {
             div("oh \(yeah)")
-        }*/
+        }
 
         let _:AsyncStream<String> = #html(resultType: .stream()) {
             div("oh yeah")
