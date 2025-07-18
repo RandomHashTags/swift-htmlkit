@@ -24,7 +24,7 @@ struct StreamTests {
             }
         )
         var test:AsyncStream<String> = #html(
-            resultType: .streamedAsync(chunkSize: 50, { _ in
+            resultType: .streamAsync(chunkSize: 50, { _ in
                 try await Task.sleep(for: .milliseconds(5))
             })) {
             html {
@@ -52,7 +52,7 @@ struct StreamTests {
         #expect(receivedHTML == expected)
 
         test = #html(
-            resultType: .streamedAsync(
+            resultType: .streamAsync(
                 chunkSize: 40, { yieldIndex in
                     try await Task.sleep(for: .milliseconds((yieldIndex+1) * 5))
                 }
@@ -107,7 +107,7 @@ extension StreamTests {
         )
 
         var test:AsyncStream<String> = #html(
-            resultType: .streamedAsync(chunkSize: 50, { _ in
+            resultType: .streamAsync(chunkSize: 50, { _ in
                 try await Task.sleep(for: .milliseconds(5))
             })) {
             html {
@@ -136,7 +136,7 @@ extension StreamTests {
         #expect(receivedHTML == expected)
 
         test = #html(
-            resultType: .streamedAsync(chunkSize: 200, { _ in
+            resultType: .streamAsync(chunkSize: 200, { _ in
                 try await Task.sleep(for: .milliseconds(5))
             })) {
             html {

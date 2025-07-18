@@ -102,44 +102,44 @@ extension HTMLKitTests {
             div("oh \(yeah)")
         }*/
 
-        let _:[String] = #html(resultType: .chunked()) {
+        let _:[String] = #html(resultType: .chunks()) {
             div("oh yeah")
         }
-        let _:[StaticString] = #html(resultType: .chunked()) {
+        let _:[StaticString] = #html(resultType: .chunks()) {
             div("oh yeah")
         }
-        /*let _:[String] = #html(resultType: .chunked(chunkSize: 3)) { // TODO: fix
+        /*let _:[String] = #html(resultType: .chunks(chunkSize: 3)) { // TODO: fix
             div("oh \(yeah)")
         }*/
 
-        let _:AsyncStream<String> = #html(resultType: .streamed()) {
+        let _:AsyncStream<String> = #html(resultType: .stream()) {
             div("oh yeah")
         }
-        let _:AsyncStream<StaticString> = #html(resultType: .streamed()) {
+        let _:AsyncStream<StaticString> = #html(resultType: .stream()) {
             div("oh yeah")
         }
-        let _:AsyncStream<String> = #html(resultType: .streamed(chunkSize: 3)) {
+        let _:AsyncStream<String> = #html(resultType: .stream(chunkSize: 3)) {
             div("oh yeah")
         }
-        let _:AsyncStream<StaticString> = #html(resultType: .streamed(chunkSize: 3)) {
+        let _:AsyncStream<StaticString> = #html(resultType: .stream(chunkSize: 3)) {
             div("oh yeah")
         }
-        /*let _:AsyncStream<String> = #html(resultType: .streamed(chunkSize: 3)) {
+        /*let _:AsyncStream<String> = #html(resultType: .stream(chunkSize: 3)) {
             div("oh\(yeah)") // TODO: fix
         }*/
 
-        let _:AsyncStream<String> = #html(resultType: .streamedAsync()) {
+        let _:AsyncStream<String> = #html(resultType: .streamAsync()) {
             div("oh yeah")
         }
-        let _:AsyncStream<String> = #html(resultType: .streamedAsync(chunkSize: 3)) {
+        let _:AsyncStream<String> = #html(resultType: .streamAsync(chunkSize: 3)) {
             div("oh yeah")
         }
-        let _:AsyncStream<String> = #html(resultType: .streamedAsync({ _ in
+        let _:AsyncStream<String> = #html(resultType: .streamAsync({ _ in
             try await Task.sleep(for: .milliseconds(50))
         })) {
             div("oh yeah")
         }
-        let _:AsyncStream<String> = #html(resultType: .streamedAsync(chunkSize: 3, { _ in
+        let _:AsyncStream<String> = #html(resultType: .streamAsync(chunkSize: 3, { _ in
             try await Task.sleep(for: .milliseconds(50))
         })) {
             div("oh yeah")

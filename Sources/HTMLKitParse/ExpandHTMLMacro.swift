@@ -93,15 +93,15 @@ extension HTMLKitUtilities {
             } else {
                 // TODO: show compiler diagnostic
             }*/
-        case .chunked(let optimized, let chunkSize):
+        case .chunks(let optimized, let chunkSize):
             return "[" + chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ", ") + "]"
         #if compiler(>=6.2)
-        case .chunkedInline(let optimized, let chunkSize):
+        case .chunksInline(let optimized, let chunkSize):
             let typeAnnotation:String = "String" // TODO: fix
             let chunks = chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ", ")
             return "InlineArray<\(chunks.count), \(typeAnnotation)>([\(chunks)])"
         #endif
-        case .streamed(let optimized, let chunkSize):
+        case .stream(let optimized, let chunkSize):
             return streamed(
                 encoding: encoding,
                 encodedResult: encodedResult,
@@ -111,7 +111,7 @@ extension HTMLKitUtilities {
                 yieldVariableName: nil,
                 afterYield: nil
             )
-        case .streamedAsync(let optimized, let chunkSize, let yieldVariableName, let afterYield):
+        case .streamAsync(let optimized, let chunkSize, let yieldVariableName, let afterYield):
             return streamed(
                 encoding: encoding,
                 encodedResult: encodedResult,

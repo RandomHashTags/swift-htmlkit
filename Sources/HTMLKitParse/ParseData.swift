@@ -90,12 +90,16 @@ extension HTMLKitUtilities {
             switch expr.memberAccess!.declName.baseName.text {
             case "literal": return .literal
             //case "literalOptimized": return .literalOptimized
-            case "chunked": return .chunked()
-            #if compiler(>=6.2)
-            case "chunkedInline": return .chunkedInline()
-            #endif
-            case "streamed": return .streamed()
-            case "streamedAsync": return .streamedAsync()
+            case "chunks": return .chunks()
+            case "chunksInline":
+                #if compiler(>=6.2)
+                return .chunksInline()
+                #else
+                return nil // TODO: show compiler diagnostic
+                #endif
+            
+            case "stream": return .stream()
+            case "streamAsync": return .streamAsync()
             default: return nil
             }
         case .functionCallExpr:
@@ -128,17 +132,20 @@ extension HTMLKitUtilities {
                 }
             }
             switch function.calledExpression.memberAccess?.declName.baseName.text {
-            case "chunked":
-                return .chunked(optimized: optimized, chunkSize: chunkSize)
-            #if compiler(>=6.2)
-            case "chunkedInline":
-                return .chunkedInline(optimized: optimized, chunkSize: chunkSize)
-            #endif
-            case "streamed":
-                return .streamed(optimized: optimized, chunkSize: chunkSize)
-            case "streamedAsync":
-                return .streamedAsync(optimized: optimized, chunkSize: chunkSize, yieldVariableName: yieldVariableName, afterYield: afterYield)
+            case "chunks":
+                return .chunks(optimized: optimized, chunkSize: chunkSize)
+            case "chunksInline":
+                #if compiler(>=6.2)
+                return .chunksInline(optimized: optimized, chunkSize: chunkSize)
+                #else
+                return nil // TODO: show compiler diagnostic
+                #endif
+            case "stream":
+                return .stream(optimized: optimized, chunkSize: chunkSize)
+            case "streamAsync":
+                return .streamAsync(optimized: optimized, chunkSize: chunkSize, yieldVariableName: yieldVariableName, afterYield: afterYield)
             default:
+                // TODO: show compiler diagnostic
                 return nil
             }
         default:
