@@ -87,7 +87,7 @@ struct StreamTests {
 extension StreamTests {
     @Test
     func streamInterpolation() async {
-        let rawHTMLInterpolationTest = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567689"
+        let rawHTMLInterpolationTest = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         let expected:String = #html(
             html {
                 body {

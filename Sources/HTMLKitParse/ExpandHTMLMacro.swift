@@ -183,8 +183,7 @@ extension HTMLKitUtilities {
             let interp = interpolation.removeFirst()
             let left = encodedResult[index..<interp.range.lowerBound]
             values.append("StaticString(\(left))")
-
-            values.append(normalizeInterpolation(encodedResult[interp.range]))
+            values.append(normalizeInterpolation(encodedResult[interp.range], withQuotationMarks: true))
             index = interp.range.upperBound
 
             reserveCapacity += left.count + 32
@@ -196,12 +195,16 @@ extension HTMLKitUtilities {
         }
         return "HTMLOptimizedLiteral(reserveCapacity: \(reserveCapacity)).render((\n\(values.joined(separator: ",\n"))\n))"
     }
-    static func normalizeInterpolation(_ value: Substring) -> String {
+    static func normalizeInterpolation(_ value: Substring, withQuotationMarks: Bool) -> String {
         var value = value
         value.removeFirst(22) // ` + String(describing: `.count
         value.removeLast(3) // ` + `.count
         value.removeAll(where: { $0.isNewline })
-        return String("\"\\(" + value + "\"")
+        if withQuotationMarks {
+            value.insert("\"", at: value.startIndex)
+            value.append("\"")
+        }
+        return String("\\(" + value)
     }
 }
 
@@ -231,8 +234,7 @@ extension HTMLKitUtilities {
             var slice = encodedResult[range]
             var interpolation:String?
             if let interp = interpolationMatches.first, range.contains(interp.range.lowerBound) { // chunk contains interpolation
-                var normalized = normalizeInterpolation(encodedResult[interp.range])
-                normalized.removeFirst()
+                let normalized = normalizeInterpolation(encodedResult[interp.range], withQuotationMarks: false)
                 interpolation = normalized
                 if !range.contains(interp.range.upperBound) {
                     endIndex = encodedResult.index(before: interp.range.lowerBound)
@@ -240,7 +242,6 @@ extension HTMLKitUtilities {
                     i += encodedResult.distance(from: range.upperBound, to: interp.range.upperBound)
                 } else {
                     interpolation = nil
-                    normalized.removeLast()
                     slice.remove(at: interp.range.upperBound) // "
                     slice.replaceSubrange(interp.range, with: normalized)
                     slice.remove(at: slice.index(before: interp.range.lowerBound)) // "
@@ -262,9 +263,9 @@ extension HTMLKitUtilities {
                 string += interpolation
             } else {
                 string += slice
-                if let l = slice.last, let d = delimiter(l) {
-                    string += d
-                }
+            }
+            if let l = slice.last, let d = delimiter(l) {
+                string += d
             }
             chunks.append(string)
         }
