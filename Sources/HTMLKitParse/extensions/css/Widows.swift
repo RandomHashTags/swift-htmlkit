@@ -1,8 +1,9 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
-extension CSSStyle.Widows: HTMLParsable {
+/*
+extension Widows: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "inherit": self = .inherit
@@ -14,4 +15,4 @@ extension CSSStyle.Widows: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/

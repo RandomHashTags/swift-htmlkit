@@ -1,8 +1,9 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
-extension CSSStyle.Cursor: HTMLParsable {
+/*
+extension Cursor: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "alias": self = .alias
@@ -38,7 +39,7 @@ extension CSSStyle.Cursor: HTMLParsable {
         case "seResize": self = .seResize
         case "swResize": self = .swResize
         case "text": self = .text
-        case "urls": self = .urls(context.arrayString())
+        //case "urls": self = .urls(context.arrayString())
         case "verticalText": self = .verticalText
         case "wResize": self = .wResize
         case "wait": self = .wait
@@ -47,4 +48,4 @@ extension CSSStyle.Cursor: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/

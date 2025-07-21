@@ -1,5 +1,5 @@
 
-import HTMLAttributes
+import HTMLElements
 import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax

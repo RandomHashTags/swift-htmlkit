@@ -1,8 +1,9 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
-extension CSSStyle.Zoom: HTMLParsable {
+/*
+extension Zoom: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "float": self = .float(context.float())
@@ -17,4 +18,4 @@ extension CSSStyle.Zoom: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/

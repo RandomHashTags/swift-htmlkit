@@ -1,8 +1,9 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
-extension CSSStyle.Opacity: HTMLParsable {
+/*
+extension Opacity: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "float": self = .float(context.float())
@@ -15,4 +16,4 @@ extension CSSStyle.Opacity: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/

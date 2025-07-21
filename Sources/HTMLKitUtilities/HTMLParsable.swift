@@ -8,7 +8,14 @@ public protocol HTMLParsable: HTMLInitializable {
 #if canImport(SwiftSyntax)
 extension HTMLParsable where Self: RawRepresentable, RawValue == String {
     public init?(context: HTMLExpansionContext) {
-        guard let value:Self = .init(rawValue: context.key) else { return nil }
+        guard let value = Self(rawValue: context.key) else { return nil }
+        self = value
+    }
+}
+
+extension HTMLParsable where Self: RawRepresentable, RawValue == Bool {
+    public init?(context: HTMLExpansionContext) {
+        guard let value = Self(rawValue: true) else { return nil } // TODO: fix?
         self = value
     }
 }

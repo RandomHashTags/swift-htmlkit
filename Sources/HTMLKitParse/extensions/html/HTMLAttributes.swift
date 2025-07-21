@@ -10,9 +10,9 @@ extension HTMLAttribute: HTMLParsable {
         func string() -> String? { context.string() }
         switch context.key {
         case "accesskey":             self = .accesskey(string())
-        case "ariaattribute":         self = .ariaattribute(enumeration())
-        case "role":                  self = .role(enumeration())
-        case "autocapitalize":        self = .autocapitalize(enumeration())
+        //case "ariaattribute":         self = .ariaattribute(enumeration())
+        //case "role":                  self = .role(enumeration())
+        //case "autocapitalize":        self = .autocapitalize(enumeration())
         case "autofocus":             self = .autofocus(boolean())
         case "class":                 self = .class(arrayString())
         case "contenteditable":       self = .contenteditable(enumeration())
@@ -54,7 +54,7 @@ extension HTMLAttribute: HTMLParsable {
 
         case "tabindex":              self = .tabindex(context.int())
         case "title":                 self = .title(string())
-        case "translate":             self = .translate(enumeration())
+        //case "translate":             self = .translate(enumeration())
         case "virtualkeyboardpolicy": self = .virtualkeyboardpolicy(enumeration())
         case "writingsuggestions":    self = .writingsuggestions(enumeration())
         case "trailingSlash":         self = .trailingSlash

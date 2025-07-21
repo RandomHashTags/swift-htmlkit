@@ -19,7 +19,10 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1")
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
+
+        .package(url: "https://github.com/coenttb/swift-html-types", branch: "main"),
+        .package(url: "https://github.com/coenttb/swift-css-types", branch: "main")
     ],
     targets: [
         .macro(
@@ -43,15 +46,6 @@ let package = Package(
         ),
 
         .target(
-            name: "CSS",
-            dependencies: [
-                "HTMLKitUtilities",
-                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
-            ]
-        ),
-        .target(
             name: "HTMX",
             dependencies: [
                 "HTMLKitUtilities",
@@ -64,7 +58,8 @@ let package = Package(
         .target(
             name: "HTMLAttributes",
             dependencies: [
-                "CSS",
+                .product(name: "HTMLAttributeTypes", package: "swift-html-types"),
+                .product(name: "CSSTypes", package: "swift-css-types"),
                 "HTMX",
                 "HTMLKitUtilities",
                 .product(name: "SwiftDiagnostics", package: "swift-syntax"),
@@ -77,8 +72,9 @@ let package = Package(
             name: "HTMLElements",
             dependencies: [
                 "HTMLKitUtilities",
+                .product(name: "HTMLElementTypes", package: "swift-html-types"),
                 "HTMLAttributes",
-                "CSS",
+                .product(name: "CSSTypes", package: "swift-css-types"),
                 "HTMX"
             ]
         ),
@@ -104,7 +100,7 @@ let package = Package(
         .target(
             name: "HTMLKit",
             dependencies: [
-                "CSS",
+                .product(name: "CSSTypes", package: "swift-css-types"),
                 "HTMLAttributes",
                 "HTMLElements",
                 "HTMLKitParse",

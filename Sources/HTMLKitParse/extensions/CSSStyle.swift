@@ -1,12 +1,13 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
-extension CSSStyle: HTMLParsable {
-    public init?(context: HTMLExpansionContext) {
+/*
+struct CSSStyle: HTMLParsable {
+    public static func parse(context: HTMLExpansionContext) -> CSSString? {
         func enumeration<T: HTMLParsable>() -> T? { context.enumeration() }
         switch context.key {
-        case "all": self = .all(enumeration())
+        case "all": self = All(enumeration())
         case "appearance": self = .appearance(enumeration())
 
         case "backfaceVisibility": self = .backfaceVisibility(enumeration())
@@ -48,4 +49,4 @@ extension CSSStyle: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/

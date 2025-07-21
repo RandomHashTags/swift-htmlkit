@@ -1,8 +1,9 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
-extension CSSStyle.ZIndex: HTMLParsable {
+/*
+extension ZIndex: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "auto": self = .auto
@@ -15,4 +16,4 @@ extension CSSStyle.ZIndex: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/

@@ -1,8 +1,9 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
-extension CSSStyle.Order: HTMLParsable {
+/*
+extension Order: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
         case "int": self = .int(context.int())
@@ -14,4 +15,4 @@ extension CSSStyle.Order: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/

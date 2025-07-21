@@ -378,11 +378,11 @@ string = #html(div(attributes: [.htmx(.ext("ws")), .htmx(.ws(.send(true)))]))
 
 - Libraries tested
   - [BinaryBuilds/swift-html](https://github.com/BinaryBirds/swift-html) v1.7.0 (patched version [here](https://github.com/RandomHashTags/fork-bb-swift-html))
-  - [sliemeobn/elementary](https://github.com/sliemeobn/elementary) v0.4.1
+  - [sliemeobn/elementary](https://github.com/sliemeobn/elementary) v0.5.3
   - [JohnSundell/Plot](https://github.com/JohnSundell/Plot) v0.14.0
   - [tayloraswift/swift-dom](https://github.com/tayloraswift/swift-dom) v1.1.0 (patched version [here](https://github.com/RandomHashTags/fork-swift-dom))
-  - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.10.0 (this library)
-  - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.4.1
+  - [RandomHashTags/swift-htmlkit](https://github.com/RandomHashTags/swift-htmlkit) v0.13.0 (this library)
+  - [pointfreeco/swift-html](https://github.com/pointfreeco/swift-html) v0.5.0
   - [robb/Swim](https://github.com/robb/Swim) v0.4.0
   - [vapor-community/HTMLKit](https://github.com/vapor-community/HTMLKit) v2.8.1
   - [dokun1/Vaux](https://github.com/dokun1/Vaux) v0.2.0 (patched version [here](https://github.com/RandomHashTags/fork-Vaux); custom renderer [here](https://github.com/RandomHashTags/swift-htmlkit/blob/main/Benchmarks/Benchmarks/Vaux/Vaux.swift))
@@ -391,8 +391,9 @@ Test machine:
 - CPU: 7800x3D
 - RAM: 32GB DDR5
 - Storage: 1TB NVME (661.2 GiB free space)
-- OS: Arch Linux 6.11.9-arch1-1
-- Swift: 6.0.2, Swift 6 compiler
+- OS: Arch Linux 6.15.6-arch1-1
+- Swift tools version: 5.10
+- Swift: 6.1.2
 
 Benchmark command: `swift package --allow-writing-to-package-directory benchmark --target Benchmarks --metric throughput --format jmh`
 

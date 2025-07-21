@@ -1,6 +1,10 @@
 
-#if canImport(CSS)
-import CSS
+#if canImport(CSSTypes)
+import CSSTypes
+#endif
+
+#if canImport(HTMLAttributeTypes)
+@_exported import HTMLAttributeTypes
 #endif
 
 #if canImport(HTMLKitUtilities)
@@ -15,22 +19,22 @@ import HTMX
 public enum HTMLAttribute: HTMLInitializable {
     case accesskey(String? = nil)
 
-    case ariaattribute(Extra.ariaattribute? = nil)
-    case role(Extra.ariarole? = nil)
+    //case ariaattribute(AriaAttribute? = nil)
+    //case role(AriaRole? = nil)
 
-    case autocapitalize(Extra.autocapitalize? = nil)
+    //case autocapitalize(AutoCapitalize? = nil)
     case autofocus(Bool? = false)
     case `class`([String]? = nil)
-    case contenteditable(Extra.contenteditable? = nil)
+    case contenteditable(Contenteditable? = nil)
     case data(_ id: String, _ value: String? = nil)
-    case dir(Extra.dir? = nil)
-    case draggable(Extra.draggable? = nil)
-    case enterkeyhint(Extra.enterkeyhint? = nil)
+    case dir(Dir? = nil)
+    case draggable(Draggable? = nil)
+    case enterkeyhint(Enterkeyhint? = nil)
     case exportparts([String]? = nil)
-    case hidden(Extra.hidden? = nil)
+    case hidden(Hidden? = nil)
     case id(String? = nil)
     case inert(Bool? = false)
-    case inputmode(Extra.inputmode? = nil)
+    case inputmode(Inputmode? = nil)
     case `is`(String? = nil)
     case itemid(String? = nil)
     case itemprop(String? = nil)
@@ -40,9 +44,9 @@ public enum HTMLAttribute: HTMLInitializable {
     case lang(String? = nil)
     case nonce(String? = nil)
     case part([String]? = nil)
-    case popover(Extra.popover? = nil)
+    case popover(Popover? = nil)
     case slot(String? = nil)
-    case spellcheck(Extra.spellcheck? = nil)
+    case spellcheck(Spellcheck? = nil)
 
     /*#if canImport(CSS)
     case style([CSSStyle]? = nil)
@@ -52,9 +56,9 @@ public enum HTMLAttribute: HTMLInitializable {
 
     case tabindex(Int? = nil)
     case title(String? = nil)
-    case translate(Extra.translate? = nil)
-    case virtualkeyboardpolicy(Extra.virtualkeyboardpolicy? = nil)
-    case writingsuggestions(Extra.writingsuggestions? = nil)
+    //case translate(Translate? = nil)
+    case virtualkeyboardpolicy(Virtualkeyboardpolicy? = nil)
+    case writingsuggestions(Writingsuggestions? = nil)
 
     /// This attribute adds a space and forward slash character (" /") before closing a void element tag, and does nothing to a non-void element.
     /// 
@@ -75,11 +79,11 @@ public enum HTMLAttribute: HTMLInitializable {
     public var key: String {
         switch self {
         case .accesskey:             return "accesskey"
-        case .ariaattribute(let value):
-            guard let value else { return "" }
-            return "aria-" + value.key
-        case .role:                  return "role"
-        case .autocapitalize:        return "autocapitalize"
+        //case .ariaattribute(let value):
+        //    guard let value else { return "" }
+        //    return "aria-" + value.key
+        //case .role:                  return "role"
+        //case .autocapitalize:        return "autocapitalize"
         case .autofocus:             return "autofocus"
         case .class:                 return "class"
         case .contenteditable:       return "contenteditable"
@@ -107,7 +111,7 @@ public enum HTMLAttribute: HTMLInitializable {
         case .style:                 return "style"
         case .tabindex:              return "tabindex"
         case .title:                 return "title"
-        case .translate:             return "translate"
+        //case .translate:             return "translate"
         case .virtualkeyboardpolicy: return "virtualkeyboardpolicy"
         case .writingsuggestions:    return "writingsuggestions"
 
@@ -135,9 +139,9 @@ public enum HTMLAttribute: HTMLInitializable {
     public func htmlValue(encoding: HTMLEncoding, forMacro: Bool) -> String? {
         switch self {
         case .accesskey(let value):             return value
-        case .ariaattribute(let value):         return value?.htmlValue(encoding: encoding, forMacro: forMacro)
-        case .role(let value):                  return value?.rawValue
-        case .autocapitalize(let value):        return value?.rawValue
+        //case .ariaattribute(let value):         return value?.htmlValue(encoding: encoding, forMacro: forMacro)
+        //case .role(let value):                  return value?.rawValue
+        //case .autocapitalize(let value):        return value?.rawValue
         case .autofocus(let value):             return value == true ? "" : nil
         case .class(let value):                 return value?.joined(separator: " ")
         case .contenteditable(let value):       return value?.htmlValue(encoding: encoding, forMacro: forMacro)
@@ -161,7 +165,7 @@ public enum HTMLAttribute: HTMLInitializable {
         case .part(let value):                  return value?.joined(separator: " ")
         case .popover(let value):               return value?.rawValue
         case .slot(let value):                  return value
-        case .spellcheck(let value):            return value?.rawValue
+        case .spellcheck(let value):            return value?.rawValue.description
 
         /*#if canImport(CSS)
         case .style(let value):                 return value?.compactMap({ $0.htmlValue(encoding: encoding, forMacro: forMacro) }).joined(separator: ";")
@@ -171,7 +175,7 @@ public enum HTMLAttribute: HTMLInitializable {
         
         case .tabindex(let value):              return value?.description
         case .title(let value):                 return value
-        case .translate(let value):             return value?.rawValue
+        //case .translate(let value):             return value?.rawValue
         case .virtualkeyboardpolicy(let value): return value?.rawValue
         case .writingsuggestions(let value):    return value?.rawValue
 

@@ -1,7 +1,6 @@
 
-import HTMLAttributes
 import HTMLKitUtilities
-
+/*
 extension HTMLAttribute.Extra.ariaattribute: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         func arrayString() -> [String]? { context.arrayString() }
@@ -67,4 +66,4 @@ extension HTMLAttribute.Extra.ariaattribute: HTMLParsable {
         default:                       return nil
         }
     }
-}
+}*/

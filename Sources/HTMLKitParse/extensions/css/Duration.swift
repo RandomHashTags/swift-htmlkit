@@ -1,7 +1,8 @@
 
-import CSS
+import CSSTypes
 import HTMLKitUtilities
 
+/*
 extension CSSStyle.Duration: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
@@ -17,4 +18,4 @@ extension CSSStyle.Duration: HTMLParsable {
         default: return nil
         }
     }
-}
+}*/
