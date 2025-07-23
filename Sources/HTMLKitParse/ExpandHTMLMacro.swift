@@ -228,22 +228,23 @@ extension HTMLExpansionResultTypeAST {
                 endingIndex += 1
                 offset = 1
             }
-            var endIndex = encodedResult.index(encodedResult.startIndex, offsetBy: endingIndex, limitedBy: encodedResult.endIndex) ?? encodedResult.endIndex
-            let range = encodedResult.index(encodedResult.startIndex, offsetBy: i)..<endIndex
-            var slice = encodedResult[range]
+            let sliceStartIndex = encodedResult.index(encodedResult.startIndex, offsetBy: i)
+            var sliceEndIndex = encodedResult.index(encodedResult.startIndex, offsetBy: endingIndex, limitedBy: encodedResult.endIndex) ?? encodedResult.endIndex
+            let sliceRange = sliceStartIndex..<sliceEndIndex
+            var slice = encodedResult[sliceRange]
             var interpolation:String? = nil
-            if let interp = interpolationMatches.first, range.contains(interp.range.lowerBound) { // chunk contains interpolation
+            if let interp = interpolationMatches.first, sliceRange.contains(interp.range.lowerBound) { // chunk contains interpolation
                 var normalized = normalizeInterpolation(encodedResult[interp.range], withQuotationMarks: false)
-                if !range.contains(interp.range.upperBound) {
-                    endIndex = encodedResult.index(before: interp.range.lowerBound)
-                    if slice.startIndex < endIndex {
-                        slice = slice[slice.startIndex..<endIndex]
+                if !sliceRange.contains(interp.range.upperBound) { // interpolation literal is cut short
+                    sliceEndIndex = encodedResult.index(before: interp.range.lowerBound)
+                    if sliceStartIndex < sliceEndIndex {
+                        slice = slice[sliceStartIndex..<sliceEndIndex]
                     } else {
                         slice = ""
                         normalized = "\"\(normalized)\""
                     }
                     interpolation = normalized
-                    i += encodedResult.distance(from: range.upperBound, to: interp.range.upperBound)
+                    i = encodedResult.distance(from: encodedResult.startIndex, to: interp.range.upperBound) + 1
                 } else {
                     interpolation = nil
                     slice.remove(at: interp.range.upperBound) // "
@@ -251,10 +252,16 @@ extension HTMLExpansionResultTypeAST {
                     slice.remove(at: slice.index(before: interp.range.lowerBound)) // "
                 }
                 interpolationMatches.removeFirst()
+                if slice == "\"" && interpolation != nil {
+                    slice = ""
+                    interpolation = "\"\(interpolation!)\""
+                }
             } else {
                 interpolation = nil
             }
-            i += chunkSize + offset
+            if interpolation == nil {
+                i += chunkSize + offset
+            }
             if slice.isEmpty && interpolation == nil || encoding == .string && slice.count == 1 && slice[slice.startIndex] == "\"" {
                 continue
             }

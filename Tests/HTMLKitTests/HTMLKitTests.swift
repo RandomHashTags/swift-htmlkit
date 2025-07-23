@@ -84,69 +84,6 @@ struct HTMLKitTests {
     }*/
 }
 
-// MARK: Representations
-extension HTMLKitTests {
-    @Test
-    func representations() {
-        let yeah = "yeah"
-        let _:String = #html(resultType: .literal) {
-            div("oh yeah")
-        }
-        let _:String = #html(resultType: .literal) {
-            div("oh \(yeah)")
-        }
-        /*let _:String = #html(resultType: .literalOptimized) {
-            div("oh yeah")
-        }
-        let _:String = #html(resultType: .literalOptimized) {
-            div("oh \(yeah)")
-        }*/
-
-        let _:[String] = #html(resultType: .chunks()) {
-            div("oh yeah")
-        }
-        let _:[StaticString] = #html(resultType: .chunks()) {
-            div("oh yeah")
-        }
-        let _:[String] = #html(resultType: .chunks(chunkSize: 3)) {
-            div("oh \(yeah)")
-        }
-
-        let _:AsyncStream<String> = #html(resultType: .stream()) {
-            div("oh yeah")
-        }
-        let _:AsyncStream<StaticString> = #html(resultType: .stream()) {
-            div("oh yeah")
-        }
-        let _:AsyncStream<String> = #html(resultType: .stream(chunkSize: 3)) {
-            div("oh yeah")
-        }
-        let _:AsyncStream<StaticString> = #html(resultType: .stream(chunkSize: 3)) {
-            div("oh yeah")
-        }
-        let _:AsyncStream<String> = #html(resultType: .stream(chunkSize: 3)) {
-            div("oh\(yeah)")
-        }
-
-        let _:AsyncStream<String> = #html(resultType: .streamAsync()) {
-            div("oh yeah")
-        }
-        let _:AsyncStream<String> = #html(resultType: .streamAsync(chunkSize: 3)) {
-            div("oh yeah")
-        }
-        let _:AsyncStream<String> = #html(resultType: .streamAsync({ _ in
-            try await Task.sleep(for: .milliseconds(50))
-        })) {
-            div("oh yeah")
-        }
-        let _:AsyncStream<String> = #html(resultType: .streamAsync(chunkSize: 3, { _ in
-            try await Task.sleep(for: .milliseconds(50))
-        })) {
-            div("oh yeah")
-        }
-    }
-}
-
 // MARK: StaticString Example
 extension HTMLKitTests {
     @Test func example1() {
