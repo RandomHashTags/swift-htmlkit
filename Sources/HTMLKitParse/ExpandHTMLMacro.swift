@@ -7,8 +7,8 @@ extension HTMLKitUtilities {
     public static func expandHTMLMacro(context: HTMLExpansionContext) throws -> ExprSyntax {
         var context = context
         let (string, encoding) = expandMacro(context: &context)
-        let encodingResult = encodingResult(context: context, node: context.expansion, string: string, for: encoding)
-        let expandedResult = representationResult(encoding: encoding, encodedResult: encodingResult, resultType: context.resultType)
+        let encodingResult = encoding.result(context: context, node: context.expansion, string: string)
+        let expandedResult = context.resultType.result(encoding: encoding, encodedResult: encodingResult)
         return "\(raw: expandedResult)"
     }
 
@@ -24,14 +24,13 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Encoding result
-extension HTMLKitUtilities {
-    static func encodingResult(
+extension HTMLEncoding {
+    public func result(
         context: HTMLExpansionContext,
         node: MacroExpansionExprSyntax,
-        string: String,
-        for encoding: HTMLEncoding
+        string: String
     ) -> String {
-        switch encoding {
+        switch self {
         case .utf8Bytes:
             guard hasNoInterpolation(context, node, string) else { return "" }
             return bytes([UInt8](string.utf8))
@@ -56,7 +55,7 @@ extension HTMLKitUtilities {
             return encoded.replacingOccurrences(of: "$0", with: string)
         }
     }
-    private static func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
+    private func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
         var string = "["
         for b in bytes {
             string += "\(b),"
@@ -64,7 +63,7 @@ extension HTMLKitUtilities {
         string.removeLast()
         return string.isEmpty ? "[]" : string + "]"
     }
-    private static func hasNoInterpolation(_ context: HTMLExpansionContext, _ node: MacroExpansionExprSyntax, _ string: String) -> Bool {
+    private func hasNoInterpolation(_ context: HTMLExpansionContext, _ node: MacroExpansionExprSyntax, _ string: String) -> Bool {
         guard string.firstRange(of: try! Regex("\\((.*)\\)")) == nil else {
             if !context.ignoresCompilerWarnings {
                 context.diagnose(Diagnostic(node: node, message: DiagnosticMsg(id: "interpolationNotAllowedForDataType", message: "String Interpolation is not allowed for this data type. Runtime values get converted to raw text, which is not the intended result.")))
@@ -76,13 +75,12 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Representation results
-extension HTMLKitUtilities {
-    static func representationResult(
+extension HTMLExpansionResultTypeAST {
+    public func result(
         encoding: HTMLEncoding,
-        encodedResult: String,
-        resultType: HTMLExpansionResultTypeAST
+        encodedResult: String
     ) -> String {
-        switch resultType {
+        switch self {
         case .literal:
             if encoding == .string {
                 return literal(encodedResult: encodedResult)
@@ -94,12 +92,13 @@ extension HTMLKitUtilities {
                 // TODO: show compiler diagnostic
             }*/
         case .chunks(let optimized, let chunkSize):
-            return "[" + chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ", ") + "]"
+            let slices = chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ",\n")
+            return "[" + (slices.isEmpty ? "" : "\n\(slices)\n") + "]"
         #if compiler(>=6.2)
         case .chunksInline(let optimized, let chunkSize):
             let typeAnnotation:String = "String" // TODO: fix
-            let chunks = chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ", ")
-            return "InlineArray<\(chunks.count), \(typeAnnotation)>([\(chunks)])"
+            let slices = chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ",\n")
+            return "InlineArray<\(chunks.count), \(typeAnnotation)>([" + (slices.isEmpty ? "" : "\n\(slices)\n") + "])"
         #endif
         case .stream(let optimized, let chunkSize):
             return streamed(
@@ -129,11 +128,11 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Literal
-extension HTMLKitUtilities {
-    static var interpolationRegex: Regex<AnyRegexOutput> {
+extension HTMLExpansionResultTypeAST {
+    public var interpolationRegex: Regex<AnyRegexOutput> {
         try! Regex.init(#"( \+ String\(describing: [\x00-\x2A\x2C-\xFF]+\) \+ )"#)
     }
-    static func literal(encodedResult: String) -> String {
+    public func literal(encodedResult: String) -> String {
         var interpolation = encodedResult.matches(of: interpolationRegex)
         guard !interpolation.isEmpty else {
             return encodedResult
@@ -170,8 +169,8 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Optimized literal
-extension HTMLKitUtilities {
-    static func optimizedLiteral(encodedResult: String) -> String {
+extension HTMLExpansionResultTypeAST {
+    public func optimizedLiteral(encodedResult: String) -> String {
         var interpolation = encodedResult.matches(of: interpolationRegex)
         guard !interpolation.isEmpty else {
             return encodedResult
@@ -195,7 +194,7 @@ extension HTMLKitUtilities {
         }
         return "HTMLOptimizedLiteral(reserveCapacity: \(reserveCapacity)).render((\n\(values.joined(separator: ",\n"))\n))"
     }
-    static func normalizeInterpolation(_ value: Substring, withQuotationMarks: Bool) -> String {
+    public func normalizeInterpolation(_ value: Substring, withQuotationMarks: Bool) -> String {
         var value = value
         value.removeFirst(22) // ` + String(describing: `.count
         value.removeLast(3) // ` + `.count
@@ -209,8 +208,8 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Chunks
-extension HTMLKitUtilities {
-    static func chunks(
+extension HTMLExpansionResultTypeAST {
+    public func chunks(
         encoding: HTMLEncoding,
         encodedResult: String,
         async: Bool,
@@ -279,8 +278,8 @@ extension HTMLKitUtilities {
 }
 
 // MARK: Streamed
-extension HTMLKitUtilities {
-    static func streamed(
+extension HTMLExpansionResultTypeAST {
+    public func streamed(
         encoding: HTMLEncoding,
         encodedResult: String,
         async: Bool,

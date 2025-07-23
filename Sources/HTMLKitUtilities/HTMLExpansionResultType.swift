@@ -45,7 +45,7 @@ public enum HTMLExpansionResultType: Sendable {
     ///   - optimized: Whether or not to use optimized literals. Default is `true`.
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
     /// - Returns: An `AsyncStream` of encoded literals of length up-to `chunkSize`.
-    /// - Warning: The values are yielded synchronously.
+    /// - Warning: The values are yielded immediately.
     case stream(
         optimized: Bool = true,
         chunkSize: Int = 1024
@@ -58,7 +58,7 @@ public enum HTMLExpansionResultType: Sendable {
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
     ///   - afterYield: Work to execute after yielding a result. The `Int` closure parameter is the index of the yielded result.
     /// - Returns: An `AsyncStream` of encoded literals of length up-to `chunkSize`.
-    /// - Warning: The values are yielded synchronously in a new `Task`. Populate `afterYield` with async work to make it completely asynchronous.
+    /// - Warning: The values are yielded immediately in a new `Task`. Populate `afterYield` with async work to make it yield asynchronously.
     case streamAsync(
         optimized: Bool = true,
         chunkSize: Int = 1024,

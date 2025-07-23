@@ -26,9 +26,9 @@ extension HTMLKitUtilities {
                 context.key = key
                 switch key {
                 case "encoding":
-                    context.encoding = parseEncoding(expr: child.expression) ?? .string
+                    context.encoding = .parse(expr: child.expression) ?? .string
                 case "resultType":
-                    context.resultType = parseRepresentation(expr: child.expression) ?? .literal
+                    context.resultType = .parse(expr: child.expression) ?? .literal
                 case "lookupFiles":
                     guard let array = child.expression.array?.elements else {
                         context.diagnose(DiagnosticMsg.expectedArrayExpr(expr: child.expression))

@@ -38,8 +38,8 @@ extension HTMLKitUtilities {
             guard let child = e.labeled else { continue }
             if let key = child.label?.text {
                 switch key {
-                case "encoding": context.encoding = parseEncoding(expr: child.expression) ?? .string
-                case "resultType": context.resultType = parseRepresentation(expr: child.expression) ?? .literal
+                case "encoding": context.encoding = .parse(expr: child.expression) ?? .string
+                case "resultType": context.resultType = .parse(expr: child.expression) ?? .literal
                 case "minify": context.minify = child.expression.boolean(context) ?? false
                 default: break
                 }
@@ -57,9 +57,11 @@ extension HTMLKitUtilities {
         innerHTML.replace(HTMLKitUtilities.lineFeedPlaceholder, with: "\\n")
         return innerHTML
     }
+}
 
-    // MARK: Parse Encoding
-    public static func parseEncoding(expr: some ExprSyntaxProtocol) -> HTMLEncoding? {
+// MARK: Parse encoding
+extension HTMLEncoding {
+    public static func parse(expr: some ExprSyntaxProtocol) -> HTMLEncoding? {
         switch expr.kind {
         case .memberAccessExpr:
             return HTMLEncoding(rawValue: expr.memberAccess!.declName.baseName.text)
@@ -82,9 +84,11 @@ extension HTMLKitUtilities {
             return nil
         }
     }
+}
 
-    // MARK: Parse Representation
-    public static func parseRepresentation(expr: ExprSyntax) -> HTMLExpansionResultTypeAST? {
+// MARK: Parse result type
+extension HTMLExpansionResultTypeAST {
+    public static func parse(expr: some ExprSyntaxProtocol) -> Self? {
         switch expr.kind {
         case .memberAccessExpr:
             switch expr.memberAccess!.declName.baseName.text {
