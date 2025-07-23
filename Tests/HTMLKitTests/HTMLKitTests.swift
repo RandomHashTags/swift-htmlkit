@@ -124,9 +124,9 @@ extension HTMLKitTests {
         let _:AsyncStream<StaticString> = #html(resultType: .stream(chunkSize: 3)) {
             div("oh yeah")
         }
-        /*let _:AsyncStream<String> = #html(resultType: .stream(chunkSize: 3)) {
-            div("oh\(yeah)") // TODO: fix
-        }*/
+        let _:AsyncStream<String> = #html(resultType: .stream(chunkSize: 3)) {
+            div("oh\(yeah)")
+        }
 
         let _:AsyncStream<String> = #html(resultType: .streamAsync()) {
             div("oh yeah")
