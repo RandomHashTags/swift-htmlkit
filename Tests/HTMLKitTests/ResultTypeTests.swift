@@ -56,7 +56,7 @@ extension ResultTypeTests {
         var chunks:[String] = #html(resultType: .chunks()) {
             div("oh yeah")
         }
-        #expect(chunks == [expected])//
+        #expect(chunks == [expected])
 
         chunks = #html(resultType: .chunks(chunkSize: 3)) {
             div("oh \(yeah)")

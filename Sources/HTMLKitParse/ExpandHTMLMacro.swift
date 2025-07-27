@@ -55,7 +55,7 @@ extension HTMLEncoding {
             return encoded.replacingOccurrences(of: "$0", with: string)
         }
     }
-    private func bytes<T: FixedWidthInteger>(_ bytes: [T]) -> String {
+    private func bytes(_ bytes: [some FixedWidthInteger]) -> String {
         var string = "["
         for b in bytes {
             string += "\(b),"

@@ -26,7 +26,7 @@ public struct HTMLOptimizedLiteral<each Literal: TextOutputStreamable> {
 
 extension StaticString: @retroactive TextOutputStreamable {
     @inlinable
-    public func write<Target: TextOutputStream>(to target: inout Target) {
+    public func write(to target: inout some TextOutputStream) {
         self.withUTF8Buffer { buffer in
             target.write(String(decoding: buffer, as: UTF8.self))
         }

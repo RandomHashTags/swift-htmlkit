@@ -16,7 +16,7 @@ extension HTMLInitializable {
     @inlinable
     public func unwrap<T>(_ value: T?, suffix: String? = nil) -> String? {
         guard let value else { return nil }
-        return "\(value)" + (suffix ?? "")
+        return "\(value)\(suffix ?? "")"
     }
 
     @inlinable
