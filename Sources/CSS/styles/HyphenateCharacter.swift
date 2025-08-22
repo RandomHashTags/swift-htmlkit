@@ -2,15 +2,11 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum HyphenateCharacter: HTMLParsable {
+    public enum HyphenateCharacter: HTMLInitializable {
         case auto
         case char(Character)
         case inherit
         case initial
-
-        public init?(context: HTMLExpansionContext) {
-            return nil
-        }
 
         public var key: String {
             switch self {

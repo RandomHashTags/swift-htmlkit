@@ -2,7 +2,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ImageRendering: String, HTMLParsable {
+    public enum ImageRendering: String, HTMLInitializable {
         case auto
         case crispEdges
         case highQuality

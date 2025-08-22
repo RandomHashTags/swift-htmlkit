@@ -13,10 +13,8 @@ let package = Package(
         .watchOS(.v9)
     ],
     products: [
-        .library(
-            name: "HTMLKit",
-            targets: ["HTMLKit"]
-        )
+        .library(name: "HTMLKit",  targets: ["HTMLKit"]),
+        .library(name: "HTMLKitParse", targets: ["HTMLKitParse"])
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1")
@@ -35,29 +33,20 @@ let package = Package(
         .target(
             name: "HTMLKitUtilities",
             dependencies: [
-                "HTMLKitUtilityMacros",
-                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
+                "HTMLKitUtilityMacros"
             ]
         ),
 
         .target(
             name: "CSS",
             dependencies: [
-                "HTMLKitUtilities",
-                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
+                "HTMLKitUtilities"
             ]
         ),
         .target(
             name: "HTMX",
             dependencies: [
-                "HTMLKitUtilities",
-                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
+                "HTMLKitUtilities"
             ]
         ),
 
@@ -66,10 +55,7 @@ let package = Package(
             dependencies: [
                 "CSS",
                 "HTMX",
-                "HTMLKitUtilities",
-                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
+                "HTMLKitUtilities"
             ]
         ),
 
@@ -86,7 +72,14 @@ let package = Package(
         .target(
             name: "HTMLKitParse",
             dependencies: [
-                "HTMLElements"
+                "CSS",
+                "HTMLAttributes",
+                "HTMLElements",
+                "HTMLKitUtilities",
+                "HTMX",
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax")
             ]
         ),
 
@@ -107,7 +100,6 @@ let package = Package(
                 "CSS",
                 "HTMLAttributes",
                 "HTMLElements",
-                "HTMLKitParse",
                 "HTMLKitUtilities",
                 "HTMLKitMacros",
                 "HTMX"

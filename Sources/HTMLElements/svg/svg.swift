@@ -5,6 +5,7 @@ import HTMLKitUtilities
 // MARK: svg
 /// The `svg` HTML element.
 // TODO: finish
+/*
 struct svg: HTMLElement {
     public static let otherAttributes:[String:String] = [:]
     
@@ -100,4 +101,4 @@ extension svg {
             case slice
         }
     }
-}
+}*/

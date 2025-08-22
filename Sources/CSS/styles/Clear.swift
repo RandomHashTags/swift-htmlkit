@@ -2,7 +2,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Clear: String, HTMLParsable {
+    public enum Clear: String, HTMLInitializable {
         case both
         case inherit
         case initial

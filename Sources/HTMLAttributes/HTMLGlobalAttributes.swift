@@ -11,10 +11,6 @@ import HTMLKitUtilities
 import HTMX
 #endif
 
-#if canImport(SwiftSyntax)
-import SwiftSyntax
-#endif
-
 // MARK: HTMLGlobalAttributes
 // TODO: finish
 struct HTMLGlobalAttributes: CustomStringConvertible {

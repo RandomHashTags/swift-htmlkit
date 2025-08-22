@@ -5,12 +5,12 @@ import HTMLKitUtilities
 
 extension HTMXAttribute {
     // MARK: TrueOrFalse
-    public enum TrueOrFalse: String, HTMLParsable {
+    public enum TrueOrFalse: String, HTMLInitializable {
         case `true`, `false`
     }
 
     // MARK: Event
-    public enum Event: String, HTMLParsable {
+    public enum Event: String, HTMLInitializable {
         case abort
         case afterOnLoad
         case afterProcessNode
@@ -142,7 +142,7 @@ extension HTMXAttribute {
     }
 
     // MARK: Swap
-    public enum Swap: String, HTMLParsable {
+    public enum Swap: String, HTMLInitializable {
         case innerHTML, outerHTML
         case textContent
         case beforebegin, afterbegin
@@ -155,7 +155,7 @@ extension HTMXAttribute {
         case drop, abort, replace
         case queue(Queue?)
 
-        public enum Queue: String, HTMLParsable {
+        public enum Queue: String, HTMLInitializable {
             case first, last, all
         }
 
@@ -181,20 +181,9 @@ extension HTMXAttribute {
     }
 
     // MARK: URL
-    public enum URL: HTMLParsable {
+    public enum URL: HTMLInitializable {
         case `true`, `false`
         case url(String)
-        
-        #if canImport(SwiftSyntax)
-        public init?(context: HTMLExpansionContext) {
-            switch context.key {
-            case "true": self = .true
-            case "false": self = .false
-            case "url": self = .url(context.expression!.stringLiteral!.string(encoding: context.encoding))
-            default: return nil
-            }
-        }
-        #endif
 
         @inlinable
         public var key: String {

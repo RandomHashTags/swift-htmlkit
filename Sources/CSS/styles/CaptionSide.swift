@@ -2,7 +2,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum CaptionSide: String, HTMLParsable {
+    public enum CaptionSide: String, HTMLInitializable {
         case bottom
         case inherit
         case initial

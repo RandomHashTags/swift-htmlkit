@@ -3,7 +3,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/visibility
 extension CSSStyle {
-    public enum Visibility: String, HTMLParsable {
+    public enum Visibility: String, HTMLInitializable {
         case collapse
         case hidden
         case inherit

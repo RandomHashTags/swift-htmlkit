@@ -65,6 +65,9 @@ extension HTMXAttribute: HTMLParsable {
     }
 }
 
+// MARK: Event
+extension HTMXAttribute.Event: HTMLParsable {}
+
 // MARK: Params
 extension HTMXAttribute.Params: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
@@ -78,7 +81,11 @@ extension HTMXAttribute.Params: HTMLParsable {
     }
 }
 
+// MARK: Swap
+extension HTMXAttribute.Swap: HTMLParsable {}
+
 // MARK: SyncStrategy
+extension HTMXAttribute.SyncStrategy.Queue: HTMLParsable {}
 extension HTMXAttribute.SyncStrategy: HTMLParsable {
     public init?(context: HTMLExpansionContext) {
         switch context.key {
@@ -99,6 +106,21 @@ extension HTMXAttribute.ServerSentEvents: HTMLParsable {
         case "connect": self = .connect(context.string())
         case "swap": self = .swap(context.string())
         case "close": self = .close(context.string())
+        default: return nil
+        }
+    }
+}
+
+// MARK: TrueOrFalse
+extension HTMXAttribute.TrueOrFalse: HTMLParsable {}
+
+// MARK: URL
+extension HTMXAttribute.URL: HTMLParsable {
+    public init?(context: HTMLExpansionContext) {
+        switch context.key {
+        case "true": self = .true
+        case "false": self = .false
+        case "url": self = .url(context.expression!.stringLiteral!.string(encoding: context.encoding))
         default: return nil
         }
     }

@@ -2,15 +2,11 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ColumnCount: HTMLParsable {
+    public enum ColumnCount: HTMLInitializable {
         case auto
         case inherit
         case initial
         case int(Int)
-
-        public init?(context: HTMLExpansionContext) {
-            return nil
-        }
 
         public var key: String {
             switch self {

@@ -1,9 +1,8 @@
 
-#if canImport(SwiftDiagnostics) && canImport(SwiftSyntax) && canImport(SwiftSyntaxMacros)
+import HTMLKitUtilities
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
-#endif
 
 /// Data required to process an HTML expansion.
 public struct HTMLExpansionContext: @unchecked Sendable {
@@ -63,16 +62,12 @@ public struct HTMLExpansionContext: @unchecked Sendable {
         self.elementsRequireEscaping = elementsRequireEscaping
     }
 
-    #if canImport(SwiftSyntax)
     /// First expression in the arguments.
     public var expression: ExprSyntax? {
         arguments.first?.expression
     }
-    #endif
 
-    #if canImport(SwiftDiagnostics)
     package func diagnose(_ msg: Diagnostic) {
         context.diagnose(msg)
     }
-    #endif
 }

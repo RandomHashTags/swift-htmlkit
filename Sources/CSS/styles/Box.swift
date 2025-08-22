@@ -2,7 +2,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum Box: String, HTMLParsable {
+    public enum Box: String, HTMLInitializable {
         case decorationBreak
         case reflect
         case shadow

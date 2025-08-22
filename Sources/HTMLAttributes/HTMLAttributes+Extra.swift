@@ -7,10 +7,6 @@ import CSS
 import HTMLKitUtilities
 #endif
 
-#if canImport(SwiftSyntax)
-import SwiftSyntax
-#endif
-
 // MARK: HTMLAttribute.Extra
 extension HTMLAttribute {
     public enum Extra {
@@ -73,86 +69,6 @@ extension HTMLAttribute {
         }
     }
 }
-
-#if canImport(SwiftSyntax)
-extension HTMLAttribute.Extra {
-    public static func parse(context: HTMLExpansionContext, expr: ExprSyntax) -> (any HTMLInitializable)? {
-        func get<T: HTMLParsable>(_ type: T.Type) -> T? {
-            let innerKey:String
-            let arguments:LabeledExprListSyntax
-            if let function = expr.functionCall {
-                if let ik = function.calledExpression.memberAccess?.declName.baseName.text {
-                    innerKey = ik
-                } else {
-                    return nil
-                }
-                arguments = function.arguments
-            } else if let member = expr.memberAccess {
-                innerKey = member.declName.baseName.text
-                arguments = LabeledExprListSyntax()
-            } else {
-                return nil
-            }
-            var c = context
-            c.key = innerKey
-            c.arguments = arguments
-            return T(context: c)
-        }
-        switch context.key {
-        case "as": return get(`as`.self)
-        case "autocapitalize": return get(autocapitalize.self)
-        case "autocomplete": return get(autocomplete.self)
-        case "autocorrect": return get(autocorrect.self)
-        case "blocking": return get(blocking.self)
-        case "buttontype": return get(buttontype.self)
-        case "capture": return get(capture.self)
-        case "command": return get(command.self)
-        case "contenteditable": return get(contenteditable.self)
-        case "controlslist": return get(controlslist.self)
-        case "crossorigin": return get(crossorigin.self)
-        case "decoding": return get(decoding.self)
-        case "dir": return get(dir.self)
-        case "dirname": return get(dirname.self)
-        case "draggable": return get(draggable.self)
-        case "download": return get(download.self)
-        case "enterkeyhint": return get(enterkeyhint.self)
-        case "event": return get(HTMLEvent.self)
-        case "fetchpriority": return get(fetchpriority.self)
-        case "formenctype": return get(formenctype.self)
-        case "formmethod": return get(formmethod.self)
-        case "formtarget": return get(formtarget.self)
-        case "hidden": return get(hidden.self)
-        case "httpequiv": return get(httpequiv.self)
-        case "inputmode": return get(inputmode.self)
-        case "inputtype": return get(inputtype.self)
-        case "kind": return get(kind.self)
-        case "loading": return get(loading.self)
-        case "numberingtype": return get(numberingtype.self)
-        case "popover": return get(popover.self)
-        case "popovertargetaction": return get(popovertargetaction.self)
-        case "preload": return get(preload.self)
-        case "referrerpolicy": return get(referrerpolicy.self)
-        case "rel": return get(rel.self)
-        case "sandbox": return get(sandbox.self)
-        case "scripttype": return get(scripttype.self)
-        case "scope": return get(scope.self)
-        case "shadowrootmode": return get(shadowrootmode.self)
-        case "shadowrootclonable": return get(shadowrootclonable.self)
-        case "shape": return get(shape.self)
-        case "spellcheck": return get(spellcheck.self)
-        case "target": return get(target.self)
-        case "translate": return get(translate.self)
-        case "virtualkeyboardpolicy": return get(virtualkeyboardpolicy.self)
-        case "wrap": return get(wrap.self)
-        case "writingsuggestions": return get(writingsuggestions.self)
-
-        case "width": return get(width.self)
-        case "height": return get(height.self)
-        default: return nil
-        }
-    }
-}
-#endif
 
 extension HTMLAttribute.Extra {
     public typealias height = CSSUnit
@@ -350,49 +266,49 @@ extension HTMLAttribute.Extra {
             }
         }
 
-        public enum Autocomplete: String, HTMLParsable {
+        public enum Autocomplete: String, HTMLInitializable {
             case none, inline, list, both
         }
-        public enum Checked: String, HTMLParsable {
+        public enum Checked: String, HTMLInitializable {
             case `false`, `true`, mixed, undefined
         }
-        public enum Current: String, HTMLParsable {
+        public enum Current: String, HTMLInitializable {
             case page, step, location, date, time, `true`, `false`
         }
-        public enum DropEffect: String, HTMLParsable {
+        public enum DropEffect: String, HTMLInitializable {
             case copy, execute, link, move, none, popup
         }
-        public enum Expanded: String, HTMLParsable {
+        public enum Expanded: String, HTMLInitializable {
             case `false`, `true`, undefined
         }
-        public enum Grabbed: String, HTMLParsable {
+        public enum Grabbed: String, HTMLInitializable {
             case `true`, `false`, undefined
         }
-        public enum HasPopup: String, HTMLParsable {
+        public enum HasPopup: String, HTMLInitializable {
             case `false`, `true`, menu, listbox, tree, grid, dialog
         }
-        public enum Hidden: String, HTMLParsable {
+        public enum Hidden: String, HTMLInitializable {
             case `false`, `true`, undefined
         }
-        public enum Invalid: String, HTMLParsable {
+        public enum Invalid: String, HTMLInitializable {
             case grammar, `false`, spelling, `true`
         }
-        public enum Live: String, HTMLParsable {
+        public enum Live: String, HTMLInitializable {
             case assertive, off, polite
         }
-        public enum Orientation: String, HTMLParsable {
+        public enum Orientation: String, HTMLInitializable {
             case horizontal, undefined, vertical
         }
-        public enum Pressed: String, HTMLParsable {
+        public enum Pressed: String, HTMLInitializable {
             case `false`, mixed, `true`, undefined
         }
-        public enum Relevant: String, HTMLParsable {
+        public enum Relevant: String, HTMLInitializable {
             case additions, all, removals, text
         }
-        public enum Selected: String, HTMLParsable {
+        public enum Selected: String, HTMLInitializable {
             case `true`, `false`, undefined
         }
-        public enum Sort: String, HTMLParsable {
+        public enum Sort: String, HTMLInitializable {
             case ascending, descending, none, other
         }
     }
@@ -409,7 +325,7 @@ extension HTMLAttribute.Extra {
     /// It is also important to test your authored ARIA with actual assistive technology. This is because browser emulators and simulators are not really effective for testing full support. Similarly, proxy assistive technology solutions are not sufficient to fully guarantee functionality.
     ///
     /// Learn more at https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA .
-    public enum ariarole: String, HTMLParsable {
+    public enum ariarole: String, HTMLInitializable {
         case alert, alertdialog
         case application
         case article
@@ -512,64 +428,50 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: as
-    public enum `as`: String, HTMLParsable {
+    public enum `as`: String, HTMLInitializable {
         case audio, document, embed, fetch, font, image, object, script, style, track, video, worker
     }
 
     // MARK: autocapitalize
-    public enum autocapitalize: String, HTMLParsable {
+    public enum autocapitalize: String, HTMLInitializable {
         case on, off
         case none
         case sentences, words, characters
     }
 
     // MARK: autocomplete
-    public enum autocomplete: String, HTMLParsable {
+    public enum autocomplete: String, HTMLInitializable {
         case off, on
     }
 
     // MARK: autocorrect
-    public enum autocorrect: String, HTMLParsable {
+    public enum autocorrect: String, HTMLInitializable {
         case off, on
     }
 
     // MARK: blocking
-    public enum blocking: String, HTMLParsable {
+    public enum blocking: String, HTMLInitializable {
         case render
     }
 
     // MARK: buttontype
-    public enum buttontype: String, HTMLParsable {
+    public enum buttontype: String, HTMLInitializable {
         case submit, reset, button
     }
 
     // MARK: capture
-    public enum capture: String, HTMLParsable{
+    public enum capture: String, HTMLInitializable {
         case user, environment
     }
 
     // MARK: command
-    public enum command: HTMLParsable {
+    public enum command: HTMLInitializable {
         case showModal
         case close
         case showPopover
         case hidePopover
         case togglePopover
         case custom(String)
-
-        #if canImport(SwiftSyntax)
-        public init?(context: HTMLExpansionContext) {
-            switch context.key {
-            case "showModal":     self = .showModal
-            case "close":         self = .close
-            case "showPopover":   self = .showPopover
-            case "hidePopover":   self = .hidePopover
-            case "togglePopover": self = .togglePopover
-            case "custom":        self = .custom(context.expression!.stringLiteral!.string(encoding: context.encoding))
-            default:              return nil
-            }
-        }
-        #endif
 
         @inlinable
         public var key: String {
@@ -597,7 +499,7 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: contenteditable
-    public enum contenteditable: String, HTMLParsable {
+    public enum contenteditable: String, HTMLInitializable {
         case `true`, `false`
         case plaintextOnly
 
@@ -611,12 +513,12 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: controlslist
-    public enum controlslist: String, HTMLParsable {
+    public enum controlslist: String, HTMLInitializable {
         case nodownload, nofullscreen, noremoteplayback
     }
 
     // MARK: crossorigin
-    public enum crossorigin: String, HTMLParsable {
+    public enum crossorigin: String, HTMLInitializable {
         case anonymous
         case useCredentials
 
@@ -630,39 +532,29 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: decoding
-    public enum decoding: String, HTMLParsable {
+    public enum decoding: String, HTMLInitializable {
         case sync, async, auto
     }
 
     // MARK: dir
-    public enum dir: String, HTMLParsable {
+    public enum dir: String, HTMLInitializable {
         case auto, ltr, rtl
     }
 
     // MARK: dirname
-    public enum dirname: String, HTMLParsable {
+    public enum dirname: String, HTMLInitializable {
         case ltr, rtl
     }
 
     // MARK: draggable
-    public enum draggable: String, HTMLParsable {
+    public enum draggable: String, HTMLInitializable {
         case `true`, `false`
     }
 
     // MARK: download
-    public enum download: HTMLParsable {
+    public enum download: HTMLInitializable {
         case empty
         case filename(String)
-
-        #if canImport(SwiftSyntax)
-        public init?(context: HTMLExpansionContext) {
-            switch context.key {
-            case "empty":    self = .empty
-            case "filename": self = .filename(context.expression!.stringLiteral!.string(encoding: context.encoding))
-            default:         return nil
-            }
-        }
-        #endif
 
         @inlinable
         public var key: String {
@@ -690,17 +582,17 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: enterkeyhint
-    public enum enterkeyhint: String, HTMLParsable {
+    public enum enterkeyhint: String, HTMLInitializable {
         case enter, done, go, next, previous, search, send
     }
 
     // MARK: fetchpriority
-    public enum fetchpriority: String, HTMLParsable {
+    public enum fetchpriority: String, HTMLInitializable {
         case high, low, auto
     }
 
     // MARK: formenctype
-    public enum formenctype: String, HTMLParsable {
+    public enum formenctype: String, HTMLInitializable {
         case applicationXWWWFormURLEncoded
         case multipartFormData
         case textPlain
@@ -716,17 +608,17 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: formmethod
-    public enum formmethod: String, HTMLParsable {
+    public enum formmethod: String, HTMLInitializable {
         case get, post, dialog
     }
 
     // MARK: formtarget
-    public enum formtarget: String, HTMLParsable {
+    public enum formtarget: String, HTMLInitializable {
         case _self, _blank, _parent, _top
     }
 
     // MARK: hidden
-    public enum hidden: String, HTMLParsable {
+    public enum hidden: String, HTMLInitializable {
         case `true`
         case untilFound
 
@@ -740,7 +632,7 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: httpequiv
-    public enum httpequiv: String, HTMLParsable {
+    public enum httpequiv: String, HTMLInitializable {
         case contentSecurityPolicy
         case contentType
         case defaultStyle
@@ -760,12 +652,12 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: inputmode
-    public enum inputmode: String, HTMLParsable {
+    public enum inputmode: String, HTMLInitializable {
         case none, text, decimal, numeric, tel, search, email, url
     }
     
     // MARK: inputtype
-    public enum inputtype: String, HTMLParsable {
+    public enum inputtype: String, HTMLInitializable {
         case button, checkbox, color, date
         case datetimeLocal
         case email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week
@@ -780,17 +672,17 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: kind
-    public enum kind: String, HTMLParsable {
+    public enum kind: String, HTMLInitializable {
         case subtitles, captions, chapters, metadata
     }
 
     // MARK: loading
-    public enum loading: String, HTMLParsable {
+    public enum loading: String, HTMLInitializable {
         case eager, lazy
     }
 
     // MARK: numberingtype
-    public enum numberingtype: String, HTMLParsable {
+    public enum numberingtype: String, HTMLInitializable {
         case a, A, i, I, one
 
         @inlinable
@@ -803,22 +695,22 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: popover
-    public enum popover: String, HTMLParsable {
+    public enum popover: String, HTMLInitializable {
         case auto, manual
     }
 
     // MARK: popovertargetaction
-    public enum popovertargetaction: String, HTMLParsable {
+    public enum popovertargetaction: String, HTMLInitializable {
         case hide, show, toggle
     }
 
     // MARK: preload
-    public enum preload: String, HTMLParsable {
+    public enum preload: String, HTMLInitializable {
         case none, metadata, auto
     }
 
     // MARK: referrerpolicy
-    public enum referrerpolicy: String, HTMLParsable {
+    public enum referrerpolicy: String, HTMLInitializable {
         case noReferrer
         case noReferrerWhenDowngrade
         case origin
@@ -843,7 +735,7 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: rel
-    public enum rel: String, HTMLParsable {
+    public enum rel: String, HTMLInitializable {
         case alternate, author
         case bookmark
         case canonical, compressionDictionary
@@ -869,7 +761,7 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: sandbox
-    public enum sandbox: String, HTMLParsable {
+    public enum sandbox: String, HTMLInitializable {
         case allowDownloads
         case allowForms
         case allowModals
@@ -907,57 +799,57 @@ extension HTMLAttribute.Extra {
     }
 
     // MARK: scripttype
-    public enum scripttype: String, HTMLParsable {
+    public enum scripttype: String, HTMLInitializable {
         case importmap, module, speculationrules
     }
 
     // MARK: scope
-    public enum scope: String, HTMLParsable {
+    public enum scope: String, HTMLInitializable {
         case row, col, rowgroup, colgroup
     }
 
     // MARK: shadowrootmode
-    public enum shadowrootmode: String, HTMLParsable {
+    public enum shadowrootmode: String, HTMLInitializable {
         case open, closed
     }
 
     // MARK: shadowrootclonable
-    public enum shadowrootclonable: String, HTMLParsable {
+    public enum shadowrootclonable: String, HTMLInitializable {
         case `true`, `false`
     }
 
     // MARK: shape
-    public enum shape: String, HTMLParsable {
+    public enum shape: String, HTMLInitializable {
         case rect, circle, poly, `default`
     }
 
     // MARK: spellcheck
-    public enum spellcheck: String, HTMLParsable {
+    public enum spellcheck: String, HTMLInitializable {
         case `true`, `false`
     }
 
     // MARK: target
-    public enum target: String, HTMLParsable {
+    public enum target: String, HTMLInitializable {
         case _self, _blank, _parent, _top, _unfencedTop
     }
 
     // MARK: translate
-    public enum translate: String, HTMLParsable {
+    public enum translate: String, HTMLInitializable {
         case yes, no
     }
 
     // MARK: virtualkeyboardpolicy
-    public enum virtualkeyboardpolicy: String, HTMLParsable {
+    public enum virtualkeyboardpolicy: String, HTMLInitializable {
         case auto, manual
     }
 
     // MARK: wrap
-    public enum wrap: String, HTMLParsable {
+    public enum wrap: String, HTMLInitializable {
         case hard, soft
     }
 
     // MARK: writingsuggestions
-    public enum writingsuggestions: String, HTMLParsable {
+    public enum writingsuggestions: String, HTMLInitializable {
         case `true`, `false`
     }
 }

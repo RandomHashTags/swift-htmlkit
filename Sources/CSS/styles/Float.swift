@@ -3,7 +3,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/float
 extension CSSStyle {
-    public enum Float: String, HTMLParsable {
+    public enum Float: String, HTMLInitializable {
         case inherit
         case initial
         case inlineEnd

@@ -3,7 +3,7 @@ import HTMLKitUtilities
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-collapse
 extension CSSStyle {
-    public enum WhiteSpaceCollapse: String, HTMLParsable {
+    public enum WhiteSpaceCollapse: String, HTMLInitializable {
         case breakSpaces
         case collapse
         case inherit

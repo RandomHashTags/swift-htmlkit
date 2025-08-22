@@ -3,7 +3,6 @@
 @_exported import HTMLAttributes
 @_exported import HTMLElements
 @_exported import HTMLKitUtilities
-@_exported import HTMLKitParse
 @_exported import HTMX
 
 // MARK: Escape HTML

@@ -2,7 +2,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum WritingMode: String, HTMLParsable {
+    public enum WritingMode: String, HTMLInitializable {
         case horizontalTB
         case verticalRL
         case verticalLR

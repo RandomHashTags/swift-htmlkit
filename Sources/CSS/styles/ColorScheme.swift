@@ -2,7 +2,7 @@
 import HTMLKitUtilities
 
 extension CSSStyle {
-    public enum ColorScheme: String, HTMLParsable {
+    public enum ColorScheme: String, HTMLInitializable {
         case dark
         case light
         case lightDark

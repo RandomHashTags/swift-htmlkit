@@ -1,5 +1,5 @@
 
-public enum HTMLEvent: String, HTMLParsable {
+public enum HTMLEvent: String, HTMLInitializable {
     case accept, afterprint, animationend, animationiteration, animationstart
     case beforeprint, beforeunload, blur
     case canplay, canplaythrough, change, click, contextmenu, copy, cut
