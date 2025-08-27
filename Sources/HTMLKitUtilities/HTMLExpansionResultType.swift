@@ -1,4 +1,5 @@
 
+/// The expected data type the macro expansion should return the result as.
 public enum HTMLExpansionResultType: Sendable {
 
 
@@ -23,16 +24,6 @@ public enum HTMLExpansionResultType: Sendable {
     ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
     ///   - Returns: An array of encoded literals of length up-to `chunkSize`.
     case chunks(optimized: Bool = true, chunkSize: Int = 1024)
-
-    #if compiler(>=6.2)
-    /// Breaks up the encoded literal into chunks.
-    /// 
-    /// - Parameters:
-    ///   - optimized: Whether or not to use optimized literals. Default is `true`.
-    ///   - chunkSize: The maximum size of an individual literal. Default is `1024`.
-    /// - Returns: An `InlineArray` of encoded literals of length up-to `chunkSize`.
-    case chunksInline(optimized: Bool = true, chunkSize: Int = 1024)
-    #endif
 
 
 
@@ -72,10 +63,6 @@ public enum HTMLExpansionResultTypeAST: Sendable {
     //case literalOptimized
 
     case chunks(optimized: Bool = true, chunkSize: Int = 1024)
-
-    #if compiler(>=6.2)
-    case chunksInline(optimized: Bool = true, chunkSize: Int = 1024)
-    #endif
 
     case stream(optimized: Bool = true, chunkSize: Int = 1024)
     case streamAsync(

@@ -94,12 +94,6 @@ extension HTMLExpansionResultTypeAST {
         case .chunks(let optimized, let chunkSize):
             let slices = chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ",\n")
             return "[" + (slices.isEmpty ? "" : "\n\(slices)\n") + "]"
-        #if compiler(>=6.2)
-        case .chunksInline(let optimized, let chunkSize):
-            let typeAnnotation:String = "String" // TODO: fix
-            let slices = chunks(encoding: encoding, encodedResult: encodedResult, async: false, optimized: optimized, chunkSize: chunkSize).joined(separator: ",\n")
-            return "InlineArray<\(chunks.count), \(typeAnnotation)>([" + (slices.isEmpty ? "" : "\n\(slices)\n") + "])"
-        #endif
         case .stream(let optimized, let chunkSize):
             return streamed(
                 encoding: encoding,

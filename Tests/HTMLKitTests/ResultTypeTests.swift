@@ -80,6 +80,45 @@ extension ResultTypeTests {
     }
 }
 
+#if compiler(>=6.2)
+// MARK: Chunks inline
+extension ResultTypeTests {
+    @Test
+    func resultTypeChunksInline() {
+        let _:InlineArray<1, String> = #html(resultType: .chunks()) {
+            div("oh yeah")
+        }
+
+        let expected = "<div>oh yeah</div>"
+        let chunks1:InlineArray<1, String> = #html(resultType: .chunks()) {
+            div("oh yeah")
+        }
+        #expect(chunks1[0] == expected)
+
+        let chunks6:InlineArray<6, String> = #html(resultType: .chunks(chunkSize: 3)) {
+            div("oh \(yeah)")
+        }
+        #expect(chunks6[0] == "<di")
+        #expect(chunks6[1] == "v>o")
+        #expect(chunks6[2] == "h ")
+        #expect(chunks6[3] == "\(yeah)")
+        #expect(chunks6[4] == "</d")
+        #expect(chunks6[5] == "iv>")
+
+        let chunks7:InlineArray<7, String> = #html(resultType: .chunks(chunkSize: 3)) {
+            div("oh \(yeah)", yeah)
+        }
+        #expect(chunks7[0] == "<di")
+        #expect(chunks7[1] == "v>o")
+        #expect(chunks7[2] == "h ")
+        #expect(chunks7[3] == "\(yeah)")
+        #expect(chunks7[4] == "\(yeah)")
+        #expect(chunks7[5] == "</d")
+        #expect(chunks7[6] == "iv>")
+    }
+}
+#endif
+
 // MARK: Stream
 extension ResultTypeTests {
     @Test

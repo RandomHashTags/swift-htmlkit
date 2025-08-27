@@ -95,12 +95,6 @@ extension HTMLExpansionResultTypeAST {
             case "literal": return .literal
             //case "literalOptimized": return .literalOptimized
             case "chunks": return .chunks()
-            case "chunksInline":
-                #if compiler(>=6.2)
-                return .chunksInline()
-                #else
-                return nil // TODO: show compiler diagnostic
-                #endif
             
             case "stream": return .stream()
             case "streamAsync": return .streamAsync()
@@ -138,12 +132,6 @@ extension HTMLExpansionResultTypeAST {
             switch function.calledExpression.memberAccess?.declName.baseName.text {
             case "chunks":
                 return .chunks(optimized: optimized, chunkSize: chunkSize)
-            case "chunksInline":
-                #if compiler(>=6.2)
-                return .chunksInline(optimized: optimized, chunkSize: chunkSize)
-                #else
-                return nil // TODO: show compiler diagnostic
-                #endif
             case "stream":
                 return .stream(optimized: optimized, chunkSize: chunkSize)
             case "streamAsync":
