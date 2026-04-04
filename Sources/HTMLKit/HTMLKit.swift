@@ -49,6 +49,17 @@ public macro uncheckedHTML<T>(
     _ innerHTML: Sendable...
 ) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
 
+/// Same as `#html` but ignoring compiler warnings.
+/// 
+/// - Returns: The inferred concrete type.
+@freestanding(expression)
+public macro uncheckedHTML<T>(
+    encoding: HTMLEncoding = .string,
+    resultType: HTMLExpansionResultType = .literal,
+    lookupFiles: [StaticString] = [],
+    _ innerHTML: () -> Sendable...
+) -> T = #externalMacro(module: "HTMLKitMacros", type: "HTMLElementMacro")
+
 // MARK: Raw
 /// Does not escape the `innerHTML`.
 /// 

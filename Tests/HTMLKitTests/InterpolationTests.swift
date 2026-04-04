@@ -335,6 +335,9 @@ extension InterpolationTests {
 
     @Test func uncheckedInterpolation() {
         let _:String = #uncheckedHTML(encoding: .string, div(InterpolationTests.patrick))
+        let _:String = #uncheckedHTML(encoding: .string) {
+            div(InterpolationTests.patrick)
+        }
     }
 
     @Test func closureInterpolation() {
